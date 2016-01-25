@@ -1,0 +1,1 @@
+﻿assembly-informational-format: '{NuGetVersionV2}' # So that NuGet doesn't fall back
