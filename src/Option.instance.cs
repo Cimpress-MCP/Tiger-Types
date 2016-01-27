@@ -22,12 +22,19 @@ namespace Tiger.Types
         /// is equal to <see langword="null"/>; otherwise, an <see cref="Option{T}"/>
         /// in the Some state.
         /// </returns>
+        /// <remarks>
+        /// Passing a nullable struct into this method is likely to confuse
+        /// both the type system and the programmer.
+        /// </remarks>
         public static Option<T> From([CanBeNull] T value) => new Option<T>(value);
 
+        /// <summary>Represents the state of an <see cref="Option{T}"/>.</summary>
         enum OptionState
             : byte // todo(cosborn) Does this save anything?
         {
+            /// <summary>The <see cref="Option{T}"/> represents no value.</summary>
             None = 0, // note(cosborn) None must be the 0 value in case of default(Option<T>).
+            /// <summary>The <see cref="Option{T}"/> represents some wrapped value.</summary>
             Some
         }
 
@@ -42,10 +49,12 @@ namespace Tiger.Types
         readonly OptionState _state;
         readonly T _value;
 
+        /// <summary>Initializes a new instance of <see cref="Option{T}"/>.</summary>
+        /// <param name="value">The value to be wrapped.</param>
         Option([CanBeNull] T value)
             : this()
         {
-            if (ReferenceEquals(value, null)) { return; }
+            if (value == null) { return; } // note(cosborn) Defaults all fields.
 
             _value = value;
             _state = OptionState.Some;
@@ -54,6 +63,56 @@ namespace Tiger.Types
         #region Match
 
         #region Value
+
+        /// <summary>Produces a value from this instance by matching on its state.</summary>
+        /// <typeparam name="TOut">The type of the value to be produced.</typeparam>
+        /// <param name="none">
+        /// A value to return if this instance is in the None state.
+        /// </param>
+        /// <param name="some">
+        /// A function to be invoked with the Some value of this instance as
+        /// the argument if this instance is in the Some state.
+        /// </param>
+        /// <returns>A value produced by <paramref name="none"/> or <paramref name="some"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
+        [NotNull]
+        public TOut Match<TOut>(
+            [NotNull, InstantHandle] TOut none,
+            [NotNull, InstantHandle] Func<T, TOut> some)
+        {
+            if (none == null) { throw new ArgumentNullException(nameof(none)); }
+            if (some == null) { throw new ArgumentNullException(nameof(some)); }
+
+            return IsNone
+                ? none
+                : some(_value);
+        }
+
+        /// <summary>Produces a value from this instance by matching on its state, asynchronously.</summary>
+        /// <typeparam name="TOut">The type of the value to be produced.</typeparam>
+        /// <param name="none">
+        /// A value to return if this instance is in the None state.
+        /// </param>
+        /// <param name="some">
+        /// A function to be invoked asynchronously with the Some value of this instance as
+        /// the argument if this instance is in the Some state.
+        /// </param>
+        /// <returns>A value produced by <paramref name="none"/> or <paramref name="some"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
+        [NotNull, ItemNotNull]
+        public async Task<TOut> Match<TOut>(
+            [NotNull, InstantHandle] TOut none,
+            [NotNull, InstantHandle] Func<T, Task<TOut>> some)
+        {
+            if (none == null) { throw new ArgumentNullException(nameof(none)); }
+            if (some == null) { throw new ArgumentNullException(nameof(some)); }
+
+            return IsNone
+                ? none
+                : await some(_value).ConfigureAwait(false);
+        }
 
         /// <summary>Produces a value from this instance by matching on its state.</summary>
         /// <typeparam name="TOut">The type of the value to be produced.</typeparam>
@@ -293,8 +352,8 @@ namespace Tiger.Types
             if (mapper == null) { throw new ArgumentNullException(nameof(mapper)); }
 
             return Match(
-                none: () => Option<TOut>.None,
-                some: v => mapper(v).Pipe(Option.From));
+                none: Option<TOut>.None,
+                some: v => mapper(v));
         }
 
         /// <summary>Maps a function over the Some value of this instance, if present, asynchronously.</summary>
@@ -315,8 +374,150 @@ namespace Tiger.Types
             if (mapper == null) { throw new ArgumentNullException(nameof(mapper)); }
 
             return Match(
-                none: () => Option<TOut>.None,
+                none: Option<TOut>.None,
                 some: v => mapper(v).Map(Option.From));
+        }
+
+        #endregion
+
+        #region Bind
+
+        /// <summary>Binds a function over the Some value of this instance, if present.</summary>
+        /// <typeparam name="TOut">The type to which to bind.</typeparam>
+        /// <param name="binder">
+        /// A function to invoke with the Some value of this instance
+        /// as the argument if this instance is in the Some state.
+        /// </param>
+        /// <returns>
+        /// An <see cref="Option{T}"/> in the None state if this instance is in the None state
+        /// or if the result of applying <paramref name="binder"/> over the Some value of this instance
+        /// is in the None state; otherwise, an <see cref="Option{T}"/> in the Some state with its
+        /// Some value set to the value of applying <paramref name="binder"/> over the Some value
+        /// of this instance.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="binder"/> is <see langword="null"/>.</exception>
+        public Option<TOut> Bind<TOut>([NotNull, InstantHandle] Func<T, Option<TOut>> binder)
+        {
+            if (binder == null) { throw new ArgumentNullException(nameof(binder)); }
+
+            return Match(
+                none: Option<TOut>.None,
+                some: binder);
+        }
+
+        /// <summary>Binds a function over the Some value of this instance, if present, asynchronously.</summary>
+        /// <typeparam name="TOut">The type to which to bind.</typeparam>
+        /// <param name="binder">
+        /// A function to invoke asynchronously with the Some value of this instance
+        /// as the argument if this instance is in the Some state.
+        /// </param>
+        /// <returns>
+        /// An <see cref="Option{T}"/> in the None state if this instance is in the None state
+        /// or if the result of applying <paramref name="binder"/> over the Some value of this instance
+        /// is in the None state; otherwise, an <see cref="Option{T}"/> in the Some state with its
+        /// Some value set to the value of applying <paramref name="binder"/> over the Some value
+        /// of this instance.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="binder"/> is <see langword="null"/>.</exception>
+        public Task<Option<TOut>> Bind<TOut>([NotNull, InstantHandle] Func<T, Task<Option<TOut>>> binder)
+        {
+            if (binder == null) { throw new ArgumentNullException(nameof(binder)); }
+
+            return Match(
+                none: Option<TOut>.None,
+                some: binder);
+        }
+
+        #endregion
+
+        #region Other Useful Methods
+
+        /// <summary>
+        /// Unwraps this instance with an alternative value
+        /// if this instance is in the None state.
+        /// </summary>
+        /// <param name="other">An alternative value.</param>
+        /// <returns>
+        /// The Some value of this instance if this instance is in the Some state;
+        /// otherwise, <paramref name="other"/>.
+        /// </returns>
+        /// <remarks>This is very similar to the null-coalescence operator (??).</remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="other"/> is <see langword="null"/>.</exception>
+        [NotNull]
+        public T IfNone([NotNull] T other)
+        {
+            if (other == null) { throw new ArgumentNullException(nameof(other)); }
+
+            return Match(
+                none: other,
+                some: v => v);
+        }
+
+        /// <summary>
+        /// Unwraps this instance with an alternative value
+        /// if this instance is in the None state.
+        /// </summary>
+        /// <param name="other">A function producing an alternative value.</param>
+        /// <returns>
+        /// The Some value of this instance if this instance is in the Some state;
+        /// otherwise, <paramref name="other"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="other"/> is <see langword="null"/>.</exception>
+        [NotNull]
+        public T IfNone([NotNull, InstantHandle] Func<T> other)
+        {
+            if (other == null) { throw new ArgumentNullException(nameof(other)); }
+
+            return Match(
+                none: other,
+                some: v => v);
+        }
+
+        /// <summary>
+        /// Unwraps this instance asynchronously with an alternative value
+        /// if this instance is in the None state.
+        /// </summary>
+        /// <param name="other">A function producing an alternative value asynchronously.</param>
+        /// <returns>
+        /// The Some value of this instance if this instance is in the Some state;
+        /// otherwise, <paramref name="other"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="other"/> is <see langword="null"/>.</exception>
+        [NotNull, ItemNotNull]
+        public Task<T> IfNone([NotNull, InstantHandle] Func<Task<T>> other)
+        {
+            if (other == null) { throw new ArgumentNullException(nameof(other)); }
+
+            return Match(
+                none: other,
+                some: v => v);
+        }
+
+        /// <summary>Performs an action on the Some value of this instance.</summary>
+        /// <param name="action">An action to perform.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="action"/> is <see langword="null"/>.</exception>
+        public void IfSome([NotNull, InstantHandle] Action<T> action)
+        {
+            if (action == null) { throw new ArgumentNullException(nameof(action)); }
+
+            if (IsSome)
+            {
+                action(_value);
+            }
+        }
+
+        /// <summary>Performs an action on the Some value of this instance, asynchronously.</summary>
+        /// <param name="action">An action to perform asynchronously.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="action"/> is <see langword="null"/>.</exception>
+        [NotNull]
+        public async Task IfSome([NotNull, InstantHandle] Func<T, Task> action)
+        {
+            if (action == null) { throw new ArgumentNullException(nameof(action)); }
+
+            if (IsSome)
+            {
+                await action(_value);
+            }
         }
 
         #endregion
@@ -326,9 +527,8 @@ namespace Tiger.Types
         /// <summary>Converts this instance to a string.</summary>
         /// <returns>A <see cref="string"/> containing the value of this instance.</returns>
         /// <filterpriority>2</filterpriority>
-        public override string ToString() => Match(
-            none: () => "None",
-            some: v => string.Format(CultureInfo.InvariantCulture, "Some({0})", v));
+        public override string ToString() =>
+            Map(v => string.Format(CultureInfo.InvariantCulture, "Some({0})", v)).IfNone("None");
 
         /// <summary>Indicates whether this instance and a specified object are equal.</summary>
         /// <param name="obj">The object to compare with the current instance.</param>
@@ -342,9 +542,7 @@ namespace Tiger.Types
         /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
         /// <filterpriority>2</filterpriority>
-        public override int GetHashCode() => Match(
-            none: () => 0,
-            some: v => v.GetHashCode());
+        public override int GetHashCode() => Map(v => v.GetHashCode()).IfNone(0);
 
         #endregion
 
@@ -356,17 +554,17 @@ namespace Tiger.Types
         /// <see langword="true"/> if the current object is equal to the <paramref name="other"/> parameter;
         /// otherwise, <see langword="false"/>.
         /// </returns>
-        public bool Equals(Option<T> other) => Match(
-            none: () => other.Match(
-                none: () => true,
-                some: _ => false),
-            some: v => other.Match(
-                none: () => false,
-                some: ov => EqualityComparer<T>.Default.Equals(v, ov)));
+        public bool Equals(Option<T> other)
+        { // note(cosborn) Eh, this gets gnarly using Match.
+            if (IsNone && other.IsNone) { return true; }
+            if (IsNone || other.IsNone) { return false; }
+
+            return EqualityComparer<T>.Default.Equals(_value, other._value);
+        }
 
         #endregion
 
-        #region Operators and Named Alternatives
+        #region Operators and Named Alternates
 
         /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
         /// <param name="left">An object to compare with <paramref name="right"/>.</param>
@@ -386,8 +584,81 @@ namespace Tiger.Types
         /// </returns>
         public static bool operator !=(Option<T> left, Option<T> right) => !(left == right);
 
-        /// <summary>Wraps a value in <see cref="Option{T}"/> implicitly.</summary>
+        /// <summary>Performs logical disjunction between two objects of the same type.</summary>
+        /// <param name="left">An object to disjoin with <paramref name="right"/>.</param>
+        /// <param name="right">An object to disjoin with <paramref name="left"/>.</param>
+        /// <returns>
+        /// The first value of <paramref name="left"/> and <paramref name="right"/>
+        /// that is in the Some state; otherwise, <see cref="None"/>.
+        /// </returns>
+        // note(cosborn) Also implements || (LogicalOr) operator, see below.
+        public static Option<T> operator |(Option<T> left, Option<T> right) => left.BitwiseOr(right);
+
+        /// <summary>
+        /// Performs logical disjunction between this instance
+        /// and another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to disjoin with this instance.</param>
+        /// <returns>
+        /// The first value of this instance and <paramref name="other"/>
+        /// that is in the Some state; otherwise, <see cref="None"/>.
+        /// </returns>
+        // note(cosborn) Yes, BitwiseOr is the alternate name for the operator.
+        public Option<T> BitwiseOr(Option<T> other) => Match(
+            none: other,
+            some: v => v);
+
+        /// <summary>Performs logical conjunction between two objects of the same type.</summary>
+        /// <param name="left">An object to conjoin with <paramref name="right"/>.</param>
+        /// <param name="right">An object to conjoin with <paramref name="left"/>.</param>
+        /// <returns>
+        /// The last value of <paramref name="left"/> and <paramref name="right"/>
+        /// if they are both in the Some state; otherwise, <see cref="None"/>.
+        /// </returns>
+        // note(cosborn) Also implements && (LogicalAnd) operator, see below.
+        public static Option<T> operator &(Option<T> left, Option<T> right) => left.BitwiseAnd(right);
+
+        /// <summary>
+        /// Performs logical conjunction between this instance
+        /// and another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to conjoin with this instance.</param>
+        /// <returns>
+        /// The last value of this instance and <paramref name="other"/>
+        /// if they are both in the Some state; otherwise, <see cref="None"/>.
+        /// </returns>
+        // note(cosborn) Yes, BitwiseAnd is the alternate name for the operator.
+        public Option<T> BitwiseAnd(Option<T> other) => Match(
+            none: None,
+            some: _ => other);
+
+        // note(cosborn) Implementing true and false operators allows || and && operators to short-circuit.
+
+        /// <summary>Tests whether <paramref name="value"/> is in the Some state.</summary>
+        /// <param name="value">The value to be tested.</param>
+        /// <returns>
+        /// <see langword="true"/> if <paramref name="value"/> is in the Some state;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        public static bool operator true(Option<T> value) => value.IsTrue;
+
+        /// <summary>Gets a value indicating whether this instance is in the Some state.</summary>
+        public bool IsTrue => IsSome;
+
+        /// <summary>Tests whether <paramref name="value"/> is in the None state.</summary>
+        /// <param name="value">The value to be tested.</param>
+        /// <returns>
+        /// <see langword="true"/> if <paramref name="value"/> is in the None state;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        public static bool operator false(Option<T> value) => value.IsFalse;
+
+        /// <summary>Gets a value indicating whether the current object is in the None state.</summary>
+        public bool IsFalse => IsNone;
+
+        /// <summary>Wraps a value in <see cref="Option{T}"/>.</summary>
         /// <param name="value">The value to be wrapped.</param>
+        // note(cosborn) Can be [NotNull] because C# checks for value/reference before implicit conversions.
         public static implicit operator Option<T>([NotNull] T value) => Option.From(value);
 
         #endregion

@@ -17,11 +17,13 @@ namespace Tiger.Types
         /// <returns>The value of applying <paramref name="value"/> to <paramref name="piper"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="piper"/> is <see langword="null"/>.</exception>
-        public static TOut Pipe<TIn, TOut>([NotNull] this TIn value,
-            [InstantHandle] [NotNull] Func<TIn, TOut> piper)
+        public static TOut Pipe<TIn, TOut>(
+            [NotNull] this TIn value,
+            [NotNull, InstantHandle] Func<TIn, TOut> piper)
         {
             if (value == null) { throw new ArgumentNullException(nameof(value)); }
             if (piper == null) { throw new ArgumentNullException(nameof(piper)); }
+
             return piper(value);
         }
     }
