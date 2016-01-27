@@ -60,7 +60,8 @@ Teardown(() =>
 
 // Task Definitions
 
-Task("Clean") // Clean all build directories.
+Task("Clean")
+  .Description("Clean all build directories.")
   .Does(() =>
   {
     foreach (var solutionPath in solutions.Select(s => s.GetDirectory()))
@@ -72,7 +73,8 @@ Task("Clean") // Clean all build directories.
     }
   });
 
-Task("Restore") // Restore all NuGet packages.
+Task("Restore")
+  .Description("Restore all NuGet packages.")
   .Does(() =>
   {
     foreach (var solution in solutions)
@@ -85,7 +87,8 @@ Task("Restore") // Restore all NuGet packages.
     }
   });
 
-Task("Build") // Build all solutions.
+Task("Build")
+  .Description("Build all solutions.")
   .IsDependentOn("Clean")
   .IsDependentOn("Restore")
   .Does(() =>
@@ -101,7 +104,8 @@ Task("Build") // Build all solutions.
     }
   });
 
-Task("Test") // Run all NUnit unit tests.
+Task("Test")
+  .Description("Run all NUnit unit tests.")
   .IsDependentOn("Build")
   .Does(() =>
   {
@@ -114,7 +118,8 @@ Task("Test") // Run all NUnit unit tests.
     });
   });
 
-Task("Package") // Pack the produced assemblies into a NuGet package.
+Task("Package")
+  .Description("Pack the produced assemblies into a NuGet package.")
   .IsDependentOn("Test") // note(cosborn) This creates the artifacts directory.
   .Does(() =>
   { // todo(cosborn) The built-in NuGet packer doesn't respect project files.  Make this a Cake extension.
@@ -126,7 +131,8 @@ Task("Package") // Pack the produced assemblies into a NuGet package.
     }
   });
 
-Task("Push-Stable") // Push the packed NuGet package to the stable repo.
+Task("Push-Stable")
+  .Description("Push NuGet packages to the stable repo.")
   .IsDependentOn("Package")
   .Does(() =>
   {
@@ -143,6 +149,7 @@ Task("Push-Stable") // Push the packed NuGet package to the stable repo.
 // Targets
 
 Task("Default")
+  .Description("=> Test")
   .IsDependentOn("Test");
 
 // Execution
