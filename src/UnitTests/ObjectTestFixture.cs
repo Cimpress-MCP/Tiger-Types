@@ -10,6 +10,8 @@ namespace Tiger.Types.UnitTests
     {
         const string Sentinel = "sentinel";
 
+        #region Pipe
+
         #region Null Throws
 
         [Test, Precondition]
@@ -56,5 +58,8 @@ namespace Tiger.Types.UnitTests
             // assert
             Assert.That(actual, Is.EqualTo(expected));
         }
+
+        #endregion
+
     }
 }

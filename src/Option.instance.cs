@@ -430,6 +430,40 @@ namespace Tiger.Types
 
         #endregion
 
+        #region Tap
+
+        /// <summary>
+        /// Performs an action on the Some value of this instance,
+        /// if present, and returns this instance.
+        /// </summary>
+        /// <param name="tapper">An action to perform.</param>
+        /// <returns>This instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="tapper"/> is <see langword="null"/>.</exception>
+        public Option<T> Tap([NotNull] Action<T> tapper)
+        {
+            if (tapper == null) { throw new ArgumentNullException(nameof(tapper)); }
+
+            IfSome(tapper);
+            return this;
+        }
+
+        /// <summary>
+        /// Performs an action on the Some value of this instance asynchronously,
+        /// if present, and returns this instance.
+        /// </summary>
+        /// <param name="tapper">An action to perform asynchronously.</param>
+        /// <returns>This instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="tapper"/> is <see langword="null"/>.</exception>
+        public async Task<Option<T>> Tap([NotNull] Func<T, Task> tapper)
+        {
+            if (tapper == null) { throw new ArgumentNullException(nameof(tapper)); }
+
+            await IfSome(tapper);
+            return this;
+        }
+
+        #endregion
+
         #region Other Useful Methods
 
         /// <summary>
@@ -441,7 +475,10 @@ namespace Tiger.Types
         /// The Some value of this instance if this instance is in the Some state;
         /// otherwise, <paramref name="other"/>.
         /// </returns>
-        /// <remarks>This is very similar to the null-coalescence operator (??).</remarks>
+        /// <remarks>
+        /// This is very similar to the null-coalescence operator (??)
+        /// or <see cref="Nullable{T}.GetValueOrDefault()"/>.
+        /// </remarks>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <see langword="null"/>.</exception>
         [NotNull]
         public T IfNone([NotNull] T other)
@@ -462,6 +499,10 @@ namespace Tiger.Types
         /// The Some value of this instance if this instance is in the Some state;
         /// otherwise, <paramref name="other"/>.
         /// </returns>
+        /// <remarks>
+        /// This is very similar to the null-coalescence operator (??)
+        /// or <see cref="Nullable{T}.GetValueOrDefault()"/>.
+        /// </remarks>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <see langword="null"/>.</exception>
         [NotNull]
         public T IfNone([NotNull, InstantHandle] Func<T> other)
@@ -482,6 +523,10 @@ namespace Tiger.Types
         /// The Some value of this instance if this instance is in the Some state;
         /// otherwise, <paramref name="other"/>.
         /// </returns>
+        /// <remarks>
+        /// This is very similar to the null-coalescence operator (??)
+        /// or <see cref="Nullable{T}.GetValueOrDefault()"/>.
+        /// </remarks>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <see langword="null"/>.</exception>
         [NotNull, ItemNotNull]
         public Task<T> IfNone([NotNull, InstantHandle] Func<Task<T>> other)

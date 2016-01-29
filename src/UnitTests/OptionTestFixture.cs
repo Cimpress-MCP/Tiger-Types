@@ -811,6 +811,104 @@ namespace Tiger.Types.UnitTests
 
         #endregion
 
+        #region Tap
+
+        #region Null Throws
+
+        [Test, Precondition]
+        public void FuncTap_Null_Throws()
+        {
+            // arrange
+            var value = Option<string>.None;
+            Action<string> tapper = null;
+
+            // act
+            var ex = Assert.Throws<ArgumentNullException>(() => value.Tap(tapper));
+
+            // assert
+            Assert.That(ex, Is.Not.Null.With.Message.Contains("tapper"));
+        }
+
+        [Test, Precondition]
+        public void TaskTap_Null_Throws()
+        {
+            // arrange
+            var value = Option<string>.None;
+            Func<string, Task> tapper = null;
+
+            // act, assert
+            Assert.That(() => value.Tap(tapper),
+                Throws.ArgumentNullException.With.Message.Contains("tapper"));
+        }
+
+        #endregion
+
+        [Test(Description = "Tapping a None Option over a func should return a None Option " +
+                            "and perform no action.")]
+        public void FuncTap_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var output = Sentinel;
+            var actual = value.Tap(v => output = string.Empty);
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Option<string>.None));
+            Assert.That(output, Is.EqualTo(Sentinel));
+        }
+
+        [Test(Description = "Tapping a Some Option over a func should return a Some Option " +
+                            "and perform an action.")]
+        public void FuncTap_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var output = string.Empty;
+            var actual = value.Tap(v => output = Sentinel);
+
+            // assert
+            Assert.That(actual, Is.EqualTo(value));
+            Assert.That(output, Is.EqualTo(Sentinel));
+        }
+
+        [Test(Description = "Tapping a None Option over a task should return a None Option " +
+                            "and perform no action.")]
+        public async Task TaskTap_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var output = Sentinel;
+            var actual = await value.Tap(v => Task.Run(() => output = string.Empty));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Option<string>.None));
+            Assert.That(output, Is.EqualTo(Sentinel));
+        }
+
+        [Test(Description = "Tapping a Some Option over a task should return a Some Option " +
+                            "and perform an action.")]
+        public async Task TaskTap_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var output = string.Empty;
+            var actual = await value.Tap(v => Task.Run(() => output = Sentinel));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(value));
+            Assert.That(output, Is.EqualTo(Sentinel));
+        }
+
+        #endregion
+
         #region Bind
 
         #region Null Throws
