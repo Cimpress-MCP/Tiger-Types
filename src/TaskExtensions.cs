@@ -53,22 +53,22 @@ namespace Tiger.Types
         /// <summary>
         /// Performs actions in a sequence.
         /// </summary>
-        /// <typeparam name="TOut">The return type of <paramref name="binder"/>.</typeparam>
+        /// <typeparam name="TOut">The return type of <paramref name="thenner"/>.</typeparam>
         /// <param name="task">The <see cref="Task"/> to perform first.</param>
-        /// <param name="binder">A function producing a <typeparamref name="TOut"/>, asynchronously.</param>
-        /// <returns>The return value of <paramref name="binder"/>.</returns>
+        /// <param name="thenner">A function producing a <typeparamref name="TOut"/>, asynchronously.</param>
+        /// <returns>The return value of <paramref name="thenner"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="task"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="binder"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="thenner"/> is <see langword="null"/>.</exception>
         [NotNull, ItemNotNull]
         public static async Task<TOut> Then<TOut>(
             [NotNull] this Task task,
-            [NotNull, InstantHandle] Func<Task<TOut>> binder)
+            [NotNull, InstantHandle] Func<Task<TOut>> thenner)
         {
             if (task == null) { throw new ArgumentNullException(nameof(task)); }
-            if (binder == null) { throw new ArgumentNullException(nameof(binder)); }
+            if (thenner == null) { throw new ArgumentNullException(nameof(thenner)); }
 
             await task.ConfigureAwait(false);
-            return await binder().ConfigureAwait(false);
+            return await thenner().ConfigureAwait(false);
         }
 
         /// <summary>
