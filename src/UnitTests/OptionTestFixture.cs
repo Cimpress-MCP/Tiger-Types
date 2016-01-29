@@ -31,11 +31,10 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "Null values should create None Options using the typed static From method.")]
-        [TestCase(null)]
-        public void TypedFrom_Null_IsNone(string innerValue)
+        public void TypedFrom_Null_IsNone()
         {
             // arrange
-            var value = Option<string>.From(innerValue);
+            var value = Option<string>.From(null);
 
             // assert
             Assert.That(value.IsNone, Is.True);
@@ -56,11 +55,10 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "Null values should create None Options using the untyped static From method.")]
-        [TestCase(null)]
-        public void UntypedFrom_Null_IsNone(string innerValue)
+        public void UntypedFrom_Null_IsNone()
         {
             // arrange
-            var value = Option.From(innerValue);
+            var value = Option.From((string)null);
 
             // assert
             Assert.That(value.IsNone, Is.True);
@@ -82,11 +80,10 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "Null nullable values should create None Options.")]
-        [TestCase(null)]
-        public void UntypedFrom_NullableNull_IsNull(int? innerValue)
+        public void UntypedFrom_NullableNull_IsNone()
         {
             // arrange
-            var value = Option.From(innerValue);
+            var value = Option.From((int?)null);
 
             // assert
             Assert.That(value.IsNone, Is.True);
@@ -1174,7 +1171,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.IfNone(other);
-            
+
             // assert
             Assert.That(actual, Is.EqualTo(Sentinel));
         }
@@ -1803,6 +1800,62 @@ namespace Tiger.Types.UnitTests
             // assert
             Assert.That(actualLeftFirst, Is.EqualTo(left));
             Assert.That(actualRightFirst, Is.EqualTo(right));
+        }
+
+        [Test(Description = "A None Option should not evaluate as true.")]
+        [Category("Operator")]
+        public void NamedIsTrue_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = value.IsTrue;
+
+            // assert
+            Assert.That(actual, Is.False);
+        }
+
+        [Test(Description = "A Some Option should evaluate as true.")]
+        [Category("Operator")]
+        public void NamedIsTrue_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = value.IsTrue;
+
+            // assert
+            Assert.That(actual, Is.True);
+        }
+
+        [Test(Description = "A None Option should evaluate as false.")]
+        [Category("Operator")]
+        public void NamedIsFalse_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = value.IsFalse;
+
+            // assert
+            Assert.That(actual, Is.True);
+        }
+
+        [Test(Description = "A Some Option should not evaluate as true.")]
+        [Category("Operator")]
+        public void NamedIsFalse_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = value.IsFalse;
+
+            // assert
+            Assert.That(actual, Is.False);
         }
 
         [Test(Description = "The disjunction of a Some Option and a None Option should short-circuit.")]
