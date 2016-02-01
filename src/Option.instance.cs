@@ -202,7 +202,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
         [NotNull, ItemNotNull]
-        public async Task<TOut> Match<TOut>(
+        public Task<TOut> Match<TOut>(
             [NotNull, InstantHandle] Func<Task<TOut>> none,
             [NotNull, InstantHandle] Func<T, Task<TOut>> some)
         {
@@ -210,8 +210,8 @@ namespace Tiger.Types
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
             return IsNone
-                ? await none().ConfigureAwait(false)
-                : await some(_value).ConfigureAwait(false);
+                ? none()
+                : some(_value);
         }
 
         #endregion
@@ -312,21 +312,16 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
         [NotNull]
-        public async Task Match(
+        public Task Match(
             [NotNull, InstantHandle] Func<Task> none,
             [NotNull, InstantHandle] Func<T, Task> some)
         {
             if (none == null) { throw new ArgumentNullException(nameof(none)); }
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            if (IsNone)
-            {
-                await none().ConfigureAwait(false);
-            }
-            else
-            {
-                await some(_value).ConfigureAwait(false);
-            }
+            return IsNone
+                ? none()
+                : some(_value);
         }
 
         #endregion
@@ -458,7 +453,7 @@ namespace Tiger.Types
         {
             if (tapper == null) { throw new ArgumentNullException(nameof(tapper)); }
 
-            await IfSome(tapper);
+            await IfSome(tapper).ConfigureAwait(false);
             return this;
         }
 
@@ -561,7 +556,7 @@ namespace Tiger.Types
 
             if (IsSome)
             {
-                await action(_value);
+                await action(_value).ConfigureAwait(false);
             }
         }
 

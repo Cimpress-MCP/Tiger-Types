@@ -251,11 +251,13 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
             Func<Task<string>> none = null;
 
-            // act, assert
-            Assert.That(() => value.Match(
+            // act
+            var ex = Assert.Throws<ArgumentNullException>(() => value.Match(
                 none: none,
-                some: v => Task.FromResult(Sentinel)),
-                Throws.ArgumentNullException.With.Message.Contains("none"));
+                some: v => Task.FromResult(Sentinel)));
+
+            // assert
+            Assert.That(ex, Is.Not.Null.With.Message.Contains("none"));
         }
 
         [Test, Precondition]
@@ -265,11 +267,13 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
             Func<string, Task<string>> some = null;
 
-            // act, assert
-            Assert.That(() => value.Match(
+            // act
+            var ex = Assert.Throws<ArgumentNullException>(() => value.Match(
                 none: () => Task.FromResult(Sentinel),
-                some: some),
-                Throws.ArgumentNullException.With.Message.Contains("some"));
+                some: some));
+
+            // assert
+            Assert.That(ex, Is.Not.Null.With.Message.Contains("some"));
         }
 
         [Test, Precondition]
@@ -367,11 +371,13 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
             Func<Task> none = null;
 
-            // act, assert
-            Assert.That(() => value.Match(
+            // act
+            var ex = Assert.Throws<ArgumentNullException>(() => value.Match(
                 none: none,
-                some: v => Task.Run(() => Console.WriteLine(Sentinel))),
-                Throws.ArgumentNullException.With.Message.Contains("none"));
+                some: v => Task.Run(() => Console.WriteLine(Sentinel))));
+
+            // assert
+            Assert.That(ex, Is.Not.Null.With.Message.Contains("none"));
         }
 
         [Test, Precondition]
@@ -381,11 +387,13 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
             Func<string, Task> some = null;
 
-            // act, assert
-            Assert.That(() => value.Match(
+            // act
+            var ex = Assert.Throws<ArgumentNullException>(() => value.Match(
                 none: () => Task.Run(() => Console.WriteLine(Sentinel)),
-                some: some),
-                Throws.ArgumentNullException.With.Message.Contains("some"));
+                some: some));
+
+            // assert
+            Assert.That(ex, Is.Not.Null.With.Message.Contains("some"));
         }
 
         #endregion
@@ -1813,7 +1821,7 @@ namespace Tiger.Types.UnitTests
             var actual = value.IsTrue;
 
             // assert
-            Assert.That(actual, Is.False);
+            Assert.That(actual, Is.Not.True);
         }
 
         [Test(Description = "A Some Option should evaluate as true.")]
@@ -1855,7 +1863,7 @@ namespace Tiger.Types.UnitTests
             var actual = value.IsFalse;
 
             // assert
-            Assert.That(actual, Is.False);
+            Assert.That(actual, Is.Not.True);
         }
 
         [Test(Description = "The disjunction of a Some Option and a None Option should short-circuit.")]
@@ -1875,8 +1883,8 @@ namespace Tiger.Types.UnitTests
             var dummy = left || right();
 
             // assert
-            Assert.That(actual, Is.EqualTo(string.Empty));
             Assert.That(actual, Is.Not.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(string.Empty));
         }
 
         [Test(Description = "The disjunction of two Some Options should short-circuit.")]
@@ -1896,8 +1904,8 @@ namespace Tiger.Types.UnitTests
             var dummy = left || right();
 
             // assert
-            Assert.That(actual, Is.EqualTo(string.Empty));
             Assert.That(actual, Is.Not.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(string.Empty));
         }
 
         [Test(Description = "The conjunction of two None Options should be a None Option.")]
