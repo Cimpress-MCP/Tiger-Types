@@ -27,6 +27,11 @@ namespace Tiger.Types
         /// in the Some state with its Some value set to <paramref name="value"/>.
         /// </returns>
         public static Option<T> From<T>([CanBeNull] T? value)
-            where T : struct => value == null ? Option<T>.None : Option<T>.From((T)value);
+            where T : struct => value == null ? None : Option<T>.From((T)value);
+
+        /// <summary>
+        /// Gets a value that can be converted to an <see cref="Option{T}"/> of any Some type.
+        /// </summary>
+        public static OptionNone None => default(OptionNone);
     }
 }

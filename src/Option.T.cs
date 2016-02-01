@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -7,7 +8,7 @@ using JetBrains.Annotations;
 namespace Tiger.Types
 {
     /// <summary>Represents the presence or absence of a value.</summary>
-    /// <typeparam name="T">The type of the value that may be represented.</typeparam>
+    /// <typeparam name="T">The Some type of the value that may be represented.</typeparam>
     [PublicAPI]
     public struct Option<T>
         : IEquatable<Option<T>>
@@ -28,13 +29,10 @@ namespace Tiger.Types
         /// </remarks>
         public static Option<T> From([CanBeNull] T value) => new Option<T>(value);
 
-        /// <summary>Represents the state of an <see cref="Option{T}"/>.</summary>
         enum OptionState
             : byte // todo(cosborn) Does this save anything?
         {
-            /// <summary>The <see cref="Option{T}"/> represents no value.</summary>
-            None = 0, // note(cosborn) None must be the 0 value in case of default(Option<T>).
-            /// <summary>The <see cref="Option{T}"/> represents some wrapped value.</summary>
+            None, // note(cosborn) None must be the 0 value in case of default(Option<T>).
             Some
         }
 
@@ -49,8 +47,6 @@ namespace Tiger.Types
         readonly OptionState _state;
         readonly T _value;
 
-        /// <summary>Initializes a new instance of <see cref="Option{T}"/>.</summary>
-        /// <param name="value">The value to be wrapped.</param>
         Option([CanBeNull] T value)
             : this()
         {
@@ -644,6 +640,7 @@ namespace Tiger.Types
         /// that is in the Some state; otherwise, <see cref="None"/>.
         /// </returns>
         // note(cosborn) Yes, BitwiseOr is the alternate name for the operator.
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public Option<T> BitwiseOr(Option<T> other) => Match(
             none: other,
             some: v => v);
@@ -668,6 +665,7 @@ namespace Tiger.Types
         /// if they are both in the Some state; otherwise, <see cref="None"/>.
         /// </returns>
         // note(cosborn) Yes, BitwiseAnd is the alternate name for the operator.
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public Option<T> BitwiseAnd(Option<T> other) => Match(
             none: None,
             some: _ => other);
@@ -683,6 +681,7 @@ namespace Tiger.Types
         public static bool operator true(Option<T> value) => value.IsTrue;
 
         /// <summary>Gets a value indicating whether this instance is in the Some state.</summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public bool IsTrue => IsSome;
 
         /// <summary>Tests whether <paramref name="value"/> is in the None state.</summary>
@@ -694,12 +693,20 @@ namespace Tiger.Types
         public static bool operator false(Option<T> value) => value.IsFalse;
 
         /// <summary>Gets a value indicating whether the current object is in the None state.</summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public bool IsFalse => IsNone;
 
         /// <summary>Wraps a value in <see cref="Option{T}"/>.</summary>
         /// <param name="value">The value to be wrapped.</param>
         // note(cosborn) Can be [NotNull] because C# checks for value/reference before implicit conversions.
         public static implicit operator Option<T>([NotNull] T value) => Option.From(value);
+
+        /// <summary>
+        /// Implicitly converts a <see cref="OptionNone"/> to an
+        /// <see cref="Option{T}"/> in the None state.
+        /// </summary>
+        /// <param name="none">The default value of <see cref="OptionNone"/>.</param>
+        public static implicit operator Option<T>(OptionNone none) => None;
 
         #endregion
     }

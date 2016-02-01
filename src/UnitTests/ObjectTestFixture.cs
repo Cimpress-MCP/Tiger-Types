@@ -24,7 +24,7 @@ namespace Tiger.Types.UnitTests
             var ex = Assert.Throws<ArgumentNullException>(() => value.Pipe(v => v.Length));
 
             // assert
-            Assert.That(ex, Is.Not.Null.With.Message.Contains("value"));
+            Assert.That(ex, Has.Message.Contains("value"));
         }
 
         [Test, Precondition]
@@ -38,7 +38,7 @@ namespace Tiger.Types.UnitTests
             var ex = Assert.Throws<ArgumentNullException>(() => value.Pipe(piper));
 
             // assert
-            Assert.That(ex, Is.Not.Null.With.Message.Contains("piper"));
+            Assert.That(ex, Has.Message.Contains("piper"));
         }
 
         #endregion
