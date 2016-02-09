@@ -5,7 +5,6 @@ using static System.Diagnostics.Contracts.Contract;
 namespace Tiger.Types
 {
     /// <summary>Extensions to the functionality of <see cref="object"/>.</summary>
-    [PublicAPI]
     public static class ObjectExtensions
     {
         /// <summary>Invokes <paramref name="piper"/> with <paramref name="value"/> as its argument.</summary>

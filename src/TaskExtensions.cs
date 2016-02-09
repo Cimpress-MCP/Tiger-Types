@@ -6,7 +6,6 @@ using static System.Diagnostics.Contracts.Contract;
 namespace Tiger.Types
 {
     /// <summary>Extensions to the functionality of <see cref="Task{TResult}"/>.</summary>
-    [PublicAPI]
     public static class TaskExtensions
     {
         /// <summary>Applies a <see cref="Task"/> over a function.</summary>

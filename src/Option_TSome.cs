@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -12,7 +13,6 @@ namespace Tiger.Types
 {
     /// <summary>Represents the presence or absence of a value.</summary>
     /// <typeparam name="TSome">The Some type of the value that may be represented.</typeparam>
-    [PublicAPI]
     public struct Option<TSome>
         : IEquatable<Option<TSome>>
     {
@@ -441,6 +441,7 @@ namespace Tiger.Types
         /// and the result of invoking <paramref name="predicate"/> over the Some value of this instance
         /// is <see langword="true"/>; otherwise, an <see cref="Option{TSome}"/> in the None state.
         /// </returns>
+        [Pure]
         public Option<TSome> Filter([NotNull, InstantHandle] Func<TSome, bool> predicate)
         {
             Requires(predicate != null);
@@ -450,10 +451,89 @@ namespace Tiger.Types
                 : predicate(_someValue) ? this : None;
         }
 
+        /// <summary>
+        /// Filters the Some value of this instance based on a provided condition, asynchronously.
+        /// </summary>
+        /// <param name="predicate">
+        /// A function to invoke asynchronously with the Some value of this instance
+        /// as the argument if this instance is in the Some state.
+        /// </param>
+        /// <returns>
+        /// An <see cref="Option{TSome}"/> in the Some state if this instance is in the Some state
+        /// and the result of invoking <paramref name="predicate"/> over the Some value of this instance
+        /// is <see langword="true"/>; otherwise, an <see cref="Option{TSome}"/> in the None state.
+        /// </returns>
+        [NotNull, Pure]
+        public async Task<Option<TSome>> Filter([NotNull, InstantHandle] Func<TSome, Task<bool>> predicate)
+        {
+            Requires(predicate != null);
+            Ensures(Result<Task<Option<TSome>>>() != null);
+
+            return IsNone
+                ? None
+                : await predicate(_someValue).ConfigureAwait(false) ? this : None;
+        }
+
         #endregion
 
         #region Fold
-        // todo(cosborn) Write this.
+
+        /// <summary>Combines the provided seed state with the Some value of this instance.</summary>
+        /// <typeparam name="TState">The type of the seed value.</typeparam>
+        /// <param name="state">The seed value to be combined with the some value of this instance.</param>
+        /// <param name="folder">
+        /// A function to invoke with the seed value and the Some value of this instance as the arguments
+        /// if this instance is in the Some state.
+        /// </param>
+        /// <returns>
+        /// The result of combining the provided seed value with the Some value of this instance
+        /// if this instance is in the Some state; otherwise, the seed value.
+        /// </returns>
+        [NotNull, Pure]
+        public TState Fold<TState>(
+            [NotNull] TState state,
+            [NotNull, InstantHandle] Func<TState, TSome, TState> folder)
+        {
+            Requires(state != null);
+            Requires(folder != null);
+            Ensures(Result<TState>() != null);
+
+            var result = IsNone
+                ? state
+                : folder(state, _someValue);
+            Assume(result != null, Resources.ResultIsNull);
+            return result;
+        }
+
+        /// <summary>
+        /// Combines the provided seed state with the Some value of this instance, asynchronously.
+        /// </summary>
+        /// <typeparam name="TState">The type of the seed value.</typeparam>
+        /// <param name="state">The seed value to be combined with the some value of this instance.</param>
+        /// <param name="folder">
+        /// A function to invoke with the seed value and the Some value of this instance as the arguments
+        /// if this instance is in the Some state.
+        /// </param>
+        /// <returns>
+        /// The result of combining the provided seed value with the Some value of this instance
+        /// if this instance is in the Some state; otherwise, the seed value.
+        /// </returns>
+        [NotNull, ItemNotNull, Pure]
+        public async Task<TState> Fold<TState>(
+            [NotNull] TState state,
+            [NotNull, InstantHandle] Func<TState, TSome, Task<TState>> folder)
+        {
+            Requires(state != null);
+            Requires(folder != null);
+            Ensures(Result<TState>() != null);
+            Ensures(Result<Task<TState>>() != null);
+
+            var result = IsNone
+                ? state
+                : await folder(state, _someValue).ConfigureAwait(false);
+            Assume(result != null, Resources.ResultIsNull);
+            return result;
+        }
 
         #endregion
         
@@ -503,11 +583,13 @@ namespace Tiger.Types
         /// <exception cref="InvalidOperationException" accessor="get">
         /// This instance is in an invalid state.
         /// </exception>
+        [SuppressMessage("ReSharper", "ExceptionNotThrown",
+            Justification = "R# doesn't understand Code Contracts.")]
         public TSome Value
         {
             get
             {
-                if (IsNone) { throw new InvalidOperationException(Resources.OptionIsNone); }
+                Requires<InvalidOperationException>(IsSome, Resources.OptionIsNone);
 
                 return _someValue;
             }
@@ -540,14 +622,9 @@ namespace Tiger.Types
         /// <remarks>This method is unsafe, as it can return <see langword="null"/>
         /// if <typeparamref name="TSome"/> satisfies <see langword="class"/>.</remarks>
         [CanBeNull, Pure]
-        public TSome GetValueOrDefault([CanBeNull] TSome other)
-        {
-            Requires(other != null);
-
-            return IsNone
-                ? other
-                : _someValue;
-        }
+        public TSome GetValueOrDefault([CanBeNull] TSome other) => IsNone
+            ? other
+            : _someValue;
 
         /// <summary>
         /// Unwraps this instance with an alternative value
@@ -808,9 +885,11 @@ namespace Tiger.Types
         /// <summary>Unwraps the Some value of this instance.</summary>
         /// <param name="value">The value to be unwrapped.</param>
         /// <exception cref="InvalidOperationException">This instance is in an invalid state.</exception>
+        [SuppressMessage("ReSharper", "ExceptionNotThrown",
+            Justification = "R# doesn't understand Code Contracts.")]
         public static explicit operator TSome(Option<TSome> value)
         {
-            if (value.IsNone) { throw new InvalidOperationException(Resources.OptionIsNone); }
+            Requires<InvalidOperationException>(value.IsSome, Resources.OptionIsNone);
 
             return value._someValue;
         }

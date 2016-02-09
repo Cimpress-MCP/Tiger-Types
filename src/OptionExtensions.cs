@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using static System.Diagnostics.Contracts.Contract;
 using PureAttribute = System.Diagnostics.Contracts.PureAttribute;
@@ -8,6 +9,7 @@ using PureAttribute = System.Diagnostics.Contracts.PureAttribute;
 namespace Tiger.Types
 {
     /// <summary>Extensions to the functionality of <see cref="Option{TSome}"/>.</summary>
+    [SuppressMessage("ReSharper", "ExceptionNotThrown", Justification = "R# doesn't understand Code Contracts.")]
     public static class OptionExtensions
     {
         /// <summary>Converts an <see cref="Option{TSome}"/> into a <see cref="Nullable{T}"/>.</summary>
@@ -47,12 +49,13 @@ namespace Tiger.Types
         /// <see langword="true"/> if the Some value of the source optional value passes the test
         /// in the specified predicate; otherwise, <see langword="false"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is <see langword="null"/>.</exception>
         [Pure]
         public static bool Any<TSource>(
             this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, bool> predicate)
         {
-            Requires(predicate != null);
+            Requires<ArgumentNullException>(predicate != null);
 
             return source.Filter(predicate).IsSome;
         }
@@ -70,13 +73,14 @@ namespace Tiger.Types
         /// in the specified predicate, or if the source optional value is in the None state;
         /// otherwise, <see langword="false"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is <see langword="null" />.</exception>
         [Pure]
         public static bool All<TSource>(
             this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, bool> predicate)
         {
-            Requires(predicate != null);
-            
+            Requires<ArgumentNullException>(predicate != null);
+
             return source.IsNone || source.Filter(predicate).IsSome;
         }
 
@@ -92,12 +96,8 @@ namespace Tiger.Types
         /// otherwise <see langword="false"/>.
         /// </returns>
         [Pure]
-        public static bool Contains<TSource>(this Option<TSource> source, [NotNull] TSource value)
-        {
-            Requires(value != null);
-
-            return source.Any(v => EqualityComparer<TSource>.Default.Equals(v, value));
-        }
+        public static bool Contains<TSource>(this Option<TSource> source, [CanBeNull] TSource value) =>
+            source.Any(v => EqualityComparer<TSource>.Default.Equals(v, value));
 
         /// <summary>
         /// Determines whether an optional value contains a specified value
@@ -114,15 +114,11 @@ namespace Tiger.Types
         [Pure]
         public static bool Contains<TSource>(
             this Option<TSource> source,
-            [NotNull] TSource value,
-            [NotNull] IEqualityComparer<TSource> comparer)
-        {
-            Requires(value != null);
-            Requires(comparer != null);
+            [CanBeNull] TSource value,
+            [CanBeNull] IEqualityComparer<TSource> comparer) =>
+                source.Any(v => (comparer ?? EqualityComparer<TSource>.Default).Equals(v, value));
 
-            return source.Any(v => comparer.Equals(v, value));
-        }
-
+        // ReSharper disable once ExceptionNotThrown
         /// <summary>Filters the Some value of an optional value based on a predicate.</summary>
         /// <typeparam name="TSource">The Some type of <paramref name="source"/>.</typeparam>
         /// <param name="source">An <see cref="Option{TSome}"/> to filter.</param>
@@ -131,12 +127,13 @@ namespace Tiger.Types
         /// An <see cref="Option{TSome}"/> that contains the value from the input
         /// option value that satifies the condition.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is <see langword="null"/>.</exception>
         [Pure, EditorBrowsable(EditorBrowsableState.Never)]
         public static Option<TSource> Where<TSource>(
             this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, bool> predicate)
         {
-            Requires(predicate != null);
+            Requires<ArgumentNullException>(predicate != null);
 
             return source.Filter(predicate);
         }
@@ -150,12 +147,13 @@ namespace Tiger.Types
         /// An <see cref="Option{TSome}"/> whose Some value is the result of invoking
         /// the transform function on the Some value of <paramref name="source"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="selector"/> is <see langword="null"/>.</exception>
         [Pure, EditorBrowsable(EditorBrowsableState.Never)]
         public static Option<TResult> Select<TSource, TResult>(
             this Option<TSource> source,
-            [InstantHandle] [NotNull] Func<TSource, TResult> selector)
+            [NotNull, InstantHandle] Func<TSource, TResult> selector)
         {
-            Requires(selector != null);
+            Requires<ArgumentNullException>(selector != null);
 
             return source.Map(selector);
         }
@@ -174,13 +172,14 @@ namespace Tiger.Types
         /// An <see cref="Option{TSome}"/> whose Some value is the result of invoking the some-to-optional
         /// transform function on the Some value of the input optional value.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="selector"/> is <see langword="null"/>.</exception>
         [Pure, EditorBrowsable(EditorBrowsableState.Never)]
         public static Option<TResult> SelectMany<TSource, TResult>(
             this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, Option<TResult>> selector)
         {
-            Requires(selector != null);
-
+            Requires<ArgumentNullException>(selector != null);
+            
             return source.Bind(selector);
         }
 
@@ -208,16 +207,70 @@ namespace Tiger.Types
         /// <paramref name="source"/> and them mapping that Some value and their corresponding optional
         /// value to a result optional value.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="optionalSelector"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="resultSelector"/> is <see langword="null"/>.</exception>
         [Pure, EditorBrowsable(EditorBrowsableState.Never)]
         public static Option<TResult> SelectMany<TSource, TOption, TResult>(
             this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, Option<TOption>> optionalSelector,
             [NotNull, InstantHandle] Func<TSource, TOption, TResult> resultSelector)
         {
-            Requires(optionalSelector != null);
-            Requires(resultSelector != null);
+            Requires<ArgumentNullException>(optionalSelector != null);
+            Requires<ArgumentNullException>(resultSelector != null);
 
             return source.Bind(sv => source.Bind(optionalSelector).Map(cv => resultSelector(sv, cv)));
+        }
+
+        /// <summary>
+        /// Applies an accumulator function over an optional value.
+        /// The specified seed value is used as the initial accumulator value.
+        /// </summary>
+        /// <typeparam name="TSource">The Some type of <paramref name="source"/>.</typeparam>
+        /// <typeparam name="TAccumulate">The type of the accumulator value.</typeparam>
+        /// <param name="source">An <see cref="Option{TSome}"/> to aggregate over.</param>
+        /// <param name="seed">The initial accumulator value.</param>
+        /// <param name="func">An accumulator value to be invoked on the Some value.</param>
+        /// <returns>The final accumulator value.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
+        [Pure, CanBeNull]
+        public static TAccumulate Aggregate<TSource, TAccumulate>(
+            this Option<TSource> source,
+            [CanBeNull] TAccumulate seed,
+            [NotNull, InstantHandle] Func<TAccumulate, TSource, TAccumulate> func)
+        { // note(cosborn) Can't re-use the Fold implementation due to the [CanBeNull] requirement.
+            Requires<ArgumentNullException>(func != null);
+
+            return source.Map(v => func(seed, v)).GetValueOrDefault(seed);
+        }
+
+        /// <summary>
+        /// Applies an accumulator function over an optional value.
+        /// The specified seed value is used as the initial accumulator value,
+        /// and the specified function is used to select the result value.
+        /// </summary>
+        /// <typeparam name="TSource">The Some type of <paramref name="source"/>.</typeparam>
+        /// <typeparam name="TAccumulate">The type of the accumulator value.</typeparam>
+        /// <typeparam name="TResult">The type of the resulting value.</typeparam>
+        /// <param name="source">An <see cref="Option{TSome}"/> to aggregate over.</param>
+        /// <param name="seed">The initial accumulator value.</param>
+        /// <param name="func">An accumulator value to be invoked on the Some value.</param>
+        /// <param name="resultSelector">
+        /// A function to transform the final accumulator value into the result value.
+        /// </param>
+        /// <returns>The transformed final return accumulator value.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="resultSelector"/> is <see langword="null"/>.</exception>
+        [Pure, CanBeNull]
+        public static TResult Aggregate<TSource, TAccumulate, TResult>(
+            this Option<TSource> source,
+            [CanBeNull] TAccumulate seed,
+            [NotNull, InstantHandle] Func<TAccumulate, TSource, TAccumulate> func,
+            [NotNull, InstantHandle] Func<TAccumulate, TResult> resultSelector)
+        { // note(cosborn) Can't re-use the Fold implementation due to the [CanBeNull] requirement.
+            Requires<ArgumentNullException>(func != null);
+            Requires<ArgumentNullException>(resultSelector != null);
+
+            return resultSelector(source.Map(v => func(seed, v)).GetValueOrDefault(seed));
         }
 
         #endregion

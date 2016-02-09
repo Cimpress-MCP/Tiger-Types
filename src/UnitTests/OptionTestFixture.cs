@@ -555,7 +555,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Filtering a None Option should produce a None Option.")]
         [Category("Extension")]
-        public void Filter_None()
+        public void FuncFilter_None()
         {
             // arrange
             var value = Option<int>.None;
@@ -569,13 +569,13 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Filtering a Some Option with a false predicate should produce a None Option.")]
         [Category("Extension")]
-        public void Filter_SomeFalse()
+        public void FuncFilter_SomeFalse()
         {
             // arrange
             var value = Option.From(42);
 
             // act
-            var actual = value.Filter(v => v <= 0);
+            var actual = value.Filter(_ => false);
 
             // assert
             Assert.That(actual, Is.EqualTo(Option<int>.None));
@@ -583,13 +583,55 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Filtering a Some Option with a true predicate should produce a None Option.")]
         [Category("Extension")]
-        public void Filter_SomeTrue()
+        public void FuncFilter_SomeTrue()
         {
             // arrange
             var value = Option.From(42);
 
             // act
-            var actual = value.Filter(v => v > 0);
+            var actual = value.Filter(_ => true);
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Option.From(42)));
+        }
+
+        [Test(Description = "Filtering a None Option should produce a None Option.")]
+        [Category("Extension")]
+        public async Task TaskFilter_None()
+        {
+            // arrange
+            var value = Option<int>.None;
+
+            // act
+            var actual = await value.Filter(v => Task.FromResult(v <= 0));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Option<int>.None));
+        }
+
+        [Test(Description = "Filtering a Some Option with a false predicate should produce a None Option.")]
+        [Category("Extension")]
+        public async Task TaskFilter_SomeFalse()
+        {
+            // arrange
+            var value = Option.From(42);
+
+            // act
+            var actual = await value.Filter(_ => Task.FromResult(false));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Option<int>.None));
+        }
+
+        [Test(Description = "Filtering a Some Option with a true predicate should produce a None Option.")]
+        [Category("Extension")]
+        public async Task TaskFilter_SomeTrue()
+        {
+            // arrange
+            var value = Option.From(42);
+
+            // act
+            var actual = await value.Filter(v => Task.FromResult(true));
 
             // assert
             Assert.That(actual, Is.EqualTo(Option.From(42)));
@@ -598,6 +640,60 @@ namespace Tiger.Types.UnitTests
         #endregion
 
         #region Fold
+
+        [Test(Description = "Folding over a None Option should return the seed value.")]
+        public void FuncFold_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = value.Fold(34, (s, v) => s + v.Length);
+
+            // assert
+            Assert.That(actual, Is.EqualTo(34));
+        }
+
+        [Test(Description = "Folding over a Some Option should return result of invoking the accumulator" +
+                            "over the seed value and the Some value.")]
+        public void FuncFold_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = value.Fold(34, (s, v) => s + v.Length);
+
+            // assert
+            Assert.That(actual, Is.EqualTo(42));
+        }
+
+        [Test(Description = "Folding over a None Option should return the seed value.")]
+        public async Task TaskFold_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = await value.Fold(34, (s, v) => Task.FromResult(s + v.Length));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(34));
+        }
+
+        [Test(Description = "Folding over a Some Option should return result of invoking the accumulator" +
+                            "over the seed value and the Some value.")]
+        public async Task TaskFold_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = await value.Fold(34, (s, v) => Task.FromResult(s + v.Length));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(42));
+        }
 
         #endregion
 
@@ -696,7 +792,7 @@ namespace Tiger.Types.UnitTests
             }
             catch (InvalidOperationException ioe)
             {
-                Assert.That(ioe, Has.Message.EqualTo(Resources.OptionIsNone));
+                Assert.That(ioe, Has.Message.Contains(Resources.OptionIsNone));
             }
             Assert.That(actual, Is.EqualTo(Sentinel));
         }
@@ -1920,7 +2016,7 @@ namespace Tiger.Types.UnitTests
             }
             catch (InvalidOperationException ioe)
             {
-                Assert.That(ioe, Has.Message.EqualTo(Resources.OptionIsNone));
+                Assert.That(ioe, Has.Message.Contains(Resources.OptionIsNone));
             }
             Assert.That(actual, Is.EqualTo(Sentinel));
         }
@@ -2391,6 +2487,60 @@ namespace Tiger.Types.UnitTests
 
             // assert
             Assert.That(actual, Is.EqualTo(Sentinel.Length.Pipe(Option.From)));
+        }
+
+        [Test(Description = "Folding over a None Option should return the seed value.")]
+        public void Aggregate_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = value.Aggregate(34, (s, v) => s + v.Length);
+
+            // assert
+            Assert.That(actual, Is.EqualTo(34));
+        }
+
+        [Test(Description = "Folding over a Some Option should return result of invoking the accumulator" +
+                            "over the seed value and the Some value.")]
+        public void Aggregate_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = value.Aggregate(34, (s, v) => s + v.Length);
+
+            // assert
+            Assert.That(actual, Is.EqualTo(42));
+        }
+
+        [Test(Description = "Folding over a None Option should return the seed value.")]
+        public void ResultAggregate_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = value.Aggregate(34, (s, v) => s + v.Length, v => v * 2);
+
+            // assert
+            Assert.That(actual, Is.EqualTo(68));
+        }
+
+        [Test(Description = "Folding over a Some Option should return result of invoking the accumulator" +
+                            "over the seed value and the Some value.")]
+        public void ResultAggregate_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = value.Aggregate(34, (s, v) => s + v.Length, v => v * 2);
+
+            // assert
+            Assert.That(actual, Is.EqualTo(84));
         }
 
         #endregion
