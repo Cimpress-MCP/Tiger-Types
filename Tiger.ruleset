@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <RuleSet Name="Tiger" Description="This is based on the list of rules Microsoft has turned on internally." ToolsVersion="12.0">
   <IncludeAll Action="Warning" />
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
@@ -27,6 +27,7 @@
     <Rule Id="CA1049" Action="None" />
     <Rule Id="CA1060" Action="None" />
     <Rule Id="CA1061" Action="None" />
+    <Rule Id="CA1062" Action="None" />
     <Rule Id="CA1302" Action="None" />
     <Rule Id="CA1303" Action="None" />
     <Rule Id="CA1308" Action="None" />

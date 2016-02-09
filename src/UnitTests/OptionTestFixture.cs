@@ -1,8 +1,10 @@
 ﻿// ReSharper disable All
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Tiger.Types.Properties;
 
 namespace Tiger.Types.UnitTests
 {
@@ -10,7 +12,7 @@ namespace Tiger.Types.UnitTests
      * NUnit doesn't have good support for async in Assert.Throws<T>, so we
      * work around it where necessary using the accidental support in Assert.That.
      */
-    /// <summary>Tests related to <see cref="Option{T}"/>.</summary>
+    /// <summary>Tests related to <see cref="Option{TSome}"/>.</summary>
     [TestFixture(TestOf = typeof(Option<>))]
     public sealed class OptionTestFixture
     {
@@ -91,327 +93,13 @@ namespace Tiger.Types.UnitTests
             Assert.That(actual.IsSome, Is.False);
         }
 
-        public void LiteralNone_IsNone()
-        {
-            // arrange, act
-            Option<string> actual = Option.None;
-
-            // assert
-            Assert.That(actual.IsNone, Is.True);
-            Assert.That(actual.IsSome, Is.False);
-        }
-
         #endregion
 
         #region Match
 
-        #region Null Throws
-
-        [Test, Precondition]
-        public void ValueFuncMatch_Return_NullNone_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            string none = null;
-
-            // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.Match(
-                none: none,
-                some: v => Sentinel));
-
-            // assert
-            Assert.That(ex, Has.Message.Contain("none"));
-        }
-
-        [Test, Precondition]
-        public void ValueFuncMatch_Return_NullSome_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Func<string, string> some = null;
-
-            // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.Match(
-                none: Sentinel,
-                some: some));
-
-            // assert
-            Assert.That(ex, Has.Message.Contain("some"));
-        }
-
-        [Test, Precondition]
-        public void ValueTaskMatch_Return_NullNone_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            string none = null;
-
-            // act, assert
-            Assert.That(() => value.Match(
-                none: none,
-                some: v => Task.FromResult(Sentinel)),
-                Throws.ArgumentNullException.With.Message.Contains("none"));
-        }
-
-        [Test, Precondition]
-        public void ValueTaskMatch_Return_NullSome_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Func<string, Task<string>> some = null;
-
-            // act, assert
-            Assert.That(() => value.Match(
-                none: Sentinel,
-                some: some),
-                Throws.ArgumentNullException.With.Message.Contains("some"));
-        }
-
-        [Test, Precondition]
-        public void FuncFuncMatch_Return_NullNone_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Func<string> none = null;
-
-            // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.Match(
-                none: none,
-                some: v => Sentinel));
-
-            // assert
-            Assert.That(ex.Message, Does.Contain("none"));
-        }
-
-        [Test, Precondition]
-        public void FuncFuncMatch_Return_NullSome_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Func<string, string> some = null;
-
-            // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.Match(
-                none: () => Sentinel,
-                some: some));
-
-            // assert
-            Assert.That(ex.Message, Does.Contain("some"));
-        }
-
-        [Test, Precondition]
-        public void FuncTaskMatch_Return_NullNone_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Func<string> none = null;
-
-            // act, assert
-            Assert.That(() => value.Match(
-                none: none,
-                some: v => Task.FromResult(Sentinel)),
-                Throws.ArgumentNullException.With.Message.Contains("none"));
-        }
-
-        [Test, Precondition]
-        public void FuncTaskMatch_Return_NullSome_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Func<string, Task<string>> some = null;
-
-            // act, assert
-            Assert.That(() => value.Match(
-                none: () => Sentinel,
-                some: some),
-                Throws.ArgumentNullException.With.Message.Contains("some"));
-        }
-
-        [Test, Precondition]
-        public void TaskFuncMatch_Return_NullNone_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Func<Task<string>> none = null;
-
-            // act, assert
-            Assert.That(() => value.Match(
-                none: none,
-                some: v => Sentinel),
-                Throws.ArgumentNullException.With.Message.Contains("none"));
-        }
-
-        [Test, Precondition]
-        public void TaskFuncMatch_Return_NullSome_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Func<string, string> some = null;
-
-            // act, assert
-            Assert.That(() => value.Match(
-                none: () => Task.FromResult(Sentinel),
-                some: some),
-                Throws.ArgumentNullException.With.Message.Contains("some"));
-        }
-
-        [Test, Precondition]
-        public void TaskTaskMatch_Return_NullNone_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Func<Task<string>> none = null;
-
-            // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.Match(
-                none: none,
-                some: v => Task.FromResult(Sentinel)));
-
-            // assert
-            Assert.That(ex, Has.Message.Contains("none"));
-        }
-
-        [Test, Precondition]
-        public void TaskTaskMatch_Return_NullSome_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Func<string, Task<string>> some = null;
-
-            // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.Match(
-                none: () => Task.FromResult(Sentinel),
-                some: some));
-
-            // assert
-            Assert.That(ex, Has.Message.Contains("some"));
-        }
-
-        [Test, Precondition]
-        public void ActionActionMatch_Void_NullNone_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Action none = null;
-
-            // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.Match(
-                none: none,
-                some: v => Console.WriteLine(Sentinel)));
-
-            // assert
-            Assert.That(ex, Has.Message.Contain("none"));
-        }
-
-        [Test, Precondition]
-        public void ActionActionMatch_Void_NullSome_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Action<string> some = null;
-
-            // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.Match(
-                none: () => Console.WriteLine(Sentinel),
-                some: some));
-
-            // assert
-            Assert.That(ex, Has.Message.Contain("some"));
-        }
-
-        [Test, Precondition]
-        public void ActionTaskMatch_Void_NullNone_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Action none = null;
-
-            // act, assert
-            Assert.That(() => value.Match(
-                none: none,
-                some: v => Task.Run(() => Console.WriteLine(Sentinel))),
-                Throws.ArgumentNullException.With.Message.Contains("none"));
-        }
-
-        [Test, Precondition]
-        public void ActionTaskMatch_Void_NullSome_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Func<string, Task> some = null;
-
-            // act, assert
-            Assert.That(() => value.Match(
-                none: () => Console.WriteLine(Sentinel),
-                some: some),
-                Throws.ArgumentNullException.With.Message.Contains("some"));
-        }
-
-        [Test, Precondition]
-        public void TaskActionMatch_Void_NullNone_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Func<Task> none = null;
-
-            // act, assert
-            Assert.That(() => value.Match(
-                none: none,
-                some: v => Console.WriteLine(Sentinel)),
-                Throws.ArgumentNullException.With.Message.Contains("none"));
-        }
-
-        [Test, Precondition]
-        public void TaskActionMatch_Void_NullSome_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Action<string> some = null;
-
-            // act, assert
-            Assert.That(() => value.Match(
-                none: () => Task.Run(() => Console.WriteLine(Sentinel)),
-                some: some),
-                Throws.ArgumentNullException.With.Message.Contains("some"));
-        }
-
-        [Test, Precondition]
-        public void TaskTaskMatch_Void_NullNone_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Func<Task> none = null;
-
-            // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.Match(
-                none: none,
-                some: v => Task.Run(() => Console.WriteLine(Sentinel))));
-
-            // assert
-            Assert.That(ex, Has.Message.Contains("none"));
-        }
-
-        [Test, Precondition]
-        public void TaskTaskMatch_Void_NullSome_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Func<string, Task> some = null;
-
-            // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.Match(
-                none: () => Task.Run(() => Console.WriteLine(Sentinel)),
-                some: some));
-
-            // assert
-            Assert.That(ex, Has.Message.Contains("some"));
-        }
-
-        #endregion
-
         [Test(Description = "Matching a None Option should return the None value branch, " +
                             "not the Some func branch.")]
-        public void ValueFuncMatch_Return_None()
+        public void ValueFuncMatchReturn_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -427,7 +115,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Matching a Some Option should return the Some func branch, " +
                             "not the None value branch.")]
-        public void ValueFuncMatch_Return_Some()
+        public void ValueFuncMatchReturn_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
@@ -443,7 +131,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Matching a None Option should return the None value branch, " +
                             "not the Some task branch.")]
-        public async Task ValueTaskMatch_Return_None()
+        public async Task ValueTaskMatchReturn_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -459,7 +147,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Matching a Some Option should return the Some task branch, " +
                             "not the None value branch.")]
-        public async Task ValueTaskMatch_Return_Some()
+        public async Task ValueTaskMatchReturn_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
@@ -475,7 +163,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Matching a None Option should return the None func branch, " +
                             "not the Some func branch.")]
-        public void FuncFuncMatch_Return_None()
+        public void FuncFuncMatchReturn_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -491,7 +179,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Matching a Some Option should return the Some func branch, " +
                             "not the None func branch.")]
-        public void FuncFuncMatch_Return_Some()
+        public void FuncFuncMatchReturn_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
@@ -507,7 +195,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Matching a None Option should return the None func branch, " +
                             "not the Some task branch.")]
-        public async Task FuncTaskMatch_Return_None()
+        public async Task FuncTaskMatchReturn_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -523,7 +211,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Matching a Some Option should return the Some task branch, " +
                             "not the None func branch.")]
-        public async Task FuncTaskMatch_Return_Some()
+        public async Task FuncTaskMatchReturn_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
@@ -539,7 +227,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Matching a None Option should return the None task branch, " +
                             "not the Some func branch.")]
-        public async Task TaskFuncMatch_Return_None()
+        public async Task TaskFuncMatchReturn_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -555,7 +243,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Matching a Some Option should return the Some func branch, " +
                             "not the None task branch.")]
-        public async Task TaskFuncMatch_Return_Some()
+        public async Task TaskFuncMatchReturn_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
@@ -571,7 +259,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Matching a None Option should return the None task branch, " +
                             "not the Some task branch.")]
-        public async Task TaskTaskMatch_Return_None()
+        public async Task TaskTaskMatchReturn_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -579,7 +267,7 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = await value.Match(
                 none: () => Task.FromResult(0),
-                some: v => Task.FromResult(v.Length));
+                some: v => v.Length.Pipe(Task.FromResult));
 
             // assert
             Assert.That(actual, Is.EqualTo(0));
@@ -587,7 +275,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Matching a Some Option should return the Some task branch, " +
                             "not the None task branch.")]
-        public async Task TaskTaskMatch_Return_Some()
+        public async Task TaskTaskMatchReturn_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
@@ -595,7 +283,7 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = await value.Match(
                 none: () => Task.FromResult(0),
-                some: v => Task.FromResult(v.Length));
+                some: v => v.Length.Pipe(Task.FromResult));
 
             // assert
             Assert.That(actual, Is.EqualTo(Sentinel.Length));
@@ -603,7 +291,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Matching a None Option should execute the None action branch, " +
                             "not the Some action branch.")]
-        public void ActionActionMatch_Void_None()
+        public void ActionActionMatchVoid_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -620,7 +308,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Matching a Some Option should execute the Some action branch, " +
                             "not the None action branch.")]
-        public void ActionActionMatch_Void_Some()
+        public void ActionActionMatchVoid_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
@@ -637,7 +325,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Matching a None Option should execute the None action branch, " +
                             "not the Some task branch.")]
-        public async Task ActionTaskMatch_Void_None()
+        public async Task ActionTaskMatchVoid_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -654,7 +342,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Matching a Some Option should execute the Some task branch, " +
                             "not the None action branch.")]
-        public async Task ActionTaskMatch_Void_Some()
+        public async Task ActionTaskMatchVoid_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
@@ -671,7 +359,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Matching a None Option should execute the None task branch, " +
                             "not the Some action branch.")]
-        public async Task TaskActionMatch_Void_None()
+        public async Task TaskActionMatchVoid_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -688,7 +376,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Matching a Some Option should execute the Some action branch, " +
                             "not the None task branch.")]
-        public async Task TaskActionMatch_Void_Some()
+        public async Task TaskActionMatchVoid_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
@@ -705,7 +393,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Matching a None Option should execute the None task branch, " +
                             "not the Some task branch.")]
-        public async Task TaskTaskMatch_Void_None()
+        public async Task TaskTaskMatchVoid_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -722,7 +410,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Matching a Some Option should execute the Some task branch, " +
                             "not the None task branch.")]
-        public async Task TaskTaskMatch_Void_Some()
+        public async Task TaskTaskMatchVoid_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
@@ -740,38 +428,6 @@ namespace Tiger.Types.UnitTests
         #endregion
 
         #region Map
-
-        #region Null Throws
-
-        [Test, Precondition]
-        public void FuncMap_Null_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Func<string, string> mapper = null;
-
-            // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.Map(mapper));
-
-            // assert
-            Assert.That(ex, Has.Message.Contains("mapper"));
-        }
-
-        [Test, Precondition]
-        public void TaskMap_Null_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Func<string, Task<string>> mapper = null;
-
-            // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.Map(mapper));
-
-            // assert
-            Assert.That(ex, Has.Message.Contains("mapper"));
-        }
-
-        #endregion
 
         [Test(Description = "Mapping a None Option over a func should return a None Option.")]
         public void FuncMap_None()
@@ -796,7 +452,7 @@ namespace Tiger.Types.UnitTests
             var actual = value.Map(v => v.Length);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Option.From(Sentinel.Length)));
+            Assert.That(actual, Is.EqualTo(Sentinel.Length.Pipe(Option.From)));
         }
 
         [Test(Description = "Mapping a None Option over a task should return a None Option.")]
@@ -806,7 +462,7 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act
-            var actual = await value.Map(v => Task.FromResult(v.Length));
+            var actual = await value.Map(v => v.Length.Pipe(Task.FromResult));
 
             // assert
             Assert.That(actual, Is.EqualTo(Option<int>.None));
@@ -819,45 +475,15 @@ namespace Tiger.Types.UnitTests
             var value = Option.From(Sentinel);
 
             // act
-            var actual = await value.Map(v => Task.FromResult(v.Length));
+            var actual = await value.Map(v => v.Length.Pipe(Task.FromResult));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Option.From(Sentinel.Length)));
+            Assert.That(actual, Is.EqualTo(Sentinel.Length.Pipe(Option.From)));
         }
 
         #endregion
 
         #region Tap
-
-        #region Null Throws
-
-        [Test, Precondition]
-        public void FuncTap_Null_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Action<string> tapper = null;
-
-            // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.Tap(tapper));
-
-            // assert
-            Assert.That(ex, Has.Message.Contains("tapper"));
-        }
-
-        [Test, Precondition]
-        public void TaskTap_Null_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Func<string, Task> tapper = null;
-
-            // act, assert
-            Assert.That(() => value.Tap(tapper),
-                Throws.ArgumentNullException.With.Message.Contains("tapper"));
-        }
-
-        #endregion
 
         [Test(Description = "Tapping a None Option over a func should return a None Option " +
                             "and perform no action.")]
@@ -925,39 +551,57 @@ namespace Tiger.Types.UnitTests
 
         #endregion
 
-        #region Bind
+        #region Filter
 
-        #region Null Throws
-
-        [Test, Precondition]
-        public void FuncBind_Null_Throws()
+        [Test(Description = "Filtering a None Option should produce a None Option.")]
+        [Category("Extension")]
+        public void Filter_None()
         {
             // arrange
-            var value = Option<string>.None;
-            Func<string, Option<int>> binder = null;
+            var value = Option<int>.None;
 
             // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.Bind(binder));
+            var actual = value.Filter(v => v <= 0);
 
             // assert
-            Assert.That(ex, Has.Message.Contains("binder"));
+            Assert.That(actual, Is.EqualTo(Option<int>.None));
         }
 
-        [Test, Precondition]
-        public void TaskBind_Null_Throws()
+        [Test(Description = "Filtering a Some Option with a false predicate should produce a None Option.")]
+        [Category("Extension")]
+        public void Filter_SomeFalse()
         {
             // arrange
-            var value = Option<string>.None;
-            Func<string, Task<Option<int>>> binder = null;
+            var value = Option.From(42);
 
             // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.Bind(binder));
+            var actual = value.Filter(v => v <= 0);
 
             // assert
-            Assert.That(ex, Has.Message.Contains("binder"));
+            Assert.That(actual, Is.EqualTo(Option<int>.None));
+        }
+
+        [Test(Description = "Filtering a Some Option with a true predicate should produce a None Option.")]
+        [Category("Extension")]
+        public void Filter_SomeTrue()
+        {
+            // arrange
+            var value = Option.From(42);
+
+            // act
+            var actual = value.Filter(v => v > 0);
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Option.From(42)));
         }
 
         #endregion
+
+        #region Fold
+
+        #endregion
+
+        #region Bind
 
         [Test(Description = "Binding a None Option over a func should return a None Option.")]
         public void FuncBind_None()
@@ -988,7 +632,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Binding a Some Option over a func returning a Some Option " +
                             "should return a Some Option.")]
-        public void FuncBind_ReturnSome_Some()
+        public void FuncBindReturnSome_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
@@ -997,7 +641,7 @@ namespace Tiger.Types.UnitTests
             var actual = value.Bind(v => v.Length == 0 ? Option.None : Option.From(v.Length));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Option.From(Sentinel.Length)));
+            Assert.That(actual, Is.EqualTo(Sentinel.Length.Pipe(Option.From)));
         }
 
         [Test(Description = "Binding a Some Option over a task returning a None Option " +
@@ -1019,7 +663,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Binding a Some Option over a task returning a Some Option " +
                             "should return a Some Option.")]
-        public async Task TaskBind_ReturnSome_Some()
+        public async Task TaskBindReturnSome_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
@@ -1031,94 +675,82 @@ namespace Tiger.Types.UnitTests
                     : Option.From(v.Length)));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Option.From(Sentinel.Length)));
+            Assert.That(actual, Is.EqualTo(Sentinel.Length.Pipe(Option.From)));
         }
 
         #endregion
 
         #region Other Useful Methods
 
-        #region Null Throws
-
-        [Test, Precondition]
-        public void NullOther_ValueIfNone_Throws()
+        [Test(Description = "Forcibly unwrapping a None Option should throw.")]
+        public void Value_None()
         {
             // arrange
             var value = Option<string>.None;
-            string other = null;
-
-            // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.IfNone(other));
-
-            // assert
-            Assert.That(ex, Has.Message.Contains("other"));
-        }
-
-        [Test, Precondition]
-        public void NullOther_FuncIfNone_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Func<string> other = null;
-
-            // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.IfNone(other));
-
-            // assert
-            Assert.That(ex, Has.Message.Contains("other"));
-        }
-
-        [Test, Precondition]
-        public void NullOther_TaskIfNone_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Func<Task<string>> other = null;
-
-            // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.IfNone(other));
-
-            // assert
-            Assert.That(ex, Has.Message.Contains("other"));
-        }
-
-        [Test, Precondition]
-        public void NullAction_ActionIfSome_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Action<string> action = null;
-
-            // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.IfSome(action));
-
-            // assert
-            Assert.That(ex, Has.Message.Contains("action"));
-        }
-
-        [Test, Precondition]
-        public void NullAction_TaskIfSome_Throws()
-        {
-            // arrange
-            var value = Option<string>.None;
-            Func<string, Task> action = null;
 
             // act, assert
-            Assert.That(() => value.IfSome(action),
-                Throws.ArgumentNullException.With.Message.Contains("action"));
+            var actual = Sentinel;
+            try
+            {
+                actual = value.Value;
+            }
+            catch (InvalidOperationException ioe)
+            {
+                Assert.That(ioe, Has.Message.EqualTo(Resources.OptionIsNone));
+            }
+            Assert.That(actual, Is.EqualTo(Sentinel));
         }
 
-        #endregion
+        [Test(Description = "Forcibly unwrapping a Some Option should return the Some value.")]
+        public void Value_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = value.Value;
+            
+            // assert
+            Assert.That(actual, Is.EqualTo(Sentinel));
+        }
 
         [Test(Description = "Coalescing a None Option with an alternative value " +
                             "should return the alternative value.")]
-        public void ValueIfNone_None()
+        public void GetValueOrDefault_None()
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = value.IfNone(Sentinel);
+            var actual = value.GetValueOrDefault();
+
+            // assert
+            Assert.That(actual, Is.EqualTo(default(string)));
+        }
+
+        [Test(Description = "Coalescing a None Option with an alternative value " +
+                            "should return the alternative value.")]
+        public void GetValueOrDefault_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = value.GetValueOrDefault();
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Sentinel));
+        }
+
+        [Test(Description = "Coalescing a None Option with an alternative value " +
+                            "should return the alternative value.")]
+        public void ValueGetValueOrDefault_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = value.GetValueOrDefault(Sentinel);
 
             // assert
             Assert.That(actual, Is.EqualTo(Sentinel));
@@ -1126,13 +758,13 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Coalescing a Some Option with an alternative value " +
                             "should return the Some value.")]
-        public void ValueIfNone_Some()
+        public void ValueGetValueOrDefault_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
 
             // act
-            var actual = value.IfNone(string.Empty);
+            var actual = value.GetValueOrDefault(string.Empty);
 
             // assert
             Assert.That(actual, Is.EqualTo(Sentinel));
@@ -1140,13 +772,13 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Coalescing a None Option with a func producing an alternative value " +
                             "should return the alternative value.")]
-        public void FuncIfNone_None()
+        public void FuncGetValueOrDefault_None()
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = value.IfNone(() => Sentinel);
+            var actual = value.GetValueOrDefault(() => Sentinel);
 
             // assert
             Assert.That(actual, Is.EqualTo(Sentinel));
@@ -1154,13 +786,13 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Coalescing a Some Option with a func producing an alternative value " +
                             "should return the Some value.")]
-        public void FuncIfNone_Some()
+        public void FuncGetValueOrDefault_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
 
             // act
-            var actual = value.IfNone(() => string.Empty);
+            var actual = value.GetValueOrDefault(() => string.Empty);
 
             // assert
             Assert.That(actual, Is.EqualTo(Sentinel));
@@ -1168,13 +800,13 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Coalescing a None Option with a task producing an alternative value " +
                             "should return the alternative value.")]
-        public async Task TaskIfNone_None()
+        public async Task TaskGetValueOrDefault_None()
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = await value.IfNone(() => Task.FromResult(Sentinel));
+            var actual = await value.GetValueOrDefault(() => Task.FromResult(Sentinel));
 
             // assert
             Assert.That(actual, Is.EqualTo(Sentinel));
@@ -1182,14 +814,14 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Coalescing a Some Option with a task producing an alternative value " +
                             "should return the Some value.")]
-        public async Task TaskIfNone_Some()
+        public async Task TaskGetValueOrDefault_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
             Func<Task<string>> other = () => Task.FromResult(string.Empty);
 
             // act
-            var actual = await value.IfNone(other);
+            var actual = await value.GetValueOrDefault(other);
 
             // assert
             Assert.That(actual, Is.EqualTo(Sentinel));
@@ -1532,6 +1164,42 @@ namespace Tiger.Types.UnitTests
             Assert.That(actualRightFirst, Is.True);
         }
 
+        [Test(Description = "A None Option should not iterate.")]
+        [Category("Implementation")]
+        public void ForEach_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = Sentinel;
+            foreach (var v in value)
+            {
+                actual = string.Empty;
+            }
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Sentinel));
+        }
+
+        [Test(Description = "A Some Option should not iterate.")]
+        [Category("Implementation")]
+        public void ForEach_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = string.Empty;
+            foreach (var v in value)
+            {
+                actual = v;
+            }
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Sentinel));
+        }
+
         #endregion
 
         #region Operators and Named Alternatives
@@ -1823,6 +1491,24 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "A None Option should not evaluate as true.")]
         [Category("Operator")]
+        public void OperatorIsTrue_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act, assert
+            if (value)
+            {
+                Assert.Fail();
+            }
+            else
+            {
+                Assert.Pass();
+            }
+        }
+
+        [Test(Description = "A None Option should not evaluate as true.")]
+        [Category("Operator")]
         public void NamedIsTrue_None()
         {
             // arrange
@@ -1832,7 +1518,7 @@ namespace Tiger.Types.UnitTests
             var actual = value.IsTrue;
 
             // assert
-            Assert.That(actual, Is.Not.True);
+            Assert.That(actual, Is.False);
         }
 
         [Test(Description = "A Some Option should evaluate as true.")]
@@ -1847,6 +1533,24 @@ namespace Tiger.Types.UnitTests
 
             // assert
             Assert.That(actual, Is.True);
+        }
+
+        [Test(Description = "A Some Option should evaluate as true.")]
+        [Category("Operator")]
+        public void OperatorIsTrue_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act, assert
+            if (value)
+            {
+                Assert.Pass();
+            }
+            else
+            {
+                Assert.Fail();
+            }
         }
 
         [Test(Description = "A None Option should evaluate as false.")]
@@ -1874,7 +1578,63 @@ namespace Tiger.Types.UnitTests
             var actual = value.IsFalse;
 
             // assert
-            Assert.That(actual, Is.Not.True);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test(Description = "The logical inverse of a None Option should be true.")]
+        [Category("Operator")]
+        public void NamedLogicalNot_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = value.LogicalNot();
+
+            // assert
+            Assert.That(actual, Is.True);
+        }
+
+        [Test(Description = "The logical inverse of a None Option should be true.")]
+        [Category("Operator")]
+        public void OperatorLogicalNot_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = !value;
+
+            // assert
+            Assert.That(actual, Is.True);
+        }
+
+        [Test(Description = "The logical inverse of a Some Option should be false.")]
+        [Category("Operator")]
+        public void NamedLogicalNot_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = value.LogicalNot();
+
+            // assert
+            Assert.That(actual, Is.False);
+        }
+
+        [Test(Description = "The logical inverse of a Some Option should be false.")]
+        [Category("Operator")]
+        public void OperatorNot_None()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = !value;
+
+            // assert
+            Assert.That(actual, Is.False);
         }
 
         [Test(Description = "The disjunction of a Some Option and a None Option should short-circuit.")]
@@ -1883,10 +1643,10 @@ namespace Tiger.Types.UnitTests
         { // note(cosborn) This tests "operator true"/IsTrue
             // arrange
             var left = Option.From(Sentinel);
-            string actual = string.Empty;
+            string actual = Sentinel;
             Func<Option<string>> right = () =>
             {
-                actual = Sentinel;
+                actual = string.Empty;
                 return Option.None;
             };
 
@@ -1894,8 +1654,7 @@ namespace Tiger.Types.UnitTests
             var dummy = left || right();
 
             // assert
-            Assert.That(actual, Is.Not.EqualTo(Sentinel));
-            Assert.That(actual, Is.EqualTo(string.Empty));
+            Assert.That(actual, Is.EqualTo(Sentinel));
         }
 
         [Test(Description = "The disjunction of two Some Options should short-circuit.")]
@@ -1904,10 +1663,10 @@ namespace Tiger.Types.UnitTests
         { // note(cosborn) This tests "operator true"/IsTrue
             // arrange
             var left = Option.From(Sentinel);
-            string actual = string.Empty;
+            string actual = Sentinel;
             Func<Option<string>> right = () =>
             {
-                actual = Sentinel;
+                actual = string.Empty;
                 return Option.From(Sentinel);
             };
 
@@ -1915,8 +1674,7 @@ namespace Tiger.Types.UnitTests
             var dummy = left || right();
 
             // assert
-            Assert.That(actual, Is.Not.EqualTo(Sentinel));
-            Assert.That(actual, Is.EqualTo(string.Empty));
+            Assert.That(actual, Is.EqualTo(Sentinel));
         }
 
         [Test(Description = "The conjunction of two None Options should be a None Option.")]
@@ -2064,12 +1822,12 @@ namespace Tiger.Types.UnitTests
             var right = Option.From(Sentinel);
 
             // act
-            var actualLeftFirst = left || right;
-            var actualRightFirst = right || left;
+            var actualLeftFirst = left && right;
+            var actualRightFirst = right && left;
 
             // assert
-            Assert.That(actualLeftFirst, Is.EqualTo(left));
-            Assert.That(actualRightFirst, Is.EqualTo(right));
+            Assert.That(actualLeftFirst, Is.EqualTo(right));
+            Assert.That(actualRightFirst, Is.EqualTo(left));
         }
 
         [Test(Description = "The conjunction of two None Options should short-circuit.")]
@@ -2078,10 +1836,10 @@ namespace Tiger.Types.UnitTests
         { // note(cosborn) This tests "operator false"/IsFalse
             // arrange
             var left = Option<string>.None;
-            string actual = string.Empty;
+            string actual = Sentinel;
             Func<Option<string>> right = () =>
             {
-                actual = Sentinel;
+                actual = string.Empty;
                 return Option.None;
             };
 
@@ -2089,20 +1847,19 @@ namespace Tiger.Types.UnitTests
             var dummy = left && right();
 
             // assert
-            Assert.That(actual, Is.EqualTo(string.Empty));
-            Assert.That(actual, Is.Not.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(Sentinel));
         }
 
-        [Test(Description = "The disjunction of a None Option and a Some Option should short-circuit.")]
+        [Test(Description = "The conjunction of a None Option and a Some Option should short-circuit.")]
         [Category("Operator")]
-        public void OperatorLogicalOr_NoneSome_ShortCircuits()
+        public void OperatorLogicalAnd_NoneSome_ShortCircuits()
         { // note(cosborn) This tests "operator false"/IsFalse
             // arrange
             var left = Option<string>.None;
-            string actual = string.Empty;
+            string actual = Sentinel;
             Func<Option<string>> right = () =>
             {
-                actual = Sentinel;
+                actual = string.Empty;
                 return Option.From(Sentinel);
             };
 
@@ -2110,8 +1867,75 @@ namespace Tiger.Types.UnitTests
             var dummy = left && right();
 
             // assert
-            Assert.That(actual, Is.EqualTo(string.Empty));
-            Assert.That(actual, Is.Not.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(Sentinel));
+        }
+
+        [Test(Description = "The untyped None should convert to a None Option.")]
+        public void LiteralNone_IsNone()
+        {
+            // arrange, act
+            Option<string> actual = Option.None;
+
+            // assert
+            Assert.That(actual.IsNone, Is.True);
+            Assert.That(actual.IsSome, Is.False);
+        }
+
+        [Test(Description = "Null should convert to a None Option.")]
+        public void Null_IsNone()
+        {
+            // arrange, act
+            Option<string> actual = null;
+
+            // assert
+            Assert.That(actual.IsNone, Is.True);
+            Assert.That(actual.IsSome, Is.False);
+        }
+
+        [Test(Description = "Values should convert to Some Options.")]
+        [TestCase(0)]
+        [TestCase(3)]
+        [TestCase(-1)]
+        public void Value_IsSome(int innerValue)
+        {
+            // arrange, act
+            Option<int> actual = innerValue;
+
+            // assert
+            Assert.That(actual.IsNone, Is.False);
+            Assert.That(actual.IsSome, Is.True);
+        }
+
+        [Test(Description = "Unwrapping a None Option should throw.")]
+        public void Cast_None_Throws()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act, assert
+            var actual = Sentinel;
+            try
+            {
+                actual = (string)value;
+            }
+            catch (InvalidOperationException ioe)
+            {
+                Assert.That(ioe, Has.Message.EqualTo(Resources.OptionIsNone));
+            }
+            Assert.That(actual, Is.EqualTo(Sentinel));
+        }
+
+        [Test(Description = "Unwrapping a Some Option should return its Some value.")]
+        public void Cast_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = (string)value;
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Sentinel));
         }
 
         #endregion
@@ -2147,6 +1971,240 @@ namespace Tiger.Types.UnitTests
         }
 
         #region LINQ
+
+        [Test(Description = "Asking a None Option for any should return false.")]
+        [Category("Extension")]
+        public void Any_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = value.Any();
+
+            // assert
+            Assert.That(actual, Is.False);
+        }
+
+        [Test(Description = "Asking a Some Option for any should return true.")]
+        [Category("Extension")]
+        public void Any_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = value.Any();
+
+            // assert
+            Assert.That(actual, Is.True);
+        }
+
+        [Test(Description = "Asking a None Option for any with a false predicate should return false.")]
+        [Category("Extension")]
+        public void PredicateAny_NoneFalse()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = value.Any(v => false);
+
+            // assert
+            Assert.That(actual, Is.False);
+        }
+
+        [Test(Description = "Asking a None Option for any with a true predicate should return false.")]
+        [Category("Extension")]
+        public void PredicateAny_NoneTrue()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = value.Any(v => true);
+
+            // assert
+            Assert.That(actual, Is.False);
+        }
+
+        [Test(Description = "Asking a Some Option for any with a false predicate should return false.")]
+        [Category("Extension")]
+        public void PredicateAny_SomeFalse()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = value.Any(_ => false);
+
+            // assert
+            Assert.That(actual, Is.False);
+        }
+
+        [Test(Description = "Asking a Some Option for any with a true predicate should return false.")]
+        [Category("Extension")]
+        public void PredicateAny_SomeTrue()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = value.Any(_ => true);
+
+            // assert
+            Assert.That(actual, Is.True);
+        }
+
+        [Test(Description = "Asking a None Option for all with a false predicate should return true.")]
+        [Category("Extension")]
+        public void PredicateAll_NoneFalse()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = value.All(v => false);
+
+            // assert
+            Assert.That(actual, Is.True);
+        }
+
+        [Test(Description = "Asking a None Option for all with a true predicate should return true.")]
+        [Category("Extension")]
+        public void PredicateAll_NoneTrue()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = value.All(v => true);
+
+            // assert
+            Assert.That(actual, Is.True);
+        }
+
+        [Test(Description = "Asking a Some Option for all with a false predicate should return false.")]
+        [Category("Extension")]
+        public void PredicateAll_SomeFalse()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = value.All(_ => false);
+
+            // assert
+            Assert.That(actual, Is.False);
+        }
+
+        [Test(Description = "Asking a Some Option for all with a true predicate should return true.")]
+        [Category("Extension")]
+        public void PredicateAll_SomeTrue()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = value.All(_ => true);
+
+            // assert
+            Assert.That(actual, Is.True);
+        }
+
+        [Test(Description = "Asking a None option whether it contains a value should return false.")]
+        [TestCase(0)]
+        [TestCase(3)]
+        [TestCase(-1)]
+        [Category("Extension")]
+        public void None_Contains(int testValue)
+        {
+            // arrange
+            var value = Option<int>.None;
+
+            // act
+            var actual = value.Contains(testValue);
+
+            // assert
+            Assert.That(actual, Is.False);
+        }
+
+        [Test(Description = "Asking a Some option whether it contains a value that it doesn't" +
+                            "should return false.")]
+        [Category("Extension")]
+        public void Some_Contains_False()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = value.Contains("megatron");
+
+            // assert
+            Assert.That(actual, Is.False);
+        }
+
+        [Test(Description = "Asking a Some option whether it contains a value that it does" +
+                            "should return true.")]
+        [Category("Extension")]
+        public void Some_Contains_True()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = value.Contains(Sentinel);
+
+            // assert
+            Assert.That(actual, Is.True);
+        }
+
+        [Test(Description = "Asking a None option whether it contains a value should return false.")]
+        [TestCase(0)]
+        [TestCase(3)]
+        [TestCase(-1)]
+        [Category("Extension")]
+        public void None_ComparerContains(int testValue)
+        {
+            // arrange
+            var value = Option<int>.None;
+
+            // act
+            var actual = value.Contains(testValue, EqualityComparer<int>.Default);
+
+            // assert
+            Assert.That(actual, Is.False);
+        }
+
+        [Test(Description = "Asking a Some option whether it contains a value that it doesn't" +
+                            "should return false.")]
+        [Category("Extension")]
+        public void Some_ComparerContains_False()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = value.Contains("megatron", StringComparer.OrdinalIgnoreCase);
+
+            // assert
+            Assert.That(actual, Is.False);
+        }
+
+        [Test(Description = "Asking a Some option whether it contains a value that it does" +
+                            "should return true.")]
+        [Category("Extension")]
+        public void Some_ComparerContains_True()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = value.Contains(Sentinel.ToUpperInvariant(), StringComparer.OrdinalIgnoreCase);
+
+            // assert
+            Assert.That(actual, Is.True);
+        }
 
         [Test(Description = "Selecting a None Option should produce a None Option.")]
         [Category("Extension")]
@@ -2228,7 +2286,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Selecting from two None Options should produce a None Option.")]
         [Category("Extension")]
-        public void SelectMany_NoneNone()
+        public void SelectManyResult_NoneNone()
         {
             // arrange
             var left = Option<int>.None;
@@ -2245,7 +2303,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Selecting from a Some Option and a None Option should produce a None Option.")]
         [Category("Extension")]
-        public void SelectMany_SomeNone()
+        public void SelectManyResult_SomeNone()
         {
             // arrange
             var left = Option.From(1);
@@ -2262,7 +2320,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Selecting from a None Option and a Some Option should produce a None Option.")]
         [Category("Extension")]
-        public void SelectMany_NoneSome()
+        public void SelectManyResult_NoneSome()
         {
             // arrange
             var left = Option<int>.None;
@@ -2279,7 +2337,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Selecting from two Some Options should produce a Some ")]
         [Category("Extension")]
-        public void SelectMany_SomeSome()
+        public void SelectManyResult_SomeSome()
         {
             // arrange
             var left = Option.From(1);
@@ -2292,6 +2350,47 @@ namespace Tiger.Types.UnitTests
 
             // assert
             Assert.That(actual, Is.EqualTo(Option.From(3)));
+        }
+
+        [Test(Description = "Binding a None Option over a func should return a None Option.")]
+        public void SelectMany_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = value.SelectMany(v => v.Length == 0 ? Option.None : Option.From(v.Length));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Option<int>.None));
+        }
+
+        [Test(Description = "Binding a Some Option over a func returning a None Option " +
+                            "should return a None Option.")]
+        public void SelectMany_ReturnNone_Some()
+        {
+            // arrange
+            var value = Option.From(string.Empty);
+
+            // act
+            var actual = value.SelectMany(v => v.Length == 0 ? Option.None : Option.From(v.Length));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Option<int>.None));
+        }
+
+        [Test(Description = "Binding a Some Option over a func returning a Some Option " +
+                            "should return a Some Option.")]
+        public void SelectManyReturnSome_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = value.SelectMany(v => v.Length == 0 ? Option.None : Option.From(v.Length));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Sentinel.Length.Pipe(Option.From)));
         }
 
         #endregion

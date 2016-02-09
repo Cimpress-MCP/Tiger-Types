@@ -12,37 +12,6 @@ namespace Tiger.Types.UnitTests
 
         #region Pipe
 
-        #region Null Throws
-
-        [Test, Precondition]
-        public void Pipe_NullValue_Throws()
-        {
-            // arrange
-            string value = null;
-
-            // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.Pipe(v => v.Length));
-
-            // assert
-            Assert.That(ex, Has.Message.Contains("value"));
-        }
-
-        [Test, Precondition]
-        public void Pipe_NullPiper_Throws()
-        {
-            // arrange
-            var value = Sentinel;
-            Func<string, int> piper = null;
-
-            // act
-            var ex = Assert.Throws<ArgumentNullException>(() => value.Pipe(piper));
-
-            // assert
-            Assert.That(ex, Has.Message.Contains("piper"));
-        }
-
-        #endregion
-
         [Test(Description = "Piping a value through a function should be equal to invoking the " +
                             "function with that value directly.")]
         public void Pipe()
@@ -60,6 +29,5 @@ namespace Tiger.Types.UnitTests
         }
 
         #endregion
-
     }
 }

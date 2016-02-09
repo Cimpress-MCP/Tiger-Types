@@ -56,8 +56,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="BottomExceptionTestFixture.cs" />
-    <Compile Include="FakeBottomException.cs" />
+    <Compile Include="EitherTestFixture.cs" />
     <Compile Include="TaskExtensionsTestFixture.cs" />
     <Compile Include="ObjectTestFixture.cs" />
     <Compile Include="OptionTestFixture.cs" />
