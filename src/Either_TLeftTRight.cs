@@ -1,9 +1,10 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using Tiger.Types.Properties;
 using static System.Diagnostics.Contracts.Contract;
 using PureAttribute = System.Diagnostics.Contracts.PureAttribute;
@@ -13,6 +14,7 @@ namespace Tiger.Types
     /// <summary>Represents a value that can represent one of two values.</summary>
     /// <typeparam name="TLeft">The Left type of the value that may be represented.</typeparam>
     /// <typeparam name="TRight">The Right type of the value that may be represented.</typeparam>
+    [SuppressMessage("ReSharper", "ExceptionNotThrown", Justification = "R# doesn't understand Code Contracts.")]
     public struct Either<TLeft, TRight>
     {
         /// <summary>
@@ -23,9 +25,9 @@ namespace Tiger.Types
         [Pure]
         public static Either<TLeft, TRight> FromLeft([NotNull] TLeft leftValue)
         {
-            Requires(leftValue != null);
+            Requires<ArgumentNullException>(leftValue != null);
 
-            return leftValue;
+            return new Either<TLeft, TRight>(leftValue);
         }
 
         /// <summary>
@@ -36,20 +38,10 @@ namespace Tiger.Types
         [Pure]
         public static Either<TLeft, TRight> FromRight([NotNull] TRight rightValue)
         {
-            Requires(rightValue != null);
+            Requires<ArgumentNullException>(rightValue != null);
 
-            return rightValue;
+            return new Either<TLeft, TRight>(rightValue);
         }
-
-        enum EitherState
-            : byte // todo(cosborn) Does this save anything?
-        {
-            Bottom, // note(cosborn) Must be 0 in the case of default(Either<TLeft, TRight>).
-            Left,
-            Right
-        }
-
-        bool IsBottom => _state == EitherState.Bottom;
 
         /// <summary>Gets a value indicating whether this instance is in the Left state.</summary>
         /// <remarks>There are usually better ways to do this.</remarks>
@@ -67,17 +59,17 @@ namespace Tiger.Types
         Either([NotNull] TLeft leftValue)
             : this()
         {
-            Requires(leftValue != null);
+            Requires<ArgumentNullException>(leftValue != null);
 
             _leftValue = leftValue;
             _state = EitherState.Left;
         }
 
         /// <exception cref="ArgumentNullException"><paramref name="rightValue"/> is <see langword="null"/>.</exception>
-        Either([NotNull] TRight rightValue)
+        Either([CanBeNull] TRight rightValue)
             : this()
         {
-            Requires(rightValue != null);
+            Requires<ArgumentNullException>(rightValue != null);
 
             _rightValue = rightValue;
             _state = EitherState.Right;
@@ -98,16 +90,18 @@ namespace Tiger.Types
         /// the argument if this instance is in the Right state.
         /// </param>
         /// <returns>A value produced by <paramref name="left"/> or <paramref name="right"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, Pure]
         public TOut Match<TOut>(
             [NotNull, InstantHandle] Func<TLeft, TOut> left,
             [NotNull, InstantHandle] Func<TRight, TOut> right)
         {
-            Requires(left != null);
-            Requires(right != null);
+            Requires<ArgumentNullException>(left != null);
+            Requires<ArgumentNullException>(right != null);
+            Requires<InvalidOperationException>(IsLeft || IsRight, Resources.EitherIsBottom);
             Ensures(Result<TOut>() != null);
-            if (IsBottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
             var result = IsLeft
                 ? left(_leftValue)
@@ -127,17 +121,19 @@ namespace Tiger.Types
         /// the argument if this instance is in the Right state.
         /// </param>
         /// <returns>A value produced by <paramref name="left"/> or <paramref name="right"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, ItemNotNull, Pure]
         public async Task<TOut> Match<TOut>(
             [NotNull, InstantHandle] Func<TLeft, TOut> left,
             [NotNull, InstantHandle] Func<TRight, Task<TOut>> right)
         {
-            Requires(left != null);
-            Requires(right != null);
+            Requires<ArgumentNullException>(left != null);
+            Requires<ArgumentNullException>(right != null);
+            Requires<InvalidOperationException>(this != default(Either<TLeft, TRight>), Resources.EitherIsBottom);
             Ensures(Result<TOut>() != null);
             Ensures(Result<Task<TOut>>() != null);
-            if (IsBottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
             var result = IsLeft
                 ? left(_leftValue)
@@ -157,17 +153,19 @@ namespace Tiger.Types
         /// the argument if this instance is in the Right state.
         /// </param>
         /// <returns>A value produced by <paramref name="left"/> or <paramref name="right"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, ItemNotNull, Pure]
         public async Task<TOut> Match<TOut>(
             [NotNull, InstantHandle] Func<TLeft, Task<TOut>> left,
             [NotNull, InstantHandle] Func<TRight, TOut> right)
         {
-            Requires(left != null);
-            Requires(right != null);
+            Requires<ArgumentNullException>(left != null);
+            Requires<ArgumentNullException>(right != null);
+            Requires<InvalidOperationException>(this != default(Either<TLeft, TRight>), Resources.EitherIsBottom);
             Ensures(Result<TOut>() != null);
             Ensures(Result<Task<TOut>>() != null);
-            if (IsBottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
             var result = IsLeft
                 ? await left(_leftValue).ConfigureAwait(false)
@@ -187,17 +185,19 @@ namespace Tiger.Types
         /// the argument if this instance is in the Right state.
         /// </param>
         /// <returns>A value produced by <paramref name="left"/> or <paramref name="right"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, ItemNotNull, Pure]
         public async Task<TOut> Match<TOut>(
             [NotNull, InstantHandle] Func<TLeft, Task<TOut>> left,
             [NotNull, InstantHandle] Func<TRight, Task<TOut>> right)
         {
-            Requires(left != null);
-            Requires(right != null);
+            Requires<ArgumentNullException>(left != null);
+            Requires<ArgumentNullException>(right != null);
+            Requires<InvalidOperationException>(this != default(Either<TLeft, TRight>), Resources.EitherIsBottom);
             Ensures(Result<TOut>() != null);
             Ensures(Result<Task<TOut>>() != null);
-            if (IsBottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
             var result = IsLeft
                 ? await left(_leftValue).ConfigureAwait(false)
@@ -219,14 +219,16 @@ namespace Tiger.Types
         /// An action to be invoked with the Right value of this instance
         /// as the argument if this instance is in the Right state.
         /// </param>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         public void Match(
             [NotNull, InstantHandle] Action<TLeft> left,
             [NotNull, InstantHandle] Action<TRight> right)
         {
-            Requires(left != null);
-            Requires(right != null);
-            if (IsBottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            Requires<ArgumentNullException>(left != null);
+            Requires<ArgumentNullException>(right != null);
+            Requires<InvalidOperationException>(IsLeft || IsRight, Resources.EitherIsBottom);
 
             if (IsLeft)
             {
@@ -247,15 +249,17 @@ namespace Tiger.Types
         /// An action to be invoked asynchronously with the Right value of this instance
         /// as the argument if this instance is in the Right state.
         /// </param>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         public async Task Match(
             [NotNull, InstantHandle] Action<TLeft> left,
             [NotNull, InstantHandle] Func<TRight, Task> right)
         {
-            Requires(left != null);
-            Requires(right != null);
+            Requires<ArgumentNullException>(left != null);
+            Requires<ArgumentNullException>(right != null);
+            Requires<InvalidOperationException>(this != default(Either<TLeft, TRight>), Resources.EitherIsBottom);
             Ensures(Result<Task>() != null);
-            if (IsBottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
             if (IsLeft)
             {
@@ -276,15 +280,17 @@ namespace Tiger.Types
         /// An action to be invoked with the Right value of this instance
         /// as the argument if this instance is in the Right state.
         /// </param>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         public async Task Match(
             [NotNull, InstantHandle] Func<TLeft, Task> left,
             [NotNull, InstantHandle] Action<TRight> right)
         {
-            Requires(left != null);
-            Requires(right != null);
+            Requires<ArgumentNullException>(left != null);
+            Requires<ArgumentNullException>(right != null);
+            Requires<InvalidOperationException>(this != default(Either<TLeft, TRight>), Resources.EitherIsBottom);
             Ensures(Result<Task>() != null);
-            if (IsBottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
             if (IsLeft)
             {
@@ -305,19 +311,24 @@ namespace Tiger.Types
         /// An action to be invoked asynchronously with the Right value of this instance
         /// as the argument if this instance is in the Right state.
         /// </param>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
-        public Task Match(
+        public async Task Match(
             [NotNull, InstantHandle] Func<TLeft, Task> left,
             [NotNull, InstantHandle] Func<TRight, Task> right)
         {
-            Requires(left != null);
-            Requires(right != null);
+            Requires<ArgumentNullException>(left != null);
+            Requires<ArgumentNullException>(right != null);
+            Requires<InvalidOperationException>(this != default(Either<TLeft, TRight>), Resources.EitherIsBottom);
             Ensures(Result<Task>() != null);
-            if (IsBottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
-            return IsLeft
-                ? left(_leftValue)
-                : right(_rightValue);
+            if (IsLeft)
+            {
+                await left(_leftValue);
+            }
+
+            await right(_rightValue);
         }
 
         #endregion
@@ -337,21 +348,24 @@ namespace Tiger.Types
         /// otherwise, an <see cref="Either{TLeft,TRight}"/> in the Left state with its Left value set to
         /// the value of invoking <paramref name="left"/> over the Left value of this instance.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure]
         public Either<TOut, TRight> Map<TOut>([NotNull, InstantHandle] Func<TLeft, TOut> left)
         {
-            Requires(left != null);
-            if (IsBottom) { return default(Either<TOut, TRight>); }
+            Requires<ArgumentNullException>(left != null);
+            Requires<InvalidOperationException>(IsLeft || IsRight, Resources.EitherIsBottom);
 
             if (IsLeft)
             {
                 var leftResult = left(_leftValue);
-                return leftResult == null
-                    ? default(Either<TOut, TRight>)
-                    : Either<TOut, TRight>.FromLeft(leftResult);
+                Assume(leftResult != null, Resources.ResultIsNull);
+                return Either<TOut, TRight>.FromLeft(leftResult);
             }
 
-            return _rightValue;
+            // note(cosborn) Invariants don't understand sum types; can't link `!IsLeft` and `_rightValue != null`.
+            Assume(_rightValue != null);
+            return Either<TOut, TRight>.FromRight(_rightValue);
         }
 
         /// <summary>Maps a function over the Left value of this instance, if present, asynchronously.</summary>
@@ -365,16 +379,23 @@ namespace Tiger.Types
         /// otherwise, an <see cref="Either{TLeft,TRight}"/> in the Left state with its Left value set to
         /// the value of invoking <paramref name="left"/> over the Left value of this instance.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, Pure]
         public async Task<Either<TOut, TRight>> Map<TOut>([NotNull, InstantHandle] Func<TLeft, Task<TOut>> left)
         {
-            Requires(left != null);
+            Requires<ArgumentNullException>(left != null);
+            Requires<InvalidOperationException>(this != default(Either<TLeft, TRight>), Resources.EitherIsBottom);
             Ensures(Result<Task<Either<TOut, TRight>>>() != null);
-            if (IsBottom) { return default(Either<TOut, TRight>); }
 
-            return IsLeft
-                ? await left(_leftValue).Map(Either<TOut, TRight>.FromLeft).ConfigureAwait(false)
-                : Either<TOut, TRight>.FromRight(_rightValue);
+            if (IsLeft)
+            {
+                var leftResult = await left(_leftValue).ConfigureAwait(false);
+                Assume(leftResult != null, Resources.ResultIsNull);
+                return Either<TOut, TRight>.FromLeft(leftResult);
+            }
+
+            return Either<TOut, TRight>.FromRight(_rightValue);
         }
 
         /// <summary>Maps a function over the Right value of this instance, if present.</summary>
@@ -388,21 +409,23 @@ namespace Tiger.Types
         /// otherwise, an <see cref="Either{TLeft,TRight}"/> in the Right state with its Right value set to
         /// the value of invoking <paramref name="right"/> over the Right value of this instance.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure]
         public Either<TLeft, TOut> Map<TOut>([NotNull, InstantHandle] Func<TRight, TOut> right)
         {
-            Requires(right != null);
-            if (IsBottom) { return default(Either<TLeft, TOut>); }
+            Requires<ArgumentNullException>(right != null);
+            Requires<InvalidOperationException>(IsLeft || IsRight, Resources.EitherIsBottom);
 
             if (IsLeft)
-            {
-                return _leftValue;
+            { // note(cosborn) Invariants don't understand sum types; can't link `IsLeft` and `_leftValue != null`.
+                Assume(_leftValue != null);
+                return Either<TLeft, TOut>.FromLeft(_leftValue);
             }
 
             var rightResult = right(_rightValue);
-            return rightResult == null
-                ? default(Either<TLeft, TOut>)
-                : Either<TLeft, TOut>.FromRight(rightResult);
+            Assume(rightResult != null, Resources.ResultIsNull);
+            return Either<TLeft, TOut>.FromRight(rightResult);
         }
 
         /// <summary>Maps a function over the Right value of this instance, if present, asynchronously.</summary>
@@ -416,16 +439,20 @@ namespace Tiger.Types
         /// otherwise, an <see cref="Either{TLeft,TRight}"/> in the Right state with its Right value set to
         /// the value of invoking <paramref name="right"/> over the Right value of this instance.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, Pure]
         public async Task<Either<TLeft, TOut>> Map<TOut>([NotNull, InstantHandle] Func<TRight, Task<TOut>> right)
         {
-            Requires(right != null);
+            Requires<ArgumentNullException>(right != null);
+            Requires<InvalidOperationException>(this != default(Either<TLeft, TRight>), Resources.EitherIsBottom);
             Ensures(Result<Task<Either<TLeft, TOut>>>() != null);
-            if (IsBottom) { return default(Either<TLeft, TOut>); }
 
-            return IsLeft
-                ? Either<TLeft, TOut>.FromLeft(_leftValue)
-                : await right(_rightValue).Map(Either<TLeft, TOut>.FromRight).ConfigureAwait(false);
+            if (IsLeft) { return Either<TLeft, TOut>.FromLeft(_leftValue); }
+
+            var rightResult = await right(_rightValue).ConfigureAwait(false);
+            Assume(rightResult != null, Resources.ResultIsNull);
+            return Either<TLeft, TOut>.FromRight(rightResult);
         }
 
         /// <summary>
@@ -448,27 +475,28 @@ namespace Tiger.Types
         /// in the Right state with its Right value set to the value of invoking <paramref name="right"/>
         /// over the Right value of this instance.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure]
         public Either<TLeftOut, TRightOut> Map<TLeftOut, TRightOut>(
             [NotNull, InstantHandle] Func<TLeft, TLeftOut> left,
             [NotNull, InstantHandle] Func<TRight, TRightOut> right)
         {
-            Requires(left != null);
-            Requires(right != null);
-            if (IsBottom) { return default(Either<TLeftOut, TRightOut>); }
+            Requires<ArgumentNullException>(left != null);
+            Requires<ArgumentNullException>(right != null);
+            Requires<InvalidOperationException>(IsLeft || IsRight, Resources.EitherIsBottom);
 
             if (IsLeft)
             {
                 var leftResult = left(_leftValue);
-                return leftResult == null
-                    ? default(Either<TLeftOut, TRightOut>)
-                    : new Either<TLeftOut, TRightOut>(leftResult);
+                Assume(leftResult != null, Resources.ResultIsNull);
+                return Either<TLeftOut, TRightOut>.FromLeft(leftResult);
             }
 
             var rightResult = right(_rightValue);
-            return rightResult == null
-                ? default(Either<TLeftOut, TRightOut>)
-                : new Either<TLeftOut, TRightOut>(rightResult);
+            Assume(rightResult != null, Resources.ResultIsNull);
+            return new Either<TLeftOut, TRightOut>(rightResult);
         }
 
         /// <summary>
@@ -492,25 +520,29 @@ namespace Tiger.Types
         /// in the Right state with its Right value set to the value of invoking <paramref name="right"/>
         /// over the Right value of this instance.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, Pure]
         public async Task<Either<TLeftOut, TRightOut>> Map<TLeftOut, TRightOut>(
             [NotNull, InstantHandle] Func<TLeft, TLeftOut> left,
             [NotNull, InstantHandle] Func<TRight, Task<TRightOut>> right)
         {
-            Requires(left != null);
-            Requires(right != null);
+            Requires<ArgumentNullException>(left != null);
+            Requires<ArgumentNullException>(right != null);
+            Requires<InvalidOperationException>(this != default(Either<TLeft, TRight>), Resources.EitherIsBottom);
             Ensures(Result<Task<Either<TLeftOut, TRightOut>>>() != null);
-            if (IsBottom) { return default(Either<TLeftOut, TRightOut>); }
 
             if (IsLeft)
             {
                 var leftResult = left(_leftValue);
-                return leftResult == null
-                    ? default(Either<TLeftOut, TRightOut>)
-                    : Either<TLeftOut, TRightOut>.FromLeft(leftResult);
+                Assume(leftResult != null, Resources.ResultIsNull);
+                return Either<TLeftOut, TRightOut>.FromLeft(leftResult);
             }
 
-            return await right(_rightValue).Map(Either<TLeftOut, TRightOut>.FromRight).ConfigureAwait(false);
+            var rightResult = await right(_rightValue).ConfigureAwait(false);
+            Assume(rightResult != null, Resources.ResultIsNull);
+            return new Either<TLeftOut, TRightOut>(rightResult);
         }
 
         /// <summary>
@@ -534,25 +566,29 @@ namespace Tiger.Types
         /// in the Right state with its Right value set to the value of invoking <paramref name="right"/>
         /// over the Right value of this instance.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, Pure]
         public async Task<Either<TLeftOut, TRightOut>> Map<TLeftOut, TRightOut>(
             [NotNull, InstantHandle] Func<TLeft, Task<TLeftOut>> left,
             [NotNull, InstantHandle] Func<TRight, TRightOut> right)
         {
-            Requires(left != null);
-            Requires(right != null);
+            Requires<ArgumentNullException>(left != null);
+            Requires<ArgumentNullException>(right != null);
+            Requires<InvalidOperationException>(this != default(Either<TLeft, TRight>), Resources.EitherIsBottom);
             Ensures(Result<Task<Either<TLeftOut, TRightOut>>>() != null);
-            if (IsBottom) { return default(Either<TLeftOut, TRightOut>); }
 
             if (IsLeft)
             {
-                return await left(_leftValue).Map(Either<TLeftOut, TRightOut>.FromLeft).ConfigureAwait(false);
+                var leftResult = await left(_leftValue).ConfigureAwait(false);
+                Assume(leftResult != null, Resources.ResultIsNull);
+                return Either<TLeftOut, TRightOut>.FromLeft(leftResult);
             }
 
             var rightResult = right(_rightValue);
-            return rightResult == null
-                ? default(Either<TLeftOut, TRightOut>)
-                : new Either<TLeftOut, TRightOut>(rightResult);
+            Assume(rightResult != null, Resources.ResultIsNull);
+            return new Either<TLeftOut, TRightOut>(rightResult);
         }
 
         /// <summary>
@@ -576,22 +612,29 @@ namespace Tiger.Types
         /// in the Right state with its Right value set to the value of invoking <paramref name="right"/>
         /// over the Right value of this instance.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, Pure]
         public async Task<Either<TLeftOut, TRightOut>> Map<TLeftOut, TRightOut>(
             [NotNull, InstantHandle] Func<TLeft, Task<TLeftOut>> left,
             [NotNull, InstantHandle] Func<TRight, Task<TRightOut>> right)
         {
-            Requires(left != null);
-            Requires(right != null);
+            Requires<ArgumentNullException>(left != null);
+            Requires<ArgumentNullException>(right != null);
+            Requires<InvalidOperationException>(this != default(Either<TLeft, TRight>), Resources.EitherIsBottom);
             Ensures(Result<Task<Either<TLeftOut, TRightOut>>>() != null);
-            if (IsBottom) { return default(Either<TLeftOut, TRightOut>); }
 
             if (IsLeft)
             {
-                return await left(_leftValue).Map(Either<TLeftOut, TRightOut>.FromLeft).ConfigureAwait(false);
+                var leftResult = await left(_leftValue).ConfigureAwait(false);
+                Assume(leftResult != null, Resources.ResultIsNull);
+                return Either<TLeftOut, TRightOut>.FromLeft(leftResult);
             }
 
-            return await right(_rightValue).Map(Either<TLeftOut, TRightOut>.FromRight).ConfigureAwait(false);
+            var rightResult = await right(_rightValue).ConfigureAwait(false);
+            Assume(rightResult != null, Resources.ResultIsNull);
+            return Either<TLeftOut, TRightOut>.FromRight(rightResult);
         }
 
         #endregion
@@ -615,7 +658,7 @@ namespace Tiger.Types
         public Either<TOut, TRight> Bind<TOut>([NotNull, InstantHandle] Func<TLeft, Either<TOut, TRight>> left)
         {
             Requires(left != null);
-            if (IsBottom) { return default(Either<TOut, TRight>); }
+            Requires<InvalidOperationException>(IsLeft || IsRight, Resources.EitherIsBottom);
 
             return IsLeft
                 ? left(_leftValue)
@@ -642,8 +685,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TLeft, Task<Either<TOut, TRight>>> left)
         {
             Requires(left != null);
+            Requires<InvalidOperationException>(this != default(Either<TLeft, TRight>), Resources.EitherIsBottom);
             Ensures(Result<Task<Either<TOut, TRight>>>() != null);
-            if (IsBottom) { return default(Either<TOut, TRight>); }
 
             return IsLeft
                 ? await left(_leftValue).ConfigureAwait(false)
@@ -667,7 +710,7 @@ namespace Tiger.Types
         public Either<TLeft, TOut> Bind<TOut>([NotNull, InstantHandle] Func<TRight, Either<TLeft, TOut>> right)
         {
             Requires(right != null);
-            if (IsBottom) { return default(Either<TLeft, TOut>); }
+            Requires<InvalidOperationException>(IsLeft || IsRight, Resources.EitherIsBottom);
 
             return IsLeft
                 ? _leftValue
@@ -694,8 +737,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TRight, Task<Either<TLeft, TOut>>> right)
         {
             Requires(right != null);
+            Requires<InvalidOperationException>(this != default(Either<TLeft, TRight>), Resources.EitherIsBottom);
             Ensures(Result<Task<Either<TLeft, TOut>>>() != null);
-            if (IsBottom) { return default(Either<TLeft, TOut>); }
 
             return IsLeft
                 ? _leftValue
@@ -732,7 +775,7 @@ namespace Tiger.Types
         {
             Requires(left != null);
             Requires(right != null);
-            if (IsBottom) { return default(Either<TOutLeft, TOutRight>); }
+            Requires<InvalidOperationException>(IsLeft || IsRight, Resources.EitherIsBottom);
 
             return IsLeft
                 ? left(_leftValue)
@@ -770,8 +813,8 @@ namespace Tiger.Types
         {
             Requires(left != null);
             Requires(right != null);
+            Requires<InvalidOperationException>(this != default(Either<TLeft, TRight>), Resources.EitherIsBottom);
             Ensures(Result<Task<Either<TOutLeft, TOutRight>>>() != null);
-            if (IsBottom) { return default(Either<TOutLeft, TOutRight>); }
 
             return IsLeft
                 ? await left(_leftValue).ConfigureAwait(false)
@@ -809,8 +852,8 @@ namespace Tiger.Types
         {
             Requires(left != null);
             Requires(right != null);
+            Requires<InvalidOperationException>(this != default(Either<TLeft, TRight>), Resources.EitherIsBottom);
             Ensures(Result<Task<Either<TOutLeft, TOutRight>>>() != null);
-            if (IsBottom) { return default(Either<TOutLeft, TOutRight>); }
 
             return IsLeft
                 ? left(_leftValue)
@@ -848,8 +891,8 @@ namespace Tiger.Types
         {
             Requires(left != null);
             Requires(right != null);
+            Requires<InvalidOperationException>(this != default(Either<TLeft, TRight>), Resources.EitherIsBottom);
             Ensures(Result<Task<Either<TOutLeft, TOutRight>>>() != null);
-            if (IsBottom) { return default(Either<TOutLeft, TOutRight>); }
 
             return IsLeft
                 ? await left(_leftValue).ConfigureAwait(false)
@@ -909,7 +952,7 @@ namespace Tiger.Types
         [Pure]
         public bool Equals(Either<TLeft, TRight> other)
         { // note(cosborn) Eh, this gets gnarly using other implementations.
-            if (IsBottom && other.IsBottom) { return true; }
+            if (_state == EitherState.Bottom && other._state == EitherState.Bottom) { return true; }
 
             if (IsLeft && other.IsLeft)
             {
@@ -966,17 +1009,15 @@ namespace Tiger.Types
 
         /// <summary>Wraps a value in <see cref="Either{TLeft,TRight}"/>.</summary>
         /// <param name="leftValue">The value to be wrapped.</param>
-        public static implicit operator Either<TLeft, TRight>([CanBeNull] TLeft leftValue) =>
-            leftValue == null
-                ? default(Either<TLeft, TRight>)
-                : new Either<TLeft, TRight>(leftValue);
+        public static implicit operator Either<TLeft, TRight>([CanBeNull] TLeft leftValue) => leftValue == null
+            ? default(Either<TLeft, TRight>)
+            : FromLeft(leftValue);
 
         /// <summary>Wraps a value in <see cref="Either{TLeft,TRight}"/>.</summary>
         /// <param name="rightValue">The value to be wrapped.</param>
-        public static implicit operator Either<TLeft, TRight>([CanBeNull] TRight rightValue) =>
-            rightValue == null
-                ? default(Either<TLeft, TRight>)
-                : new Either<TLeft, TRight>(rightValue);
+        public static implicit operator Either<TLeft, TRight>([CanBeNull] TRight rightValue) => rightValue == null
+            ? default(Either<TLeft, TRight>)
+            : FromRight(rightValue);
 
         #endregion
     }

@@ -1,5 +1,4 @@
 ﻿// ReSharper disable All
-
 using System;
 using NUnit.Framework;
 

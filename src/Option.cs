@@ -14,7 +14,7 @@ namespace Tiger.Types
         /// in the Some state with its Some value set to <paramref name="value"/>.
         /// </returns>
         [Pure]
-        public static Option<TSome> From<TSome>([CanBeNull] TSome value) => value;
+        public static Option<TSome> From<TSome>([CanBeNull] TSome value) => new Option<TSome>(value);
 
         /// <summary>Creates an <see cref="Option{TSome}"/> from the provided value.</summary>
         /// <typeparam name="TSome">The type of <paramref name="value"/>.</typeparam>

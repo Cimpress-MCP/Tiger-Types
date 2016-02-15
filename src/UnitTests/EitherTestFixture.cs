@@ -1,13 +1,15 @@
 ﻿// ReSharper disable All
 
+using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Tiger.Types.Properties;
 
 namespace Tiger.Types.UnitTests
 {
     /* note(cosborn)
      * NUnit doesn't have good support for async in Assert.Throws<T>, so we
-     * work around it where necessary using the accidental support in Assert.That.
+     * work around it where necessary.
      */
     /// <summary>Tests related to <see cref="Either{TLeft,TRight}"/>.</summary>
     [TestFixture(TestOf = typeof(Either<,>))]
@@ -31,7 +33,7 @@ namespace Tiger.Types.UnitTests
         public void FromLeftOne_IsLeft_Left()
         {
             // arrange, act
-            var actual = Either<int>.WithLeft(Sentinel);
+            var actual = Either.Left<string, int>(Sentinel);
 
             // assert
             Assert.That(actual.IsLeft, Is.True);
@@ -51,7 +53,7 @@ namespace Tiger.Types.UnitTests
         public void FromRightOne_IsLeft_Right()
         {
             // arrange, act
-            var actual = Either<int>.WithRight(Sentinel);
+            var actual = Either.Right<int, string>(Sentinel);
 
             // assert
             Assert.That(actual.IsLeft, Is.False);
@@ -81,7 +83,7 @@ namespace Tiger.Types.UnitTests
         public void FromLeftOne_IsRight_Left()
         {
             // arrange, act
-            var actual = Either<int>.WithLeft(Sentinel);
+            var actual = Either.Left<string, int>(Sentinel);
 
             // assert
             Assert.That(actual.IsRight, Is.False);
@@ -91,20 +93,20 @@ namespace Tiger.Types.UnitTests
         public void FromLeftBoth_IsRight_Right()
         {
             // arrange, act
-            var actual = Either<string, int>.FromLeft(Sentinel);
+            var actual = Either<int, string>.FromRight(Sentinel);
 
             // assert
-            Assert.That(actual.IsLeft, Is.True);
+            Assert.That(actual.IsRight, Is.True);
         }
 
         [Test(Description = "A Right Either should be in the Right state.")]
         public void FromLeftOne_IsRight_Right()
         {
             // arrange, act
-            var actual = Either<int>.WithLeft(Sentinel);
+            var actual = Either.Right<int, string>(Sentinel);
 
             // assert
-            Assert.That(actual.IsLeft, Is.True);
+            Assert.That(actual.IsRight, Is.True);
         }
 
         [Test(Description = "A Bottom Either should not be in the Right state.")]
@@ -126,7 +128,7 @@ namespace Tiger.Types.UnitTests
         public void FuncFuncMatchReturn_Left()
         {
             // arrange
-            var value = Either<int>.WithLeft(Sentinel);
+            var value = Either.Left<string, int>(Sentinel);
 
             // act
             var actual = value.Match(
@@ -142,7 +144,7 @@ namespace Tiger.Types.UnitTests
         public void FuncFuncMatchReturn_Right()
         {
             // arrange
-            var value = Either<int>.WithRight(Sentinel);
+            var value = Either.Right<int, string>(Sentinel);
 
             // act
             var actual = value.Match(
@@ -158,7 +160,7 @@ namespace Tiger.Types.UnitTests
         public async Task FuncTaskMatchReturn_Left()
         {
             // arrange
-            var value = Either<int>.WithLeft(Sentinel);
+            var value = Either.Left<string, int>(Sentinel);
 
             // act
             var actual = await value.Match(
@@ -174,7 +176,7 @@ namespace Tiger.Types.UnitTests
         public async Task FuncTaskMatchReturn_Right()
         {
             // arrange
-            var value = Either<int>.WithRight(Sentinel);
+            var value = Either.Right<int, string>(Sentinel);
 
             // act
             var actual = await value.Match(
@@ -190,7 +192,7 @@ namespace Tiger.Types.UnitTests
         public async Task TaskFuncMatchReturn_Left()
         {
             // arrange
-            var value = Either<int>.WithLeft(Sentinel);
+            var value = Either.Left<string, int>(Sentinel);
 
             // act
             var actual = await value.Match(
@@ -206,7 +208,7 @@ namespace Tiger.Types.UnitTests
         public async Task TaskFuncMatchReturn_Right()
         {
             // arrange
-            var value = Either<int>.WithRight(Sentinel);
+            var value = Either.Right<int, string>(Sentinel);
 
             // act
             var actual = await value.Match(
@@ -222,7 +224,7 @@ namespace Tiger.Types.UnitTests
         public async Task TaskTaskMatchReturn_Left()
         {
             // arrange
-            var value = Either<int>.WithLeft(Sentinel);
+            var value = Either.Left<string, int>(Sentinel);
 
             // act
             var actual = await value.Match(
@@ -238,7 +240,7 @@ namespace Tiger.Types.UnitTests
         public async Task TaskTaskMatchReturn_Right()
         {
             // arrange
-            var value = Either<int>.WithRight(Sentinel);
+            var value = Either.Right<int, string>(Sentinel);
 
             // act
             var actual = await value.Match(
@@ -254,7 +256,7 @@ namespace Tiger.Types.UnitTests
         public void ActionActionMatchVoid_Left()
         {
             // arrange
-            var value = Either<int>.WithLeft(Sentinel);
+            var value = Either.Left<string, int>(Sentinel);
 
             // act
             var actual = string.Empty;
@@ -271,7 +273,7 @@ namespace Tiger.Types.UnitTests
         public void ActionActionMatchVoid_Right()
         {
             // arrange
-            var value = Either<int>.WithRight(Sentinel);
+            var value = Either.Right<int, string>(Sentinel);
 
             // act
             var actual = string.Empty;
@@ -288,7 +290,7 @@ namespace Tiger.Types.UnitTests
         public async Task ActionTaskMatchVoid_Left()
         {
             // arrange
-            var value = Either<int>.WithLeft(Sentinel);
+            var value = Either.Left<string, int>(Sentinel);
 
             // act
             var actual = string.Empty;
@@ -305,7 +307,7 @@ namespace Tiger.Types.UnitTests
         public async Task ActionTaskMatchVoid_Right()
         {
             // arrange
-            var value = Either<int>.WithRight(Sentinel);
+            var value = Either.Right<int, string>(Sentinel);
 
             // act
             var actual = string.Empty;
@@ -322,7 +324,7 @@ namespace Tiger.Types.UnitTests
         public async Task TaskActionMatchVoid_Left()
         {
             // arrange
-            var value = Either<string>.WithLeft(Sentinel);
+            var value = Either.Left<string, int>(Sentinel);
 
             // act
             var actual = string.Empty;
@@ -339,7 +341,7 @@ namespace Tiger.Types.UnitTests
         public async Task TaskActionMatchVoid_Right()
         {
             // arrange
-            var value = Either<int>.WithRight(Sentinel);
+            var value = Either.Right<int, string>(Sentinel);
 
             // act
             var actual = string.Empty;
@@ -356,7 +358,7 @@ namespace Tiger.Types.UnitTests
         public async Task TaskTaskMatchVoid_Left()
         {
             // arrange
-            var value = Either<int>.WithLeft(Sentinel);
+            var value = Either.Left<string, int>(Sentinel);
 
             // act
             var actual = string.Empty;
@@ -373,7 +375,7 @@ namespace Tiger.Types.UnitTests
         public async Task TaskTaskMatchVoid_Right()
         {
             // arrange
-            var value = Either<int>.WithRight(Sentinel);
+            var value = Either.Right<int, string>(Sentinel);
 
             // act
             var actual = string.Empty;
@@ -393,74 +395,72 @@ namespace Tiger.Types.UnitTests
         public void FuncMapLeft_Left()
         {
             // arrange
-            var value = Either<int>.WithLeft("megatron");
+            var value = Either.Left<string, int>("megatron");
 
             // act
             var actual = value.Map(left: _ => Sentinel);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Either<int>.WithLeft(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Either.Left<string, int>(Sentinel)));
         }
 
         [Test(Description = "Left-Mapping a Right Either over a func should return a Right Either.")]
         public void FuncMapLeft_Right()
         {
             // arrange
-            var value = Either<int>.WithRight(Sentinel);
+            var value = Either.Right<int, string>(Sentinel);
 
             // act
             var actual = value.Map(left: _ => false);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Either<bool>.WithRight(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Either.Right<bool, string>(Sentinel)));
         }
 
         [Test(Description = "Left-Mapping a Left Either over a task should return a Left Either.")]
         public async Task TaskMapLeft_Left()
         {
             // arrange
-            var value = Either<int>.WithLeft("megatron");
+            var value = Either.Left<string, int>("megatron");
 
             // act
             var actual = await value.Map(left: _ => Task.FromResult(Sentinel));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Either<int>.WithLeft(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Either.Left<string, int>(Sentinel)));
         }
 
         [Test(Description = "Left-Mapping a Right Either over a task should return a Right Either.")]
         public async Task TaskMapLeft_Right()
         {
             // arrange
-            var value = Either<int>.WithRight(Sentinel);
-            Assert.True(value.IsRight);
+            var value = Either.Right<int, string>(Sentinel);
 
             // act
             var actual = await value.Map(left: _ => Task.FromResult(false));
-            Assert.IsTrue(actual.IsRight);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Either<bool>.WithRight(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Either.Right<bool, string>(Sentinel)));
         }
 
         [Test(Description = "Right-Mapping a Left Either over a func should return a Left Either.")]
         public void FuncMapRight_Left()
         {
             // arrange
-            var value = Either<int>.WithLeft(Sentinel);
+            var value = Either.Left<string, int>(Sentinel);
 
             // act
             var actual = value.Map(right: _ => 42);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Either<int>.WithLeft(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Either.Left<string, int>(Sentinel)));
         }
 
         [Test(Description = "Right-Mapping a Right Either over a func should return a Right Either.")]
         public void FuncMapRight_Right()
         {
             // arrange
-            var value = Either<int>.WithRight("megatron");
+            var value = Either.Right<int, string>("megatron");
             Assert.True(value.IsRight);
 
             // act
@@ -468,40 +468,40 @@ namespace Tiger.Types.UnitTests
             Assert.IsTrue(actual.IsRight);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Either<int>.WithRight(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Either.Right<int, string>(Sentinel)));
         }
 
         [Test(Description = "Right-Mapping a Left Either over a task should return a Left Either.")]
         public async Task TaskMapRight_Left()
         {
             // arrange
-            var value = Either<int>.WithLeft(Sentinel);
+            var value = Either.Left<string, int>(Sentinel);
 
             // act
             var actual = await value.Map(right: _ => Task.FromResult(42));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Either<int>.WithLeft(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Either.Left<string, int>(Sentinel)));
         }
 
         [Test(Description = "Right-Mapping a Right Either over a task should return a Right Either.")]
         public async Task TaskMapRight_Right()
         {
             // arrange
-            var value = Either<int>.WithRight("megatron");
+            var value = Either.Right<int, string>("megatron");
 
             // act
             var actual = await value.Map(right: _ => Task.FromResult(Sentinel));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Either<int>.WithRight(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Either.Right<int, string>(Sentinel)));
         }
 
         [Test(Description = "Mapping a Left Either over a func should return a Left Either.")]
         public void FuncFuncMap_Left()
         {
             // arrange
-            var value = Either<int>.WithLeft("megatron");
+            var value = Either.Left<string, int>("megatron");
 
             // act
             var actual = value.Map(
@@ -509,14 +509,14 @@ namespace Tiger.Types.UnitTests
                 right: r => r);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Either<int>.WithLeft(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Either.Left<string, int>(Sentinel)));
         }
 
         [Test(Description = "Mapping a Right Either over a func should return a Right Either.")]
         public void FuncFuncMap_Right()
         {
             // arrange
-            var value = Either<int>.WithRight(Sentinel);
+            var value = Either.Right<int, string>(Sentinel);
 
             // act
             var actual = value.Map(
@@ -524,14 +524,14 @@ namespace Tiger.Types.UnitTests
                 right: r => r);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Either<bool>.WithRight(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Either.Right<bool, string>(Sentinel)));
         }
 
         [Test(Description = "Mapping a Left Either over a func should return a Left Either.")]
         public async Task FuncTaskMap_Left()
         {
             // arrange
-            var value = Either<int>.WithLeft("megatron");
+            var value = Either.Left<string, int>("megatron");
 
             // act
             var actual = await value.Map(
@@ -539,14 +539,14 @@ namespace Tiger.Types.UnitTests
                 right: r => r);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Either<int>.WithLeft(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Either.Left<string, int>(Sentinel)));
         }
 
         [Test(Description = "Mapping a Right Either over a task should return a Right Either.")]
         public async Task FuncTaskMap_Right()
         {
             // arrange
-            var value = Either<int>.WithRight(Sentinel);
+            var value = Either.Right<int, string>(Sentinel);
 
             // act
             var actual = await value.Map(
@@ -554,14 +554,14 @@ namespace Tiger.Types.UnitTests
                 right: r => r);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Either<bool>.WithRight(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Either.Right<bool, string>(Sentinel)));
         }
 
         [Test(Description = "Mapping a Left Either over a task should return a Left Either.")]
         public async Task TaskFuncMap_Left()
         {
             // arrange
-            var value = Either<int>.WithLeft("megatron");
+            var value = Either.Left<string, int>("megatron");
 
             // act
             var actual = await value.Map(
@@ -569,14 +569,14 @@ namespace Tiger.Types.UnitTests
                 right: Task.FromResult);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Either<int>.WithLeft(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Either.Left<string, int>(Sentinel)));
         }
 
         [Test(Description = "Mapping a Right Either over a func should return a Right Either.")]
         public async Task TaskFuncMap_Right()
         {
             // arrange
-            var value = Either<int>.WithRight(Sentinel);
+            var value = Either.Right<int, string>(Sentinel);
 
             // act
             var actual = await value.Map(
@@ -584,14 +584,14 @@ namespace Tiger.Types.UnitTests
                 right: Task.FromResult);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Either<bool>.WithRight(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Either.Right<bool, string>(Sentinel)));
         }
 
         [Test(Description = "Mapping a Left Either over a task should return a Left Either.")]
         public async Task TaskTaskMap_Left()
         {
             // arrange
-            var value = Either<int>.WithLeft("megatron");
+            var value = Either.Left<string, int>("megatron");
 
             // act
             var actual = await value.Map(
@@ -599,14 +599,14 @@ namespace Tiger.Types.UnitTests
                 right: Task.FromResult);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Either<int>.WithLeft(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Either.Left<string, int>(Sentinel)));
         }
 
         [Test(Description = "Mapping a Right Either over a task should return a Right Either.")]
         public async Task TaskTaskMap_Right()
         {
             // arrange
-            var value = Either<int>.WithRight(Sentinel);
+            var value = Either.Right<int, string>(Sentinel);
 
             // act
             var actual = await value.Map(
@@ -614,7 +614,7 @@ namespace Tiger.Types.UnitTests
                 right: Task.FromResult);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Either<bool>.WithRight(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Either.Right<bool, string>(Sentinel)));
         }
 
         #endregion

@@ -1,5 +1,4 @@
 ﻿// ReSharper disable All
-
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,7 +9,7 @@ namespace Tiger.Types.UnitTests
 {
     /* note(cosborn)
      * NUnit doesn't have good support for async in Assert.Throws<T>, so we
-     * work around it where necessary using the accidental support in Assert.That.
+     * work around it where necessary.
      */
     /// <summary>Tests related to <see cref="Option{TSome}"/>.</summary>
     [TestFixture(TestOf = typeof(Option<>))]

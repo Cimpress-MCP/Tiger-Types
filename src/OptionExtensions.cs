@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
+using Tiger.Types.Properties;
 using static System.Diagnostics.Contracts.Contract;
 using PureAttribute = System.Diagnostics.Contracts.PureAttribute;
 
@@ -231,16 +232,19 @@ namespace Tiger.Types
         /// <param name="seed">The initial accumulator value.</param>
         /// <param name="func">An accumulator value to be invoked on the Some value.</param>
         /// <returns>The final accumulator value.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="seed"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
-        [Pure, CanBeNull]
+        [Pure, NotNull]
         public static TAccumulate Aggregate<TSource, TAccumulate>(
             this Option<TSource> source,
-            [CanBeNull] TAccumulate seed,
+            [NotNull] TAccumulate seed,
             [NotNull, InstantHandle] Func<TAccumulate, TSource, TAccumulate> func)
-        { // note(cosborn) Can't re-use the Fold implementation due to the [CanBeNull] requirement.
+        {
+            Requires<ArgumentNullException>(seed != null);
             Requires<ArgumentNullException>(func != null);
+            Ensures(Result<TAccumulate>() != null);
 
-            return source.Map(v => func(seed, v)).GetValueOrDefault(seed);
+            return source.Fold(seed, func);
         }
 
         /// <summary>
@@ -258,19 +262,24 @@ namespace Tiger.Types
         /// A function to transform the final accumulator value into the result value.
         /// </param>
         /// <returns>The transformed final return accumulator value.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="seed"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="resultSelector"/> is <see langword="null"/>.</exception>
-        [Pure, CanBeNull]
+        [Pure, NotNull]
         public static TResult Aggregate<TSource, TAccumulate, TResult>(
             this Option<TSource> source,
-            [CanBeNull] TAccumulate seed,
+            [NotNull] TAccumulate seed,
             [NotNull, InstantHandle] Func<TAccumulate, TSource, TAccumulate> func,
             [NotNull, InstantHandle] Func<TAccumulate, TResult> resultSelector)
-        { // note(cosborn) Can't re-use the Fold implementation due to the [CanBeNull] requirement.
+        {
+            Requires<ArgumentNullException>(seed != null);
             Requires<ArgumentNullException>(func != null);
             Requires<ArgumentNullException>(resultSelector != null);
+            Ensures(Result<TResult>() != null);
 
-            return resultSelector(source.Map(v => func(seed, v)).GetValueOrDefault(seed));
+            var result = source.Fold(seed, func).Pipe(resultSelector);
+            Assume(result != null, Resources.ResultIsNull);
+            return result;
         }
 
         #endregion
