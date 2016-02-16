@@ -609,7 +609,39 @@ namespace Tiger.Types
 
         #endregion
 
-        #region Other Useful Methods
+        #region Let
+
+        /// <summary>Performs an action on the Some value of this instance.</summary>
+        /// <param name="action">An action to perform.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="action"/> is <see langword="null"/>.</exception>
+        public void Let([NotNull, InstantHandle] Action<TSome> action)
+        {
+            Requires<ArgumentNullException>(action != null);
+
+            if (IsSome)
+            {
+                action(_someValue);
+            }
+        }
+
+        /// <summary>Performs an action on the Some value of this instance, asynchronously.</summary>
+        /// <param name="action">An action to perform asynchronously.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="action"/> is <see langword="null"/>.</exception>
+        [NotNull]
+        public async Task Let([NotNull, InstantHandle] Func<TSome, Task> action)
+        {
+            Requires<ArgumentNullException>(action != null);
+            Ensures(Result<Task>() != null);
+
+            if (IsSome)
+            {
+                await action(_someValue);
+            }
+        }
+
+        #endregion
+
+        #region Value
 
         /// <summary>Gets the Some value of this instance.</summary>
         /// <remarks>This property is unsafe, as it can throw if this instance is in the None state.</remarks>
@@ -711,34 +743,6 @@ namespace Tiger.Types
                 : _someValue;
             Assume(result != null, Resources.ResultIsNull);
             return result;
-        }
-
-        /// <summary>Performs an action on the Some value of this instance.</summary>
-        /// <param name="action">An action to perform.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="action"/> is <see langword="null"/>.</exception>
-        public void Let([NotNull, InstantHandle] Action<TSome> action)
-        {
-            Requires<ArgumentNullException>(action != null);
-
-            if (IsSome)
-            {
-                action(_someValue);
-            }
-        }
-
-        /// <summary>Performs an action on the Some value of this instance, asynchronously.</summary>
-        /// <param name="action">An action to perform asynchronously.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="action"/> is <see langword="null"/>.</exception>
-        [NotNull]
-        public async Task Let([NotNull, InstantHandle] Func<TSome, Task> action)
-        {
-            Requires<ArgumentNullException>(action != null);
-            Ensures(Result<Task>() != null);
-
-            if (IsSome)
-            {
-                await action(_someValue);
-            }
         }
 
         #endregion
