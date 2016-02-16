@@ -716,7 +716,7 @@ namespace Tiger.Types
         /// <summary>Performs an action on the Some value of this instance.</summary>
         /// <param name="action">An action to perform.</param>
         /// <exception cref="ArgumentNullException"><paramref name="action"/> is <see langword="null"/>.</exception>
-        public void IfSome([NotNull, InstantHandle] Action<TSome> action)
+        public void Let([NotNull, InstantHandle] Action<TSome> action)
         {
             Requires<ArgumentNullException>(action != null);
 
@@ -730,7 +730,7 @@ namespace Tiger.Types
         /// <param name="action">An action to perform asynchronously.</param>
         /// <exception cref="ArgumentNullException"><paramref name="action"/> is <see langword="null"/>.</exception>
         [NotNull]
-        public async Task IfSome([NotNull, InstantHandle] Func<TSome, Task> action)
+        public async Task Let([NotNull, InstantHandle] Func<TSome, Task> action)
         {
             Requires<ArgumentNullException>(action != null);
             Ensures(Result<Task>() != null);

@@ -132,9 +132,10 @@ namespace Tiger.Types
         /// <summary>Invokes an action on the Some value of an optional value.</summary>
         /// <typeparam name="TSource">The Some type of <paramref name="source"/>.</typeparam>
         /// <param name="source">An optional value on which to perform an action.</param>
-        /// <param name="onNext">An action to invoke on the Some value.</param>
+        /// <param name="onNext">An action to invoke.</param>
         /// <returns>The original value, exhibiting the specified side effects.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="onNext"/> is <see langword="null"/>.</exception>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static Option<TSource> Do<TSource>(
             this Option<TSource> source,
             [NotNull, InstantHandle] Action<TSource> onNext)
@@ -144,7 +145,21 @@ namespace Tiger.Types
             return source.Tap(onNext);
         }
 
-        // ReSharper disable once ExceptionNotThrown
+        /// <summary>Invokes an action on the Some value of an optional value.</summary>
+        /// <typeparam name="TSource">The Some type of <paramref name="source"/>.</typeparam>
+        /// <param name="source">An optional value on which to perform an action.</param>
+        /// <param name="onNext">An action to invoke.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="onNext"/> is <see langword="null"/>.</exception>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void ForEach<TSource>(
+            this Option<TSource> source,
+            [NotNull, InstantHandle] Action<TSource> onNext)
+        {
+            Requires<ArgumentNullException>(onNext != null);
+
+            source.Let(onNext);
+        }
+
         /// <summary>Filters the Some value of an optional value based on a predicate.</summary>
         /// <typeparam name="TSource">The Some type of <paramref name="source"/>.</typeparam>
         /// <param name="source">An <see cref="Option{TSome}"/> to filter.</param>
@@ -259,7 +274,7 @@ namespace Tiger.Types
         /// <returns>The final accumulator value.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="seed"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
-        [Pure, NotNull]
+        [Pure, NotNull, EditorBrowsable(EditorBrowsableState.Never)]
         public static TAccumulate Aggregate<TSource, TAccumulate>(
             this Option<TSource> source,
             [NotNull] TAccumulate seed,
@@ -290,7 +305,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="seed"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="resultSelector"/> is <see langword="null"/>.</exception>
-        [Pure, NotNull]
+        [Pure, NotNull, EditorBrowsable(EditorBrowsableState.Never)]
         public static TResult Aggregate<TSource, TAccumulate, TResult>(
             this Option<TSource> source,
             [NotNull] TAccumulate seed,

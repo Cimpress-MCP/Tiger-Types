@@ -924,14 +924,14 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Conditionally executing an action based on a None Option " +
                             "should not execute.")]
-        public void ActionIfSome_None()
+        public void ActionLet_None()
         {
             // arrange
             var value = Option<string>.None;
 
             // act
             var actual = Sentinel;
-            value.IfSome(v => actual = string.Empty);
+            value.Let(v => actual = string.Empty);
 
             // assert
             Assert.That(actual, Is.EqualTo(Sentinel));
@@ -939,14 +939,14 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Conditionally executing an action based on a Some Option " +
                             "should execute.")]
-        public void ActionIfSome_Some()
+        public void ActionLet_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
 
             // act
             var actual = string.Empty;
-            value.IfSome(v => actual = v);
+            value.Let(v => actual = v);
 
             // assert
             Assert.That(actual, Is.EqualTo(Sentinel));
@@ -954,14 +954,14 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Conditionally executing a task based on a None Option " +
                             "should not execute.")]
-        public async Task TaskIfSome_None()
+        public async Task TaskLet_None()
         {
             // arrange
             var value = Option<string>.None;
 
             // act
             var actual = Sentinel;
-            await value.IfSome(v => Task.Run(() => actual = string.Empty));
+            await value.Let(v => Task.Run(() => actual = string.Empty));
 
             // assert
             Assert.That(actual, Is.EqualTo(Sentinel));
@@ -969,14 +969,14 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Conditionally executing a task based on a Some Option " +
                             "should execute.")]
-        public async Task TaskIfSome_Some()
+        public async Task TaskLet_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
 
             // act
             var actual = string.Empty;
-            await value.IfSome(v => Task.Run(() => actual = v));
+            await value.Let(v => Task.Run(() => actual = v));
 
             // assert
             Assert.That(actual, Is.EqualTo(Sentinel));
@@ -1261,7 +1261,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "A None Option should not iterate.")]
         [Category("Implementation")]
-        public void ForEach_None()
+        public void GetEnumerator_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -1279,7 +1279,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "A Some Option should not iterate.")]
         [Category("Implementation")]
-        public void ForEach_Some()
+        public void GetEnumerator_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
@@ -2303,6 +2303,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Tapping a None Option over a func should return a None Option " +
                             "and perform no action.")]
+        [Category("Extension")]
         public void Do_None()
         {
             // arrange
@@ -2319,6 +2320,7 @@ namespace Tiger.Types.UnitTests
 
         [Test(Description = "Tapping a Some Option over a func should return a Some Option " +
                             "and perform an action.")]
+        [Category("Extension")]
         public void Do_Some()
         {
             // arrange
@@ -2331,6 +2333,38 @@ namespace Tiger.Types.UnitTests
             // assert
             Assert.That(actual, Is.EqualTo(value));
             Assert.That(output, Is.EqualTo(Sentinel));
+        }
+
+        [Test(Description = "Conditionally executing an action based on a None Option " +
+                            "should not execute.")]
+        [Category("Extension")]
+        public void ForEach_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = Sentinel;
+            value.ForEach(v => actual = string.Empty);
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Sentinel));
+        }
+
+        [Test(Description = "Conditionally executing an action based on a Some Option " +
+                            "should execute.")]
+        [Category("Extension")]
+        public void ForEach_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = string.Empty;
+            value.ForEach(v => actual = v);
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Sentinel));
         }
 
         [Test(Description = "Selecting a None Option should produce a None Option.")]

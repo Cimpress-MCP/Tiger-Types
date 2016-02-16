@@ -56,9 +56,11 @@ This is almost identical to `Select` on `IEnumerable<T>`:  If the sequence is em
 
 - `Match` <small>(Action-Performing)</small>: Associates a value of `Action<U>` with the `None` state and a value of `Action<TSome>` with the `Some` state, and invokes the function that matches the input value's state.
 
-- `Filter`: Given a predicate value of `Func<TSome, bool>`, returns the original value if it is in the `Some` state and its `Some` value passes the predicate; otherwise, returns an `Option<TSome>` in the `None` state. <small>Aliased to `Where`, from th BCL.</small>
+- `Filter`: Given a predicate value of `Func<TSome, bool>`, returns the original value if it is in the `Some` state and its `Some` value passes the predicate; otherwise, returns an `Option<TSome>` in the `None` state. <small>Aliased to `Where`, from the BCL.</small>
 
 - `Tap`: Given a value of `Action<TSome>`, performs that action if the original value is in the `Some` state, then returns the original value -- most useful for chained methods. <small>Aliased to `Do`, from the Interactive Extensions.</small>
+
+- `Let`: Given a value of `Action<TSome>`, performs that action if the original value is in the `Some` state. <small>Aliased to `ForEach`, from the Interactive Extensions.</small>
 
 ### A Note on Aliases
 
