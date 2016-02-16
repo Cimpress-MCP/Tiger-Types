@@ -2212,7 +2212,7 @@ namespace Tiger.Types.UnitTests
         [TestCase(3)]
         [TestCase(-1)]
         [Category("Extension")]
-        public void None_Contains(int testValue)
+        public void Contains_None(int testValue)
         {
             // arrange
             var value = Option<int>.None;
@@ -2227,7 +2227,7 @@ namespace Tiger.Types.UnitTests
         [Test(Description = "Asking a Some option whether it contains a value that it doesn't" +
                             "should return false.")]
         [Category("Extension")]
-        public void Some_Contains_False()
+        public void Contains_Some_False()
         {
             // arrange
             var value = Option.From(Sentinel);
@@ -2242,7 +2242,7 @@ namespace Tiger.Types.UnitTests
         [Test(Description = "Asking a Some option whether it contains a value that it does" +
                             "should return true.")]
         [Category("Extension")]
-        public void Some_Contains_True()
+        public void Contains_Some_True()
         {
             // arrange
             var value = Option.From(Sentinel);
@@ -2259,7 +2259,7 @@ namespace Tiger.Types.UnitTests
         [TestCase(3)]
         [TestCase(-1)]
         [Category("Extension")]
-        public void None_ComparerContains(int testValue)
+        public void ComparerContains_None(int testValue)
         {
             // arrange
             var value = Option<int>.None;
@@ -2274,7 +2274,7 @@ namespace Tiger.Types.UnitTests
         [Test(Description = "Asking a Some option whether it contains a value that it doesn't" +
                             "should return false.")]
         [Category("Extension")]
-        public void Some_ComparerContains_False()
+        public void ComparerContains_Some_False()
         {
             // arrange
             var value = Option.From(Sentinel);
@@ -2289,7 +2289,7 @@ namespace Tiger.Types.UnitTests
         [Test(Description = "Asking a Some option whether it contains a value that it does" +
                             "should return true.")]
         [Category("Extension")]
-        public void Some_ComparerContains_True()
+        public void ComparerContains_Some_True()
         {
             // arrange
             var value = Option.From(Sentinel);
@@ -2299,6 +2299,38 @@ namespace Tiger.Types.UnitTests
 
             // assert
             Assert.That(actual, Is.True);
+        }
+
+        [Test(Description = "Tapping a None Option over a func should return a None Option " +
+                            "and perform no action.")]
+        public void Do_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var output = Sentinel;
+            var actual = value.Do(v => output = string.Empty);
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Option<string>.None));
+            Assert.That(output, Is.EqualTo(Sentinel));
+        }
+
+        [Test(Description = "Tapping a Some Option over a func should return a Some Option " +
+                            "and perform an action.")]
+        public void Do_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var output = string.Empty;
+            var actual = value.Do(v => output = Sentinel);
+
+            // assert
+            Assert.That(actual, Is.EqualTo(value));
+            Assert.That(output, Is.EqualTo(Sentinel));
         }
 
         [Test(Description = "Selecting a None Option should produce a None Option.")]

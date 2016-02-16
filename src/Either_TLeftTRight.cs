@@ -56,7 +56,7 @@ namespace Tiger.Types
         readonly TRight _rightValue;
 
         /// <exception cref="ArgumentNullException"><paramref name="leftValue"/> is <see langword="null"/>.</exception>
-        Either([NotNull] TLeft leftValue)
+        internal Either([NotNull] TLeft leftValue)
             : this()
         {
             Requires<ArgumentNullException>(leftValue != null);
@@ -66,7 +66,7 @@ namespace Tiger.Types
         }
 
         /// <exception cref="ArgumentNullException"><paramref name="rightValue"/> is <see langword="null"/>.</exception>
-        Either([CanBeNull] TRight rightValue)
+        internal Either([NotNull] TRight rightValue)
             : this()
         {
             Requires<ArgumentNullException>(rightValue != null);

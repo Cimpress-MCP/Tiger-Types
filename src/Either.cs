@@ -23,7 +23,7 @@ namespace Tiger.Types
         {
             Requires(leftValue != null);
 
-            return Either<TLeft, TRight>.FromLeft(leftValue);
+            return new Either<TLeft, TRight>(leftValue);
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Tiger.Types
         {
             Requires(rightValue != null);
 
-            return Either<TLeft, TRight>.FromRight(rightValue);
+            return new Either<TLeft, TRight>(rightValue);
         }
     }
 }

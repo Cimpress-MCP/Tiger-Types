@@ -96,9 +96,14 @@ namespace Tiger.Types
         /// <see langword="true"/> if the optional value contains a Some value that has the specified value;
         /// otherwise <see langword="false"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         [Pure]
-        public static bool Contains<TSource>(this Option<TSource> source, [CanBeNull] TSource value) =>
-            source.Any(v => EqualityComparer<TSource>.Default.Equals(v, value));
+        public static bool Contains<TSource>(this Option<TSource> source, [NotNull] TSource value)
+        {
+            Requires<ArgumentNullException>(value != null);
+
+            return source.Any(v => EqualityComparer<TSource>.Default.Equals(v, value));
+        }
 
         /// <summary>
         /// Determines whether an optional value contains a specified value
@@ -112,12 +117,32 @@ namespace Tiger.Types
         /// <see langword="true"/> if the optional value contains a Some value that has the specified value;
         /// otherwise <see langword="false"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         [Pure]
         public static bool Contains<TSource>(
             this Option<TSource> source,
-            [CanBeNull] TSource value,
-            [CanBeNull] IEqualityComparer<TSource> comparer) =>
-                source.Any(v => (comparer ?? EqualityComparer<TSource>.Default).Equals(v, value));
+            [NotNull] TSource value,
+            [CanBeNull] IEqualityComparer<TSource> comparer)
+        {
+            Requires<ArgumentNullException>(value != null);
+
+            return source.Any(v => (comparer ?? EqualityComparer<TSource>.Default).Equals(v, value));
+        }
+
+        /// <summary>Invokes an action on the Some value of an optional value.</summary>
+        /// <typeparam name="TSource">The Some type of <paramref name="source"/>.</typeparam>
+        /// <param name="source">An optional value on which to perform an action.</param>
+        /// <param name="onNext">An action to invoke on the Some value.</param>
+        /// <returns>The original value, exhibiting the specified side effects.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="onNext"/> is <see langword="null"/>.</exception>
+        public static Option<TSource> Do<TSource>(
+            this Option<TSource> source,
+            [NotNull, InstantHandle] Action<TSource> onNext)
+        {
+            Requires<ArgumentNullException>(onNext != null);
+
+            return source.Tap(onNext);
+        }
 
         // ReSharper disable once ExceptionNotThrown
         /// <summary>Filters the Some value of an optional value based on a predicate.</summary>
