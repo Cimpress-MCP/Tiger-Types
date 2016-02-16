@@ -5,7 +5,7 @@
 Tiger.Types is a library of useful types for C#, ones that are sometimes included by default in other languages.  These types enable and include advanced operations that encapaulate boilerplate logic.  These include, but are not limited to:
 
 - The type `Option<TSome>`, which represents the concept of "a value" or "no value" in a way that is more type-safe than returning `null`.  This maps to failable operations where failure delivers no specific information.
-- The Type `Either<TLeft, TRight>`, which represents the concept of "a value" or "a different value" in a way that is more type-safe than always throwing an exception.  This maps to operations that can return a value upon success, or a detailed error upon failure.
+- The type `Either<TLeft, TRight>`, which represents the concept of "a value" or "a different value" in a way that is more type-safe than always throwing an exception.  This maps to operations that can return a value upon success, or a detailed error upon failure.
 - Advanced operations on `Task<T>`, which allow you to transform values while remaining within the `Task<T>` context.
 
 ## Why You Want It
