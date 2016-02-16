@@ -46,25 +46,25 @@ potentialString.Map(s => ToAllUpperCase(s));
 
 (Of course, your caller could also write `potentialString.Map(s => s.ToUpper())`, but then you're out of a job!)
 
-This is almost identical to `Select` on `IEnumerable<T>`:  If the sequence is empty, we get back an empty sequence.  If the sequence has elements, the elements are transformed.  For `Option<TSome>` the "empty" state is called `None`, and the "has elements" state is called `Some`.  There are many such useful operations on optional values.  Here's an abridged list.
+This is almost identical to `Select` on `IEnumerable<T>`:  If the sequence is empty, we get back an empty sequence.  If the sequence has elements, the elements are transformed.  For `Option<TSome>` the "empty" state is called <i>None</i>, and the "has elements" state is called <i>Some</i>.  There are many such useful operations on optional values.  Here's an abridged list.
 
 - `Map`: Given a value of `Func<TSome, U>`, returns an `Option<U>` in the same state as the input value. <small>Aliased to `Select`, from the BCL.</small>
 
 - `Bind`: Given a value of `Func<TSome, Option<U>>`, calculates an `Option<Option<U>>` and flattens it to `Option<U>` before returning. <small>Aliased to `SelectMany`, from the BCL.</small>
 
-- `Match` <small>(Value-Returning)</small>: Associates a value of `Func<U>` with the `None` state and a value of `Func<TSome, U>` with the `Some` state, and invokes the function that matches the input value's state.
+- `Match` <small>(Value-Returning)</small>: Associates a value of `Func<U>` with the <i>None</i> state and a value of `Func<TSome, U>` with the <i>Some</i> state, and invokes the function that matches the input value's state.
 
-- `Match` <small>(Action-Performing)</small>: Associates a value of `Action<U>` with the `None` state and a value of `Action<TSome>` with the `Some` state, and invokes the function that matches the input value's state.
+- `Match` <small>(Action-Performing)</small>: Associates a value of `Action<U>` with the <i>None</i> state and a value of `Action<TSome>` with the <i>Some</i> state, and invokes the function that matches the input value's state.
 
-- `Filter`: Given a predicate value of `Func<TSome, bool>`, returns the original value if it is in the `Some` state and its `Some` value passes the predicate; otherwise, returns an `Option<TSome>` in the `None` state. <small>Aliased to `Where`, from the BCL.</small>
+- `Filter`: Given a predicate value of `Func<TSome, bool>`, returns the original value if it is in the <i>Some</i> state and its <i>Some</i> value passes the predicate; otherwise, returns an `Option<TSome>` in the <i>None</i> state. <small>Aliased to `Where`, from the BCL.</small>
 
-- `Tap`: Given a value of `Action<TSome>`, performs that action if the original value is in the `Some` state, then returns the original value -- most useful for chained methods. <small>Aliased to `Do`, from the Interactive Extensions.</small>
+- `Tap`: Given a value of `Action<TSome>`, performs that action if the original value is in the <i>Some</i> state, then returns the original value -- most useful for chained methods. <small>Aliased to `Do`, from the Interactive Extensions.</small>
 
-- `Let`: Given a value of `Action<TSome>`, performs that action if the original value is in the `Some` state. <small>Aliased to `ForEach`, from the Interactive Extensions.</small>
+- `Let`: Given a value of `Action<TSome>`, performs that action if the original value is in the <i>Some</i> state. <small>Aliased to `ForEach`, from the Interactive Extensions.</small>
 
 ### A Note on Aliases
 
-Many of the methods on these types are aliased to LINQ-standard names.  This is for reasons of developer familiarity and activating certain C# features.  For example, implementing `Select`, `SelectMany` and `Where` allows the LINQ query syntax to be used.  For example, using `Option<T>` again:
+Many of the methods on these types are aliased to LINQ-standard names.  This is for reasons of developer familiarity and activating certain C# features.  For example, implementing `Select`, `SelectMany`, and `Where` allows the LINQ query syntax to be used.  For example, using `Option<T>` again:
 
 ```
 var left = Option.From(3); // Some(3)
@@ -75,7 +75,7 @@ var sum = from l in left
           select l + r; // Some(7)
 ```
 
-However, if either of the input values is in the `None` state, the operation fails.
+However, if either of the input values is in the <i>None</i> state, the operation fails.
 
 ```
 var left = Option<int>.None; // None
@@ -86,7 +86,7 @@ var sum = from l in left
           select l + r; // None
 ```
 
-Additionally, implementing `GetEnumerator` allows an `Option<TSome>` to be used with the `foreach` statement, which will execute its body only if the optional value is in the `Some` state.
+Additionally, implementing `GetEnumerator` allows an `Option<TSome>` to be used with the `foreach` statement, which will execute its body only if the optional value is in the <i>Some</i> state.
 
 ```
 foreach (var value in Option.From("world"))
@@ -102,7 +102,7 @@ foreach (var value in Option<string>.None)
 
 ### A Note on `null`
 
-Most of this library is allergic to `null`.  It advertises where `null` is allowed, and where it is not -- heavily tilted to the latter.  If returning `null` from a passed function would violate the semantics of an operation, then that method will thow an exception.  For example, the contract of `Map` is that it will only return an optional value in the `None` state if the original value is in the `None` state.  However, if returning `null` from the passed function were allowed, that would put the returned value into the `None` state.  This should be refactored into a method of type `Func<TSome, Option<U>>`, and used with the `Bind` operation.
+Most of this library is allergic to `null`.  It advertises where `null` is allowed, and where it is not -- heavily tilted to the latter.  If returning `null` from a passed function would violate the semantics of an operation, then that method will thow an exception.  For example, the contract of `Map` is that it will only return an optional value in the <i>None</i> state if the original value is in the <i>None</i> state.  However, if returning `null` from the passed function were allowed, that would put the returned value into the <i>None</i> state.  This should be refactored into a method of type `Func<TSome, Option<U>>`, and used with the `Bind` operation.
 
 ## How You Develop It
 
