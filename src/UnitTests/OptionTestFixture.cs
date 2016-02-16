@@ -482,70 +482,81 @@ namespace Tiger.Types.UnitTests
 
         #endregion
 
-        #region Tap
+        #region Bind
 
-        [Test(Description = "Tapping a None Option over a func should return a None Option " +
-                            "and perform no action.")]
-        public void FuncTap_None()
+        [Test(Description = "Binding a None Option over a func should return a None Option.")]
+        public void FuncBind_None()
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var output = Sentinel;
-            var actual = value.Tap(v => output = string.Empty);
+            var actual = value.Bind(v => v.Length == 0 ? Option.None : Option.From(v.Length));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Option<string>.None));
-            Assert.That(output, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(Option<int>.None));
         }
 
-        [Test(Description = "Tapping a Some Option over a func should return a Some Option " +
-                            "and perform an action.")]
-        public void FuncTap_Some()
+        [Test(Description = "Binding a Some Option over a func returning a None Option " +
+                            "should return a None Option.")]
+        public void FuncBind_ReturnNone_Some()
+        {
+            // arrange
+            var value = Option.From(string.Empty);
+
+            // act
+            var actual = value.Bind(v => v.Length == 0 ? Option.None : Option.From(v.Length));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Option<int>.None));
+        }
+
+        [Test(Description = "Binding a Some Option over a func returning a Some Option " +
+                            "should return a Some Option.")]
+        public void FuncBindReturnSome_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
 
             // act
-            var output = string.Empty;
-            var actual = value.Tap(v => output = Sentinel);
+            var actual = value.Bind(v => v.Length == 0 ? Option.None : Option.From(v.Length));
 
             // assert
-            Assert.That(actual, Is.EqualTo(value));
-            Assert.That(output, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(Sentinel.Length.Pipe(Option.From)));
         }
 
-        [Test(Description = "Tapping a None Option over a task should return a None Option " +
-                            "and perform no action.")]
-        public async Task TaskTap_None()
+        [Test(Description = "Binding a Some Option over a task returning a None Option " +
+                            "should return a None Option.")]
+        public async Task TaskBind_ReturnNone_Some()
         {
             // arrange
-            var value = Option<string>.None;
+            var value = Option.From(string.Empty);
 
             // act
-            var output = Sentinel;
-            var actual = await value.Tap(v => Task.Run(() => output = string.Empty));
+            var actual = await value.Bind(v =>
+                Task.FromResult(v.Length == 0
+                    ? Option.None
+                    : Option.From(v.Length)));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Option<string>.None));
-            Assert.That(output, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(Option<int>.None));
         }
 
-        [Test(Description = "Tapping a Some Option over a task should return a Some Option " +
-                            "and perform an action.")]
-        public async Task TaskTap_Some()
+        [Test(Description = "Binding a Some Option over a task returning a Some Option " +
+                            "should return a Some Option.")]
+        public async Task TaskBindReturnSome_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
 
             // act
-            var output = string.Empty;
-            var actual = await value.Tap(v => Task.Run(() => output = Sentinel));
+            var actual = await value.Bind(v =>
+                Task.FromResult(v.Length == 0
+                    ? Option.None
+                    : Option.From(v.Length)));
 
             // assert
-            Assert.That(actual, Is.EqualTo(value));
-            Assert.That(output, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(Sentinel.Length.Pipe(Option.From)));
         }
 
         #endregion
@@ -696,86 +707,221 @@ namespace Tiger.Types.UnitTests
 
         #endregion
 
-        #region Bind
+        #region Tap
 
-        [Test(Description = "Binding a None Option over a func should return a None Option.")]
-        public void FuncBind_None()
+        [Test(Description = "Tapping a None Option over a func should return a None Option " +
+                            "and perform no action.")]
+        public void FuncTap_None()
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = value.Bind(v => v.Length == 0 ? Option.None : Option.From(v.Length));
+            var output = Sentinel;
+            var actual = value.Tap(v => output = string.Empty);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Option<int>.None));
+            Assert.That(actual, Is.EqualTo(Option<string>.None));
+            Assert.That(output, Is.EqualTo(Sentinel));
         }
 
-        [Test(Description = "Binding a Some Option over a func returning a None Option " +
-                            "should return a None Option.")]
-        public void FuncBind_ReturnNone_Some()
-        {
-            // arrange
-            var value = Option.From(string.Empty);
-
-            // act
-            var actual = value.Bind(v => v.Length == 0 ? Option.None : Option.From(v.Length));
-
-            // assert
-            Assert.That(actual, Is.EqualTo(Option<int>.None));
-        }
-
-        [Test(Description = "Binding a Some Option over a func returning a Some Option " +
-                            "should return a Some Option.")]
-        public void FuncBindReturnSome_Some()
+        [Test(Description = "Tapping a Some Option over a func should return a Some Option " +
+                            "and perform an action.")]
+        public void FuncTap_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
 
             // act
-            var actual = value.Bind(v => v.Length == 0 ? Option.None : Option.From(v.Length));
+            var output = string.Empty;
+            var actual = value.Tap(v => output = Sentinel);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel.Length.Pipe(Option.From)));
+            Assert.That(actual, Is.EqualTo(value));
+            Assert.That(output, Is.EqualTo(Sentinel));
         }
 
-        [Test(Description = "Binding a Some Option over a task returning a None Option " +
-                            "should return a None Option.")]
-        public async Task TaskBind_ReturnNone_Some()
+        [Test(Description = "Tapping a None Option over a task should return a None Option " +
+                            "and perform no action.")]
+        public async Task TaskTap_None()
         {
             // arrange
-            var value = Option.From(string.Empty);
+            var value = Option<string>.None;
 
             // act
-            var actual = await value.Bind(v =>
-                Task.FromResult(v.Length == 0
-                    ? Option.None
-                    : Option.From(v.Length)));
+            var output = Sentinel;
+            var actual = await value.Tap(v => Task.Run(() => output = string.Empty));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Option<int>.None));
+            Assert.That(actual, Is.EqualTo(Option<string>.None));
+            Assert.That(output, Is.EqualTo(Sentinel));
         }
 
-        [Test(Description = "Binding a Some Option over a task returning a Some Option " +
-                            "should return a Some Option.")]
-        public async Task TaskBindReturnSome_Some()
+        [Test(Description = "Tapping a Some Option over a task should return a Some Option " +
+                            "and perform an action.")]
+        public async Task TaskTap_Some()
         {
             // arrange
             var value = Option.From(Sentinel);
 
             // act
-            var actual = await value.Bind(v =>
-                Task.FromResult(v.Length == 0
-                    ? Option.None
-                    : Option.From(v.Length)));
+            var output = string.Empty;
+            var actual = await value.Tap(v => Task.Run(() => output = Sentinel));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel.Length.Pipe(Option.From)));
+            Assert.That(actual, Is.EqualTo(value));
+            Assert.That(output, Is.EqualTo(Sentinel));
         }
 
         #endregion
 
-        #region Other Useful Methods
+        #region Let
+
+        [Test(Description = "Conditionally executing an action based on a None Option " +
+                    "should not execute.")]
+        public void ActionLet_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = Sentinel;
+            value.Let(v => actual = string.Empty);
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Sentinel));
+        }
+
+        [Test(Description = "Conditionally executing an action based on a Some Option " +
+                            "should execute.")]
+        public void ActionLet_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = string.Empty;
+            value.Let(v => actual = v);
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Sentinel));
+        }
+
+        [Test(Description = "Conditionally executing a task based on a None Option " +
+                            "should not execute.")]
+        public async Task TaskLet_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = Sentinel;
+            await value.Let(v => Task.Run(() => actual = string.Empty));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Sentinel));
+        }
+
+        [Test(Description = "Conditionally executing a task based on a Some Option " +
+                            "should execute.")]
+        public async Task TaskLet_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = string.Empty;
+            await value.Let(v => Task.Run(() => actual = v));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Sentinel));
+        }
+
+        #endregion
+
+        #region Recover
+
+        [Test(Description = "Recovering a None Option should return the recovery value.")]
+        public void ValueRecover_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = value.Recover(Sentinel);
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Option.From(Sentinel)));
+        }
+
+        [Test(Description = "Recovering a Some Option should return the recovery value.")]
+        public void ValueRecover_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = value.Recover("megatron");
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Option.From(Sentinel)));
+        }
+
+        [Test(Description = "Recovering a None Option should return the recovery value.")]
+        public void FuncRecover_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = value.Recover(() => Sentinel);
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Option.From(Sentinel)));
+        }
+
+        [Test(Description = "Recovering a Some Option should return the recovery value.")]
+        public void FuncRecover_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = value.Recover(() => "megatron");
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Option.From(Sentinel)));
+        }
+
+        [Test(Description = "Recovering a None Option should return the recovery value.")]
+        public async Task TaskRecover_None()
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = await value.Recover(() => Task.FromResult(Sentinel));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Option.From(Sentinel)));
+        }
+
+        [Test(Description = "Recovering a Some Option should return the recovery value.")]
+        public async Task TaskRecover_Some()
+        {
+            // arrange
+            var value = Option.From(Sentinel);
+
+            // act
+            var actual = await value.Recover(() => Task.FromResult("megatron"));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Option.From(Sentinel)));
+        }
+
+        #endregion
+
+        #region Value
 
         [Test(Description = "Forcibly unwrapping a None Option should throw.")]
         public void Value_None()
@@ -917,66 +1063,6 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.GetValueOrDefault(other);
-
-            // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
-        }
-
-        [Test(Description = "Conditionally executing an action based on a None Option " +
-                            "should not execute.")]
-        public void ActionLet_None()
-        {
-            // arrange
-            var value = Option<string>.None;
-
-            // act
-            var actual = Sentinel;
-            value.Let(v => actual = string.Empty);
-
-            // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
-        }
-
-        [Test(Description = "Conditionally executing an action based on a Some Option " +
-                            "should execute.")]
-        public void ActionLet_Some()
-        {
-            // arrange
-            var value = Option.From(Sentinel);
-
-            // act
-            var actual = string.Empty;
-            value.Let(v => actual = v);
-
-            // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
-        }
-
-        [Test(Description = "Conditionally executing a task based on a None Option " +
-                            "should not execute.")]
-        public async Task TaskLet_None()
-        {
-            // arrange
-            var value = Option<string>.None;
-
-            // act
-            var actual = Sentinel;
-            await value.Let(v => Task.Run(() => actual = string.Empty));
-
-            // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
-        }
-
-        [Test(Description = "Conditionally executing a task based on a Some Option " +
-                            "should execute.")]
-        public async Task TaskLet_Some()
-        {
-            // arrange
-            var value = Option.From(Sentinel);
-
-            // act
-            var actual = string.Empty;
-            await value.Let(v => Task.Run(() => actual = v));
 
             // assert
             Assert.That(actual, Is.EqualTo(Sentinel));
@@ -1297,7 +1383,7 @@ namespace Tiger.Types.UnitTests
 
         #endregion
 
-        #region Operators and Named Alternatives
+        #region Operators and Named Alternates
 
         [Test(Description = "Two None Options should be equal.")]
         [Category("Operator")]

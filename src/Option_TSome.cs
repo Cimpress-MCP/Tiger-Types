@@ -641,6 +641,72 @@ namespace Tiger.Types
 
         #endregion
 
+        #region Recover
+
+        /// <summary>Provides an alternate value in that case that this instance is in the None state.</summary>
+        /// <param name="recoverer">An alternate value.</param>
+        /// <returns>
+        /// An <see cref="Option{TSome}"/> in the Some state whose Some value is the original Some value
+        /// if this instance is in the Some state; otherwise, an <see cref="Option{TSome}"/> state whose
+        /// Some value is <paramref name="recoverer"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="recoverer"/> is <see langword="null"/>.</exception>
+        public Option<TSome> Recover([NotNull] TSome recoverer)
+        {
+            Requires<ArgumentNullException>(recoverer != null);
+
+            return IsNone
+                ? new Option<TSome>(recoverer)
+                : this;
+        }
+
+        /// <summary>Provides an alternate value in that case that this instance is in the None state.</summary>
+        /// <param name="recoverer">A function producing an alternate value.</param>
+        /// <returns>
+        /// An <see cref="Option{TSome}"/> in the Some state whose Some value is the original Some value
+        /// if this instance is in the Some state; otherwise, an <see cref="Option{TSome}"/> state whose
+        /// Some value is the result of invoking <paramref name="recoverer"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="recoverer"/> is <see langword="null"/>.</exception>
+        public Option<TSome> Recover([NotNull, InstantHandle] Func<TSome> recoverer)
+        {
+            Requires<ArgumentNullException>(recoverer != null);
+
+            if (IsNone)
+            {
+                var result = recoverer();
+                Assume(result != null, Resources.ResultIsNull);
+                return result;
+            }
+
+            return this;
+        }
+
+        /// <summary>Provides an alternate value in that case that this instance is in the None state.</summary>
+        /// <param name="recoverer">A function producing an alternate value, asynchronously.</param>
+        /// <returns>
+        /// An <see cref="Option{TSome}"/> in the Some state whose Some value is the original Some value
+        /// if this instance is in the Some state; otherwise, an <see cref="Option{TSome}"/> state whose
+        /// Some value is the result of invoking <paramref name="recoverer"/> asynchronously.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="recoverer"/> is <see langword="null"/>.</exception>
+        public async Task<Option<TSome>> Recover([NotNull] Func<Task<TSome>> recoverer)
+        {
+            Requires<ArgumentNullException>(recoverer != null);
+            Ensures(Result<Task<Option<TSome>>>() != null);
+
+            if (IsNone)
+            {
+                var result = await recoverer().ConfigureAwait(false);
+                Assume(result != null, Resources.ResultIsNull);
+                return result;
+            }
+
+            return this;
+        }
+
+        #endregion
+
         #region Value
 
         /// <summary>Gets the Some value of this instance.</summary>
