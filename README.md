@@ -58,9 +58,9 @@ Here, the type of `potentialString` is explicitly `Option<string>`, and the retu
 
 - `Filter`: Given a predicate value of `Func<TSome, bool>`, returns the original value if it is in the <i>Some</i> state and its <i>Some</i> value passes the predicate; otherwise, returns an `Option<TSome>` in the <i>None</i> state. <small>Aliased to `Where`, from the BCL.</small>
 
-- `Tap`: Given a value of `Action<TSome>`, performs that action if the original value is in the <i>Some</i> state, then returns the original value – most useful for chained methods. <small>Aliased to `Do`, from the Interactive Extensions.</small>
-
 - `Let`: Given a value of `Action<TSome>`, performs that action if the original value is in the <i>Some</i> state. <small>Aliased to `ForEach`, from the Interactive Extensions.</small>
+
+- `Tap`: Given a value of `Action<TSome>`, performs that action if the original value is in the <i>Some</i> state, then returns the original value – most useful for chained methods. <small>Aliased to `Do`, from the Interactive Extensions.</small>
 
 ### A Note on Aliases
 
@@ -100,11 +100,11 @@ foreach (var value in Option<string>.None)
 }
 ```
 
-This result can also be accomplished with the `Let` method.
+This result can also be accomplished with the `Let` operation.
 
 ### A Note on `null`
 
-Most of this library is allergic to `null`.  It advertises where `null` is allowed, and where it is not – heavily tilted to the latter.  If returning `null` from a passed function would violate the semantics of an operation, then that method will thow an exception.  For example, the contract of `Map` is that it will only return an optional value in the <i>None</i> state if the original value is in the <i>None</i> state.  However, if returning `null` from the passed function were allowed, that would put the returned value into the <i>None</i> state.  This should be refactored into a method of type `Func<TSome, Option<U>>`, and used with the `Bind` operation.
+Most of this library is allergic to `null`.  It advertises where `null` is allowed, and where it is not – heavily tilted to the latter.  If returning `null` from a passed function would violate the semantics of an operation, then that operation will thow an exception.  For example, the contract of `Map` is that it will only return an optional value in the <i>None</i> state if the original value is in the <i>None</i> state.  However, if returning `null` from the passed function were allowed, that would put the returned value into the <i>None</i> state.  This should be refactored into a method of type `Func<TSome, Option<U>>`, and used with the `Bind` operation.
 
 ## How You Develop It
 
