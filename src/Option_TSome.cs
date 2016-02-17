@@ -676,7 +676,7 @@ namespace Tiger.Types
             {
                 var result = recoverer();
                 Assume(result != null, Resources.ResultIsNull);
-                return result;
+                return new Option<TSome>(result);
             }
 
             return this;
@@ -699,7 +699,7 @@ namespace Tiger.Types
             {
                 var result = await recoverer().ConfigureAwait(false);
                 Assume(result != null, Resources.ResultIsNull);
-                return result;
+                return new Option<TSome>(result);
             }
 
             return this;
