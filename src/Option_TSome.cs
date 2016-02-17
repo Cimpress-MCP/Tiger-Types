@@ -861,6 +861,23 @@ namespace Tiger.Types
             return EqualityComparer<TSome>.Default.Equals(_someValue, other._someValue);
         }
 
+        /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <param name="comparer">An equality comparer to compare values.</param>
+        /// <returns>
+        /// <see langword="true"/> if the current object is equal to the <paramref name="other"/> parameter;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        [Pure]
+        public bool Equals(Option<TSome> other, [CanBeNull] IEqualityComparer<TSome> comparer)
+        { // note(cosborn) Eh, this gets gnarly using other implementations.
+            if (IsNone && other.IsNone) { return true; }
+            if (IsNone || other.IsNone) { return false; }
+
+            // note(cosborn) Implicitly `IsSome && other.IsSome`.
+            return (comparer ?? EqualityComparer<TSome>.Default).Equals(_someValue, other._someValue);
+        }
+
         /// <summary>Returns an enumerator that iterates through the <see cref="Option{TSome}"/>.</summary>
         /// <returns>An <see cref="IEnumerator{T}"/> for the <see cref="Option{TSome}"/>.</returns>
         [NotNull, Pure, EditorBrowsable(EditorBrowsableState.Never)]

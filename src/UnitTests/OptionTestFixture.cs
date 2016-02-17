@@ -1345,6 +1345,72 @@ namespace Tiger.Types.UnitTests
             Assert.That(actualRightFirst, Is.True);
         }
 
+        [Test(Description = "Two None Options should be equal.")]
+        [Category("Implementation")]
+        public void EquatableEqualsComparer_NoneNone()
+        {
+            // arrange
+            var left = Option<string>.None;
+            var right = Option<string>.None;
+
+            // act
+            var actual = left.Equals(right, StringComparer.OrdinalIgnoreCase);
+
+            // assert
+            Assert.That(actual, Is.True);
+        }
+
+        [Test(Description = "A None Option and a Some Option should not be equal.")]
+        [Category("Implementation")]
+        public void EquatableEqualsComparer_NoneSome()
+        {
+            // arrange
+            var left = Option<string>.None;
+            var right = Option.From(Sentinel);
+
+            // act
+            var actualLeftFirst = left.Equals(right, StringComparer.OrdinalIgnoreCase);
+            var actualRightFirst = right.Equals(left, StringComparer.OrdinalIgnoreCase);
+
+            // assert
+            Assert.That(actualLeftFirst, Is.False);
+            Assert.That(actualRightFirst, Is.False);
+        }
+
+        [Test(Description = "Two Some Options with different values should not be equal.")]
+        [Category("Implementation")]
+        public void EquatableEqualsComparer_SomeSome_DifferentValue()
+        {
+            // arrange
+            var left = Option.From(Sentinel);
+            var right = Option.From("megatron");
+
+            // act
+            var actualLeftFirst = left.Equals(right, StringComparer.OrdinalIgnoreCase);
+            var actualRightFirst = right.Equals(left, StringComparer.OrdinalIgnoreCase);
+
+            // assert
+            Assert.That(actualLeftFirst, Is.False);
+            Assert.That(actualRightFirst, Is.False);
+        }
+
+        [Test(Description = "Two Some Options with the same values should be equal.")]
+        [Category("Implementation")]
+        public void EquatableEqualsComparer_SomeSome_SameValue()
+        {
+            // arrange
+            var left = Option.From(Sentinel);
+            var right = Option.From(Sentinel.ToUpper());
+
+            // act
+            var actualLeftFirst = left.Equals(right, StringComparer.OrdinalIgnoreCase);
+            var actualRightFirst = right.Equals(left, StringComparer.OrdinalIgnoreCase);
+
+            // assert
+            Assert.That(actualLeftFirst, Is.True);
+            Assert.That(actualRightFirst, Is.True);
+        }
+
         [Test(Description = "A None Option should not iterate.")]
         [Category("Implementation")]
         public void GetEnumerator_None()
