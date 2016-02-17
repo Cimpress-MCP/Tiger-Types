@@ -12,7 +12,7 @@ Tiger.Types is a library of useful types for C#, ones that are sometimes include
 
 These types and operations allow you to treat more operations in your .NET application as [monads](https://en.wikipedia.org/wiki/Monad_\(functional_programming\)#Motivating_examples), which frequently represent operations in more type-safe ways than .NET conventions.
 
-Let’s use `Option<TSome>` for a short example.  In the following code, we’ll write a short method that converts a string to all upper-case.
+Let’s use `Option<TSome>` for an example.  In the following code, we’ll write a short method that converts a string to all upper-case.
 
 ```
 public string ToAllUpperCase(string input)
@@ -46,7 +46,7 @@ potentialString.Map(s => ToAllUpperCase(s));
 
 (Of course, our caller could also write `potentialString.Map(s => s.ToUpper())`, but then we’re out of our jobs!)
 
-Here, the type of `potentialString` is explicitly `Option<string>`, and the return type of `Map` is explicitly `Option<string>`.  This is almost identical to `Select` on `IEnumerable<T>`:  If the sequence is empty, we get back an empty sequence.  If the sequence has elements, the elements are transformed.  For `Option<TSome>` the “empty” state is called <i>None</i>, and the “has elements” state is called <i>Some</i>.  There are many such useful operations on optional values.  Here’s an abridged list.
+Here, the type of `potentialString` is explicitly `Option<string>`, and the return type of `Map` is explicitly `Option<string>`.  This is almost identical to `Select` on `IEnumerable<T>`:  If the sequence is empty, we get back an empty sequence.  If the sequence has elements, the elements are transformed.  For `Option<TSome>` the “empty” state is called <i>None</i>, and the “has elements” state is called <i>Some</i>.  There are many such useful operations on optional values.  Here’s an abridged list:
 
 - `Map`: Given a value of `Func<TSome, U>`, returns an `Option<U>` in the same state as the input value. <small>Aliased to `Select`, from the BCL.</small>
 
@@ -64,7 +64,7 @@ Here, the type of `potentialString` is explicitly `Option<string>`, and the retu
 
 ### A Note on Aliases
 
-Many of the methods on these types are aliased to LINQ-standard names.  This is for reasons of developer familiarity and activating certain C# features.  For example, implementing `Select`, `SelectMany`, and `Where` allows the LINQ query syntax to be used.  For example, using `Option<T>` again:
+Many of the methods on these types are aliased to LINQ-standard names.  This is for reasons of developer familiarity and activating certain C# features.  For example, implementing `Select`, `SelectMany`, and `Where` allows the LINQ query syntax to be used.  Using `Option<TSome>` again:
 
 ```
 var left = Option.From(3); // Some(3)
