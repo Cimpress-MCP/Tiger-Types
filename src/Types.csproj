@@ -147,6 +147,7 @@
     <Compile Include="OptionExtensions.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="OptionState.cs" />
+    <Compile Include="OptionTypeConverter.cs" />
     <Compile Include="Option_TSome.cs" />
     <Compile Include="Option.cs" />
     <Compile Include="OptionNone.cs" />

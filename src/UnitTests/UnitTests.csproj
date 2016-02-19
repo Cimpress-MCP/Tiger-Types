@@ -57,6 +57,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="EitherTestFixture.cs" />
+    <Compile Include="OptionTypeConverterTestFixture.cs" />
     <Compile Include="TaskExtensionsTestFixture.cs" />
     <Compile Include="ObjectTestFixture.cs" />
     <Compile Include="OptionTestFixture.cs" />

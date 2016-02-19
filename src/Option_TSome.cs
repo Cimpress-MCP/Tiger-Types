@@ -14,6 +14,7 @@ namespace Tiger.Types
     /// <summary>Represents the presence or absence of a value.</summary>
     /// <typeparam name="TSome">The Some type of the value that may be represented.</typeparam>
     [SuppressMessage("ReSharper", "ExceptionNotThrown", Justification = "R# doesn't understand Code Contracts.")]
+    [TypeConverter(typeof(OptionTypeConverter))]
     public struct Option<TSome>
         : IEquatable<Option<TSome>>
     {
