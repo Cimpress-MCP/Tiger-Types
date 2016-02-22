@@ -82,11 +82,10 @@ namespace Tiger.Types.UnitTests
         {
             new TestCaseData(typeof(Option<int>), typeof(int), Option.From(33)).Returns(33),
             new TestCaseData(typeof(Option<string>), typeof(string), Option<string>.None).Returns(string.Empty),
+            new TestCaseData(typeof(Option<int>), typeof(int?), Option<int>.None).Returns(null),
             new TestCaseData(typeof(Option<string>), typeof(string), Option.From("megatron")).Returns("megatron"),
             new TestCaseData(typeof(Option<string>), typeof(string), null).Returns(string.Empty),
-            new TestCaseData(typeof(Option<int>), typeof(int), 33).Returns(33),
-            new TestCaseData(typeof(Option<int>), typeof(Option<int>), Option.From(33)).Returns(Option.From(33)),
-            new TestCaseData(typeof(Option<int>), typeof(Option<int>), 33).Returns(Option.From(33))
+            new TestCaseData(typeof(Option<int>), typeof(Option<int>), Option.From(33)).Returns(Option.From(33))
         };
 
         [TestCaseSource(nameof(ConvertToSource))]
@@ -102,6 +101,8 @@ namespace Tiger.Types.UnitTests
         static readonly TestCaseData[] ConvertTo_FailSource =
         {
             new TestCaseData(typeof(Option<int>), typeof(List<int>), Option.From(33)),
+            new TestCaseData(typeof(Option<int>), typeof(int), 33),
+            new TestCaseData(typeof(Option<int>), typeof(Option<int>), 33),
             new TestCaseData(typeof(Option<int>), typeof(IEnumerable<int>), new List<int> { 33 })
         };
 
