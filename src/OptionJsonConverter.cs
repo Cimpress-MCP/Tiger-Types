@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using Newtonsoft.Json;
 using Tiger.Types.Properties;
 using static System.Diagnostics.Contracts.Contract;
@@ -52,7 +53,8 @@ namespace Tiger.Types
             }
 
             var underlyingType = Option.GetUnderlyingType(objectType);
-            var underlyingValue = objectType.GetProperty(nameof(Option<object>.Value))?.GetValue(value);
+            var underlyingValue = objectType.GetField(nameof(Option<object>.SomeValue),
+                BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(value);
             serializer.Serialize(writer, underlyingValue, underlyingType);
         }
 
@@ -75,7 +77,7 @@ namespace Tiger.Types
             return Option.From(reader.ValueType)
                          .Bind<object>(_ => serializer.Deserialize(reader, underlyingType))
                          .Map(v => objectType.GetMethod(nameof(Option<object>.From)).Invoke(null, new [] { v }))
-                         .GetValueOrDefault(() => objectType.GetField(nameof(Option<object>.None)).GetValue(null));
+                         .GetValueOrDefault(() => objectType.GetProperty(nameof(Option<object>.None)).GetValue(null));
         }
     }
 }

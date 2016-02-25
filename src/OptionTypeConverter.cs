@@ -167,7 +167,8 @@ namespace Tiger.Types
             }
 
             // note(cosborn) Now that we know that it's in the Some state...
-            var underlyingValue = _type.GetProperty(nameof(Option<object>.Value))?.GetValue(value);
+            var underlyingValue = _type.GetField(nameof(Option<object>.SomeValue),
+                BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(value);
 
             if (destinationType == _underlyingType)
             { // note(cosborn) This is also easy.

@@ -18,10 +18,17 @@ namespace Tiger.Types
     [TypeConverter(typeof(OptionTypeConverter))]
     [JsonConverter(typeof(OptionJsonConverter))]
     public struct Option<TSome>
-        : IEquatable<Option<TSome>>
     {
-        /// <summary>A value representing no value.</summary>
-        public static readonly Option<TSome> None = default(Option<TSome>);
+        /// <summary>Gets a value representing no value.</summary>
+        public static Option<TSome> None
+        {
+            get
+            {
+                Ensures(Result<Option<TSome>>()._state == OptionState.None);
+
+                return default(Option<TSome>);
+            }
+        }
 
         /// <summary>Creates an <see cref="Option{TSome}"/> from the provided value.</summary>
         /// <param name="value">The value to wrap.</param>
@@ -33,7 +40,8 @@ namespace Tiger.Types
         /// <remarks>Passing a nullable struct into this method is likely to confuse
         /// both the type system and the programmer.</remarks>
         [Pure]
-        public static Option<TSome> From([CanBeNull] TSome value) => new Option<TSome>(value);
+        public static Option<TSome> From([CanBeNull] TSome value) =>
+            value == null ? None : new Option<TSome>(value);
 
         /// <summary>Gets a value indicating whether this instance is in the None state.</summary>
         /// <remarks>There are usually better ways to do this.</remarks>
@@ -44,14 +52,16 @@ namespace Tiger.Types
         public bool IsSome => _state == OptionState.Some;
 
         readonly OptionState _state;
-        readonly TSome _someValue;
+        internal readonly TSome SomeValue;
 
-        internal Option([CanBeNull] TSome someValue)
+        internal Option([NotNull] TSome someValue)
             : this()
         {
-            if (someValue == null) { return; } // note(cosborn) Defaults all fields.
+            Requires(someValue != null);
+            Ensures(SomeValue != null);
+            Ensures(_state == OptionState.Some);
 
-            _someValue = someValue;
+            SomeValue = someValue;
             _state = OptionState.Some;
         }
 
@@ -80,7 +90,7 @@ namespace Tiger.Types
 
             var result = IsNone
                 ? none
-                : some(_someValue);
+                : some(SomeValue);
             Assume(result != null, Resources.ResultIsNull);
             return result;
         }
@@ -109,7 +119,7 @@ namespace Tiger.Types
 
             var result = IsNone
                 ? none
-                : await some(_someValue).ConfigureAwait(false);
+                : await some(SomeValue).ConfigureAwait(false);
             Assume(result != null, Resources.ResultIsNull);
             return result;
         }
@@ -137,7 +147,7 @@ namespace Tiger.Types
 
             var result = IsNone
                 ? none()
-                : some(_someValue);
+                : some(SomeValue);
             Assume(result != null, Resources.ResultIsNull);
             return result;
         }
@@ -166,7 +176,7 @@ namespace Tiger.Types
 
             var result = IsNone
                 ? none()
-                : await some(_someValue).ConfigureAwait(false);
+                : await some(SomeValue).ConfigureAwait(false);
             Assume(result != null, Resources.ResultIsNull);
             return result;
         }
@@ -195,7 +205,7 @@ namespace Tiger.Types
 
             var result = IsNone
                 ? await none().ConfigureAwait(false)
-                : some(_someValue);
+                : some(SomeValue);
             Assume(result != null, Resources.ResultIsNull);
             return result;
         }
@@ -224,7 +234,7 @@ namespace Tiger.Types
 
             var result = IsNone
                 ? await none().ConfigureAwait(false)
-                : await some(_someValue).ConfigureAwait(false);
+                : await some(SomeValue).ConfigureAwait(false);
             Assume(result != null, Resources.ResultIsNull);
             return result;
         }
@@ -256,7 +266,7 @@ namespace Tiger.Types
             }
             else
             {
-                some(_someValue);
+                some(SomeValue);
             }
         }
 
@@ -285,7 +295,7 @@ namespace Tiger.Types
             }
             else
             {
-                await some(_someValue).ConfigureAwait(false);
+                await some(SomeValue).ConfigureAwait(false);
             }
         }
 
@@ -314,7 +324,7 @@ namespace Tiger.Types
             }
             else
             {
-                some(_someValue);
+                some(SomeValue);
             }
         }
 
@@ -343,7 +353,7 @@ namespace Tiger.Types
             }
             else
             {
-                await some(_someValue).ConfigureAwait(false);
+                await some(SomeValue).ConfigureAwait(false);
             }
         }
 
@@ -369,10 +379,11 @@ namespace Tiger.Types
         public Option<TOut> Map<TOut>([NotNull, InstantHandle] Func<TSome, TOut> mapper)
         {
             Requires<ArgumentNullException>(mapper != null);
+            Ensures(Result<Option<TOut>>()._state == _state);
 
             if (IsNone) { return Option<TOut>.None; }
             
-            var result = mapper(_someValue);
+            var result = mapper(SomeValue);
             Assume(result != null, Resources.ResultIsNull);
             return new Option<TOut>(result);
         }
@@ -395,9 +406,9 @@ namespace Tiger.Types
             Requires<ArgumentNullException>(mapper != null);
             Ensures(Result<Task<Option<TOut>>>() != null);
 
-            if (IsNone) { return Option.None; }
+            if (IsNone) { return Option<TOut>.None; }
 
-            var result = await mapper(_someValue).ConfigureAwait(false);
+            var result = await mapper(SomeValue).ConfigureAwait(false);
             Assume(result != null, Resources.ResultIsNull);
             return new Option<TOut>(result);
         }
@@ -427,7 +438,7 @@ namespace Tiger.Types
 
             return IsNone
                 ? Option<TOut>.None
-                : binder(_someValue);
+                : binder(SomeValue);
         }
 
         /// <summary>Binds a function over the Some value of this instance, if present, asynchronously.</summary>
@@ -452,7 +463,7 @@ namespace Tiger.Types
 
             return IsNone
                 ? Option<TOut>.None
-                : await binder(_someValue).ConfigureAwait(false);
+                : await binder(SomeValue).ConfigureAwait(false);
         }
 
         #endregion
@@ -477,7 +488,7 @@ namespace Tiger.Types
 
             return IsNone
                 ? None
-                : predicate(_someValue) ? this : None;
+                : predicate(SomeValue) ? this : None;
         }
 
         /// <summary>
@@ -501,7 +512,7 @@ namespace Tiger.Types
 
             return IsNone
                 ? None
-                : await predicate(_someValue).ConfigureAwait(false) ? this : None;
+                : await predicate(SomeValue).ConfigureAwait(false) ? this : None;
         }
 
         #endregion
@@ -532,7 +543,7 @@ namespace Tiger.Types
 
             var result = IsNone
                 ? state
-                : folder(state, _someValue);
+                : folder(state, SomeValue);
             Assume(result != null, Resources.ResultIsNull);
             return result;
         }
@@ -563,7 +574,7 @@ namespace Tiger.Types
 
             var result = IsNone
                 ? state
-                : await folder(state, _someValue).ConfigureAwait(false);
+                : await folder(state, SomeValue).ConfigureAwait(false);
             Assume(result != null, Resources.ResultIsNull);
             return result;
         }
@@ -585,7 +596,7 @@ namespace Tiger.Types
 
             if (IsSome)
             {
-                tapper(_someValue);
+                tapper(SomeValue);
             }
             return this;
         }
@@ -605,7 +616,7 @@ namespace Tiger.Types
 
             if (IsSome)
             {
-                await tapper(_someValue).ConfigureAwait(false);
+                await tapper(SomeValue).ConfigureAwait(false);
             }
             return this;
         }
@@ -623,7 +634,7 @@ namespace Tiger.Types
 
             if (IsSome)
             {
-                action(_someValue);
+                action(SomeValue);
             }
         }
 
@@ -638,7 +649,7 @@ namespace Tiger.Types
 
             if (IsSome)
             {
-                await action(_someValue);
+                await action(SomeValue);
             }
         }
 
@@ -657,6 +668,7 @@ namespace Tiger.Types
         public Option<TSome> Recover([NotNull] TSome recoverer)
         {
             Requires<ArgumentNullException>(recoverer != null);
+            Ensures(Result<Option<TSome>>().IsSome);
 
             return IsNone
                 ? new Option<TSome>(recoverer)
@@ -674,6 +686,7 @@ namespace Tiger.Types
         public Option<TSome> Recover([NotNull, InstantHandle] Func<TSome> recoverer)
         {
             Requires<ArgumentNullException>(recoverer != null);
+            Ensures(Result<Option<TSome>>().IsSome);
 
             if (IsNone)
             {
@@ -725,8 +738,8 @@ namespace Tiger.Types
                 Ensures(Result<TSome>() != null);
 
                 // note(cosborn) Invariants don't understand sum types; can't link `IsSome` and `_somevalue != null`.
-                Assume(_someValue != null);
-                return _someValue;
+                Assume(SomeValue != null);
+                return SomeValue;
             }
         }
 
@@ -741,7 +754,7 @@ namespace Tiger.Types
         /// <remarks>This method is unsafe, as it can return <see langword="null"/>
         /// if <typeparamref name="TSome"/> satisfies <see langword="class"/>.</remarks>
         [CanBeNull, Pure]
-        public TSome GetValueOrDefault() => _someValue;
+        public TSome GetValueOrDefault() => SomeValue;
 
         /// <summary>
         /// Unwraps this instance with an alternative value
@@ -762,8 +775,8 @@ namespace Tiger.Types
             if (IsNone) { return other; }
 
             // note(cosborn) Invariants don't understand sum types; can't link `!IsNone` and `_somevalue != null`.
-            Assume(_someValue != null);
-            return _someValue;
+            Assume(SomeValue != null);
+            return SomeValue;
         }
 
         /// <summary>
@@ -784,7 +797,7 @@ namespace Tiger.Types
 
             var result = IsNone
                 ? other()
-                : _someValue;
+                : SomeValue;
             Assume(result != null, Resources.ResultIsNull);
             return result;
         }
@@ -807,7 +820,7 @@ namespace Tiger.Types
 
             var result = IsNone
                 ? await other().ConfigureAwait(false)
-                : _someValue;
+                : SomeValue;
             Assume(result != null, Resources.ResultIsNull);
             return result;
         }
@@ -822,7 +835,7 @@ namespace Tiger.Types
         [Pure]
         public override string ToString() => IsNone
             ? "None"
-            : string.Format(CultureInfo.InvariantCulture, "Some({0})", _someValue);
+            : string.Format(CultureInfo.InvariantCulture, "Some({0})", SomeValue);
 
         /// <summary>Indicates whether this instance and a specified object are equal.</summary>
         /// <param name="obj">The object to compare with the current instance.</param>
@@ -832,7 +845,20 @@ namespace Tiger.Types
         /// </returns>
         /// <filterpriority>2</filterpriority>
         [Pure]
-        public override bool Equals(object obj) => obj is Option<TSome> && Equals((Option<TSome>)obj);
+        public override bool Equals(object obj)
+        {
+            return obj is Option<TSome> && EqualsCore((Option<TSome>)obj);
+        }
+
+        [Pure]
+        bool EqualsCore(Option<TSome> other)
+        {
+            if (IsNone && other.IsNone) { return true; }
+            if (IsNone || other.IsNone) { return false; }
+
+            // note(cosborn) Implicitly `IsSome && other.IsSome`.
+            return SomeValue.Equals(other.SomeValue);
+        }
 
         /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
@@ -840,45 +866,13 @@ namespace Tiger.Types
         [Pure]
         public override int GetHashCode() => IsNone
             ? 0
-            : _someValue.GetHashCode();
+            : SomeValue.GetHashCode();
 
         #endregion
 
         #region Implementations
 
-        /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
-        /// <param name="other">An object to compare with this object.</param>
-        /// <returns>
-        /// <see langword="true"/> if the current object is equal to the <paramref name="other"/> parameter;
-        /// otherwise, <see langword="false"/>.
-        /// </returns>
-        [Pure]
-        public bool Equals(Option<TSome> other)
-        { // note(cosborn) Eh, this gets gnarly using other implementations.
-            if (IsNone && other.IsNone) { return true; }
-            if (IsNone || other.IsNone) { return false; }
-
-            // note(cosborn) Implicitly `IsSome && other.IsSome`.
-            return EqualityComparer<TSome>.Default.Equals(_someValue, other._someValue);
-        }
-
-        /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
-        /// <param name="other">An object to compare with this object.</param>
-        /// <param name="comparer">An equality comparer to compare values.</param>
-        /// <returns>
-        /// <see langword="true"/> if the current object is equal to the <paramref name="other"/> parameter;
-        /// otherwise, <see langword="false"/>.
-        /// </returns>
-        [Pure]
-        public bool Equals(Option<TSome> other, [CanBeNull] IEqualityComparer<TSome> comparer)
-        { // note(cosborn) Eh, this gets gnarly using other implementations.
-            if (IsNone && other.IsNone) { return true; }
-            if (IsNone || other.IsNone) { return false; }
-
-            // note(cosborn) Implicitly `IsSome && other.IsSome`.
-            return (comparer ?? EqualityComparer<TSome>.Default).Equals(_someValue, other._someValue);
-        }
-
+        //note(cosborn) OK, it's kind of an implementation.
         /// <summary>Returns an enumerator that iterates through the <see cref="Option{TSome}"/>.</summary>
         /// <returns>An <see cref="IEnumerator{T}"/> for the <see cref="Option{TSome}"/>.</returns>
         [NotNull, Pure, EditorBrowsable(EditorBrowsableState.Never)]
@@ -888,7 +882,7 @@ namespace Tiger.Types
 
             if (IsSome)
             {
-                yield return _someValue;
+                yield return SomeValue;
             }
         }
 
@@ -1014,16 +1008,20 @@ namespace Tiger.Types
 
         /// <summary>Wraps a value in <see cref="Option{TSome}"/>.</summary>
         /// <param name="value">The value to be wrapped.</param>
-        public static implicit operator Option<TSome>([CanBeNull] TSome value) => new Option<TSome>(value);
+        public static implicit operator Option<TSome>([CanBeNull] TSome value) =>
+            value == null ? None : new Option<TSome>(value);
 
         /// <summary>Unwraps the Some value of this instance.</summary>
         /// <param name="value">The value to be unwrapped.</param>
         /// <exception cref="InvalidOperationException">This instance is in an invalid state.</exception>
+        [NotNull]
         public static explicit operator TSome(Option<TSome> value)
         {
             Requires<InvalidOperationException>(value.IsSome, Resources.OptionIsNone);
+            Ensures(Result<TSome>() != null);
 
-            return value._someValue;
+            Assume(value.SomeValue != null); // note(cosborn) I just can't prove this!
+            return value.SomeValue;
         }
 
         // ReSharper disable once UnusedParameter.Global note(cosborn) Used only for the type inference.
@@ -1032,7 +1030,12 @@ namespace Tiger.Types
         /// <see cref="Option{TSome}"/> in the None state.
         /// </summary>
         /// <param name="none">The default value of <see cref="OptionNone"/>.</param>
-        public static implicit operator Option<TSome>(OptionNone none) => None;
+        public static implicit operator Option<TSome>(OptionNone none)
+        {
+            Ensures(Result<Option<TSome>>()._state == OptionState.None);
+
+            return None;
+        }
 
         #endregion
     }

@@ -24,7 +24,7 @@ namespace Tiger.Types
         public static TSome? ToNullable<TSome>(this Option<TSome> value)
             where TSome : struct => value.IsNone
                 ? (TSome?)null
-                : value.Value;
+                : value.SomeValue;
 
         #region LINQ
 
@@ -112,7 +112,7 @@ namespace Tiger.Types
         /// <typeparam name="TSource">The Some type of <paramref name="source"/>.</typeparam>
         /// <param name="source">An optional value in which to locate a value.</param>
         /// <param name="value">The value to locate in the optional value.</param>
-        /// <param name="comparer">An equality comparer to compare values.</param>
+        /// <param name="equalityComparer">An equality comparer to compare values.</param>
         /// <returns>
         /// <see langword="true"/> if the optional value contains a Some value that has the specified value;
         /// otherwise <see langword="false"/>.
@@ -122,11 +122,53 @@ namespace Tiger.Types
         public static bool Contains<TSource>(
             this Option<TSource> source,
             [NotNull] TSource value,
-            [CanBeNull] IEqualityComparer<TSource> comparer)
+            [CanBeNull] IEqualityComparer<TSource> equalityComparer)
         {
             Requires<ArgumentNullException>(value != null);
 
-            return source.Any(v => (comparer ?? EqualityComparer<TSource>.Default).Equals(v, value));
+            return source.Any(v => (equalityComparer ?? EqualityComparer<TSource>.Default).Equals(v, value));
+        }
+
+        /// <summary>
+        /// Returns the specified optional value or the type parameter's default value as an optional value
+        /// if the optional value is in the None state.
+        /// </summary>
+        /// <typeparam name="TSource">The Some type of <paramref name="source"/>.</typeparam>
+        /// <param name="source">The optional value to return a default value for if it is in the None state.</param>
+        /// <returns>
+        /// An <see cref="Option{TSome}"/> in the Some state with the default value for
+        /// the <typeparamref name="TSource"/> type as the Some value
+        /// if <paramref name="source"/> is in the None state; otherwise; <paramref name="source"/>.
+        /// </returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static Option<TSource> DefaultIfEmpty<TSource>(this Option<TSource> source)
+            where TSource : struct
+        {
+            Ensures(Result<Option<TSource>>().IsSome);
+
+            return source.Recover(default(TSource));
+        }
+
+        /// <summary>
+        /// Returns the specified optional value or the specified value as an optional value
+        /// if the optional value is in the None state.
+        /// </summary>
+        /// <typeparam name="TSource">The Some type of <paramref name="source"/>.</typeparam>
+        /// <param name="source">The optional value to return a default value for if it is in the None state.</param>
+        /// <param name="defaultValue">The value to return if the optional value is in the None state.</param>
+        /// <returns>
+        /// An <see cref="Option{TSome}"/> in the Some state <paramref name="defaultValue"/> as the Some value
+        /// if <paramref name="source"/> is in the None state; otherwise; <paramref name="source"/>.
+        /// </returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static Option<TSource> DefaultIfEmpty<TSource>(
+            this Option<TSource> source,
+            [NotNull] TSource defaultValue)
+        {
+            Requires<ArgumentNullException>(defaultValue != null);
+            Ensures(Result<Option<TSource>>().IsSome);
+
+            return source.Recover(defaultValue);
         }
 
         /// <summary>Invokes an action on the Some value of an optional value.</summary>
