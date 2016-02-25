@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 using Tiger.Types.Properties;
 using static System.Diagnostics.Contracts.Contract;
 using PureAttribute = System.Diagnostics.Contracts.PureAttribute;
@@ -15,6 +16,7 @@ namespace Tiger.Types
     /// <typeparam name="TSome">The Some type of the value that may be represented.</typeparam>
     [SuppressMessage("ReSharper", "ExceptionNotThrown", Justification = "R# doesn't understand Code Contracts.")]
     [TypeConverter(typeof(OptionTypeConverter))]
+    [JsonConverter(typeof(OptionJsonConverter))]
     public struct Option<TSome>
         : IEquatable<Option<TSome>>
     {
@@ -739,9 +741,7 @@ namespace Tiger.Types
         /// <remarks>This method is unsafe, as it can return <see langword="null"/>
         /// if <typeparamref name="TSome"/> satisfies <see langword="class"/>.</remarks>
         [CanBeNull, Pure]
-        public TSome GetValueOrDefault() => IsNone
-            ? default(TSome)
-            : _someValue;
+        public TSome GetValueOrDefault() => _someValue;
 
         /// <summary>
         /// Unwraps this instance with an alternative value

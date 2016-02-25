@@ -121,6 +121,14 @@
     <value>This instance has not been initialized.</value>
     <comment>Explains use of default(Either&lt;TLeft,TRight&gt;).</comment>
   </data>
+  <data name="IncompatibleType" xml:space="preserve">
+    <value>The provided type is not compatible with Tiger.Types.Option`1[TSome].</value>
+    <comment>Explains that a provided type was not correct.</comment>
+  </data>
+  <data name="IncompatibleValue" xml:space="preserve">
+    <value>The provided value is not compatible with Tiger.Types.Option`1[TSome].</value>
+    <comment>Explains that a provided value was not of the correct type.</comment>
+  </data>
   <data name="OptionIsNone" xml:space="preserve">
     <value>This instance is in an invalid state.</value>
     <comment>Explains unwrapping of Option&lt;TSome&gt;.None.</comment>

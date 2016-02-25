@@ -7,8 +7,6 @@ namespace Tiger.Types.UnitTests
     [TestFixture]
     public sealed class ObjectTestFixture
     {
-        const string Sentinel = "sentinel";
-
         #region Pipe
 
         [Test(Description = "Piping a value through a function should be equal to invoking the " +

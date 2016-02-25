@@ -1,4 +1,7 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
+using static System.Diagnostics.Contracts.Contract;
+using PureAttribute = System.Diagnostics.Contracts.PureAttribute;
 
 namespace Tiger.Types
 {
@@ -32,5 +35,28 @@ namespace Tiger.Types
         /// Gets a value that can be converted to an <see cref="Option{TSome}"/> of any Some type.
         /// </summary>
         public static readonly OptionNone None = default(OptionNone);
+
+        /// <summary>Returns the underlying type argument of the specified optional type.</summary>
+        /// <param name="optionalType">
+        /// A <see cref="Type"/> object that describes a closed generic optional type.
+        /// </param>
+        /// <returns>
+        /// The underlying type argument of <paramref name="optionalType"/> if <paramref name="optionalType"/>
+        /// is a closed generic optional type; otherwise <see langword="null" />.
+        /// </returns>
+        public static Type GetUnderlyingType([NotNull] Type optionalType)
+        {
+            Requires<ArgumentNullException>(optionalType != null);
+
+            if (!optionalType.IsGenericType ||
+                optionalType.IsGenericTypeDefinition)
+            { // note(cosborn) Instantiated generics only, please.
+                return null;
+            }
+
+            return optionalType.GetGenericTypeDefinition() == typeof(Option<>)
+                ? optionalType.GetGenericArguments()[0]
+                : null;
+        }
     }
 }

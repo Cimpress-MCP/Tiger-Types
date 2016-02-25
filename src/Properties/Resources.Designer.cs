@@ -70,6 +70,24 @@ namespace Tiger.Types.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The provided type is not compatible with Tiger.Types.Option`1[TSome]..
+        /// </summary>
+        internal static string IncompatibleType {
+            get {
+                return ResourceManager.GetString("IncompatibleType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The provided value is not compatible with Tiger.Types.Option`1[TSome]..
+        /// </summary>
+        internal static string IncompatibleValue {
+            get {
+                return ResourceManager.GetString("IncompatibleValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This instance is in an invalid state..
         /// </summary>
         internal static string OptionIsNone {

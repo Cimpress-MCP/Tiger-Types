@@ -15,12 +15,12 @@ namespace Tiger.Types.UnitTests
     [TestFixture(TestOf = typeof(Option<>))]
     public sealed class OptionTestFixture
     {
-        const string Sentinel = "sentinel";
+        const string sentinel = "sentinel";
 
         #region IsNone, IsSome
 
         [Test(Description = "Non-null values should create Some Options using the typed static From method.")]
-        [TestCase(Sentinel)]
+        [TestCase(sentinel)]
         [TestCase("")]
         public void TypedFrom_Value_IsSome(string innerValue)
         {
@@ -44,7 +44,7 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "Non-null values should create Some Options using the untyped static From method.")]
-        [TestCase(Sentinel)]
+        [TestCase(sentinel)]
         [TestCase("")]
         public void UntypedFrom_Value_IsSome(string innerValue)
         {
@@ -117,7 +117,7 @@ namespace Tiger.Types.UnitTests
         public void ValueFuncMatchReturn_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.Match(
@@ -125,7 +125,7 @@ namespace Tiger.Types.UnitTests
                 some: v => v.Length);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel.Length));
+            Assert.That(actual, Is.EqualTo(sentinel.Length));
         }
 
         [Test(Description = "Matching a None Option should return the None value branch, " +
@@ -149,7 +149,7 @@ namespace Tiger.Types.UnitTests
         public async Task ValueTaskMatchReturn_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = await value.Match(
@@ -157,7 +157,7 @@ namespace Tiger.Types.UnitTests
                 some: v => v.Length.Pipe(Task.FromResult));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel.Length));
+            Assert.That(actual, Is.EqualTo(sentinel.Length));
         }
 
         [Test(Description = "Matching a None Option should return the None func branch, " +
@@ -181,7 +181,7 @@ namespace Tiger.Types.UnitTests
         public void FuncFuncMatchReturn_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.Match(
@@ -189,7 +189,7 @@ namespace Tiger.Types.UnitTests
                 some: v => v.Length);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel.Length));
+            Assert.That(actual, Is.EqualTo(sentinel.Length));
         }
 
         [Test(Description = "Matching a None Option should return the None func branch, " +
@@ -213,7 +213,7 @@ namespace Tiger.Types.UnitTests
         public async Task FuncTaskMatchReturn_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = await value.Match(
@@ -221,7 +221,7 @@ namespace Tiger.Types.UnitTests
                 some: v => v.Length.Pipe(Task.FromResult));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel.Length));
+            Assert.That(actual, Is.EqualTo(sentinel.Length));
         }
 
         [Test(Description = "Matching a None Option should return the None task branch, " +
@@ -245,7 +245,7 @@ namespace Tiger.Types.UnitTests
         public async Task TaskFuncMatchReturn_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = await value.Match(
@@ -253,7 +253,7 @@ namespace Tiger.Types.UnitTests
                 some: v => v.Length);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel.Length));
+            Assert.That(actual, Is.EqualTo(sentinel.Length));
         }
 
         [Test(Description = "Matching a None Option should return the None task branch, " +
@@ -277,7 +277,7 @@ namespace Tiger.Types.UnitTests
         public async Task TaskTaskMatchReturn_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = await value.Match(
@@ -285,7 +285,7 @@ namespace Tiger.Types.UnitTests
                 some: v => v.Length.Pipe(Task.FromResult));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel.Length));
+            Assert.That(actual, Is.EqualTo(sentinel.Length));
         }
 
         [Test(Description = "Matching a None Option should execute the None action branch, " +
@@ -298,11 +298,11 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = string.Empty;
             value.Match(
-                none: () => actual = Sentinel,
+                none: () => actual = sentinel,
                 some: v => { });
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Matching a Some Option should execute the Some action branch, " +
@@ -310,7 +310,7 @@ namespace Tiger.Types.UnitTests
         public void ActionActionMatchVoid_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = string.Empty;
@@ -319,7 +319,7 @@ namespace Tiger.Types.UnitTests
                 some: v => actual = v);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Matching a None Option should execute the None action branch, " +
@@ -332,11 +332,11 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = string.Empty;
             await value.Match(
-                none: () => actual = Sentinel,
+                none: () => actual = sentinel,
                 some: v => Task.WhenAll());
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Matching a Some Option should execute the Some task branch, " +
@@ -344,7 +344,7 @@ namespace Tiger.Types.UnitTests
         public async Task ActionTaskMatchVoid_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = string.Empty;
@@ -353,7 +353,7 @@ namespace Tiger.Types.UnitTests
                 some: v => Task.Run(() => actual = v));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Matching a None Option should execute the None task branch, " +
@@ -366,11 +366,11 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = string.Empty;
             await value.Match(
-                none: () => Task.Run(() => actual = Sentinel),
+                none: () => Task.Run(() => actual = sentinel),
                 some: v => { });
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Matching a Some Option should execute the Some action branch, " +
@@ -378,7 +378,7 @@ namespace Tiger.Types.UnitTests
         public async Task TaskActionMatchVoid_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = string.Empty;
@@ -387,7 +387,7 @@ namespace Tiger.Types.UnitTests
                 some: v => actual = v);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Matching a None Option should execute the None task branch, " +
@@ -400,11 +400,11 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = string.Empty;
             await value.Match(
-                none: () => Task.Run(() => actual = Sentinel),
+                none: () => Task.Run(() => actual = sentinel),
                 some: v => Task.WhenAll());
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Matching a Some Option should execute the Some task branch, " +
@@ -412,7 +412,7 @@ namespace Tiger.Types.UnitTests
         public async Task TaskTaskMatchVoid_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = string.Empty;
@@ -421,7 +421,7 @@ namespace Tiger.Types.UnitTests
                 some: v => Task.Run(() => actual = v));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         #endregion
@@ -445,13 +445,13 @@ namespace Tiger.Types.UnitTests
         public void FuncMap_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.Map(v => v.Length);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel.Length.Pipe(Option.From)));
+            Assert.That(actual, Is.EqualTo(sentinel.Length.Pipe(Option.From)));
         }
 
         [Test(Description = "Mapping a None Option over a task should return a None Option.")]
@@ -471,13 +471,13 @@ namespace Tiger.Types.UnitTests
         public async Task TaskMap_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = await value.Map(v => v.Length.Pipe(Task.FromResult));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel.Length.Pipe(Option.From)));
+            Assert.That(actual, Is.EqualTo(sentinel.Length.Pipe(Option.From)));
         }
 
         #endregion
@@ -516,13 +516,13 @@ namespace Tiger.Types.UnitTests
         public void FuncBindReturnSome_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.Bind(v => v.Length == 0 ? Option.None : Option.From(v.Length));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel.Length.Pipe(Option.From)));
+            Assert.That(actual, Is.EqualTo(sentinel.Length.Pipe(Option.From)));
         }
 
         [Test(Description = "Binding a Some Option over a task returning a None Option " +
@@ -547,7 +547,7 @@ namespace Tiger.Types.UnitTests
         public async Task TaskBindReturnSome_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = await value.Bind(v =>
@@ -556,7 +556,7 @@ namespace Tiger.Types.UnitTests
                     : Option.From(v.Length)));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel.Length.Pipe(Option.From)));
+            Assert.That(actual, Is.EqualTo(sentinel.Length.Pipe(Option.From)));
         }
 
         #endregion
@@ -669,7 +669,7 @@ namespace Tiger.Types.UnitTests
         public void FuncFold_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.Fold(34, (s, v) => s + v.Length);
@@ -696,7 +696,7 @@ namespace Tiger.Types.UnitTests
         public async Task TaskFold_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = await value.Fold(34, (s, v) => Task.FromResult(s + v.Length));
@@ -717,12 +717,12 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act
-            var output = Sentinel;
+            var output = sentinel;
             var actual = value.Tap(v => output = string.Empty);
 
             // assert
             Assert.That(actual, Is.EqualTo(Option<string>.None));
-            Assert.That(output, Is.EqualTo(Sentinel));
+            Assert.That(output, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Tapping a Some Option over a func should return a Some Option " +
@@ -730,15 +730,15 @@ namespace Tiger.Types.UnitTests
         public void FuncTap_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var output = string.Empty;
-            var actual = value.Tap(v => output = Sentinel);
+            var actual = value.Tap(v => output = sentinel);
 
             // assert
             Assert.That(actual, Is.EqualTo(value));
-            Assert.That(output, Is.EqualTo(Sentinel));
+            Assert.That(output, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Tapping a None Option over a task should return a None Option " +
@@ -749,12 +749,12 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act
-            var output = Sentinel;
+            var output = sentinel;
             var actual = await value.Tap(v => Task.Run(() => output = string.Empty));
 
             // assert
             Assert.That(actual, Is.EqualTo(Option<string>.None));
-            Assert.That(output, Is.EqualTo(Sentinel));
+            Assert.That(output, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Tapping a Some Option over a task should return a Some Option " +
@@ -762,15 +762,15 @@ namespace Tiger.Types.UnitTests
         public async Task TaskTap_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var output = string.Empty;
-            var actual = await value.Tap(v => Task.Run(() => output = Sentinel));
+            var actual = await value.Tap(v => Task.Run(() => output = sentinel));
 
             // assert
             Assert.That(actual, Is.EqualTo(value));
-            Assert.That(output, Is.EqualTo(Sentinel));
+            Assert.That(output, Is.EqualTo(sentinel));
         }
 
         #endregion
@@ -785,11 +785,11 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act
-            var actual = Sentinel;
+            var actual = sentinel;
             value.Let(v => actual = string.Empty);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Conditionally executing an action based on a Some Option " +
@@ -797,14 +797,14 @@ namespace Tiger.Types.UnitTests
         public void ActionLet_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = string.Empty;
             value.Let(v => actual = v);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Conditionally executing a task based on a None Option " +
@@ -815,11 +815,11 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act
-            var actual = Sentinel;
+            var actual = sentinel;
             await value.Let(v => Task.Run(() => actual = string.Empty));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Conditionally executing a task based on a Some Option " +
@@ -827,14 +827,14 @@ namespace Tiger.Types.UnitTests
         public async Task TaskLet_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = string.Empty;
             await value.Let(v => Task.Run(() => actual = v));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         #endregion
@@ -848,23 +848,23 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act
-            var actual = value.Recover(Sentinel);
+            var actual = value.Recover(sentinel);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Option.From(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Option.From(sentinel)));
         }
 
         [Test(Description = "Recovering a Some Option should return the recovery value.")]
         public void ValueRecover_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.Recover("megatron");
 
             // assert
-            Assert.That(actual, Is.EqualTo(Option.From(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Option.From(sentinel)));
         }
 
         [Test(Description = "Recovering a None Option should return the recovery value.")]
@@ -874,23 +874,23 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act
-            var actual = value.Recover(() => Sentinel);
+            var actual = value.Recover(() => sentinel);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Option.From(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Option.From(sentinel)));
         }
 
         [Test(Description = "Recovering a Some Option should return the recovery value.")]
         public void FuncRecover_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.Recover(() => "megatron");
 
             // assert
-            Assert.That(actual, Is.EqualTo(Option.From(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Option.From(sentinel)));
         }
 
         [Test(Description = "Recovering a None Option should return the recovery value.")]
@@ -900,23 +900,23 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act
-            var actual = await value.Recover(() => Task.FromResult(Sentinel));
+            var actual = await value.Recover(() => Task.FromResult(sentinel));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Option.From(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Option.From(sentinel)));
         }
 
         [Test(Description = "Recovering a Some Option should return the recovery value.")]
         public async Task TaskRecover_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = await value.Recover(() => Task.FromResult("megatron"));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Option.From(Sentinel)));
+            Assert.That(actual, Is.EqualTo(Option.From(sentinel)));
         }
 
         #endregion
@@ -930,7 +930,7 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act, assert
-            var actual = Sentinel;
+            var actual = sentinel;
             try
             {
                 actual = value.Value;
@@ -939,20 +939,20 @@ namespace Tiger.Types.UnitTests
             {
                 Assert.That(ioe, Has.Message.Contains(Resources.OptionIsNone));
             }
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Forcibly unwrapping a Some Option should return the Some value.")]
         public void Value_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.Value;
             
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Coalescing a None Option with an alternative value " +
@@ -974,13 +974,13 @@ namespace Tiger.Types.UnitTests
         public void GetValueOrDefault_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.GetValueOrDefault();
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Coalescing a None Option with an alternative value " +
@@ -991,10 +991,10 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act
-            var actual = value.GetValueOrDefault(Sentinel);
+            var actual = value.GetValueOrDefault(sentinel);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Coalescing a Some Option with an alternative value " +
@@ -1002,13 +1002,13 @@ namespace Tiger.Types.UnitTests
         public void ValueGetValueOrDefault_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.GetValueOrDefault(string.Empty);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Coalescing a None Option with a func producing an alternative value " +
@@ -1019,10 +1019,10 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act
-            var actual = value.GetValueOrDefault(() => Sentinel);
+            var actual = value.GetValueOrDefault(() => sentinel);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Coalescing a Some Option with a func producing an alternative value " +
@@ -1030,13 +1030,13 @@ namespace Tiger.Types.UnitTests
         public void FuncGetValueOrDefault_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.GetValueOrDefault(() => string.Empty);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Coalescing a None Option with a task producing an alternative value " +
@@ -1047,10 +1047,10 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act
-            var actual = await value.GetValueOrDefault(() => Task.FromResult(Sentinel));
+            var actual = await value.GetValueOrDefault(() => Task.FromResult(sentinel));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Coalescing a Some Option with a task producing an alternative value " +
@@ -1058,14 +1058,14 @@ namespace Tiger.Types.UnitTests
         public async Task TaskGetValueOrDefault_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
             Func<Task<string>> other = () => Task.FromResult(string.Empty);
 
             // act
             var actual = await value.GetValueOrDefault(other);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         #endregion
@@ -1091,13 +1091,13 @@ namespace Tiger.Types.UnitTests
         public void ToString_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.ToString();
 
             // assert
-            Assert.That(actual, Is.EqualTo($"Some({Sentinel})"));
+            Assert.That(actual, Is.EqualTo($"Some({sentinel})"));
         }
 
         [Test(Description = "A None Option should not be equal to null.")]
@@ -1120,7 +1120,7 @@ namespace Tiger.Types.UnitTests
         public void ObjectEquals_SomeNull()
         {
             // arrange
-            var left = Option.From(Sentinel);
+            var left = Option.From(sentinel);
             object right = null;
 
             // act
@@ -1168,7 +1168,7 @@ namespace Tiger.Types.UnitTests
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(Sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left.Equals((object)right);
@@ -1185,7 +1185,7 @@ namespace Tiger.Types.UnitTests
         {
             // arrange
             var left = Option<int>.None;
-            var right = Option.From(Sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left.Equals(right);
@@ -1201,7 +1201,7 @@ namespace Tiger.Types.UnitTests
         public void ObjectEquals_SomeSome_SameType_DifferentValue()
         {
             // arrange
-            var left = Option.From(Sentinel);
+            var left = Option.From(sentinel);
             var right = Option.From("megatron");
 
             // act
@@ -1218,8 +1218,8 @@ namespace Tiger.Types.UnitTests
         public void ObjectEquals_SomeSome_SameType_SameValue()
         {
             // arrange
-            var left = Option.From(Sentinel);
-            var right = Option.From(Sentinel);
+            var left = Option.From(sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left.Equals((object)right);
@@ -1235,7 +1235,7 @@ namespace Tiger.Types.UnitTests
         public void ObjectEquals_SomeSome_DifferentType()
         {
             // arrange
-            var left = Option.From(Sentinel);
+            var left = Option.From(sentinel);
             var right = Option.From(0);
 
             // act
@@ -1266,13 +1266,13 @@ namespace Tiger.Types.UnitTests
         public void GetHashCode_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.GetHashCode();
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel.GetHashCode()));
+            Assert.That(actual, Is.EqualTo(sentinel.GetHashCode()));
         }
 
         #endregion
@@ -1300,7 +1300,7 @@ namespace Tiger.Types.UnitTests
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(Sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left.Equals(right);
@@ -1316,7 +1316,7 @@ namespace Tiger.Types.UnitTests
         public void EquatableEquals_SomeSome_DifferentValue()
         {
             // arrange
-            var left = Option.From(Sentinel);
+            var left = Option.From(sentinel);
             var right = Option.From("megatron");
 
             // act
@@ -1333,8 +1333,8 @@ namespace Tiger.Types.UnitTests
         public void EquatableEquals_SomeSome_SameValue()
         {
             // arrange
-            var left = Option.From(Sentinel);
-            var right = Option.From(Sentinel);
+            var left = Option.From(sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left.Equals(right);
@@ -1366,7 +1366,7 @@ namespace Tiger.Types.UnitTests
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(Sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left.Equals(right, StringComparer.OrdinalIgnoreCase);
@@ -1382,7 +1382,7 @@ namespace Tiger.Types.UnitTests
         public void EquatableEqualsComparer_SomeSome_DifferentValue()
         {
             // arrange
-            var left = Option.From(Sentinel);
+            var left = Option.From(sentinel);
             var right = Option.From("megatron");
 
             // act
@@ -1399,8 +1399,8 @@ namespace Tiger.Types.UnitTests
         public void EquatableEqualsComparer_SomeSome_SameValue()
         {
             // arrange
-            var left = Option.From(Sentinel);
-            var right = Option.From(Sentinel.ToUpper());
+            var left = Option.From(sentinel);
+            var right = Option.From(sentinel.ToUpper());
 
             // act
             var actualLeftFirst = left.Equals(right, StringComparer.OrdinalIgnoreCase);
@@ -1419,14 +1419,14 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act
-            var actual = Sentinel;
+            var actual = sentinel;
             foreach (var v in value)
             {
                 actual = string.Empty;
             }
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "A Some Option should not iterate.")]
@@ -1434,7 +1434,7 @@ namespace Tiger.Types.UnitTests
         public void GetEnumerator_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = string.Empty;
@@ -1444,7 +1444,7 @@ namespace Tiger.Types.UnitTests
             }
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         #endregion
@@ -1472,7 +1472,7 @@ namespace Tiger.Types.UnitTests
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(Sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left == right;
@@ -1488,7 +1488,7 @@ namespace Tiger.Types.UnitTests
         public void OperatorEquals_SomeSome_DifferentValue()
         {
             // arrange
-            var left = Option.From(Sentinel);
+            var left = Option.From(sentinel);
             var right = Option.From("megatron");
 
             // act
@@ -1505,8 +1505,8 @@ namespace Tiger.Types.UnitTests
         public void OperatorEquals_SomeSome_SameValue()
         {
             // arrange
-            var left = Option.From(Sentinel);
-            var right = Option.From(Sentinel);
+            var left = Option.From(sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left == right;
@@ -1538,7 +1538,7 @@ namespace Tiger.Types.UnitTests
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(Sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left != right;
@@ -1554,7 +1554,7 @@ namespace Tiger.Types.UnitTests
         public void OperatorNotEquals_SomeSome_DifferentValue()
         {
             // arrange
-            var left = Option.From(Sentinel);
+            var left = Option.From(sentinel);
             var right = Option.From("megatron");
 
             // act
@@ -1571,8 +1571,8 @@ namespace Tiger.Types.UnitTests
         public void OperatorNotEquals_SomeSome_SameValue()
         {
             // arrange
-            var left = Option.From(Sentinel);
-            var right = Option.From(Sentinel);
+            var left = Option.From(sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left != right;
@@ -1640,7 +1640,7 @@ namespace Tiger.Types.UnitTests
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(Sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left | right;
@@ -1657,7 +1657,7 @@ namespace Tiger.Types.UnitTests
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(Sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left.BitwiseOr(right);
@@ -1674,7 +1674,7 @@ namespace Tiger.Types.UnitTests
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(Sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left || right;
@@ -1691,7 +1691,7 @@ namespace Tiger.Types.UnitTests
         {
             // arrange
             var left = Option.From("megatron");
-            var right = Option.From(Sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left | right;
@@ -1708,7 +1708,7 @@ namespace Tiger.Types.UnitTests
         {
             // arrange
             var left = Option.From("megatron");
-            var right = Option.From(Sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left.BitwiseOr(right);
@@ -1725,7 +1725,7 @@ namespace Tiger.Types.UnitTests
         {
             // arrange
             var left = Option.From("megatron");
-            var right = Option.From(Sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left || right;
@@ -1773,7 +1773,7 @@ namespace Tiger.Types.UnitTests
         public void NamedIsTrue_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.IsTrue;
@@ -1787,7 +1787,7 @@ namespace Tiger.Types.UnitTests
         public void OperatorIsTrue_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act, assert
             if (value)
@@ -1819,7 +1819,7 @@ namespace Tiger.Types.UnitTests
         public void NamedIsFalse_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.IsFalse;
@@ -1861,7 +1861,7 @@ namespace Tiger.Types.UnitTests
         public void NamedLogicalNot_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.LogicalNot();
@@ -1875,7 +1875,7 @@ namespace Tiger.Types.UnitTests
         public void OperatorNot_None()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = !value;
@@ -1889,8 +1889,8 @@ namespace Tiger.Types.UnitTests
         public void OperatorLogicalOr_SomeNone_ShortCircuits()
         { // note(cosborn) This tests "operator true"/IsTrue
             // arrange
-            var left = Option.From(Sentinel);
-            string actual = Sentinel;
+            var left = Option.From(sentinel);
+            string actual = sentinel;
             Func<Option<string>> right = () =>
             {
                 actual = string.Empty;
@@ -1901,7 +1901,7 @@ namespace Tiger.Types.UnitTests
             var dummy = left || right();
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "The disjunction of two Some Options should short-circuit.")]
@@ -1909,19 +1909,19 @@ namespace Tiger.Types.UnitTests
         public void OperatorLogicalOr_SomeSome_ShortCircuits()
         { // note(cosborn) This tests "operator true"/IsTrue
             // arrange
-            var left = Option.From(Sentinel);
-            string actual = Sentinel;
+            var left = Option.From(sentinel);
+            string actual = sentinel;
             Func<Option<string>> right = () =>
             {
                 actual = string.Empty;
-                return Option.From(Sentinel);
+                return Option.From(sentinel);
             };
 
             // act
             var dummy = left || right();
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "The conjunction of two None Options should be a None Option.")]
@@ -1981,7 +1981,7 @@ namespace Tiger.Types.UnitTests
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(Sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left & right;
@@ -1998,7 +1998,7 @@ namespace Tiger.Types.UnitTests
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(Sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left.BitwiseAnd(right);
@@ -2015,7 +2015,7 @@ namespace Tiger.Types.UnitTests
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(Sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left && right;
@@ -2032,7 +2032,7 @@ namespace Tiger.Types.UnitTests
         {
             // arrange
             var left = Option.From("megatron");
-            var right = Option.From(Sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left & right;
@@ -2049,7 +2049,7 @@ namespace Tiger.Types.UnitTests
         {
             // arrange
             var left = Option.From("megatron");
-            var right = Option.From(Sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left.BitwiseAnd(right);
@@ -2066,7 +2066,7 @@ namespace Tiger.Types.UnitTests
         {
             // arrange
             var left = Option.From("megatron");
-            var right = Option.From(Sentinel);
+            var right = Option.From(sentinel);
 
             // act
             var actualLeftFirst = left && right;
@@ -2083,7 +2083,7 @@ namespace Tiger.Types.UnitTests
         { // note(cosborn) This tests "operator false"/IsFalse
             // arrange
             var left = Option<string>.None;
-            string actual = Sentinel;
+            string actual = sentinel;
             Func<Option<string>> right = () =>
             {
                 actual = string.Empty;
@@ -2094,7 +2094,7 @@ namespace Tiger.Types.UnitTests
             var dummy = left && right();
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "The conjunction of a None Option and a Some Option should short-circuit.")]
@@ -2103,18 +2103,18 @@ namespace Tiger.Types.UnitTests
         { // note(cosborn) This tests "operator false"/IsFalse
             // arrange
             var left = Option<string>.None;
-            string actual = Sentinel;
+            string actual = sentinel;
             Func<Option<string>> right = () =>
             {
                 actual = string.Empty;
-                return Option.From(Sentinel);
+                return Option.From(sentinel);
             };
 
             // act
             var dummy = left && right();
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "The untyped None should convert to a None Option.")]
@@ -2160,7 +2160,7 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act, assert
-            var actual = Sentinel;
+            var actual = sentinel;
             try
             {
                 actual = (string)value;
@@ -2169,20 +2169,20 @@ namespace Tiger.Types.UnitTests
             {
                 Assert.That(ioe, Has.Message.Contains(Resources.OptionIsNone));
             }
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Unwrapping a Some Option should return its Some value.")]
         public void Cast_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = (string)value;
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         #endregion
@@ -2238,7 +2238,7 @@ namespace Tiger.Types.UnitTests
         public void Any_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.Any();
@@ -2280,7 +2280,7 @@ namespace Tiger.Types.UnitTests
         public void PredicateAny_SomeFalse()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.Any(_ => false);
@@ -2294,7 +2294,7 @@ namespace Tiger.Types.UnitTests
         public void PredicateAny_SomeTrue()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.Any(_ => true);
@@ -2336,7 +2336,7 @@ namespace Tiger.Types.UnitTests
         public void PredicateAll_SomeFalse()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.All(_ => false);
@@ -2350,7 +2350,7 @@ namespace Tiger.Types.UnitTests
         public void PredicateAll_SomeTrue()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.All(_ => true);
@@ -2382,7 +2382,7 @@ namespace Tiger.Types.UnitTests
         public void Contains_Some_False()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.Contains("megatron");
@@ -2397,10 +2397,10 @@ namespace Tiger.Types.UnitTests
         public void Contains_Some_True()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
-            var actual = value.Contains(Sentinel);
+            var actual = value.Contains(sentinel);
 
             // assert
             Assert.That(actual, Is.True);
@@ -2429,7 +2429,7 @@ namespace Tiger.Types.UnitTests
         public void ComparerContains_Some_False()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.Contains("megatron", StringComparer.OrdinalIgnoreCase);
@@ -2444,10 +2444,10 @@ namespace Tiger.Types.UnitTests
         public void ComparerContains_Some_True()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
-            var actual = value.Contains(Sentinel.ToUpperInvariant(), StringComparer.OrdinalIgnoreCase);
+            var actual = value.Contains(sentinel.ToUpperInvariant(), StringComparer.OrdinalIgnoreCase);
 
             // assert
             Assert.That(actual, Is.True);
@@ -2462,12 +2462,12 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act
-            var output = Sentinel;
+            var output = sentinel;
             var actual = value.Do(v => output = string.Empty);
 
             // assert
             Assert.That(actual, Is.EqualTo(Option<string>.None));
-            Assert.That(output, Is.EqualTo(Sentinel));
+            Assert.That(output, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Tapping a Some Option over a func should return a Some Option " +
@@ -2476,15 +2476,15 @@ namespace Tiger.Types.UnitTests
         public void Do_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var output = string.Empty;
-            var actual = value.Do(v => output = Sentinel);
+            var actual = value.Do(v => output = sentinel);
 
             // assert
             Assert.That(actual, Is.EqualTo(value));
-            Assert.That(output, Is.EqualTo(Sentinel));
+            Assert.That(output, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Conditionally executing an action based on a None Option " +
@@ -2496,11 +2496,11 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act
-            var actual = Sentinel;
+            var actual = sentinel;
             value.ForEach(v => actual = string.Empty);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Conditionally executing an action based on a Some Option " +
@@ -2509,14 +2509,14 @@ namespace Tiger.Types.UnitTests
         public void ForEach_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = string.Empty;
             value.ForEach(v => actual = v);
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel));
+            Assert.That(actual, Is.EqualTo(sentinel));
         }
 
         [Test(Description = "Selecting a None Option should produce a None Option.")]
@@ -2697,13 +2697,13 @@ namespace Tiger.Types.UnitTests
         public void SelectManyReturnSome_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.SelectMany(v => v.Length == 0 ? Option.None : Option.From(v.Length));
 
             // assert
-            Assert.That(actual, Is.EqualTo(Sentinel.Length.Pipe(Option.From)));
+            Assert.That(actual, Is.EqualTo(sentinel.Length.Pipe(Option.From)));
         }
 
         [Test(Description = "Folding over a None Option should return the seed value.")]
@@ -2724,7 +2724,7 @@ namespace Tiger.Types.UnitTests
         public void Aggregate_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.Aggregate(34, (s, v) => s + v.Length);
@@ -2751,7 +2751,7 @@ namespace Tiger.Types.UnitTests
         public void ResultAggregate_Some()
         {
             // arrange
-            var value = Option.From(Sentinel);
+            var value = Option.From(sentinel);
 
             // act
             var actual = value.Aggregate(34, (s, v) => s + v.Length, v => v * 2);
@@ -2761,6 +2761,24 @@ namespace Tiger.Types.UnitTests
         }
 
         #endregion
+
+        #endregion
+
+        #region Get Underlying Type
+
+        [TestCase(typeof(Option<int>), ExpectedResult = typeof(int))]
+        [TestCase(typeof(Option<string>), ExpectedResult = typeof(string))]
+        [TestCase(typeof(int), ExpectedResult = null)]
+        [TestCase(typeof(string), ExpectedResult = null)]
+        [TestCase(typeof(List<int>), ExpectedResult = null)]
+        [TestCase(typeof(Option<>), ExpectedResult = null)]
+        [TestCase(typeof(List<>), ExpectedResult = null)]
+        [Category("Static")]
+        public Type GetUnderlyingType(Type optionalType)
+        {
+            // arrange, act
+            return Option.GetUnderlyingType(optionalType);
+        }
 
         #endregion
     }

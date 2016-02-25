@@ -5,39 +5,33 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using JetBrains.Annotations;
+using Tiger.Types.Properties;
 using static System.Diagnostics.Contracts.Contract;
 
 namespace Tiger.Types
 {
     /// <summary>Provides a way of converting to and from the <see cref="Option{TSome}"/> space.</summary>
-    [SuppressMessage("ReSharper", "ExceptionNotDocumented", Justification = "We know what we're calling.")]
+    [SuppressMessage("ReSharper", "ExceptionNotDocumented", Justification = "Using nameof() makes reflection safer.")]
     sealed class OptionTypeConverter
         : TypeConverter
     {
         readonly Type _type;
-        readonly Type _wrappedType;
-        readonly TypeConverter _wrappedTypeConverter;
-        readonly MethodInfo _optionFrom;
+        readonly Type _underlyingType;
+        readonly TypeConverter _underlyingTypeConverter;
 
         /// <exception cref="ArgumentNullException"><paramref name="type"/> is <see langword="null"/>.</exception>
         public OptionTypeConverter([NotNull] Type type)
         {
             Requires<ArgumentNullException>(type != null);
-            Requires<ArgumentException>(type.GetGenericTypeDefinition() == typeof(Option<>));
-            Assert(type.GetGenericArguments() != null); // note(cosborn) Trivially true, if above is.
-            Assert(type.GetGenericArguments().Length > 0); // note(cosborn) Trivially true, if above is.
+            Requires<ArgumentException>(type.IsGenericType, Resources.IncompatibleType);
+            Requires<ArgumentException>(!type.IsGenericTypeDefinition, Resources.IncompatibleType);
+            Requires<ArgumentException>(type.GetGenericTypeDefinition() == typeof(Option<>),
+                Resources.IncompatibleType);
 
             _type = type; // note(cosborn) This is Option<TSome>.
-            _wrappedType = type.GetGenericArguments()[0]; // note(cosborn) This is TSome itself.
-            Assume(_wrappedType != null);
-
-            _wrappedTypeConverter = TypeDescriptor.GetConverter(_wrappedType);
-
-            Assume(typeof(Option<>).IsGenericTypeDefinition);
-            Assume(typeof(Option<>).GetGenericArguments().Length == 1);
-            _optionFrom = typeof(Option<>).MakeGenericType(_wrappedType)
-                                          .GetMethod(nameof(Option<object>.From));
-            Assume(_optionFrom != null);
+            _underlyingType = Option.GetUnderlyingType(_type); // note(cosborn) This is TSome itself.
+            Assume(_underlyingType != null);
+            _underlyingTypeConverter = TypeDescriptor.GetConverter(_underlyingType);
         }
 
         /// <summary>
@@ -51,9 +45,11 @@ namespace Tiger.Types
         /// </returns>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            return sourceType == _wrappedType || // note(cosborn) TSome can become Option<TSome>.
-                sourceType.IsNullableOf(_wrappedType) || // note(cosborn) 1–1 mapping wtih TSome?.
-                _wrappedTypeConverter.CanConvertFrom(context, sourceType);
+            Assume(sourceType != null);
+
+            return sourceType == _underlyingType || // note(cosborn) TSome can become Option<TSome>.
+                Nullable.GetUnderlyingType(sourceType) == _underlyingType || // note(cosborn) 1–1 mapping wtih TSome?.
+                _underlyingTypeConverter.CanConvertFrom(context, sourceType);
         }
 
         /// <summary>
@@ -67,26 +63,37 @@ namespace Tiger.Types
         /// <exception cref="NotSupportedException">The conversion cannot be performed.</exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value == null) { return Option.None; }
+            Ensures(Result<object>() != null);
 
-            var stringValue = value as string;
-            if (stringValue != null && stringValue.Length == 0)
+            if (value == null)
+            { // note(cosborn) It's OK to return this directly; the value assignment uses implicit cast.
+                return Option.None;
+            }
+
+            if (Option.From(value as string).Any(s => s.Length == 0))
             { // note(cosborn) For TypeConverter purposes, an empty string is "no value."
                 return Option.None;
             }
 
-            if (value.GetType() == _wrappedType)
-            { // note(cosborn) Wrap it up!
-                return _optionFrom.Invoke(null, new[] { value });
+            var optionFrom = _type.GetMethod(nameof(Option<object>.From));
+
+            if (value.GetType() == _underlyingType)
+            { // note(cosborn) Since there's no other conversion to be done, wrap it up!
+                var result = optionFrom?.Invoke(null, new[] { value });
+                Assume(result != null);
+                return result;
             }
 
             try
-            {
-                return _optionFrom.Invoke(null, new[] { _wrappedTypeConverter.ConvertFrom(context, culture, value) });
+            { // note(cosborn) Wrap up value returned by the converter for the Some type.
+                var convertedValue = _underlyingTypeConverter.ConvertFrom(context, culture, value);
+                var result = optionFrom?.Invoke(null, new[] { convertedValue });
+                Assume(result != null);
+                return result;
             }
             catch (NotSupportedException)
-            { // ReSharper disable once ThrowingSystemException note(cosborn) It's actually NotSupportedException.
-                throw GetConvertFromException(value);
+            { // note(cosborn) Read the source of GetConvertFromException; the return type is fake.
+                throw (NotSupportedException)GetConvertFromException(value);
             }
         }
 
@@ -105,11 +112,11 @@ namespace Tiger.Types
         {
             Assume(destinationType != null);
 
-            return destinationType == _wrappedType || // note(cosborn) Option<TSome> can (usually) become TSome.
+            return destinationType == _underlyingType || // note(cosborn) Option<TSome> can (usually) become TSome.
                    destinationType == _type || // note(cosborn) Natch.
-                   destinationType.IsNullableOf(_wrappedType) || // note(cosborn) 1–1 mapping wtih TSome?.
+                   Nullable.GetUnderlyingType(destinationType) == _underlyingType || // note(cosborn) 1–1 mapping wtih TSome?.
                    destinationType == typeof(InstanceDescriptor) || // todo(cosborn) MS claims this is important, but is hazy on exactly why.
-                   _wrappedTypeConverter.CanConvertTo(context, destinationType);
+                   _underlyingTypeConverter.CanConvertTo(context, destinationType);
         }
 
         /// <summary>
@@ -134,6 +141,8 @@ namespace Tiger.Types
             object value,
             Type destinationType)
         { // todo(cosborn) There is a strong possibility that this can be more efficient.
+            Assume(destinationType != null);
+
             if (value == null)
             {
                 return ConvertToNull(context, culture, destinationType);
@@ -142,7 +151,6 @@ namespace Tiger.Types
             var valueType = value.GetType();
             if (valueType != _type)
             { // note(cosborn) We can't convert what we don't (claim to) know how to convert.
-                // ReSharper disable once ThrowingSystemException note(cosborn) It's really NotSupportedException.
                 return base.ConvertTo(context, culture, valueType, destinationType);
             }
 
@@ -159,54 +167,40 @@ namespace Tiger.Types
             }
 
             // note(cosborn) Now that we know that it's in the Some state...
-            var valueProperty = _type.GetProperty(nameof(Option<object>.Value));
-            Assume(valueProperty != null);
-            var wrappedValue = valueProperty.GetValue(value);
+            var underlyingValue = _type.GetProperty(nameof(Option<object>.Value))?.GetValue(value);
 
-            if (destinationType == _wrappedType) { return wrappedValue; }
+            if (destinationType == _underlyingType)
+            { // note(cosborn) This is also easy.
+                return underlyingValue;
+            }
 
             if (destinationType == typeof(InstanceDescriptor))
             {
                 var constructor = _type.GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
-                    null, CallingConventions.Any, new[] { _wrappedType }, null);
-                Assume(_type.GetGenericArguments() != null);
-                return new InstanceDescriptor(constructor, new[] { wrappedValue }, true);
+                    null, new[] { _underlyingType }, null);
+                return new InstanceDescriptor(constructor, new[] { underlyingValue }, true);
             }
 
             try
             {
-                return _wrappedTypeConverter.ConvertTo(context, culture, wrappedValue, destinationType);
+                return _underlyingTypeConverter.ConvertTo(context, culture, underlyingValue, destinationType);
             }
             catch (NotSupportedException)
-            { // ReSharper disable once ThrowingSystemException note(cosborn) It's actually NotSupportedException.
-                throw GetConvertToException(valueType, destinationType);
+            { // note(cosborn) Read the source of GetConvertToException; the return type is fake.
+                throw (NotSupportedException)GetConvertToException(valueType, destinationType);
             }
         }
 
-        object ConvertToNull(ITypeDescriptorContext context, CultureInfo culture, Type destinationType)
+        object ConvertToNull(
+            [CanBeNull] ITypeDescriptorContext context,
+            [CanBeNull] CultureInfo culture,
+            [NotNull] Type destinationType)
         {
-            return destinationType.IsNullableOf(_wrappedType)
+            Requires(destinationType != null);
+
+            return Nullable.GetUnderlyingType(destinationType) == _underlyingType
                 ? null
                 : base.ConvertTo(context, culture, null, destinationType);
-        }
-    }
-
-    static class TypeExtensions
-    {
-        public static bool IsNullableOf([NotNull] this Type type, [NotNull] Type otherType)
-        {
-            Requires<ArgumentNullException>(otherType != null);
-
-            if (!otherType.IsValueType)
-            { // It can't possibly be; only value types can be nullable.
-                return false;
-            }
-
-            Assume(typeof(Nullable<>).GetGenericArguments() != null);
-            // ReSharper disable once ExceptionNotDocumented note(cosborn) It is definitely 1.
-            Assume(typeof(Nullable<>).GetGenericArguments().Length == 1);
-            Assume(typeof(Nullable<>).IsGenericTypeDefinition);
-            return type == typeof(Nullable<>).MakeGenericType(otherType);
         }
     }
 }
