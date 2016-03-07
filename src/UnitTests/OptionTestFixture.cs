@@ -8,10 +8,6 @@ using Tiger.Types.Properties;
 
 namespace Tiger.Types.UnitTests
 {
-    /* note(cosborn)
-     * NUnit doesn't have good support for async in Assert.Throws<T>, so we
-     * work around it where necessary.
-     */
     /// <summary>Tests related to <see cref="Option{TSome}"/>.</summary>
     [TestFixture(TestOf = typeof(Option<>))]
     public sealed class OptionTestFixture
@@ -940,21 +936,17 @@ namespace Tiger.Types.UnitTests
         #region Value
 
         [Test(Description = "Forcibly unwrapping a None Option should throw.")]
-        public void Value_None()
+        public void Value_None_Throws()
         {
             // arrange
             var value = Option<string>.None;
 
-            // act, assert
+            // act
             var actual = sentinel;
-            try
-            {
-                actual = value.Value;
-            }
-            catch (InvalidOperationException ioe)
-            {
-                Assert.That(ioe, Has.Message.Contains(Resources.OptionIsNone));
-            }
+            var ex = Assert.Throws<InvalidOperationException>(() => actual = value.Value);
+
+            // assert
+            Assert.That(ex, Has.Message.Contains(Resources.OptionIsNone));
             Assert.That(actual, Is.EqualTo(sentinel));
         }
 
@@ -2067,17 +2059,14 @@ namespace Tiger.Types.UnitTests
             // arrange
             var value = Option<string>.None;
 
-            // act, assert
+            // act
             var actual = sentinel;
-            try
-            {
-                actual = (string)value;
-            }
-            catch (InvalidOperationException ioe)
-            {
-                Assert.That(ioe, Has.Message.Contains(Resources.OptionIsNone));
-            }
+            var ex = Assert.Throws<InvalidOperationException>(() => actual = (string)value);
+
+            // assert
+            Assert.That(ex, Has.Message.Contains(Resources.OptionIsNone));
             Assert.That(actual, Is.EqualTo(sentinel));
+            
         }
 
         [Test(Description = "Unwrapping a Some Option should return its Some value.")]

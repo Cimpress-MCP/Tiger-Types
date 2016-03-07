@@ -34,10 +34,10 @@ var solutions = GetFiles("./**/*.sln");
 // anti-convention: Project files can be anywhere.
 var projects = GetFiles("./**/*.*proj");
 
-// anti-convention: NUnit project files can be anywhere.  (Top-level, next to build csproj, next to unit tests csproj?)
-var nUnitProjectsPattern = "./**/*.nunit";
+// convention: NUnit project files are top-level. (Otherwise, we run NUnit's tests of itself!)
+var nUnitProjectsPattern = "./*.nunit";
 
-// conventions: NuSpec files are next to their corresponding project, named the same.  (This convention comes from NuGet).
+// convention: NuSpec files are next to their corresponding project, named the same.  (This convention comes from NuGet).
 var packableProjects = projects.Where(p => FileExists(p.ChangeExtension("nuspec")));
 
 // convention: Artifact directory is named "artifacts".

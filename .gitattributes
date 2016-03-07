@@ -5,7 +5,6 @@
 
 # Except, don't mess with the platform-specific build files' line endings.
 build.ps1 eol=crlf
-build.sh eol=lf
 
 ###############################################################################
 # Set default behavior for command prompt diff.

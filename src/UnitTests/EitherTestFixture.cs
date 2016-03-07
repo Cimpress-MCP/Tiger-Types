@@ -1,14 +1,9 @@
 ﻿// ReSharper disable All
-
 using NUnit.Framework;
 using System.Threading.Tasks;
 
 namespace Tiger.Types.UnitTests
 {
-    /* note(cosborn)
-     * NUnit doesn't have good support for async in Assert.Throws<T>, so we
-     * work around it where necessary.
-     */
     /// <summary>Tests related to <see cref="Either{TLeft,TRight}"/>.</summary>
     [TestFixture(TestOf = typeof(Either<,>))]
     public sealed class EitherTestFixture
