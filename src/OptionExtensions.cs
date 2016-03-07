@@ -1,8 +1,8 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using JetBrains.Annotations;
 using Tiger.Types.Properties;
 using static System.Diagnostics.Contracts.Contract;
 using PureAttribute = System.Diagnostics.Contracts.PureAttribute;
@@ -144,6 +144,7 @@ namespace Tiger.Types
         public static Option<TSource> DefaultIfEmpty<TSource>(this Option<TSource> source)
             where TSource : struct
         {
+            Ensures(!Result<Option<TSource>>().IsNone);
             Ensures(Result<Option<TSource>>().IsSome);
 
             return source.Recover(default(TSource));
@@ -166,6 +167,7 @@ namespace Tiger.Types
             [NotNull] TSource defaultValue)
         {
             Requires<ArgumentNullException>(defaultValue != null);
+            Ensures(!Result<Option<TSource>>().IsNone);
             Ensures(Result<Option<TSource>>().IsSome);
 
             return source.Recover(defaultValue);
@@ -237,6 +239,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TSource, TResult> selector)
         {
             Requires<ArgumentNullException>(selector != null);
+            Ensures(Result<Option<TResult>>().IsNone == source.IsNone);
+            Ensures(Result<Option<TResult>>().IsSome == source.IsSome);
 
             return source.Map(selector);
         }
@@ -262,7 +266,7 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TSource, Option<TResult>> selector)
         {
             Requires<ArgumentNullException>(selector != null);
-            
+
             return source.Bind(selector);
         }
 

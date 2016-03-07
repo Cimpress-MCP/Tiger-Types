@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using Newtonsoft.Json;
 using Tiger.Types.Properties;
 using static System.Diagnostics.Contracts.Contract;
 
@@ -34,12 +34,7 @@ namespace Tiger.Types
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             Assume(serializer != null);
-
-            if (value == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
+            Assume(value != null, Resources.IncompatibleValue);
 
             var objectType = value.GetType();
             Assume(objectType.IsGenericType, Resources.IncompatibleValue);
@@ -76,8 +71,9 @@ namespace Tiger.Types
 
             return Option.From(reader.ValueType)
                          .Bind<object>(_ => serializer.Deserialize(reader, underlyingType))
-                         .Map(v => objectType.GetMethod(nameof(Option<object>.From)).Invoke(null, new [] { v }))
-                         .GetValueOrDefault(() => objectType.GetProperty(nameof(Option<object>.None)).GetValue(null));
+                         .Map(v => Activator.CreateInstance(objectType,
+                            BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { v }, null))
+                         .GetValueOrDefault(() => Activator.CreateInstance(objectType));
         }
     }
 }

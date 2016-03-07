@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Threading.Tasks;
 using LINQPad;
@@ -28,7 +29,6 @@ namespace Tiger.Types
         {
             get
             {
-                Ensures(Result<Option<TSome>>().State == OptionState.None);
                 Ensures(Result<Option<TSome>>().IsNone);
                 Ensures(!Result<Option<TSome>>().IsSome);
 
@@ -51,13 +51,14 @@ namespace Tiger.Types
 
         /// <summary>Gets a value indicating whether this instance is in the None state.</summary>
         /// <remarks>There are usually better ways to do this.</remarks>
-        public bool IsNone => State == OptionState.None;
+        public bool IsNone => !_isSome;
 
         /// <summary>Gets a value indicating whether this instance is in the Some state.</summary>
         /// <remarks>There are usually better ways to do this.</remarks>
-        public bool IsSome => State == OptionState.Some;
+        public bool IsSome => _isSome;
 
-        internal readonly OptionState State;
+        [ContractPublicPropertyName(nameof(IsSome))]
+        readonly bool _isSome;
         internal readonly TSome SomeValue;
 
         internal Option([NotNull] TSome someValue)
@@ -65,10 +66,10 @@ namespace Tiger.Types
         {
             Requires(someValue != null);
             Ensures(SomeValue != null);
-            Ensures(State == OptionState.Some);
+            Ensures(IsSome);
 
             SomeValue = someValue;
-            State = OptionState.Some;
+            _isSome = true;
         }
 
         #region Match
@@ -94,9 +95,9 @@ namespace Tiger.Types
             Requires<ArgumentNullException>(some != null);
             Ensures(Result<TOut>() != null);
 
-            var result = IsNone
-                ? none
-                : some(SomeValue);
+            var result = IsSome
+                ? some(SomeValue)
+                : none;
             Assume(result != null, Resources.ResultIsNull);
             return result;
         }
@@ -120,12 +121,11 @@ namespace Tiger.Types
         {
             Requires<ArgumentNullException>(none != null);
             Requires<ArgumentNullException>(some != null);
-            Ensures(Result<TOut>() != null);
             Ensures(Result<Task<TOut>>() != null);
 
-            var result = IsNone
-                ? none
-                : await some(SomeValue).ConfigureAwait(false);
+            var result = _isSome
+                ? await some(SomeValue).ConfigureAwait(false)
+                : none;
             Assume(result != null, Resources.ResultIsNull);
             return result;
         }
@@ -151,9 +151,9 @@ namespace Tiger.Types
             Requires<ArgumentNullException>(some != null);
             Ensures(Result<TOut>() != null);
 
-            var result = IsNone
-                ? none()
-                : some(SomeValue);
+            var result = _isSome
+                ? some(SomeValue)
+                : none();
             Assume(result != null, Resources.ResultIsNull);
             return result;
         }
@@ -180,9 +180,9 @@ namespace Tiger.Types
             Ensures(Result<TOut>() != null);
             Ensures(Result<Task<TOut>>() != null);
 
-            var result = IsNone
-                ? none()
-                : await some(SomeValue).ConfigureAwait(false);
+            var result = _isSome
+                ? await some(SomeValue).ConfigureAwait(false)
+                : none();
             Assume(result != null, Resources.ResultIsNull);
             return result;
         }
@@ -209,9 +209,9 @@ namespace Tiger.Types
             Ensures(Result<TOut>() != null);
             Ensures(Result<Task<TOut>>() != null);
 
-            var result = IsNone
-                ? await none().ConfigureAwait(false)
-                : some(SomeValue);
+            var result = _isSome
+                ? some(SomeValue)
+                : await none().ConfigureAwait(false);
             Assume(result != null, Resources.ResultIsNull);
             return result;
         }
@@ -238,9 +238,9 @@ namespace Tiger.Types
             Ensures(Result<TOut>() != null);
             Ensures(Result<Task<TOut>>() != null);
 
-            var result = IsNone
-                ? await none().ConfigureAwait(false)
-                : await some(SomeValue).ConfigureAwait(false);
+            var result = _isSome
+                ? await some(SomeValue).ConfigureAwait(false)
+                : await none().ConfigureAwait(false);
             Assume(result != null, Resources.ResultIsNull);
             return result;
         }
@@ -266,13 +266,13 @@ namespace Tiger.Types
             Requires<ArgumentNullException>(none != null);
             Requires<ArgumentNullException>(some != null);
 
-            if (IsNone)
+            if (_isSome)
             {
-                none();
+                some(SomeValue);
             }
             else
             {
-                some(SomeValue);
+                none();
             }
         }
 
@@ -295,13 +295,13 @@ namespace Tiger.Types
             Requires<ArgumentNullException>(some != null);
             Ensures(Result<Task>() != null);
 
-            if (IsNone)
+            if (_isSome)
             {
-                none();
+                await some(SomeValue).ConfigureAwait(false);
             }
             else
             {
-                await some(SomeValue).ConfigureAwait(false);
+                none();
             }
         }
 
@@ -324,13 +324,13 @@ namespace Tiger.Types
             Requires<ArgumentNullException>(some != null);
             Ensures(Result<Task>() != null);
 
-            if (IsNone)
+            if (_isSome)
             {
-                await none().ConfigureAwait(false);
+                some(SomeValue);
             }
             else
             {
-                some(SomeValue);
+                await none().ConfigureAwait(false);
             }
         }
 
@@ -353,13 +353,13 @@ namespace Tiger.Types
             Requires<ArgumentNullException>(some != null);
             Ensures(Result<Task>() != null);
 
-            if (IsNone)
+            if (_isSome)
             {
-                await none().ConfigureAwait(false);
+                await some(SomeValue).ConfigureAwait(false);
             }
             else
             {
-                await some(SomeValue).ConfigureAwait(false);
+                await none().ConfigureAwait(false);
             }
         }
 
@@ -385,13 +385,17 @@ namespace Tiger.Types
         public Option<TOut> Map<TOut>([NotNull, InstantHandle] Func<TSome, TOut> mapper)
         {
             Requires<ArgumentNullException>(mapper != null);
-            Ensures(Result<Option<TOut>>().State == State);
+            Ensures(Result<Option<TOut>>().IsNone == IsNone);
+            Ensures(Result<Option<TOut>>().IsSome == IsSome);
 
-            if (IsNone) { return Option<TOut>.None; }
+            if (_isSome)
+            {
+                var result = mapper(SomeValue);
+                Assume(result != null, Resources.ResultIsNull);
+                return new Option<TOut>(result);
+            }
 
-            var result = mapper(SomeValue);
-            Assume(result != null, Resources.ResultIsNull);
-            return new Option<TOut>(result);
+            return Option<TOut>.None;
         }
 
         /// <summary>Maps a function over the Some value of this instance, if present, asynchronously.</summary>
@@ -412,11 +416,14 @@ namespace Tiger.Types
             Requires<ArgumentNullException>(mapper != null);
             Ensures(Result<Task<Option<TOut>>>() != null);
 
-            if (IsNone) { return Option<TOut>.None; }
+            if (_isSome)
+            {
+                var result = await mapper(SomeValue).ConfigureAwait(false);
+                Assume(result != null, Resources.ResultIsNull);
+                return new Option<TOut>(result);
+            }
 
-            var result = await mapper(SomeValue).ConfigureAwait(false);
-            Assume(result != null, Resources.ResultIsNull);
-            return new Option<TOut>(result);
+            return Option<TOut>.None;
         }
 
         #endregion
@@ -442,9 +449,9 @@ namespace Tiger.Types
         {
             Requires<ArgumentNullException>(binder != null);
 
-            return IsNone
-                ? Option<TOut>.None
-                : binder(SomeValue);
+            return _isSome
+                ? binder(SomeValue)
+                : Option<TOut>.None;
         }
 
         /// <summary>Binds a function over the Some value of this instance, if present, asynchronously.</summary>
@@ -467,9 +474,9 @@ namespace Tiger.Types
             Requires<ArgumentNullException>(binder != null);
             Ensures(Result<Task<Option<TOut>>>() != null);
 
-            return IsNone
-                ? Option<TOut>.None
-                : await binder(SomeValue).ConfigureAwait(false);
+            return _isSome
+                ? await binder(SomeValue).ConfigureAwait(false)
+                : Option<TOut>.None;
         }
 
         #endregion
@@ -492,9 +499,9 @@ namespace Tiger.Types
         {
             Requires<ArgumentNullException>(predicate != null);
 
-            return IsNone
-                ? None
-                : predicate(SomeValue) ? this : None;
+            return _isSome
+                ? predicate(SomeValue) ? this : None
+                : None;
         }
 
         /// <summary>
@@ -516,9 +523,9 @@ namespace Tiger.Types
             Requires<ArgumentNullException>(predicate != null);
             Ensures(Result<Task<Option<TSome>>>() != null);
 
-            return IsNone
-                ? None
-                : await predicate(SomeValue).ConfigureAwait(false) ? this : None;
+            return _isSome
+                ? await predicate(SomeValue).ConfigureAwait(false) ? this : None
+                : None;
         }
 
         #endregion
@@ -546,10 +553,10 @@ namespace Tiger.Types
             Requires<ArgumentNullException>(state != null);
             Requires<ArgumentNullException>(folder != null);
             Ensures(Result<TState>() != null);
-
-            var result = IsNone
-                ? state
-                : folder(state, SomeValue);
+            
+            var result = _isSome
+                ? folder(state, SomeValue)
+                : state;
             Assume(result != null, Resources.ResultIsNull);
             return result;
         }
@@ -578,9 +585,9 @@ namespace Tiger.Types
             Requires<ArgumentNullException>(folder != null);
             Ensures(Result<Task<TState>>() != null);
 
-            var result = IsNone
-                ? state
-                : await folder(state, SomeValue).ConfigureAwait(false);
+            var result = _isSome
+                ? await folder(state, SomeValue).ConfigureAwait(false)
+                : state;
             Assume(result != null, Resources.ResultIsNull);
             return result;
         }
@@ -599,8 +606,10 @@ namespace Tiger.Types
         public Option<TSome> Tap([NotNull] Action<TSome> tapper)
         {
             Requires<ArgumentNullException>(tapper != null);
+            Ensures(Result<Option<TSome>>().IsNone == IsNone);
+            Ensures(Result<Option<TSome>>().IsSome == IsSome);
 
-            if (IsSome)
+            if (_isSome)
             {
                 tapper(SomeValue);
             }
@@ -620,7 +629,7 @@ namespace Tiger.Types
             Requires<ArgumentNullException>(tapper != null);
             Ensures(Result<Task<Option<TSome>>>() != null);
 
-            if (IsSome)
+            if (_isSome)
             {
                 await tapper(SomeValue).ConfigureAwait(false);
             }
@@ -638,7 +647,7 @@ namespace Tiger.Types
         {
             Requires<ArgumentNullException>(action != null);
 
-            if (IsSome)
+            if (_isSome)
             {
                 action(SomeValue);
             }
@@ -653,7 +662,7 @@ namespace Tiger.Types
             Requires<ArgumentNullException>(action != null);
             Ensures(Result<Task>() != null);
 
-            if (IsSome)
+            if (_isSome)
             {
                 await action(SomeValue);
             }
@@ -674,13 +683,12 @@ namespace Tiger.Types
         public Option<TSome> Recover([NotNull] TSome recoverer)
         {
             Requires<ArgumentNullException>(recoverer != null);
-            Ensures(Result<Option<TSome>>().State == OptionState.Some);
             Ensures(!Result<Option<TSome>>().IsNone);
             Ensures(Result<Option<TSome>>().IsSome);
 
-            return IsNone
-                ? new Option<TSome>(recoverer)
-                : this;
+            return _isSome
+                ? this
+                : new Option<TSome>(recoverer);
         }
 
         /// <summary>Provides an alternate value in that case that this instance is in the None state.</summary>
@@ -694,18 +702,14 @@ namespace Tiger.Types
         public Option<TSome> Recover([NotNull, InstantHandle] Func<TSome> recoverer)
         {
             Requires<ArgumentNullException>(recoverer != null);
-            Ensures(Result<Option<TSome>>().State == OptionState.Some);
             Ensures(!Result<Option<TSome>>().IsNone);
             Ensures(Result<Option<TSome>>().IsSome);
 
-            if (IsNone)
-            {
-                var result = recoverer();
-                Assume(result != null, Resources.ResultIsNull);
-                return new Option<TSome>(result);
-            }
+            if (_isSome) { return this; }
 
-            return this;
+            var result = recoverer();
+            Assume(result != null, Resources.ResultIsNull);
+            return new Option<TSome>(result);
         }
 
         /// <summary>Provides an alternate value in that case that this instance is in the None state.</summary>
@@ -721,14 +725,11 @@ namespace Tiger.Types
             Requires<ArgumentNullException>(recoverer != null);
             Ensures(Result<Task<Option<TSome>>>() != null);
 
-            if (IsNone)
-            {
-                var result = await recoverer().ConfigureAwait(false);
-                Assume(result != null, Resources.ResultIsNull);
-                return new Option<TSome>(result);
-            }
+            if (_isSome) { return this; }
 
-            return this;
+            var result = await recoverer().ConfigureAwait(false);
+            Assume(result != null, Resources.ResultIsNull);
+            return new Option<TSome>(result);
         }
 
         #endregion
@@ -744,10 +745,10 @@ namespace Tiger.Types
         {
             get
             {
-                Requires<InvalidOperationException>(IsSome, Resources.OptionIsNone);
+                Requires<InvalidOperationException>(_isSome, Resources.OptionIsNone);
                 Ensures(Result<TSome>() != null);
 
-                // note(cosborn) Invariants don't understand sum types; can't link `IsSome` and `_somevalue != null`.
+                // note(cosborn) Invariants don't understand sum types; can't link `IsSome` and `SomeValue != null`.
                 Assume(SomeValue != null);
                 return SomeValue;
             }
@@ -782,11 +783,13 @@ namespace Tiger.Types
             Requires<ArgumentNullException>(other != null);
             Ensures(Result<TSome>() != null);
 
-            if (IsNone) { return other; }
+            if (_isSome)
+            { // note(cosborn) Invariants don't understand sum types; can't link `IsSome` and `SomeValue != null`.
+                Assume(SomeValue != null);
+                return SomeValue;
+            }
 
-            // note(cosborn) Invariants don't understand sum types; can't link `!IsNone` and `_somevalue != null`.
-            Assume(SomeValue != null);
-            return SomeValue;
+            return other;
         }
 
         /// <summary>
@@ -805,9 +808,9 @@ namespace Tiger.Types
             Requires<ArgumentNullException>(other != null);
             Ensures(Result<TSome>() != null);
 
-            var result = IsNone
-                ? other()
-                : SomeValue;
+            var result = _isSome
+                ? SomeValue
+                : other();
             Assume(result != null, Resources.ResultIsNull);
             return result;
         }
@@ -828,9 +831,9 @@ namespace Tiger.Types
             Requires<ArgumentNullException>(other != null);
             Ensures(Result<Task<TSome>>() != null);
 
-            var result = IsNone
-                ? await other().ConfigureAwait(false)
-                : SomeValue;
+            var result = _isSome
+                ? SomeValue
+                : await other().ConfigureAwait(false);
             Assume(result != null, Resources.ResultIsNull);
             return result;
         }
@@ -954,9 +957,7 @@ namespace Tiger.Types
         /// </returns>
         // note(cosborn) Yes, BitwiseOr is the alternate name for the operator.
         [Pure, EditorBrowsable(EditorBrowsableState.Never)]
-        public Option<TSome> BitwiseOr(Option<TSome> other) => IsNone
-            ? other
-            : this;
+        public Option<TSome> BitwiseOr(Option<TSome> other) => _isSome ? this : other;
 
         /// <summary>Performs logical conjunction between two objects of the same type.</summary>
         /// <param name="left">An object to conjoin with <paramref name="right"/>.</param>
@@ -979,9 +980,7 @@ namespace Tiger.Types
         /// </returns>
         // note(cosborn) Yes, BitwiseAnd is the alternate name for the operator.
         [Pure, EditorBrowsable(EditorBrowsableState.Never)]
-        public Option<TSome> BitwiseAnd(Option<TSome> other) => IsNone
-            ? None
-            : other;
+        public Option<TSome> BitwiseAnd(Option<TSome> other) => _isSome ? other : None;
 
         // note(cosborn) Implementing true and false operators allows || and && operators to short-circuit.
 
@@ -995,7 +994,7 @@ namespace Tiger.Types
 
         /// <summary>Gets a value indicating whether this instance is in the Some state.</summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool IsTrue => IsSome;
+        public bool IsTrue => _isSome;
 
         /// <summary>Tests whether <paramref name="value"/> is in the None state.</summary>
         /// <param name="value">The value to be tested.</param>
@@ -1007,7 +1006,7 @@ namespace Tiger.Types
 
         /// <summary>Gets a value indicating whether this instance is in the None state.</summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool IsFalse => IsNone;
+        public bool IsFalse => !_isSome;
 
         /// <summary>
         /// Tests the logical inverse of whether <paramref name="value"/>
@@ -1029,12 +1028,13 @@ namespace Tiger.Types
         /// otherwise <see langword="false"/>.
         /// </returns>
         [Pure, EditorBrowsable(EditorBrowsableState.Never)]
-        public bool LogicalNot() => IsNone;
+        public bool LogicalNot() => !_isSome;
 
         /// <summary>Wraps a value in <see cref="Option{TSome}"/>.</summary>
         /// <param name="value">The value to be wrapped.</param>
-        public static implicit operator Option<TSome>([CanBeNull] TSome value) =>
-            value == null ? None : new Option<TSome>(value);
+        public static implicit operator Option<TSome>([CanBeNull] TSome value) => value == null
+            ? None
+            : new Option<TSome>(value);
 
         /// <summary>Unwraps the Some value of this instance.</summary>
         /// <param name="value">The value to be unwrapped.</param>
@@ -1042,7 +1042,7 @@ namespace Tiger.Types
         [NotNull]
         public static explicit operator TSome(Option<TSome> value)
         {
-            Requires<InvalidOperationException>(value.IsSome, Resources.OptionIsNone);
+            Requires<InvalidOperationException>(value._isSome, Resources.OptionIsNone);
             Ensures(Result<TSome>() != null);
 
             Assume(value.SomeValue != null); // note(cosborn) I just can't prove this!
@@ -1057,7 +1057,6 @@ namespace Tiger.Types
         /// <param name="none">The default value of <see cref="OptionNone"/>.</param>
         public static implicit operator Option<TSome>(OptionNone none)
         {
-            Ensures(Result<Option<TSome>>().State == OptionState.None);
             Ensures(Result<Option<TSome>>().IsNone);
             Ensures(!Result<Option<TSome>>().IsSome);
 

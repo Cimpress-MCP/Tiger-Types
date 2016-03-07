@@ -1,6 +1,6 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using static System.Diagnostics.Contracts.Contract;
 using PureAttribute = System.Diagnostics.Contracts.PureAttribute;
 
@@ -32,6 +32,20 @@ namespace Tiger.Types
         [Pure]
         public static Option<TSome> From<TSome>([CanBeNull] TSome? value)
             where TSome : struct => value ?? Option<TSome>.None;
+
+        /// <summary>Creates an <see cref="Option{TSome}"/> from the provided value.</summary>
+        /// <typeparam name="TSome">The type of <paramref name="value"/>.</typeparam>
+        /// <param name="value">The value to wrap.</param>
+        /// <returns>
+        /// An <see cref="Option{TSome}"/> in the Some state with its Some value set to <paramref name="value"/>.
+        /// </returns>
+        public static Option<TSome> Some<TSome>(TSome value)
+            where TSome : struct
+        {
+            Ensures(Result<Option<TSome>>().IsSome);
+
+            return new Option<TSome>(value);
+        }
 
         /// <summary>
         /// Gets a value that can be converted to an <see cref="Option{TSome}"/> of any Some type.
@@ -75,7 +89,7 @@ namespace Tiger.Types
         /// <paramref name="o2"/> parameter; otherwise, <see langword="false"/>.
         /// </returns>
         [Pure]
-        public static bool Equals<TSome>(Option<TSome> o1, Option<TSome> o2)
+        public static bool OptionalEquals<TSome>(this Option<TSome> o1, Option<TSome> o2)
         {
             if (o1.IsNone && o2.IsNone) { return true; }
             if (o1.IsNone || o2.IsNone) { return false; }
@@ -97,8 +111,8 @@ namespace Tiger.Types
         /// <paramref name="o2"/> parameter; otherwise, <see langword="false"/>.
         /// </returns>
         [Pure]
-        public static bool Equals<TSome>(
-            Option<TSome> o1,
+        public static bool OptionalEquals<TSome>(
+            this Option<TSome> o1,
             Option<TSome> o2,
             [CanBeNull] IEqualityComparer<TSome> equalityComparer)
         {
@@ -121,7 +135,7 @@ namespace Tiger.Types
         /// and <paramref name="o2"/> parameters.
         /// </returns>
         [Pure]
-        public static int Compare<TSome>(Option<TSome> o1, Option<TSome> o2)
+        public static int OptionalCompare<TSome>(this Option<TSome> o1, Option<TSome> o2)
         {
             Ensures(Result<int>() == -1 || Result<int>() == 0 || Result<int>() == 1);
 
@@ -148,8 +162,8 @@ namespace Tiger.Types
         /// and <paramref name="o2"/> parameters.
         /// </returns>
         [Pure]
-        public static int Compare<TSome>(
-            Option<TSome> o1,
+        public static int OptionalCompare<TSome>(
+            this Option<TSome> o1,
             Option<TSome> o2,
             IComparer<TSome> comparer)
         {

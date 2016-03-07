@@ -145,15 +145,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Development\CustomMemberProviderContract.cs" />
+    <Compile Include="Development\ICustomMemberProvider.cs" />
     <Compile Include="Either.cs" />
     <Compile Include="EitherState.cs" />
-    <Compile Include="Either_TLeftTRight.cs" />
+    <Compile Include="Either`2.cs" />
+    <Compile Include="Development\OptionDebuggerTypeProxy.cs" />
     <Compile Include="OptionJsonConverter.cs" />
     <Compile Include="OptionExtensions.cs" />
     <Compile Include="ObjectExtensions.cs" />
-    <Compile Include="OptionState.cs" />
     <Compile Include="OptionTypeConverter.cs" />
-    <Compile Include="Option_TSome.cs" />
+    <Compile Include="Option`1.cs" />
     <Compile Include="Option.cs" />
     <Compile Include="OptionNone.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,7 +1,7 @@
 ﻿// ReSharper disable All
+using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
-using NUnit.Framework;
 
 namespace Tiger.Types.UnitTests
 {

@@ -1,6 +1,6 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.Diagnostics.CodeAnalysis;
-using JetBrains.Annotations;
 using static System.Diagnostics.Contracts.Contract;
 
 namespace Tiger.Types

@@ -66,7 +66,6 @@
     <Compile Include="TaskExtensionsTestFixture.cs" />
     <Compile Include="ObjectTestFixture.cs" />
     <Compile Include="OptionTestFixture.cs" />
-    <Compile Include="TestAttributes\PreconditionAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

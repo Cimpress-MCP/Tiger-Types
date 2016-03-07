@@ -1,10 +1,10 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.ComponentModel;
 using System.ComponentModel.Design.Serialization;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
-using JetBrains.Annotations;
 using Tiger.Types.Properties;
 using static System.Diagnostics.Contracts.Contract;
 
@@ -23,6 +23,7 @@ namespace Tiger.Types
         public OptionTypeConverter([NotNull] Type type)
         {
             Requires<ArgumentNullException>(type != null);
+            Requires<ArgumentNullException>(type.IsValueType);
             Requires<ArgumentException>(type.IsGenericType, Resources.IncompatibleType);
             Requires<ArgumentException>(!type.IsGenericTypeDefinition, Resources.IncompatibleType);
             Requires<ArgumentException>(type.GetGenericTypeDefinition() == typeof(Option<>),
@@ -65,31 +66,24 @@ namespace Tiger.Types
         {
             Ensures(Result<object>() != null);
 
-            if (value == null)
-            { // note(cosborn) It's OK to return this directly; the value assignment uses implicit cast.
-                return Option.None;
-            }
+            if (value == null) { return Activator.CreateInstance(_type); }
 
             if (Option.From(value as string).Any(s => s.Length == 0))
             { // note(cosborn) For TypeConverter purposes, an empty string is "no value."
-                return Option.None;
+                return Activator.CreateInstance(_type);
             }
-
-            var optionFrom = _type.GetMethod(nameof(Option<object>.From));
 
             if (value.GetType() == _underlyingType)
             { // note(cosborn) Since there's no other conversion to be done, wrap it up!
-                var result = optionFrom?.Invoke(null, new[] { value });
-                Assume(result != null);
-                return result;
+                return Activator.CreateInstance(_type,
+                    BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { value }, null);
             }
 
             try
             { // note(cosborn) Wrap up value returned by the converter for the Some type.
                 var convertedValue = _underlyingTypeConverter.ConvertFrom(context, culture, value);
-                var result = optionFrom?.Invoke(null, new[] { convertedValue });
-                Assume(result != null);
-                return result;
+                return Activator.CreateInstance(_type,
+                    BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { convertedValue }, null);
             }
             catch (NotSupportedException)
             { // note(cosborn) Read the source of GetConvertFromException; the return type is fake.

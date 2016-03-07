@@ -1,8 +1,9 @@
 ﻿// ReSharper disable All
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using LINQPad;
 using Tiger.Types.Properties;
 
 namespace Tiger.Types.UnitTests
@@ -90,6 +91,21 @@ namespace Tiger.Types.UnitTests
             // assert
             Assert.That(actual.IsNone, Is.True);
             Assert.That(actual.IsSome, Is.False);
+        }
+
+        [Test(Description = "Values should create Some Options.")]
+        [TestCase(0)]
+        [TestCase(3)]
+        [TestCase(-1)]
+        public void Some_Value_IsSome(int innerValue)
+        {
+            // arrange, act
+            var actual = Option.Some(innerValue);
+
+            // assert
+            Assert.That(actual.IsNone, Is.False);
+            Assert.That(actual.IsSome, Is.True);
+
         }
 
         #endregion
@@ -950,7 +966,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = value.Value;
-            
+
             // assert
             Assert.That(actual, Is.EqualTo(sentinel));
         }
@@ -1297,7 +1313,7 @@ namespace Tiger.Types.UnitTests
             Assert.That(actual, Is.EqualTo(sentinel));
         }
 
-        [Test(Description = "A Some Option should not iterate.")]
+        [Test(Description = "A Some Option should iterate.")]
         [Category("Implementation")]
         public void GetEnumerator_Some()
         {
@@ -1313,6 +1329,30 @@ namespace Tiger.Types.UnitTests
 
             // assert
             Assert.That(actual, Is.EqualTo(sentinel));
+        }
+
+        [Test(Description = "A None Option should interact with LINQPad correctly.")]
+        public void CustomMemberProvider_None()
+        {
+            // arrange
+            var value = Option<string>.None as ICustomMemberProvider;
+
+            // act, assert
+            Assert.That(value.GetNames(), Is.EquivalentTo(new[] { string.Empty }));
+            Assert.That(value.GetTypes(), Is.EquivalentTo(new[] { typeof(string) }));
+            Assert.That(value.GetValues(), Is.EquivalentTo(new[] { Option<string>.None.ToString() }));
+        }
+
+        [Test(Description = "A Some Option should interact with LINQPad correctly.")]
+        public void CustomMemberProvider_Some()
+        {
+            // arrange
+            var value = Option.From(sentinel) as ICustomMemberProvider;
+
+            // act, assert
+            Assert.That(value.GetNames(), Is.EquivalentTo(new[] { string.Empty }));
+            Assert.That(value.GetTypes(), Is.EquivalentTo(new[] { typeof(string) }));
+            Assert.That(value.GetValues(), Is.EquivalentTo(new[] { Option.From(sentinel).ToString() }));
         }
 
         #endregion
@@ -2713,7 +2753,7 @@ namespace Tiger.Types.UnitTests
             var right = Option<string>.None;
 
             // act
-            var actual = Option.Equals(left, right);
+            var actual = Option.OptionalEquals(left, right);
 
             // assert
             Assert.That(actual, Is.True);
@@ -2728,8 +2768,8 @@ namespace Tiger.Types.UnitTests
             var right = Option.From(sentinel);
 
             // act
-            var actualLeftFirst = Option.Equals(left, right);
-            var actualRightFirst = Option.Equals(right, left);
+            var actualLeftFirst = Option.OptionalEquals(left, right);
+            var actualRightFirst = Option.OptionalEquals(right, left);
 
             // assert
             Assert.That(actualLeftFirst, Is.False);
@@ -2745,8 +2785,8 @@ namespace Tiger.Types.UnitTests
             var right = Option.From("megatron");
 
             // act
-            var actualLeftFirst = Option.Equals(left, right);
-            var actualRightFirst = Option.Equals(right, left);
+            var actualLeftFirst = Option.OptionalEquals(left, right);
+            var actualRightFirst = Option.OptionalEquals(right, left);
 
             // assert
             Assert.That(actualLeftFirst, Is.False);
@@ -2762,8 +2802,8 @@ namespace Tiger.Types.UnitTests
             var right = Option.From(sentinel);
 
             // act
-            var actualLeftFirst = Option.Equals(left, right);
-            var actualRightFirst = Option.Equals(right, left);
+            var actualLeftFirst = Option.OptionalEquals(left, right);
+            var actualRightFirst = Option.OptionalEquals(right, left);
 
             // assert
             Assert.That(actualLeftFirst, Is.True);
@@ -2779,7 +2819,7 @@ namespace Tiger.Types.UnitTests
             var right = Option<string>.None;
 
             // act
-            var actual = Option.Equals(left, right, StringComparer.OrdinalIgnoreCase);
+            var actual = Option.OptionalEquals(left, right, StringComparer.OrdinalIgnoreCase);
 
             // assert
             Assert.That(actual, Is.True);
@@ -2794,8 +2834,8 @@ namespace Tiger.Types.UnitTests
             var right = Option.From(sentinel);
 
             // act
-            var actualLeftFirst = Option.Equals(left, right, StringComparer.OrdinalIgnoreCase);
-            var actualRightFirst = Option.Equals(right, left, StringComparer.OrdinalIgnoreCase);
+            var actualLeftFirst = Option.OptionalEquals(left, right, StringComparer.OrdinalIgnoreCase);
+            var actualRightFirst = Option.OptionalEquals(right, left, StringComparer.OrdinalIgnoreCase);
 
             // assert
             Assert.That(actualLeftFirst, Is.False);
@@ -2811,8 +2851,8 @@ namespace Tiger.Types.UnitTests
             var right = Option.From("megatron");
 
             // act
-            var actualLeftFirst = Option.Equals(left, right, StringComparer.OrdinalIgnoreCase);
-            var actualRightFirst = Option.Equals(right, left, StringComparer.OrdinalIgnoreCase);
+            var actualLeftFirst = Option.OptionalEquals(left, right, StringComparer.OrdinalIgnoreCase);
+            var actualRightFirst = Option.OptionalEquals(right, left, StringComparer.OrdinalIgnoreCase);
 
             // assert
             Assert.That(actualLeftFirst, Is.False);
@@ -2828,8 +2868,8 @@ namespace Tiger.Types.UnitTests
             var right = Option.From(sentinel.ToUpper());
 
             // act
-            var actualLeftFirst = Option.Equals(left, right, StringComparer.OrdinalIgnoreCase);
-            var actualRightFirst = Option.Equals(right, left, StringComparer.OrdinalIgnoreCase);
+            var actualLeftFirst = Option.OptionalEquals(left, right, StringComparer.OrdinalIgnoreCase);
+            var actualRightFirst = Option.OptionalEquals(right, left, StringComparer.OrdinalIgnoreCase);
 
             // assert
             Assert.That(actualLeftFirst, Is.True);
@@ -2845,8 +2885,8 @@ namespace Tiger.Types.UnitTests
             var right = Option<string>.None;
 
             // act
-            var actualLeftFirst = Option.Compare(left, right);
-            var actualRightFirst = Option.Compare(right, left);
+            var actualLeftFirst = Option.OptionalCompare(left, right);
+            var actualRightFirst = Option.OptionalCompare(right, left);
 
             // assert
             Assert.That(actualLeftFirst, Is.EqualTo(0));
@@ -2862,8 +2902,8 @@ namespace Tiger.Types.UnitTests
             var right = Option.From(sentinel);
 
             // act
-            var actualLeftFirst = Option.Compare(left, right);
-            var actualRightFirst = Option.Compare(right, left);
+            var actualLeftFirst = Option.OptionalCompare(left, right);
+            var actualRightFirst = Option.OptionalCompare(right, left);
 
             // assert
             Assert.That(actualLeftFirst, Is.EqualTo(-1));
@@ -2879,8 +2919,8 @@ namespace Tiger.Types.UnitTests
             var right = Option.From(sentinel);
 
             // act
-            var actualLeftFirst = Option.Compare(left, right);
-            var actualRightFirst = Option.Compare(right, left);
+            var actualLeftFirst = Option.OptionalCompare(left, right);
+            var actualRightFirst = Option.OptionalCompare(right, left);
 
             // assert
             Assert.That(actualLeftFirst, Is.EqualTo(-1));
@@ -2894,8 +2934,8 @@ namespace Tiger.Types.UnitTests
             var right = Option.From(sentinel);
 
             // act
-            var actualLeftFirst = Option.Compare(left, right);
-            var actualRightFirst = Option.Compare(right, left);
+            var actualLeftFirst = Option.OptionalCompare(left, right);
+            var actualRightFirst = Option.OptionalCompare(right, left);
 
             // assert
             Assert.That(actualLeftFirst, Is.EqualTo(0));
@@ -2911,8 +2951,8 @@ namespace Tiger.Types.UnitTests
             var right = Option<string>.None;
 
             // act
-            var actualLeftFirst = Option.Compare(left, right, StringComparer.OrdinalIgnoreCase);
-            var actualRightFirst = Option.Compare(right, left, StringComparer.OrdinalIgnoreCase);
+            var actualLeftFirst = Option.OptionalCompare(left, right, StringComparer.OrdinalIgnoreCase);
+            var actualRightFirst = Option.OptionalCompare(right, left, StringComparer.OrdinalIgnoreCase);
 
             // assert
             Assert.That(actualLeftFirst, Is.EqualTo(0));
@@ -2928,8 +2968,8 @@ namespace Tiger.Types.UnitTests
             var right = Option.From(sentinel);
 
             // act
-            var actualLeftFirst = Option.Compare(left, right, StringComparer.OrdinalIgnoreCase);
-            var actualRightFirst = Option.Compare(right, left, StringComparer.OrdinalIgnoreCase);
+            var actualLeftFirst = Option.OptionalCompare(left, right, StringComparer.OrdinalIgnoreCase);
+            var actualRightFirst = Option.OptionalCompare(right, left, StringComparer.OrdinalIgnoreCase);
 
             // assert
             Assert.That(actualLeftFirst, Is.EqualTo(-1));
@@ -2945,8 +2985,8 @@ namespace Tiger.Types.UnitTests
             var right = Option.From(sentinel);
 
             // act
-            var actualLeftFirst = Option.Compare(left, right, StringComparer.OrdinalIgnoreCase);
-            var actualRightFirst = Option.Compare(right, left, StringComparer.OrdinalIgnoreCase);
+            var actualLeftFirst = Option.OptionalCompare(left, right, StringComparer.OrdinalIgnoreCase);
+            var actualRightFirst = Option.OptionalCompare(right, left, StringComparer.OrdinalIgnoreCase);
 
             // assert
             Assert.That(actualLeftFirst, Is.EqualTo(-1));
@@ -2960,8 +3000,8 @@ namespace Tiger.Types.UnitTests
             var right = Option.From(sentinel.ToUpper());
 
             // act
-            var actualLeftFirst = Option.Compare(left, right, StringComparer.OrdinalIgnoreCase);
-            var actualRightFirst = Option.Compare(right, left, StringComparer.OrdinalIgnoreCase);
+            var actualLeftFirst = Option.OptionalCompare(left, right, StringComparer.OrdinalIgnoreCase);
+            var actualRightFirst = Option.OptionalCompare(right, left, StringComparer.OrdinalIgnoreCase);
 
             // assert
             Assert.That(actualLeftFirst, Is.EqualTo(0));

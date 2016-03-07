@@ -1,10 +1,7 @@
 ﻿// ReSharper disable All
-
-using System;
-using System.IO;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Tiger.Types.Properties;
+using System;
 
 namespace Tiger.Types.UnitTests
 {
@@ -58,23 +55,6 @@ namespace Tiger.Types.UnitTests
 
             // act
             return converter.CanConvert(serializationType);
-        }
-
-        [Test]
-        public void WriteJson()
-        {
-            // arrange
-            var converter = new OptionJsonConverter();
-            var stringWriter = new StringWriter();
-            var writer = new JsonTextWriter(stringWriter);
-            var serializer = new JsonSerializer();
-
-            // act
-            converter.WriteJson(writer, null, serializer);
-            var actual = stringWriter.ToString();
-
-            // assert
-            Assert.That(actual, Is.EqualTo(none));
         }
     }
 }

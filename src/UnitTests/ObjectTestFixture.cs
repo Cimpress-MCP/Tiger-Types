@@ -1,6 +1,6 @@
 ﻿// ReSharper disable All
-using System;
 using NUnit.Framework;
+using System;
 
 namespace Tiger.Types.UnitTests
 {

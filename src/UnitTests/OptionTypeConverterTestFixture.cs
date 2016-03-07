@@ -1,9 +1,9 @@
 ﻿// ReSharper disable All
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Design.Serialization;
-using NUnit.Framework;
 
 namespace Tiger.Types.UnitTests
 {
@@ -33,8 +33,8 @@ namespace Tiger.Types.UnitTests
             new TestCaseData(typeof(Option<int>), 33).Returns(Option.From(33)),
             new TestCaseData(typeof(Option<int>), "33").Returns(Option.From(33)),
             new TestCaseData(typeof(Option<int>), (int?)33).Returns(Option.From(33)),
-            new TestCaseData(typeof(Option<int>), string.Empty).Returns(Option.None),
-            new TestCaseData(typeof(Option<int>), null).Returns(Option.None)
+            new TestCaseData(typeof(Option<int>), string.Empty).Returns(Option<int>.None),
+            new TestCaseData(typeof(Option<int>), null).Returns(Option<int>.None)
         };
 
         [TestCaseSource(nameof(ConvertFromSource))]
