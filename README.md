@@ -54,7 +54,7 @@ Here, the type of `potentialString` is explicitly `Option<string>`, and the retu
 
 - `Match` <small>(Value-Returning)</small>: Associates a value of `Func<U>` with the <i>None</i> state and a value of `Func<TSome, U>` with the <i>Some</i> state, and invokes the function that matches the input value’s state.
 
-- `Match` <small>(Action-Performing)</small>: Associates a value of `Action<U>` with the <i>None</i> state and a value of `Action<TSome>` with the <i>Some</i> state, and invokes the function that matches the input value’s state.
+- `Match` <small>(Action-Performing)</small>: Associates a value of `Action` with the <i>None</i> state and a value of `Action<TSome>` with the <i>Some</i> state, and invokes the function that matches the input value’s state.
 
 - `Filter`: Given a predicate value of `Func<TSome, bool>`, returns the original value if it is in the <i>Some</i> state and its <i>Some</i> value passes the predicate; otherwise, returns an `Option<TSome>` in the <i>None</i> state. <small>Aliased to `Where`, from the BCL.</small>
 
