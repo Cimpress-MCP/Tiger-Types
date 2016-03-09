@@ -7,6 +7,7 @@ using static System.Diagnostics.Contracts.Contract;
 
 namespace Tiger.Types
 {
+    //todo(cosborn) This should be its own library!
     /// <summary>
     /// Provides the capabilities to serialize and deserialize <see cref="Option{TSome}"/> to and from JSON.
     /// </summary>

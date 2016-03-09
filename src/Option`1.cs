@@ -19,7 +19,7 @@ namespace Tiger.Types
     /// <typeparam name="TSome">The Some type of the value that may be represented.</typeparam>
     [SuppressMessage("ReSharper", "ExceptionNotThrown", Justification = "R# doesn't understand Code Contracts.")]
     [TypeConverter(typeof(OptionTypeConverter))]
-    [JsonConverter(typeof(OptionJsonConverter))]
+    [JsonConverter(typeof(OptionJsonConverter))] // todo(cosborn) Library.
     [DebuggerTypeProxy(typeof(OptionDebuggerTypeProxy<>))]
     public struct Option<TSome>
         : ICustomMemberProvider

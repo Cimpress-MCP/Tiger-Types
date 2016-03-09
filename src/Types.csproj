@@ -145,7 +145,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Development\CustomMemberProviderContract.cs" />
     <Compile Include="Development\ICustomMemberProvider.cs" />
     <Compile Include="Either.cs" />
     <Compile Include="EitherState.cs" />
