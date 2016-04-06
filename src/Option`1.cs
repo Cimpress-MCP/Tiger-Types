@@ -30,7 +30,6 @@ namespace Tiger.Types
             get
             {
                 Ensures(Result<Option<TSome>>().IsNone);
-                Ensures(!Result<Option<TSome>>().IsSome);
 
                 return default(Option<TSome>);
             }
@@ -51,11 +50,27 @@ namespace Tiger.Types
 
         /// <summary>Gets a value indicating whether this instance is in the None state.</summary>
         /// <remarks>There are usually better ways to do this.</remarks>
-        public bool IsNone => !_isSome;
+        public bool IsNone
+        {
+            get
+            {
+                Ensures(Result<bool>() == !IsSome);
+
+                return !_isSome;
+            }
+        }
 
         /// <summary>Gets a value indicating whether this instance is in the Some state.</summary>
         /// <remarks>There are usually better ways to do this.</remarks>
-        public bool IsSome => _isSome;
+        public bool IsSome
+        {
+            get
+            {
+                Ensures(Result<bool>() == _isSome);
+
+                return _isSome;
+            }
+        }
 
         [ContractPublicPropertyName(nameof(IsSome))]
         readonly bool _isSome;
@@ -1058,7 +1073,6 @@ namespace Tiger.Types
         public static implicit operator Option<TSome>(OptionNone none)
         {
             Ensures(Result<Option<TSome>>().IsNone);
-            Ensures(!Result<Option<TSome>>().IsSome);
 
             return None;
         }
