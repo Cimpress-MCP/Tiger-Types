@@ -614,7 +614,220 @@ namespace Tiger.Types.UnitTests
 
         #region Bind
 
+        [Test(Description = "Right-Binding a Left Either over a func should return a Left Either.")]
+        public void FuncBindRight_Left()
+        {
+            // arrange
+            var value = Either.Left<int, string>(42);
 
+            // act
+            var actual = value.Bind(v => v == sentinel
+                ? Either.Right<int, bool>(true)
+                : Either.Left<int, bool>(33));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Either.Left<int, bool>(42)));
+        }
+
+        [Test(Description = "Right-Binding a Right Either over a func that returns a Left Either " + 
+                            "should return a Left Either.")]
+        public void FuncBindRight_Right_Left()
+        {
+            // arrange
+            var value = Either.Right<int, string>(sentinel);
+
+            // act
+            var actual = value.Bind(v => v == sentinel
+                ? Either.Left<int, bool>(33)
+                : Either.Right<int, bool>(true));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Either.Left<int, bool>(33)));
+        }
+
+        [Test(Description = "Right-Binding a Right Either over a func that returns a Right Either " +
+                            "should return a Right Either.")]
+        public void FuncBindRight_Right_Right()
+        {
+            // arrange
+            var value = Either.Right<int, string>(sentinel);
+
+            // act
+            var actual = value.Bind(v => v == sentinel
+                ? Either.Right<int, bool>(true)
+                : Either.Left<int, bool>(33));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Either.Right<int, bool>(true)));
+        }
+
+        [Test(Description = "Left-Binding a Right Either over a func should return a Right Either.")]
+        public void FuncBindLeft_Right()
+        {
+            // arrange
+            var value = Either.Right<string, int>(42);
+
+            // act
+            var actual = value.Bind(v => v == sentinel
+                ? Either.Left<bool, int>(true)
+                : Either.Right<bool, int>(33));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Either.Right<bool, int>(42)));
+        }
+
+        [Test(Description = "Left-Binding a Left Either over a func that returns a Right Either " +
+                            "should return a Right Either.")]
+        public void FuncBindLeft_Left_Right()
+        {
+            // arrange
+            var value = Either.Left<int, string>(42);
+
+            // act
+            var actual = value.Bind(v => v == 42 ? Either.Right<bool, string>(sentinel) : Either.Left<bool, string>(true));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Either.Right<bool, string>(sentinel)));
+        }
+
+        [Test(Description = "Left-Binding a Left Either over a func that returns a Left Either " +
+                            "should return a Left Either.")]
+        public void FuncBindLeft_Left_Left()
+        {
+            // arrange
+            var value = Either.Left<int, string>(42);
+
+            // act
+            var actual = value.Bind(v => v == 42 ? Either.Left<bool, string>(true) : Either.Right<bool, string>(sentinel));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Either.Left<bool, string>(true)));
+        }
+
+        [Test(Description = "Right-Binding a Left Either over a func should return a Left Either.")]
+        public async Task TaskBindRight_Left()
+        {
+            // arrange
+            var value = Either.Left<int, string>(42);
+
+            // act
+            var actual = await value.Bind(v => Task.FromResult(v == sentinel
+                ? Either.Right<int, bool>(true)
+                : Either.Left<int, bool>(33)));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Either.Left<int, bool>(42)));
+        }
+
+        [Test(Description = "Right-Binding a Right Either over a func that returns a Left Either " +
+                            "should return a Left Either.")]
+        public async Task TaskBindRight_Right_Left()
+        {
+            // arrange
+            var value = Either.Right<int, string>(sentinel);
+
+            // act
+            var actual = await value.Bind(v => Task.FromResult(v == sentinel
+                ? Either.Left<int, bool>(33)
+                : Either.Right<int, bool>(true)));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Either.Left<int, bool>(33)));
+        }
+
+        [Test(Description = "Right-Binding a Right Either over a func that returns a Right Either " +
+                            "should return a Right Either.")]
+        public async Task TaskBindRight_Right_Right()
+        {
+            // arrange
+            var value = Either.Right<int, string>(sentinel);
+
+            // act
+            var actual = await value.Bind(v => Task.FromResult(v == sentinel
+                ? Either.Right<int, bool>(true)
+                : Either.Left<int, bool>(33)));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Either.Right<int, bool>(true)));
+        }
+
+        [Test(Description = "Left-Binding a Right Either over a func should return a Right Either.")]
+        public async Task TaskBindLeft_Right()
+        {
+            // arrange
+            var value = Either.Right<string, int>(42);
+
+            // act
+            var actual = await value.Bind(v => Task.FromResult(v == sentinel
+                ? Either.Left<bool, int>(true)
+                : Either.Right<bool, int>(33)));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Either.Right<bool, int>(42)));
+        }
+
+        [Test(Description = "Left-Binding a Left Either over a func that returns a Right Either " +
+                            "should return a Right Either.")]
+        public async Task TaskBindLeft_Left_Right()
+        {
+            // arrange
+            var value = Either.Left<int, string>(42);
+
+            // act
+            var actual = await value.Bind(v => Task.FromResult(v == 42
+                ? Either.Right<bool, string>(sentinel)
+                : Either.Left<bool, string>(true)));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Either.Right<bool, string>(sentinel)));
+        }
+
+        [Test(Description = "Left-Binding a Left Either over a func that returns a Left Either " +
+                            "should return a Left Either.")]
+        public async Task TaskBindLeft_Left_Left()
+        {
+            // arrange
+            var value = Either.Left<int, string>(42);
+
+            // act
+            var actual = await value.Bind(v => Task.FromResult(v == 42
+                ? Either.Left<bool, string>(true)
+                : Either.Right<bool, string>(sentinel)));
+
+            // assert
+            Assert.That(actual, Is.EqualTo(Either.Left<bool, string>(true)));
+        }
+
+        #endregion
+
+        #region Fold
+
+        [Test(Description = "Right-Folding over a Left Either should return the seed value.")]
+        public void FuncFoldRight_Left()
+        {
+            // arrange
+            var value = Either.Left<int, string>(42);
+
+            // act
+            var actual = value.Fold(34, (s, v) => s + v.Length);
+
+            // assert
+            Assert.That(actual, Is.EqualTo(34));
+        }
+
+        [Test(Description = "Right-Folding over a Right Either should return result of invoking the accumulator" +
+                            "over the seed value and the Right value.")]
+        public void FuncFoldRight_Right()
+        {
+            // arrange
+            var value = Either.Right<int, string>(sentinel);
+
+            // act
+            var actual = value.Fold(34, (s, v) => s + v.Length);
+
+            // assert
+            Assert.That(actual, Is.EqualTo(42));
+        }
 
         #endregion
     }

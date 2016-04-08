@@ -104,7 +104,7 @@ This result can also be accomplished with the `Let` operation.
 
 ### A Note on `null`
 
-Most of this library is allergic to `null`.  It advertises where `null` is allowed, and where it is not – heavily tilted to the latter.  If returning `null` from a passed function would violate the semantics of an operation, then that operation will thow an exception.  For example, the contract of `Map` is that it will only return an optional value in the <i>None</i> state if the original value is in the <i>None</i> state.  However, if returning `null` from the passed function were allowed, that would put the returned value into the <i>None</i> state.  This should be refactored into a method of type `Func<TSome, Option<U>>`, and used with the `Bind` operation.
+Most of this library is allergic to `null`.  It advertises where `null` is allowed, and where it is not – heavily tilted to the latter.  If returning `null` from a passed function would violate the semantics of an operation, then that operation will thow an exception.  For example, the contract of `Map` is that it will only return an optional value in the <i>None</i> state if the original value is in the <i>None</i> state.  However, if returning `null` from the passed function were allowed, that would put the returned value from an oroginal value in the <i>Some</i> state into the <i>None</i> state.  This should be refactored into a method of type `Func<TSome, Option<U>>`, and used with the `Bind` operation.
 
 ## How You Develop It
 
@@ -115,10 +115,6 @@ You’re in the right place for that.  Once you have this directory forked and c
 - bash: `powershell ./build.ps1`
 
 This repository is attempting to use the [GitFlow](http://jeffkreeftmeijer.com/2010/why-arent-you-using-git-flow/) branching methodology.  Results may be mixed, please be aware.
-
-### A Note on Code Contracts
-
-This codebase uses Microsoft’s [Code Contracts](https://github.com/Microsoft/CodeContracts) libraries to provide static analysis of pre- and post-conditions.  If you also activate this feature, you will be told at compile-time if you could violate one of these constraints.  If you do not activate this feature, then exceptions such as `ArgumentNullException` will be thrown at runtime in the usual fashion.
 
 ## Thank You
 

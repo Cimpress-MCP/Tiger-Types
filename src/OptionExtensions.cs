@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using Tiger.Types.Properties;
 using static System.Diagnostics.Contracts.Contract;
 using PureAttribute = System.Diagnostics.Contracts.PureAttribute;
@@ -10,7 +9,6 @@ using PureAttribute = System.Diagnostics.Contracts.PureAttribute;
 namespace Tiger.Types
 {
     /// <summary>Extensions to the functionality of <see cref="Option{TSome}"/>.</summary>
-    [SuppressMessage("ReSharper", "ExceptionNotThrown", Justification = "R# doesn't understand Code Contracts.")]
     public static class OptionExtensions
     {
         /// <summary>Converts an <see cref="Option{TSome}"/> into a <see cref="Nullable{T}"/>.</summary>
@@ -56,7 +54,7 @@ namespace Tiger.Types
             this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, bool> predicate)
         {
-            Requires<ArgumentNullException>(predicate != null);
+            if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
 
             return source.Filter(predicate).IsSome;
         }
@@ -80,7 +78,7 @@ namespace Tiger.Types
             this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, bool> predicate)
         {
-            Requires<ArgumentNullException>(predicate != null);
+            if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
 
             return source.IsNone || source.Filter(predicate).IsSome;
         }
@@ -100,7 +98,7 @@ namespace Tiger.Types
         [Pure]
         public static bool Contains<TSource>(this Option<TSource> source, [NotNull] TSource value)
         {
-            Requires<ArgumentNullException>(value != null);
+            if (value == null) { throw new ArgumentNullException(nameof(value)); }
 
             return source.Any(v => EqualityComparer<TSource>.Default.Equals(v, value));
         }
@@ -124,7 +122,7 @@ namespace Tiger.Types
             [NotNull] TSource value,
             [CanBeNull] IEqualityComparer<TSource> equalityComparer)
         {
-            Requires<ArgumentNullException>(value != null);
+            if (value == null) { throw new ArgumentNullException(nameof(value)); }
 
             return source.Any(v => (equalityComparer ?? EqualityComparer<TSource>.Default).Equals(v, value));
         }
@@ -142,13 +140,7 @@ namespace Tiger.Types
         /// </returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static Option<TSource> DefaultIfEmpty<TSource>(this Option<TSource> source)
-            where TSource : struct
-        {
-            Ensures(!Result<Option<TSource>>().IsNone);
-            Ensures(Result<Option<TSource>>().IsSome);
-
-            return source.Recover(default(TSource));
-        }
+            where TSource : struct => source.Recover(default(TSource));
 
         /// <summary>
         /// Returns the specified optional value or the specified value as an optional value
@@ -161,14 +153,13 @@ namespace Tiger.Types
         /// An <see cref="Option{TSome}"/> in the Some state <paramref name="defaultValue"/> as the Some value
         /// if <paramref name="source"/> is in the None state; otherwise; <paramref name="source"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="defaultValue"/> is <see langword="null"/>.</exception>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static Option<TSource> DefaultIfEmpty<TSource>(
             this Option<TSource> source,
             [NotNull] TSource defaultValue)
         {
-            Requires<ArgumentNullException>(defaultValue != null);
-            Ensures(!Result<Option<TSource>>().IsNone);
-            Ensures(Result<Option<TSource>>().IsSome);
+            if (defaultValue == null) { throw new ArgumentNullException(nameof(defaultValue)); }
 
             return source.Recover(defaultValue);
         }
@@ -184,7 +175,7 @@ namespace Tiger.Types
             this Option<TSource> source,
             [NotNull, InstantHandle] Action<TSource> onNext)
         {
-            Requires<ArgumentNullException>(onNext != null);
+            if (onNext == null) { throw new ArgumentNullException(nameof(onNext)); }
 
             return source.Tap(onNext);
         }
@@ -199,7 +190,7 @@ namespace Tiger.Types
             this Option<TSource> source,
             [NotNull, InstantHandle] Action<TSource> onNext)
         {
-            Requires<ArgumentNullException>(onNext != null);
+            if (onNext == null) { throw new ArgumentNullException(nameof(onNext)); }
 
             source.Let(onNext);
         }
@@ -218,7 +209,7 @@ namespace Tiger.Types
             this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, bool> predicate)
         {
-            Requires<ArgumentNullException>(predicate != null);
+            if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
 
             return source.Filter(predicate);
         }
@@ -238,9 +229,7 @@ namespace Tiger.Types
             this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, TResult> selector)
         {
-            Requires<ArgumentNullException>(selector != null);
-            Ensures(Result<Option<TResult>>().IsNone == source.IsNone);
-            Ensures(Result<Option<TResult>>().IsSome == source.IsSome);
+            if (selector == null) { throw new ArgumentNullException(nameof(selector)); }
 
             return source.Map(selector);
         }
@@ -265,7 +254,7 @@ namespace Tiger.Types
             this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, Option<TResult>> selector)
         {
-            Requires<ArgumentNullException>(selector != null);
+            if (selector == null) { throw new ArgumentNullException(nameof(selector)); }
 
             return source.Bind(selector);
         }
@@ -302,8 +291,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TSource, Option<TOption>> optionalSelector,
             [NotNull, InstantHandle] Func<TSource, TOption, TResult> resultSelector)
         {
-            Requires<ArgumentNullException>(optionalSelector != null);
-            Requires<ArgumentNullException>(resultSelector != null);
+            if (optionalSelector == null) { throw new ArgumentNullException(nameof(optionalSelector)); }
+            if (resultSelector == null) { throw new ArgumentNullException(nameof(resultSelector)); }
 
             return source.Bind(sv => source.Bind(optionalSelector).Map(cv => resultSelector(sv, cv)));
         }
@@ -326,9 +315,8 @@ namespace Tiger.Types
             [NotNull] TAccumulate seed,
             [NotNull, InstantHandle] Func<TAccumulate, TSource, TAccumulate> func)
         {
-            Requires<ArgumentNullException>(seed != null);
-            Requires<ArgumentNullException>(func != null);
-            Ensures(Result<TAccumulate>() != null);
+            if (seed == null) { throw new ArgumentNullException(nameof(seed)); }
+            if (func == null) { throw new ArgumentNullException(nameof(func)); }
 
             return source.Fold(seed, func);
         }
@@ -358,10 +346,9 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TAccumulate, TSource, TAccumulate> func,
             [NotNull, InstantHandle] Func<TAccumulate, TResult> resultSelector)
         {
-            Requires<ArgumentNullException>(seed != null);
-            Requires<ArgumentNullException>(func != null);
-            Requires<ArgumentNullException>(resultSelector != null);
-            Ensures(Result<TResult>() != null);
+            if (seed == null) { throw new ArgumentNullException(nameof(seed)); }
+            if (func == null) { throw new ArgumentNullException(nameof(func)); }
+            if (resultSelector == null) { throw new ArgumentNullException(nameof(resultSelector)); }
 
             var result = source.Fold(seed, func).Pipe(resultSelector);
             Assume(result != null, Resources.ResultIsNull);

@@ -1,12 +1,9 @@
 ﻿using JetBrains.Annotations;
 using System;
-using System.Diagnostics.CodeAnalysis;
-using static System.Diagnostics.Contracts.Contract;
 
 namespace Tiger.Types
 {
     /// <summary>Extensions to the functionality of <see cref="object"/>.</summary>
-    [SuppressMessage("ReSharper", "ExceptionNotThrown", Justification = "R# doesn't understand Code Contracts.")]
     public static class ObjectExtensions
     {
         /// <summary>Invokes <paramref name="piper"/> with <paramref name="value"/> as its argument.</summary>
@@ -21,8 +18,8 @@ namespace Tiger.Types
             [NotNull] this TIn value,
             [NotNull, InstantHandle] Func<TIn, TOut> piper)
         {
-            Requires<ArgumentNullException>(value != null);
-            Requires<ArgumentNullException>(piper != null);
+            if (value == null) { throw new ArgumentNullException(nameof(value)); }
+            if (piper == null) { throw new ArgumentNullException(nameof(piper)); }
 
             return piper(value);
         }

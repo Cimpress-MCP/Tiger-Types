@@ -1,5 +1,5 @@
+using System;
 using JetBrains.Annotations;
-using static System.Diagnostics.Contracts.Contract;
 
 namespace Tiger.Types
 {
@@ -19,9 +19,10 @@ namespace Tiger.Types
         /// The value from which to create the <see cref="Either{TLeft,TRight}"/>.
         /// </param>
         /// <returns>An <see cref="Either{TLeft,TRight}"/> in the Left state.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="leftValue"/> is <see langword="null"/>.</exception>
         public static Either<TLeft, TRight> Left<TLeft, TRight>([NotNull] TLeft leftValue)
         {
-            Requires(leftValue != null);
+            if (leftValue == null) { throw new ArgumentNullException(nameof(leftValue)); }
 
             return new Either<TLeft, TRight>(leftValue);
         }
@@ -39,9 +40,10 @@ namespace Tiger.Types
         /// The value from which to create the <see cref="Either{TLeft,TRight}"/>.
         /// </param>
         /// <returns>An <see cref="Either{TLeft,TRight}"/> in the Right state.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="rightValue"/> is <see langword="null"/>.</exception>
         public static Either<TLeft, TRight> Right<TLeft, TRight>([NotNull] TRight rightValue)
         {
-            Requires(rightValue != null);
+            if (rightValue == null) { throw new ArgumentNullException(nameof(rightValue)); }
 
             return new Either<TLeft, TRight>(rightValue);
         }

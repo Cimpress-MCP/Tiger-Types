@@ -22,12 +22,15 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="type"/> is <see langword="null"/>.</exception>
         public OptionTypeConverter([NotNull] Type type)
         {
-            Requires<ArgumentNullException>(type != null);
-            Requires<ArgumentNullException>(type.IsValueType);
-            Requires<ArgumentException>(type.IsGenericType, Resources.IncompatibleType);
-            Requires<ArgumentException>(!type.IsGenericTypeDefinition, Resources.IncompatibleType);
-            Requires<ArgumentException>(type.GetGenericTypeDefinition() == typeof(Option<>),
-                Resources.IncompatibleType);
+            if (type == null) { throw new ArgumentNullException(nameof(type)); }
+
+            if (!type.IsValueType ||
+                !type.IsGenericType ||
+                type.IsGenericTypeDefinition ||
+                type.GetGenericTypeDefinition() != typeof(Option<>))
+            {
+                throw new ArgumentOutOfRangeException(nameof(type), Resources.IncompatibleType);
+            }
 
             _type = type; // note(cosborn) This is Option<TSome>.
             _underlyingType = Option.GetUnderlyingType(_type); // note(cosborn) This is TSome itself.
@@ -44,14 +47,10 @@ namespace Tiger.Types
         /// <returns>
         /// <see langword="true"/> if this converter can perform the conversion; otherwise, <see langword="false"/>.
         /// </returns>
-        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
-        {
-            Assume(sourceType != null);
-
-            return sourceType == _underlyingType || // note(cosborn) TSome can become Option<TSome>.
-                Nullable.GetUnderlyingType(sourceType) == _underlyingType || // note(cosborn) 1–1 mapping wtih TSome?.
-                _underlyingTypeConverter.CanConvertFrom(context, sourceType);
-        }
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) =>
+            sourceType == _underlyingType || // note(cosborn) TSome can become Option<TSome>.
+            Nullable.GetUnderlyingType(sourceType) == _underlyingType || // note(cosborn) 1–1 mapping wtih TSome?.
+            _underlyingTypeConverter.CanConvertFrom(context, sourceType);
 
         /// <summary>
         /// Converts the given object to the type of this converter,
@@ -64,8 +63,6 @@ namespace Tiger.Types
         /// <exception cref="NotSupportedException">The conversion cannot be performed.</exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            Ensures(Result<object>() != null);
-
             if (value == null) { return Activator.CreateInstance(_type); }
 
             if (Option.From(value as string).Any(s => s.Length == 0))
@@ -102,16 +99,12 @@ namespace Tiger.Types
         /// <returns>
         /// <see langword="true"/> if this converter can perform the conversion; otherwise, <see langword="false"/>.
         /// </returns>
-        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
-        {
-            Assume(destinationType != null);
-
-            return destinationType == _underlyingType || // note(cosborn) Option<TSome> can (usually) become TSome.
-                   destinationType == _type || // note(cosborn) Natch.
-                   Nullable.GetUnderlyingType(destinationType) == _underlyingType || // note(cosborn) 1–1 mapping wtih TSome?.
-                   destinationType == typeof(InstanceDescriptor) || // todo(cosborn) MS claims this is important, but is hazy on exactly why.
-                   _underlyingTypeConverter.CanConvertTo(context, destinationType);
-        }
+        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType) =>
+            destinationType == _underlyingType || // note(cosborn) Option<TSome> can (usually) become TSome.
+            destinationType == _type || // note(cosborn) Natch.
+            Nullable.GetUnderlyingType(destinationType) == _underlyingType || // note(cosborn) 1–1 mapping wtih TSome?.
+            destinationType == typeof(InstanceDescriptor) || // todo(cosborn) MS claims this is important, but is hazy on exactly why.
+            _underlyingTypeConverter.CanConvertTo(context, destinationType);
 
         /// <summary>
         /// Converts the given value object to the specified type,
@@ -135,8 +128,6 @@ namespace Tiger.Types
             object value,
             Type destinationType)
         { // todo(cosborn) There is a strong possibility that this can be more efficient.
-            Assume(destinationType != null);
-
             if (value == null)
             {
                 return ConvertToNull(context, culture, destinationType);
@@ -186,12 +177,13 @@ namespace Tiger.Types
             }
         }
 
+        [CanBeNull]
         object ConvertToNull(
             [CanBeNull] ITypeDescriptorContext context,
             [CanBeNull] CultureInfo culture,
             [NotNull] Type destinationType)
         {
-            Requires(destinationType != null);
+            if (destinationType == null) { throw new ArgumentNullException(nameof(destinationType)); }
 
             return Nullable.GetUnderlyingType(destinationType) == _underlyingType
                 ? null

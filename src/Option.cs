@@ -40,12 +40,7 @@ namespace Tiger.Types
         /// An <see cref="Option{TSome}"/> in the Some state with its Some value set to <paramref name="value"/>.
         /// </returns>
         public static Option<TSome> Some<TSome>(TSome value)
-            where TSome : struct
-        {
-            Ensures(Result<Option<TSome>>().IsSome);
-
-            return new Option<TSome>(value);
-        }
+            where TSome : struct => new Option<TSome>(value);
 
         /// <summary>
         /// Gets a value that can be converted to an <see cref="Option{TSome}"/> of any Some type.
@@ -137,8 +132,6 @@ namespace Tiger.Types
         [Pure]
         public static int OptionalCompare<TSome>(this Option<TSome> o1, Option<TSome> o2)
         {
-            Ensures(Result<int>() == -1 || Result<int>() == 0 || Result<int>() == 1);
-
             if (o1.IsNone && o2.IsNone) { return 0; }
             if (o1.IsNone || o2.IsNone)
             {
@@ -167,8 +160,6 @@ namespace Tiger.Types
             Option<TSome> o2,
             IComparer<TSome> comparer)
         {
-            Ensures(Result<int>() == -1 || Result<int>() == 0 || Result<int>() == 1);
-
             if (o1.IsNone && o2.IsNone) { return 0; }
             if (o1.IsNone || o2.IsNone)
             {

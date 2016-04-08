@@ -34,8 +34,7 @@ namespace Tiger.Types
         /// <param name="serializer">The calling serializer.</param>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            Assume(serializer != null);
-            Assume(value != null, Resources.IncompatibleValue);
+            if (value == null) { throw new ArgumentNullException(nameof(value), Resources.IncompatibleValue); }
 
             var objectType = value.GetType();
             Assume(objectType.IsGenericType, Resources.IncompatibleValue);
@@ -63,10 +62,6 @@ namespace Tiger.Types
         /// <returns>The object value.</returns>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            Assume(objectType != null);
-            Assume(reader != null);
-            Assume(serializer != null);
-
             var underlyingType = Option.GetUnderlyingType(objectType);
             Assume(underlyingType != null, Resources.IncompatibleType);
 
