@@ -41,10 +41,6 @@
       <HintPath>..\..\packages\JetBrains.Annotations.10.1.5\lib\net\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="nunit.framework, Version=3.4.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\..\packages\NUnit.3.4.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
@@ -61,7 +57,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="EitherTestFixture.cs" />
-    <Compile Include="OptionJsonConverterTestFixture.cs" />
     <Compile Include="OptionTypeConverterTestFixture.cs" />
     <Compile Include="TaskExtensionsTestFixture.cs" />
     <Compile Include="ObjectTestFixture.cs" />

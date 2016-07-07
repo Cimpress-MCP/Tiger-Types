@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,7 +14,6 @@ namespace Tiger.Types
     /// <summary>Represents the presence or absence of a value.</summary>
     /// <typeparam name="TSome">The Some type of the value that may be represented.</typeparam>
     [TypeConverter(typeof(OptionTypeConverter))]
-    [JsonConverter(typeof(OptionJsonConverter))] // todo(cosborn) Library.
     [DebuggerTypeProxy(typeof(OptionDebuggerTypeProxy<>))]
     public struct Option<TSome>
         : ICustomMemberProvider
