@@ -8,10 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Tiger.Types.Properties
-{
-
-
+namespace Tiger.Types.Properties {
+    using System;
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -66,6 +66,15 @@ namespace Tiger.Types.Properties
         internal static string EitherIsBottom {
             get {
                 return ResourceManager.GetString("EitherIsBottom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This instance is in an invalid state..
+        /// </summary>
+        internal static string EitherIsNotRight {
+            get {
+                return ResourceManager.GetString("EitherIsNotRight", resourceCulture);
             }
         }
         

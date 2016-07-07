@@ -1,6 +1,5 @@
 ﻿using JetBrains.Annotations;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Tiger.Types.Properties;
 using static System.Diagnostics.Contracts.Contract;
@@ -8,7 +7,6 @@ using static System.Diagnostics.Contracts.Contract;
 namespace Tiger.Types
 {
     /// <summary>Extensions to the functionality of <see cref="Task{TResult}"/>.</summary>
-    [SuppressMessage("ReSharper", "ExceptionNotThrown", Justification = "R# doesn't understand Code Contracts.")]
     public static class TaskExtensions
     {
         /// <summary>Applies a <see cref="Task"/> over a function.</summary>
@@ -18,19 +16,18 @@ namespace Tiger.Types
         /// <returns>The return value of <paramref name="applier"/>, asynchronously.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="task"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="applier"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [NotNull, ItemNotNull]
         public static async Task<TOut> Apply<TOut>(
             [NotNull] this Task task,
             [NotNull, InstantHandle] Func<TOut> applier)
         {
-            Requires<ArgumentNullException>(task != null);
-            Requires<ArgumentNullException>(applier != null);
-            Ensures(Result<TOut>() != null);
-            Ensures(Result<Task<TOut>>() != null);
+            if (task == null) { throw new ArgumentNullException(nameof(task)); }
+            if (applier == null) { throw new ArgumentNullException(nameof(applier)); }
 
             await task.ConfigureAwait(false);
             var result = applier();
-            Assume(result != null, Resources.ResultIsNull);
+            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
             return result;
         }
 
@@ -44,18 +41,17 @@ namespace Tiger.Types
         /// <returns>The result of <paramref name="mapper"/>, asynchronously.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="taskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="mapper"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [NotNull, ItemNotNull]
         public static async Task<TOut> Map<TIn, TOut>(
             [NotNull, ItemNotNull] this Task<TIn> taskValue,
             [NotNull, InstantHandle] Func<TIn, TOut> mapper)
         {
-            Requires<ArgumentNullException>(taskValue != null);
-            Requires<ArgumentNullException>(mapper != null);
-            Ensures(Result<TOut>() != null);
-            Ensures(Result<Task<TOut>>() != null);
+            if (taskValue == null) { throw new ArgumentNullException(nameof(taskValue)); }
+            if (mapper == null) { throw new ArgumentNullException(nameof(mapper)); }
 
             var result = mapper(await taskValue.ConfigureAwait(false));
-            Assume(result != null, Resources.ResultIsNull);
+            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
             return result;
         }
 
@@ -68,19 +64,18 @@ namespace Tiger.Types
         /// <returns>The return value of <paramref name="thenner"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="task"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="thenner"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [NotNull, ItemNotNull]
         public static async Task<TOut> Then<TOut>(
             [NotNull] this Task task,
             [NotNull, InstantHandle] Func<Task<TOut>> thenner)
         {
-            Requires<ArgumentNullException>(task != null);
-            Requires<ArgumentNullException>(thenner != null);
-            Ensures(Result<TOut>() != null);
-            Ensures(Result<Task<TOut>>() != null);
+            if (task == null) { throw new ArgumentNullException(nameof(task)); }
+            if (thenner == null) { throw new ArgumentNullException(nameof(thenner)); }
 
             await task.ConfigureAwait(false);
             var result = await thenner().ConfigureAwait(false);
-            Assume(result != null, Resources.ResultIsNull);
+            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
             return result;
         }
 
@@ -94,18 +89,17 @@ namespace Tiger.Types
         /// <returns>The result of <paramref name="binder"/>, asynchronously.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="taskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="binder"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [NotNull, ItemNotNull]
         public static async Task<TOut> Bind<TIn, TOut>(
             [NotNull, ItemNotNull] this Task<TIn> taskValue,
             [NotNull, InstantHandle] Func<TIn, Task<TOut>> binder)
         {
-            Requires<ArgumentNullException>(taskValue != null);
-            Requires<ArgumentNullException>(binder != null);
-            Ensures(Result<TOut>() != null);
-            Ensures(Result<Task<TOut>>() != null);
+            if (taskValue == null) { throw new ArgumentNullException(nameof(taskValue)); }
+            if (binder == null) { throw new ArgumentNullException(nameof(binder)); }
 
             var result = await binder(await taskValue.ConfigureAwait(false)).ConfigureAwait(false);
-            Assume(result != null, Resources.ResultIsNull);
+            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
             return result;
         }
     }

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Tiger.Types.Properties;
-using static System.Diagnostics.Contracts.Contract;
 using PureAttribute = System.Diagnostics.Contracts.PureAttribute;
 
 namespace Tiger.Types
@@ -128,8 +127,8 @@ namespace Tiger.Types
         }
 
         /// <summary>
-        /// Returns the specified optional value or the type parameter's default value as an optional value
-        /// if the optional value is in the None state.
+        /// Returns the specified optional value or the default value of <typeparamref name="TSource"/>
+        /// as an optional value if the optional value is in the None state.
         /// </summary>
         /// <typeparam name="TSource">The Some type of <paramref name="source"/>.</typeparam>
         /// <param name="source">The optional value to return a default value for if it is in the None state.</param>
@@ -150,8 +149,9 @@ namespace Tiger.Types
         /// <param name="source">The optional value to return a default value for if it is in the None state.</param>
         /// <param name="defaultValue">The value to return if the optional value is in the None state.</param>
         /// <returns>
-        /// An <see cref="Option{TSome}"/> in the Some state <paramref name="defaultValue"/> as the Some value
-        /// if <paramref name="source"/> is in the None state; otherwise; <paramref name="source"/>.
+        /// An <see cref="Option{TSome}"/> in the Some state with <paramref name="defaultValue"/>
+        /// as the Some value if <paramref name="source"/> is in the None state;
+        /// otherwise, <paramref name="source"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="defaultValue"/> is <see langword="null"/>.</exception>
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -170,7 +170,7 @@ namespace Tiger.Types
         /// <param name="onNext">An action to invoke.</param>
         /// <returns>The original value, exhibiting the specified side effects.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="onNext"/> is <see langword="null"/>.</exception>
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        [LinqTunnel, EditorBrowsable(EditorBrowsableState.Never)]
         public static Option<TSource> Do<TSource>(
             this Option<TSource> source,
             [NotNull, InstantHandle] Action<TSource> onNext)
@@ -204,7 +204,7 @@ namespace Tiger.Types
         /// option value that satifies the condition.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is <see langword="null"/>.</exception>
-        [Pure, EditorBrowsable(EditorBrowsableState.Never)]
+        [Pure, LinqTunnel, EditorBrowsable(EditorBrowsableState.Never)]
         public static Option<TSource> Where<TSource>(
             this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, bool> predicate)
@@ -224,7 +224,7 @@ namespace Tiger.Types
         /// the transform function on the Some value of <paramref name="source"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="selector"/> is <see langword="null"/>.</exception>
-        [Pure, EditorBrowsable(EditorBrowsableState.Never)]
+        [Pure, LinqTunnel, EditorBrowsable(EditorBrowsableState.Never)]
         public static Option<TResult> Select<TSource, TResult>(
             this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, TResult> selector)
@@ -249,7 +249,7 @@ namespace Tiger.Types
         /// transform function on the Some value of the input optional value.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="selector"/> is <see langword="null"/>.</exception>
-        [Pure, EditorBrowsable(EditorBrowsableState.Never)]
+        [Pure, LinqTunnel, EditorBrowsable(EditorBrowsableState.Never)]
         public static Option<TResult> SelectMany<TSource, TResult>(
             this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, Option<TResult>> selector)
@@ -280,12 +280,12 @@ namespace Tiger.Types
         /// <returns>
         /// An <see cref="Option{TSome}"/> whose Some value is the result of invoking the some-to-optional
         /// transform function <paramref name="optionalSelector"/> on the Some value of
-        /// <paramref name="source"/> and them mapping that Some value and their corresponding optional
+        /// <paramref name="source"/> and then mapping that Some value and their corresponding optional
         /// value to a result optional value.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="optionalSelector"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="resultSelector"/> is <see langword="null"/>.</exception>
-        [Pure, EditorBrowsable(EditorBrowsableState.Never)]
+        [Pure, LinqTunnel, EditorBrowsable(EditorBrowsableState.Never)]
         public static Option<TResult> SelectMany<TSource, TOption, TResult>(
             this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, Option<TOption>> optionalSelector,
@@ -305,7 +305,7 @@ namespace Tiger.Types
         /// <typeparam name="TAccumulate">The type of the accumulator value.</typeparam>
         /// <param name="source">An <see cref="Option{TSome}"/> to aggregate over.</param>
         /// <param name="seed">The initial accumulator value.</param>
-        /// <param name="func">An accumulator value to be invoked on the Some value.</param>
+        /// <param name="func">An accumulator function to be invoked on the Some value.</param>
         /// <returns>The final accumulator value.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="seed"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
@@ -339,6 +339,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="seed"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="resultSelector"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [Pure, NotNull, EditorBrowsable(EditorBrowsableState.Never)]
         public static TResult Aggregate<TSource, TAccumulate, TResult>(
             this Option<TSource> source,
@@ -351,7 +352,7 @@ namespace Tiger.Types
             if (resultSelector == null) { throw new ArgumentNullException(nameof(resultSelector)); }
 
             var result = source.Fold(seed, func).Pipe(resultSelector);
-            Assume(result != null, Resources.ResultIsNull);
+            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
             return result;
         }
 

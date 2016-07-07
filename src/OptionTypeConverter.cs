@@ -19,7 +19,10 @@ namespace Tiger.Types
         readonly Type _underlyingType;
         readonly TypeConverter _underlyingTypeConverter;
 
+        /// <summary>Initializes an instance of <see cref="OptionTypeConverter"/>.</summary>
+        /// <param name="type">The type from which to convert.</param>
         /// <exception cref="ArgumentNullException"><paramref name="type"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="type"/> is not compatible.</exception>
         public OptionTypeConverter([NotNull] Type type)
         {
             if (type == null) { throw new ArgumentNullException(nameof(type)); }

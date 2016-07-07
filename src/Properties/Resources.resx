@@ -119,7 +119,11 @@
   </resheader>
   <data name="EitherIsBottom" xml:space="preserve">
     <value>This instance has not been initialized.</value>
-    <comment>Explains use of default(Either&lt;TLeft,TRight&gt;).</comment>
+    <comment>Explains use of a Bottom Either.</comment>
+  </data>
+  <data name="EitherIsNotRight" xml:space="preserve">
+    <value>This instance is in an invalid state.</value>
+    <comment>Explains unwrapping of an Either in a state that is not Right.</comment>
   </data>
   <data name="IncompatibleType" xml:space="preserve">
     <value>The provided type is not compatible with Tiger.Types.Option`1[TSome].</value>
@@ -131,7 +135,7 @@
   </data>
   <data name="OptionIsNone" xml:space="preserve">
     <value>This instance is in an invalid state.</value>
-    <comment>Explains unwrapping of Option&lt;TSome&gt;.None.</comment>
+    <comment>Explains unwrapping of a None Option.</comment>
   </data>
   <data name="ResultIsNull" xml:space="preserve">
     <value>This result evaluated to null.</value>

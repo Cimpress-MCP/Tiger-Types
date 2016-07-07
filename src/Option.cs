@@ -1,7 +1,6 @@
 ﻿using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
-using static System.Diagnostics.Contracts.Contract;
 using PureAttribute = System.Diagnostics.Contracts.PureAttribute;
 
 namespace Tiger.Types
@@ -57,9 +56,11 @@ namespace Tiger.Types
         /// The underlying type argument of <paramref name="optionalType"/> if <paramref name="optionalType"/>
         /// is a closed generic optional type; otherwise <see langword="null" />.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="optionalType"/> is <see langword="null" />.</exception>
+        [Pure, CanBeNull]
         public static Type GetUnderlyingType([NotNull] Type optionalType)
         {
-            Requires<ArgumentNullException>(optionalType != null);
+            if (optionalType == null) { throw new ArgumentNullException(nameof(optionalType)); }
 
             if (!optionalType.IsGenericType ||
                 optionalType.IsGenericTypeDefinition)

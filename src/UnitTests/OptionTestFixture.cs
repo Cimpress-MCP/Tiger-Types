@@ -790,7 +790,7 @@ namespace Tiger.Types.UnitTests
         #region Let
 
         [Test(Description = "Conditionally executing an action based on a None Option " +
-                    "should not execute.")]
+                            "should not execute.")]
         public void ActionLet_None()
         {
             // arrange
@@ -866,7 +866,7 @@ namespace Tiger.Types.UnitTests
             Assert.That(actual, Is.EqualTo(Option.From(sentinel)));
         }
 
-        [Test(Description = "Recovering a Some Option should return the recovery value.")]
+        [Test(Description = "Recovering a Some Option should return the original value.")]
         public void ValueRecover_Some()
         {
             // arrange
@@ -892,7 +892,7 @@ namespace Tiger.Types.UnitTests
             Assert.That(actual, Is.EqualTo(Option.From(sentinel)));
         }
 
-        [Test(Description = "Recovering a Some Option should return the recovery value.")]
+        [Test(Description = "Recovering a Some Option should return the original value.")]
         public void FuncRecover_Some()
         {
             // arrange
@@ -918,7 +918,7 @@ namespace Tiger.Types.UnitTests
             Assert.That(actual, Is.EqualTo(Option.From(sentinel)));
         }
 
-        [Test(Description = "Recovering a Some Option should return the recovery value.")]
+        [Test(Description = "Recovering a Some Option should return the original value.")]
         public async Task TaskRecover_Some()
         {
             // arrange
@@ -977,8 +977,8 @@ namespace Tiger.Types.UnitTests
             Assert.That(actual, Is.EqualTo(default(string)));
         }
 
-        [Test(Description = "Coalescing a None Option with an alternative value " +
-                            "should return the alternative value.")]
+        [Test(Description = "Coalescing a Some Option with an alternative value " +
+                            "should return the Some value.")]
         public void GetValueOrDefault_Some()
         {
             // arrange
@@ -1081,7 +1081,7 @@ namespace Tiger.Types.UnitTests
         #region Overrides
 
         [Test(Description = "A None Option should stringify to None.")]
-        [Category("Overload")]
+        [Category("Override")]
         public void ToString_None()
         {
             // arrange
@@ -1095,7 +1095,7 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "A Some Option should stringify to a wrapped value.")]
-        [Category("Overload")]
+        [Category("Override")]
         public void ToString_Some()
         {
             // arrange
@@ -1109,7 +1109,7 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "A None Option should not be equal to null.")]
-        [Category("Overload")]
+        [Category("Override")]
         public void ObjectEquals_NoneNull()
         {
             // arrange
@@ -1124,7 +1124,7 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "A Some Option should not be equal to null.")]
-        [Category("Overload")]
+        [Category("Override")]
         public void ObjectEquals_SomeNull()
         {
             // arrange
@@ -1139,7 +1139,7 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "Two None Options of the same type should be equal.")]
-        [Category("Overload")]
+        [Category("Override")]
         public void ObjectEquals_NoneNone_SameType()
         {
             // arrange
@@ -1154,7 +1154,7 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "Two None Options of different types should not be equal.")]
-        [Category("Overload")]
+        [Category("Override")]
         public void ObjectEquals_NoneNone_DifferentType()
         {
             // arrange
@@ -1171,7 +1171,7 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "A None Option and a Some Option of the same type should not be equal.")]
-        [Category("Overload")]
+        [Category("Override")]
         public void ObjectEquals_NoneSome_SameType()
         {
             // arrange
@@ -1188,7 +1188,7 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "A None Option and a Some Option of different types should not be equal.")]
-        [Category("Overload")]
+        [Category("Override")]
         public void ObjectEquals_NoneSome_DifferentType()
         {
             // arrange
@@ -1205,7 +1205,7 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "Two Some Options of the same type with different values should not be equal.")]
-        [Category("Overload")]
+        [Category("Override")]
         public void ObjectEquals_SomeSome_SameType_DifferentValue()
         {
             // arrange
@@ -1222,7 +1222,7 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "Two Some Options of the same type with the same values should be equal.")]
-        [Category("Overload")]
+        [Category("Override")]
         public void ObjectEquals_SomeSome_SameType_SameValue()
         {
             // arrange
@@ -1238,8 +1238,8 @@ namespace Tiger.Types.UnitTests
             Assert.That(actualRightFirst, Is.True);
         }
 
-        [Test(Description = "Two Some Options of different types should be equal.")]
-        [Category("Overload")]
+        [Test(Description = "Two Some Options of different types should not be equal.")]
+        [Category("Override")]
         public void ObjectEquals_SomeSome_DifferentType()
         {
             // arrange
@@ -1256,7 +1256,7 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "A None Option should have a hashcode of 0.")]
-        [Category("Overload")]
+        [Category("Override")]
         public void GetHashCode_None()
         {
             // arrange
@@ -1270,7 +1270,7 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "A Some Option should have the hashcode of its Some value.")]
-        [Category("Overload")]
+        [Category("Override")]
         public void GetHashCode_Some()
         {
             // arrange
@@ -2351,6 +2351,7 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "Recovering a None Option should return the recovery value.")]
+        [Category("Extension")]
         public void DefaultIfEmpty_None()
         {
             // arrange
@@ -2363,7 +2364,8 @@ namespace Tiger.Types.UnitTests
             Assert.That(actual, Is.EqualTo(Option.From(0)));
         }
 
-        [Test(Description = "Recovering a Some Option should return the recovery value.")]
+        [Test(Description = "Recovering a Some Option should return the Some value.")]
+        [Category("Extension")]
         public void DefaultIfEmpty_Some()
         {
             // arrange
@@ -2377,6 +2379,7 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "Recovering a None Option should return the recovery value.")]
+        [Category("Extension")]
         public void ValueDefaultIfEmpty_None()
         {
             // arrange
@@ -2389,7 +2392,8 @@ namespace Tiger.Types.UnitTests
             Assert.That(actual, Is.EqualTo(Option.From(sentinel)));
         }
 
-        [Test(Description = "Recovering a Some Option should return the recovery value.")]
+        [Test(Description = "Recovering a Some Option should return the Some value.")]
+        [Category("Extension")]
         public void ValueDefaultIfEmpty_Some()
         {
             // arrange
@@ -2597,7 +2601,7 @@ namespace Tiger.Types.UnitTests
             Assert.That(actual, Is.EqualTo(Option<int>.None));
         }
 
-        [Test(Description = "Selecting from two Some Options should produce a Some ")]
+        [Test(Description = "Selecting from two Some Options should produce a Some Option.")]
         [Category("Extension")]
         public void SelectManyResult_SomeSome()
         {
@@ -2656,6 +2660,7 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "Folding over a None Option should return the seed value.")]
+        [Category("Extension")]
         public void Aggregate_None()
         {
             // arrange
@@ -2668,8 +2673,9 @@ namespace Tiger.Types.UnitTests
             Assert.That(actual, Is.EqualTo(34));
         }
 
-        [Test(Description = "Folding over a Some Option should return result of invoking the accumulator" +
-                            "over the seed value and the Some value.")]
+        [Test(Description = "Folding over a Some Option should return the result of invoking the " +
+                            "accumulator over the seed value and the Some value.")]
+        [Category("Extension")]
         public void Aggregate_Some()
         {
             // arrange
@@ -2683,6 +2689,7 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "Folding over a None Option should return the seed value.")]
+        [Category("Extension")]
         public void ResultAggregate_None()
         {
             // arrange
@@ -2695,8 +2702,9 @@ namespace Tiger.Types.UnitTests
             Assert.That(actual, Is.EqualTo(68));
         }
 
-        [Test(Description = "Folding over a Some Option should return result of invoking the accumulator" +
-                            "over the seed value and the Some value.")]
+        [Test(Description = "Folding over a Some Option should return the result of invoking the " +
+                            "accumulator over the seed value and the Some value.")]
+        [Category("Extension")]
         public void ResultAggregate_Some()
         {
             // arrange
