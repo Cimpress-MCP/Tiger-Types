@@ -1,7 +1,6 @@
 ﻿using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
-using PureAttribute = System.Diagnostics.Contracts.PureAttribute;
 
 namespace Tiger.Types
 {
