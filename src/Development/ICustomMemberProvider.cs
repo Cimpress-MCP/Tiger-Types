@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using PureAttribute = System.Diagnostics.Contracts.PureAttribute;
 
 namespace LINQPad
 {

@@ -7,7 +7,6 @@ using System.Globalization;
 using System.Threading.Tasks;
 using LINQPad;
 using Tiger.Types.Properties;
-using PureAttribute = System.Diagnostics.Contracts.PureAttribute;
 
 namespace Tiger.Types
 {
