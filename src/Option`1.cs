@@ -3,10 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Threading.Tasks;
 using LINQPad;
 using Tiger.Types.Properties;
+using static System.Diagnostics.Contracts.Contract;
 
 namespace Tiger.Types
 {
@@ -39,18 +41,15 @@ namespace Tiger.Types
 
         /// <summary>Gets a value indicating whether this instance is in the Some state.</summary>
         /// <remarks>There are usually better ways to do this.</remarks>
-        // ReSharper disable once ConvertToAutoPropertyWhenPossible because(cosborn) Performance?
+        // ReSharper disable once ConvertToAutoPropertyWhenPossible because(cosborn) Performance???
         public bool IsSome => _isSome;
 
         readonly bool _isSome;
         internal readonly TSome SomeValue;
 
-        internal Option([NotNull] TSome someValue)
-            : this()
+        internal Option([NotNull] TSome value)
         {
-            if (someValue == null) { throw new ArgumentNullException(nameof(someValue)); }
-
-            SomeValue = someValue;
+            SomeValue = value;
             _isSome = true;
         }
 
@@ -68,10 +67,9 @@ namespace Tiger.Types
         /// <returns>A value produced by <paramref name="none"/> or <paramref name="some"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [NotNull, Pure]
         public TOut Match<TOut>(
-            [NotNull, InstantHandle] TOut none,
+            [NotNull] TOut none,
             [NotNull, InstantHandle] Func<TSome, TOut> some)
         {
             if (none == null) { throw new ArgumentNullException(nameof(none)); }
@@ -80,7 +78,7 @@ namespace Tiger.Types
             var result = IsSome
                 ? some(SomeValue)
                 : none;
-            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
+            Assume(result != null, Resources.ResultIsNull);
             return result;
         }
 
@@ -96,10 +94,9 @@ namespace Tiger.Types
         /// <returns>A value produced by <paramref name="none"/> or <paramref name="some"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [NotNull, ItemNotNull, Pure]
         public async Task<TOut> Match<TOut>(
-            [NotNull, InstantHandle] TOut none,
+            [NotNull] TOut none,
             [NotNull, InstantHandle] Func<TSome, Task<TOut>> some)
         {
             if (none == null) { throw new ArgumentNullException(nameof(none)); }
@@ -108,7 +105,7 @@ namespace Tiger.Types
             var result = _isSome
                 ? await some(SomeValue).ConfigureAwait(false)
                 : none;
-            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
+            Assume(result != null, Resources.ResultIsNull);
             return result;
         }
 
@@ -124,7 +121,6 @@ namespace Tiger.Types
         /// <returns>A value produced by <paramref name="none"/> or <paramref name="some"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [NotNull, Pure]
         public TOut Match<TOut>(
             [NotNull, InstantHandle] Func<TOut> none,
@@ -136,7 +132,7 @@ namespace Tiger.Types
             var result = _isSome
                 ? some(SomeValue)
                 : none();
-            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
+            Assume(result != null, Resources.ResultIsNull);
             return result;
         }
 
@@ -152,7 +148,6 @@ namespace Tiger.Types
         /// <returns>A value produced by <paramref name="none"/> or <paramref name="some"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [ItemNotNull, Pure]
         public async Task<TOut> Match<TOut>(
             [NotNull, InstantHandle] Func<TOut> none,
@@ -164,7 +159,7 @@ namespace Tiger.Types
             var result = _isSome
                 ? await some(SomeValue).ConfigureAwait(false)
                 : none();
-            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
+            Assume(result != null, Resources.ResultIsNull);
             return result;
         }
 
@@ -180,7 +175,6 @@ namespace Tiger.Types
         /// <returns>A value produced by <paramref name="none"/> or <paramref name="some"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [NotNull, ItemNotNull, Pure]
         public async Task<TOut> Match<TOut>(
             [NotNull, InstantHandle] Func<Task<TOut>> none,
@@ -192,7 +186,7 @@ namespace Tiger.Types
             var result = _isSome
                 ? some(SomeValue)
                 : await none().ConfigureAwait(false);
-            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
+            Assume(result != null, Resources.ResultIsNull);
             return result;
         }
 
@@ -208,7 +202,6 @@ namespace Tiger.Types
         /// <returns>A value produced by <paramref name="none"/> or <paramref name="some"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [NotNull, ItemNotNull, Pure]
         public async Task<TOut> Match<TOut>(
             [NotNull, InstantHandle] Func<Task<TOut>> none,
@@ -220,7 +213,7 @@ namespace Tiger.Types
             var result = _isSome
                 ? await some(SomeValue).ConfigureAwait(false)
                 : await none().ConfigureAwait(false);
-            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
+            Assume(result != null, Resources.ResultIsNull);
             return result;
         }
 
@@ -228,7 +221,7 @@ namespace Tiger.Types
 
         #region Void
 
-        /// <summary>Performs an action on this instance by matching on its state.</summary>
+        /// <summary>Performs an action with this instance by matching on its state.</summary>
         /// <param name="none">
         /// An action to be invoked with no arguments if this instance is in the None state.
         /// </param>
@@ -255,7 +248,7 @@ namespace Tiger.Types
             }
         }
 
-        /// <summary>Performs an action on this instance by matching on its state, asynchronously.</summary>
+        /// <summary>Performs an action with this instance by matching on its state, asynchronously.</summary>
         /// <param name="none">
         /// An action to be invoked with no arguments if this instance is in the None state.
         /// </param>
@@ -283,7 +276,7 @@ namespace Tiger.Types
             }
         }
 
-        /// <summary>Performs an action on this instance by matching on its state, asynchronously.</summary>
+        /// <summary>Performs an action with this instance by matching on its state, asynchronously.</summary>
         /// <param name="none">
         /// An action to be invoked asynchronously with no arguments if this instance is in the None state.
         /// </param>
@@ -311,7 +304,7 @@ namespace Tiger.Types
             }
         }
 
-        /// <summary>Performs an action on this instance by matching on its state, asynchronously.</summary>
+        /// <summary>Performs an action with this instance by matching on its state, asynchronously.</summary>
         /// <param name="none">
         /// An action to be invoked asynchronously with no arguments if this instance is in the None state.
         /// </param>
@@ -347,26 +340,25 @@ namespace Tiger.Types
 
         /// <summary>Maps a function over the Some value of this instance, if present.</summary>
         /// <typeparam name="TOut">The type to which to map.</typeparam>
-        /// <param name="mapper">
+        /// <param name="some">
         /// A function to invoke with the Some value of this instance
         /// as the argument if this instance is in the Some state.
         /// </param>
         /// <returns>
         /// An <see cref="Option{TSome}"/> in the None state if this instance is in the None state;
         /// otherwise, an <see cref="Option{TSome}"/> in the Some state with its Some value set to
-        /// the value of invoking <paramref name="mapper"/> over the Some value of this instance.
+        /// the value of invoking <paramref name="some"/> over the Some value of this instance.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="mapper"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
         [Pure]
-        public Option<TOut> Map<TOut>([NotNull, InstantHandle] Func<TSome, TOut> mapper)
+        public Option<TOut> Map<TOut>([NotNull, InstantHandle] Func<TSome, TOut> some)
         {
-            if (mapper == null) { throw new ArgumentNullException(nameof(mapper)); }
+            if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
             if (_isSome)
             {
-                var result = mapper(SomeValue);
-                if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
+                var result = some(SomeValue);
+                Assume(result != null, Resources.ResultIsNull);
                 return new Option<TOut>(result);
             }
 
@@ -375,26 +367,25 @@ namespace Tiger.Types
 
         /// <summary>Maps a function over the Some value of this instance, if present, asynchronously.</summary>
         /// <typeparam name="TOut">The type to which to map.</typeparam>
-        /// <param name="mapper">
+        /// <param name="some">
         /// A function to invoke asynchronously with the Some value of this instance
         /// as the argument if this instance is in the Some state.
         /// </param>
         /// <returns>
         /// An <see cref="Option{TSome}"/> in the None state if this instance is in the None state;
         /// otherwise, an <see cref="Option{TSome}"/> in the Some state with its Some value set to
-        /// the value of invoking <paramref name="mapper"/> over the Some value of this instance.
+        /// the value of invoking <paramref name="some"/> over the Some value of this instance.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="mapper"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
         [NotNull, Pure]
-        public async Task<Option<TOut>> Map<TOut>([NotNull, InstantHandle] Func<TSome, Task<TOut>> mapper)
+        public async Task<Option<TOut>> Map<TOut>([NotNull, InstantHandle] Func<TSome, Task<TOut>> some)
         {
-            if (mapper == null) { throw new ArgumentNullException(nameof(mapper)); }
+            if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
             if (_isSome)
             {
-                var result = await mapper(SomeValue).ConfigureAwait(false);
-                if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
+                var result = await some(SomeValue).ConfigureAwait(false);
+                Assume(result != null, Resources.ResultIsNull);
                 return new Option<TOut>(result);
             }
 
@@ -407,49 +398,49 @@ namespace Tiger.Types
 
         /// <summary>Binds a function over the Some value of this instance, if present.</summary>
         /// <typeparam name="TOut">The type to which to bind.</typeparam>
-        /// <param name="binder">
+        /// <param name="some">
         /// A function to invoke with the Some value of this instance
         /// as the argument if this instance is in the Some state.
         /// </param>
         /// <returns>
         /// An <see cref="Option{TSome}"/> in the None state if this instance is in the None state
-        /// or if the result of invoking <paramref name="binder"/> over the Some value of this instance
+        /// or if the result of invoking <paramref name="some"/> over the Some value of this instance
         /// is in the None state; otherwise, an <see cref="Option{TSome}"/> in the Some state with its
-        /// Some value set to the value of invoking <paramref name="binder"/> over the Some value
+        /// Some value set to the value of invoking <paramref name="some"/> over the Some value
         /// of this instance.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="binder"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
         [Pure]
-        public Option<TOut> Bind<TOut>([NotNull, InstantHandle] Func<TSome, Option<TOut>> binder)
+        public Option<TOut> Bind<TOut>([NotNull, InstantHandle] Func<TSome, Option<TOut>> some)
         {
-            if (binder == null) { throw new ArgumentNullException(nameof(binder)); }
+            if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
             return _isSome
-                ? binder(SomeValue)
+                ? some(SomeValue)
                 : Option<TOut>.None;
         }
 
         /// <summary>Binds a function over the Some value of this instance, if present, asynchronously.</summary>
         /// <typeparam name="TOut">The type to which to bind.</typeparam>
-        /// <param name="binder">
+        /// <param name="some">
         /// A function to invoke asynchronously with the Some value of this instance
         /// as the argument if this instance is in the Some state.
         /// </param>
         /// <returns>
         /// An <see cref="Option{TSome}"/> in the None state if this instance is in the None state
-        /// or if the result of invoking <paramref name="binder"/> over the Some value of this instance
+        /// or if the result of invoking <paramref name="some"/> over the Some value of this instance
         /// is in the None state; otherwise, an <see cref="Option{TSome}"/> in the Some state with its
-        /// Some value set to the value of invoking <paramref name="binder"/> over the Some value
+        /// Some value set to the value of invoking <paramref name="some"/> over the Some value
         /// of this instance.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="binder"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
         [NotNull, Pure]
-        public async Task<Option<TOut>> Bind<TOut>([NotNull, InstantHandle] Func<TSome, Task<Option<TOut>>> binder)
+        public async Task<Option<TOut>> Bind<TOut>([NotNull, InstantHandle] Func<TSome, Task<Option<TOut>>> some)
         {
-            if (binder == null) { throw new ArgumentNullException(nameof(binder)); }
+            if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
             return _isSome
-                ? await binder(SomeValue).ConfigureAwait(false)
+                ? await some(SomeValue).ConfigureAwait(false)
                 : Option<TOut>.None;
         }
 
@@ -518,7 +509,6 @@ namespace Tiger.Types
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="state"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="folder"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [NotNull, Pure]
         public TState Fold<TState>(
             [NotNull] TState state,
@@ -530,7 +520,7 @@ namespace Tiger.Types
             var result = _isSome
                 ? folder(state, SomeValue)
                 : state;
-            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
+            Assume(result != null, Resources.ResultIsNull);
             return result;
         }
 
@@ -549,7 +539,6 @@ namespace Tiger.Types
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="state"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="folder"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [NotNull, ItemNotNull, Pure]
         public async Task<TState> Fold<TState>(
             [NotNull] TState state,
@@ -561,7 +550,7 @@ namespace Tiger.Types
             var result = _isSome
                 ? await folder(state, SomeValue).ConfigureAwait(false)
                 : state;
-            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
+            Assume(result != null, Resources.ResultIsNull);
             return result;
         }
 
@@ -571,37 +560,37 @@ namespace Tiger.Types
 
         /// <summary>
         /// Performs an action on the Some value of this instance,
-        /// if present, and returns this instance.
+        /// if present, and returns the same value as this instance.
         /// </summary>
-        /// <param name="tapper">An action to perform.</param>
-        /// <returns>This instance.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="tapper"/> is <see langword="null"/>.</exception>
-        public Option<TSome> Tap([NotNull, InstantHandle] Action<TSome> tapper)
+        /// <param name="some">An action to perform.</param>
+        /// <returns>The same value as this instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
+        public Option<TSome> Tap([NotNull, InstantHandle] Action<TSome> some)
         {
-            if (tapper == null) { throw new ArgumentNullException(nameof(tapper)); }
+            if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
             if (_isSome)
             {
-                tapper(SomeValue);
+                some(SomeValue);
             }
             return this;
         }
 
         /// <summary>
         /// Performs an action on the Some value of this instance asynchronously,
-        /// if present, and returns this instance.
+        /// if present, and returns the same value as this instance.
         /// </summary>
-        /// <param name="tapper">An action to perform asynchronously.</param>
-        /// <returns>This instance.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="tapper"/> is <see langword="null"/>.</exception>
+        /// <param name="some">An action to perform asynchronously.</param>
+        /// <returns>The same value as this instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
         [NotNull]
-        public async Task<Option<TSome>> Tap([NotNull, InstantHandle] Func<TSome, Task> tapper)
+        public async Task<Option<TSome>> Tap([NotNull, InstantHandle] Func<TSome, Task> some)
         {
-            if (tapper == null) { throw new ArgumentNullException(nameof(tapper)); }
+            if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
             if (_isSome)
             {
-                await tapper(SomeValue).ConfigureAwait(false);
+                await some(SomeValue).ConfigureAwait(false);
             }
             return this;
         }
@@ -611,29 +600,29 @@ namespace Tiger.Types
         #region Let
 
         /// <summary>Performs an action on the Some value of this instance.</summary>
-        /// <param name="action">An action to perform.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="action"/> is <see langword="null"/>.</exception>
-        public void Let([NotNull, InstantHandle] Action<TSome> action)
+        /// <param name="some">An action to perform.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
+        public void Let([NotNull, InstantHandle] Action<TSome> some)
         {
-            if (action == null) { throw new ArgumentNullException(nameof(action)); }
+            if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
             if (_isSome)
             {
-                action(SomeValue);
+                some(SomeValue);
             }
         }
 
         /// <summary>Performs an action on the Some value of this instance, asynchronously.</summary>
-        /// <param name="action">An action to perform asynchronously.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="action"/> is <see langword="null"/>.</exception>
+        /// <param name="some">An action to perform asynchronously.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
         [NotNull]
-        public async Task Let([NotNull, InstantHandle] Func<TSome, Task> action)
+        public async Task Let([NotNull, InstantHandle] Func<TSome, Task> some)
         {
-            if (action == null) { throw new ArgumentNullException(nameof(action)); }
+            if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
             if (_isSome)
             {
-                await action(SomeValue);
+                await some(SomeValue);
             }
         }
 
@@ -649,6 +638,7 @@ namespace Tiger.Types
         /// Some state state whose Some value is <paramref name="recoverer"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="recoverer"/> is <see langword="null"/>.</exception>
+        [Pure]
         public Option<TSome> Recover([NotNull] TSome recoverer)
         {
             if (recoverer == null) { throw new ArgumentNullException(nameof(recoverer)); }
@@ -666,7 +656,7 @@ namespace Tiger.Types
         /// Some state whose Some value is the result of invoking <paramref name="recoverer"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="recoverer"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
+        [Pure]
         public Option<TSome> Recover([NotNull, InstantHandle] Func<TSome> recoverer)
         {
             if (recoverer == null) { throw new ArgumentNullException(nameof(recoverer)); }
@@ -674,7 +664,7 @@ namespace Tiger.Types
             if (_isSome) { return this; }
 
             var result = recoverer();
-            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
+            Assume(result != null, Resources.ResultIsNull);
             return new Option<TSome>(result);
         }
 
@@ -686,8 +676,7 @@ namespace Tiger.Types
         /// Some state whose Some value is the result of invoking <paramref name="recoverer"/> asynchronously.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="recoverer"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
-        [NotNull]
+        [NotNull, Pure]
         public async Task<Option<TSome>> Recover([NotNull] Func<Task<TSome>> recoverer)
         {
             if (recoverer == null) { throw new ArgumentNullException(nameof(recoverer)); }
@@ -695,7 +684,7 @@ namespace Tiger.Types
             if (_isSome) { return this; }
 
             var result = await recoverer().ConfigureAwait(false);
-            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
+            Assume(result != null, Resources.ResultIsNull);
             return new Option<TSome>(result);
         }
 
@@ -708,6 +697,7 @@ namespace Tiger.Types
         /// <exception cref="InvalidOperationException" accessor="get">
         /// This instance is in an invalid state.
         /// </exception>
+        [NotNull]
         public TSome Value
         {
             get
@@ -761,7 +751,6 @@ namespace Tiger.Types
         /// otherwise, the result of invoking <paramref name="other"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [NotNull, Pure]
         public TSome GetValueOrDefault([NotNull, InstantHandle] Func<TSome> other)
         {
@@ -770,7 +759,7 @@ namespace Tiger.Types
             var result = _isSome
                 ? SomeValue
                 : other();
-            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
+            Assume(result != null, Resources.ResultIsNull);
             return result;
         }
 
@@ -784,7 +773,6 @@ namespace Tiger.Types
         /// otherwise, the result of invoking <paramref name="other"/> asynchronously.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [NotNull, ItemCanBeNull, Pure]
         public async Task<TSome> GetValueOrDefault([NotNull, InstantHandle] Func<Task<TSome>> other)
         {
@@ -793,7 +781,7 @@ namespace Tiger.Types
             var result = _isSome
                 ? SomeValue
                 : await other().ConfigureAwait(false);
-            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
+            Assume(result != null, Resources.ResultIsNull);
             return result;
         }
 
@@ -880,7 +868,7 @@ namespace Tiger.Types
         /// <see langword="true"/> if <paramref name="left"/> is equal to the <paramref name="right"/>;
         /// otherwise, <see langword="false"/>.
         /// </returns>
-        public static bool operator ==(Option<TSome> left, Option<TSome> right) => left.Equals(right);
+        public static bool operator ==(Option<TSome> left, Option<TSome> right) => left.EqualsCore(right);
 
         /// <summary>Indicates whether the current object is not equal to another object of the same type.</summary>
         /// <param name="left">An object to compare with <paramref name="right"/>.</param>
@@ -995,19 +983,15 @@ namespace Tiger.Types
         /// <param name="value">The value to be unwrapped.</param>
         /// <exception cref="InvalidOperationException">This instance is in an invalid state.</exception>
         [NotNull]
-        public static explicit operator TSome(Option<TSome> value)
-        {
-            if (!value._isSome) { throw new InvalidOperationException(Resources.OptionIsNone); }
+        public static explicit operator TSome(Option<TSome> value) => value.Value;
 
-            return value.SomeValue;
-        }
-
-        // ReSharper disable once UnusedParameter.Global because(cosborn) Used only for the type inference.
         /// <summary>
         /// Implicitly converts a <see cref="OptionNone"/> to an
         /// <see cref="Option{TSome}"/> in the None state.
         /// </summary>
         /// <param name="none">The default value of <see cref="OptionNone"/>.</param>
+        [SuppressMessage("ReSharper", "UnusedParameter.Global",
+            Justification = "Used only for the type inference.")]
         public static implicit operator Option<TSome>(OptionNone none) => None;
 
         #endregion

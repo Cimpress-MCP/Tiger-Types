@@ -11,12 +11,12 @@ namespace Tiger.Types
     sealed class OptionDebuggerTypeProxy<TSome>
     {
         /// <summary>The internal value of the <see cref="Option{TSome}"/>.</summary>
-        [CanBeNull]
-        TSome Value => _value.SomeValue;
+        [NotNull]
+        TSome Value => _value.Value;
 
         /// <summary>The internal state of the <see cref="Option{TSome}"/>.</summary>
         [NotNull]
-        string State => _value.IsSome ? "Some" : "None";
+        string State => _value.IsSome ? @"Some" : @"None";
 
         readonly Option<TSome> _value;
 

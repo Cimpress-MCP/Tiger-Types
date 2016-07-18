@@ -89,21 +89,6 @@ namespace Tiger.Types.UnitTests
             Assert.That(actual.IsSome, Is.False);
         }
 
-        [Test(Description = "Values should create Some Options.")]
-        [TestCase(0)]
-        [TestCase(3)]
-        [TestCase(-1)]
-        public void Some_Value_IsSome(int innerValue)
-        {
-            // arrange, act
-            var actual = Option.Some(innerValue);
-
-            // assert
-            Assert.That(actual.IsNone, Is.False);
-            Assert.That(actual.IsSome, Is.True);
-
-        }
-
         #endregion
 
         #region Match

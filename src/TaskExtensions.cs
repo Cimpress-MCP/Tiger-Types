@@ -16,7 +16,6 @@ namespace Tiger.Types
         /// <returns>The return value of <paramref name="applier"/>, asynchronously.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="task"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="applier"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [NotNull, ItemNotNull]
         public static async Task<TOut> Apply<TOut>(
             [NotNull] this Task task,
@@ -27,7 +26,7 @@ namespace Tiger.Types
 
             await task.ConfigureAwait(false);
             var result = applier();
-            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
+            Assume(result != null, Resources.ResultIsNull);
             return result;
         }
 
@@ -41,7 +40,6 @@ namespace Tiger.Types
         /// <returns>The result of <paramref name="mapper"/>, asynchronously.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="taskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="mapper"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [NotNull, ItemNotNull]
         public static async Task<TOut> Map<TIn, TOut>(
             [NotNull, ItemNotNull] this Task<TIn> taskValue,
@@ -51,7 +49,7 @@ namespace Tiger.Types
             if (mapper == null) { throw new ArgumentNullException(nameof(mapper)); }
 
             var result = mapper(await taskValue.ConfigureAwait(false));
-            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
+            Assume(result != null, Resources.ResultIsNull);
             return result;
         }
 
@@ -64,7 +62,6 @@ namespace Tiger.Types
         /// <returns>The return value of <paramref name="thenner"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="task"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="thenner"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [NotNull, ItemNotNull]
         public static async Task<TOut> Then<TOut>(
             [NotNull] this Task task,
@@ -75,7 +72,7 @@ namespace Tiger.Types
 
             await task.ConfigureAwait(false);
             var result = await thenner().ConfigureAwait(false);
-            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
+            Assume(result != null, Resources.ResultIsNull);
             return result;
         }
 
@@ -89,7 +86,6 @@ namespace Tiger.Types
         /// <returns>The result of <paramref name="binder"/>, asynchronously.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="taskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="binder"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [NotNull, ItemNotNull]
         public static async Task<TOut> Bind<TIn, TOut>(
             [NotNull, ItemNotNull] this Task<TIn> taskValue,
@@ -99,7 +95,7 @@ namespace Tiger.Types
             if (binder == null) { throw new ArgumentNullException(nameof(binder)); }
 
             var result = await binder(await taskValue.ConfigureAwait(false)).ConfigureAwait(false);
-            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
+            Assume(result != null, Resources.ResultIsNull);
             return result;
         }
     }

@@ -2316,20 +2316,6 @@ namespace Tiger.Types.UnitTests
             Assert.That(actual, Is.True);
         }
 
-        [Test(Description = "Asking a Bottom Either for any should return false.")]
-        [Category("Extension")]
-        public void Any_Bottom()
-        {
-            // arrange
-            var value = default(Either<string, int>);
-
-            // act
-            var actual = value.Any();
-
-            // assert
-            Assert.That(actual, Is.False);
-        }
-
         [Test(Description = "Asking a Left Either for any with a false predicate should return false.")]
         [Category("Extension")]
         public void PredicateAny_LeftFalse()
@@ -2384,34 +2370,6 @@ namespace Tiger.Types.UnitTests
 
             // assert
             Assert.That(actual, Is.True);
-        }
-
-        [Test(Description = "Asking a Bottom Either for any with a false predicate should return false.")]
-        [Category("Extension")]
-        public void PredicateAny_BottomFalse()
-        {
-            // arrange
-            var value = default(Either<string, int>);
-
-            // act
-            var actual = value.Any(_ => false);
-
-            // assert
-            Assert.That(actual, Is.False);
-        }
-
-        [Test(Description = "Asking a Bottom Either for any with a true predicate should return false.")]
-        [Category("Extension")]
-        public void PredicateAny_BottomTrue()
-        {
-            // arrange
-            var value = default(Either<string, int>);
-
-            // act
-            var actual = value.Any(_ => true);
-
-            // assert
-            Assert.That(actual, Is.False);
         }
 
         [Test(Description = "Asking a Left Either for all with a false predicate should return true.")]
@@ -2517,20 +2475,6 @@ namespace Tiger.Types.UnitTests
             Assert.That(actual, Is.True);
         }
 
-        [Test(Description = "Asking a Bottom Either whether it contains a value should return false.")]
-        [Category("Extension")]
-        public void Contains_Bottom()
-        {
-            // arrange
-            var value = default(Either<int, string>);
-
-            // act
-            var actual = value.Contains(sentinel);
-
-            // assert
-            Assert.That(actual, Is.False);
-        }
-
         [Test(Description = "Asking a Left Either whether it contains a value should return false.")]
         [TestCase(0)]
         [TestCase(3)]
@@ -2576,20 +2520,6 @@ namespace Tiger.Types.UnitTests
 
             // assert
             Assert.That(actual, Is.True);
-        }
-
-        [Test(Description = "Asking a Bottom Either whether it contains a value should return false.")]
-        [Category("Extension")]
-        public void ComparerContains_Bottom()
-        {
-            // arrange
-            var value = default(Either<int, string>);
-
-            // act
-            var actual = value.Contains(sentinel, StringComparer.Ordinal);
-
-            // assert
-            Assert.That(actual, Is.False);
         }
 
         [Test(Description = "Recovering a Left Either should return the recovery value.")]
@@ -2668,23 +2598,6 @@ namespace Tiger.Types.UnitTests
             Assert.That(output, Is.EqualTo(sentinel));
         }
 
-        [Test(Description = "Tapping a Bottom Either over a func should return a Bottom Either " +
-                            "and perform no action.")]
-        [Category("Extension")]
-        public void Do_Bottom()
-        {
-            // arrange
-            var value = default(Either<string, int>);
-
-            // act
-            var output = 42;
-            var actual = value.Do(v => output = v);
-
-            // assert
-            Assert.That(actual, Is.EqualTo(default(Either<string, int>)));
-            Assert.That(output, Is.EqualTo(42));
-        }
-
         [Test(Description = "Conditionally executing an action based on a Left Either " +
                             "should not execute.")]
         [Category("Extension")]
@@ -2715,22 +2628,6 @@ namespace Tiger.Types.UnitTests
 
             // assert
             Assert.That(actual, Is.EqualTo(sentinel));
-        }
-
-        [Test(Description = "Conditionally executing an action based on a Bottom Either " +
-                            "should not execute.")]
-        [Category("Extension")]
-        public void ForEach_Bottom()
-        {
-            // arrange
-            var value = default(Either<string, int>);
-
-            // act
-            var actual = 42;
-            value.ForEach(v => actual = v);
-
-            // assert
-            Assert.That(actual, Is.EqualTo(42));
         }
 
         [Test(Description = "Selecting a Left Either should produce a Left Either.")]

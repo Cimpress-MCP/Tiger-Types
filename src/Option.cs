@@ -16,8 +16,9 @@ namespace Tiger.Types
         /// in the Some state with its Some value set to <paramref name="value"/>.
         /// </returns>
         [Pure]
-        public static Option<TSome> From<TSome>([CanBeNull] TSome value) =>
-            value == null ? Option<TSome>.None : new Option<TSome>(value);
+        public static Option<TSome> From<TSome>([CanBeNull] TSome value) => value == null
+            ? Option<TSome>.None
+            : new Option<TSome>(value);
 
         /// <summary>Creates an <see cref="Option{TSome}"/> from the provided value.</summary>
         /// <typeparam name="TSome">The type of <paramref name="value"/>.</typeparam>
@@ -29,19 +30,12 @@ namespace Tiger.Types
         /// </returns>
         [Pure]
         public static Option<TSome> From<TSome>([CanBeNull] TSome? value)
-            where TSome : struct => value ?? Option<TSome>.None;
-
-        /// <summary>Creates an <see cref="Option{TSome}"/> from the provided value.</summary>
-        /// <typeparam name="TSome">The type of <paramref name="value"/>.</typeparam>
-        /// <param name="value">The value to wrap.</param>
-        /// <returns>
-        /// An <see cref="Option{TSome}"/> in the Some state with its Some value set to <paramref name="value"/>.
-        /// </returns>
-        public static Option<TSome> Some<TSome>(TSome value)
-            where TSome : struct => new Option<TSome>(value);
+            where TSome : struct => value == null
+            ? Option<TSome>.None
+            : new Option<TSome>(value.Value);
 
         /// <summary>
-        /// Gets a value that can be converted to an <see cref="Option{TSome}"/> of any Some type.
+        /// A value that can be converted to an <see cref="Option{TSome}"/> of any Some type.
         /// </summary>
         public static readonly OptionNone None = default(OptionNone);
 
