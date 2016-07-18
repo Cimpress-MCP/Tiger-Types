@@ -30,7 +30,9 @@ namespace Tiger.Types
         /// </returns>
         [Pure]
         public static Option<TSome> From<TSome>([CanBeNull] TSome? value)
-            where TSome : struct => value == null ? Option<TSome>.None : new Option<TSome>(value.Value);
+            where TSome : struct => value == null
+            ? Option<TSome>.None
+            : new Option<TSome>(value.Value);
 
         /// <summary>
         /// A value that can be converted to an <see cref="Option{TSome}"/> of any Some type.
