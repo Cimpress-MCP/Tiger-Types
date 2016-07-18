@@ -7,9 +7,7 @@ using static System.Diagnostics.Contracts.Contract;
 
 namespace Tiger.Types
 {
-    /// <summary>
-    /// Extensions to the functionality of <see cref="Either{TLeft,TRight}"/>.
-    /// </summary>
+    /// <summary>Extensions to the functionality of <see cref="Either{TLeft,TRight}"/>.</summary>
     public static class EitherExtensions
     {
         /// <summary>
@@ -18,13 +16,17 @@ namespace Tiger.Types
         /// <typeparam name="TLeft">The Left type of <paramref name="value"/>.</typeparam>
         /// <typeparam name="TRight">The Right type of <paramref name="value"/>.</typeparam>
         /// <param name="value">The value to be converted.</param>
-        /// <returns></returns>
+        /// <returns>
+        /// An <see cref="Option{TSome}"/> in the Some state with its Some value set to the
+        /// Right value of <paramref name="value"/> if <paramref name="value"/> is in the
+        /// Right state; otherwise, an <see cref="Option{TSome}"/> in the None state.
+        /// </returns>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         public static Option<TRight> ToOption<TLeft, TRight>(this Either<TLeft, TRight> value)
         {
             if (value.State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
-            return value.Map(Option<TRight>.From).GetValueOrDefault(Option<TRight>.None);
+            return value.Map(v => new Option<TRight>(v)).GetValueOrDefault(Option<TRight>.None);
         }
 
         #region LINQ

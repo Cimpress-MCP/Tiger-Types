@@ -27,7 +27,7 @@ namespace Tiger.Types
         /// Converts an <see cref="Option{TSome}"/> into an <see cref="Either{TLeft,TRight}"/>.
         /// </summary>
         /// <typeparam name="TLeft">The type of <paramref name="fallback"/>.</typeparam>
-        /// <typeparam name="TSome">The Some type of <paramref name="value"/></typeparam>
+        /// <typeparam name="TRight">The Some type of <paramref name="value"/></typeparam>
         /// <param name="value">The value to be converted.</param>
         /// <param name="fallback"></param>
         /// <returns>
@@ -38,13 +38,13 @@ namespace Tiger.Types
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="fallback"/> is <see langword="null"/>.</exception>
         [Pure]
-        public static Either<TLeft, TSome> ToEither<TLeft, TSome>(
-            this Option<TSome> value,
+        public static Either<TLeft, TRight> ToEither<TLeft, TRight>(
+            this Option<TRight> value,
             [NotNull] TLeft fallback)
         {
             if (fallback == null) { throw new ArgumentNullException(nameof(fallback)); }
 
-            return value.Map(Either.Right<TLeft, TSome>).GetValueOrDefault(fallback);
+            return value.Map(v => new Either<TLeft,TRight>(v)).GetValueOrDefault(fallback);
         }
 
         #region LINQ
