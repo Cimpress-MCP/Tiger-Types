@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Tiger.Types.Properties;
+using static System.Diagnostics.Contracts.Contract;
 
 namespace Tiger.Types
 {
@@ -11,6 +12,21 @@ namespace Tiger.Types
     /// </summary>
     public static class EitherExtensions
     {
+        /// <summary>
+        /// Converts an <see cref="Either{TLeft,TRight}"/> into an <see cref="Option{TSome}"/>.
+        /// </summary>
+        /// <typeparam name="TLeft">The Left type of <paramref name="value"/>.</typeparam>
+        /// <typeparam name="TRight">The Right type of <paramref name="value"/>.</typeparam>
+        /// <param name="value">The value to be converted.</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
+        public static Option<TRight> ToOption<TLeft, TRight>(this Either<TLeft, TRight> value)
+        {
+            if (value.State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+
+            return value.Map(Option<TRight>.From).GetValueOrDefault(Option<TRight>.None);
+        }
+
         #region LINQ
 
         /// <summary>Determines whether the either value contains a right value.</summary>
@@ -21,9 +37,14 @@ namespace Tiger.Types
         /// <see langword="true"/> if the either value contains a right value;
         /// otherwise <see langword="false"/>.
         /// </returns>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure]
         public static bool Any<TLeftSource, TRightSource>(this Either<TLeftSource, TRightSource> source)
-            => source.IsRight;
+        {
+            if (source.State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+
+            return source.IsRight;
+        }
 
         /// <summary>
         /// Determines whether an either value contains a right value that satisfies a condition.
@@ -39,12 +60,14 @@ namespace Tiger.Types
         /// in the specified predicate; otherwise, <see langword="false"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure]
         public static bool Any<TLeftSource, TRightSource>(
             this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Func<TRightSource, bool> predicate)
         {
             if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
+            if (source.State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
             return source.IsRight && predicate(source.Value);
         }
@@ -64,12 +87,14 @@ namespace Tiger.Types
         /// otherwise, <see langword="false"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure]
         public static bool All<TLeftSource, TRightSource>(
             this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Func<TRightSource, bool> predicate)
         {
             if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
+            if (source.State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
             return source.IsLeft || source.IsRight && predicate(source.Value);
         }
@@ -87,12 +112,14 @@ namespace Tiger.Types
         /// otherwise, <see langword="false"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure]
         public static bool Contains<TLeftSource, TRightSource>(
             this Either<TLeftSource, TRightSource> source,
             [NotNull] TRightSource value)
         {
             if (value == null) { throw new ArgumentNullException(nameof(value)); }
+            if (source.State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
             return source.Any(v => EqualityComparer<TRightSource>.Default.Equals(v, value));
         }
@@ -111,6 +138,7 @@ namespace Tiger.Types
         /// otherwise, <see langword="false"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure]
         public static bool Contains<TLeftSource, TRightSource>(
             this Either<TLeftSource, TRightSource> source,
@@ -118,6 +146,7 @@ namespace Tiger.Types
             [CanBeNull] IEqualityComparer<TRightSource> equalityComparer)
         {
             if (value == null) { throw new ArgumentNullException(nameof(value)); }
+            if (source.State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
             return source.Any(v => (equalityComparer ?? EqualityComparer<TRightSource>.Default).Equals(v, value));
         }
@@ -136,7 +165,7 @@ namespace Tiger.Types
         /// the <typeparamref name="TRightSource"/> type as the Right value
         /// if <paramref name="source"/> is not in the Right state; otherwise, <paramref name="source"/>.
         /// </returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Pure, EditorBrowsable(EditorBrowsableState.Never)]
         public static Either<TLeftSource, TRightSource> DefaultIfEmpty<TLeftSource, TRightSource>(
             this Either<TLeftSource, TRightSource> source)
             where TRightSource : struct => source.Recover(default(TRightSource));
@@ -157,7 +186,7 @@ namespace Tiger.Types
         /// otherwise, <paramref name="source"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="defaultValue"/> is <see langword="null"/>.</exception>
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Pure, EditorBrowsable(EditorBrowsableState.Never)]
         public static Either<TLeftSource, TRightSource> DefaultIfEmpty<TLeftSource, TRightSource>(
             this Either<TLeftSource, TRightSource> source,
             [NotNull] TRightSource defaultValue)
@@ -174,12 +203,14 @@ namespace Tiger.Types
         /// <param name="onNext">An action to invoke.</param>
         /// <returns>The original value, exhibiting the specified side effects.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="onNext"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [LinqTunnel, EditorBrowsable(EditorBrowsableState.Never)]
         public static Either<TLeftSource, TRightSource> Do<TLeftSource, TRightSource>(
             this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Action<TRightSource> onNext)
         {
             if (onNext == null) { throw new ArgumentNullException(nameof(onNext)); }
+            if (source.State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
             return source.Tap(onNext);
         }
@@ -190,12 +221,14 @@ namespace Tiger.Types
         /// <param name="source">An either value on which to perform an action.</param>
         /// <param name="onNext">An action to invoke.</param>
         /// <exception cref="ArgumentNullException"><paramref name="onNext"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void ForEach<TLeftSource, TRightSource>(
             this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Action<TRightSource> onNext)
         {
             if (onNext == null) { throw new ArgumentNullException(nameof(onNext)); }
+            if (source.State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
             source.Let(onNext);
         }
@@ -211,12 +244,14 @@ namespace Tiger.Types
         /// the transform function on the Right value of <paramref name="source"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="selector"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure, LinqTunnel, EditorBrowsable(EditorBrowsableState.Never)]
         public static Either<TLeftSource, TResult> Select<TLeftSource, TRightSource, TResult>(
             this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Func<TRightSource, TResult> selector)
         {
             if (selector == null) { throw new ArgumentNullException(nameof(selector)); }
+            if (source.State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
             return source.Map(selector);
         }
@@ -237,12 +272,14 @@ namespace Tiger.Types
         /// right-to-either transform function on the Right value of the input either value.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="selector"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure, LinqTunnel, EditorBrowsable(EditorBrowsableState.Never)]
         public static Either<TLeftSource, TResult> SelectMany<TLeftSource, TRightSource, TResult>(
             this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Func<TRightSource, Either<TLeftSource, TResult>> selector)
         {
             if (selector == null) { throw new ArgumentNullException(nameof(selector)); }
+            if (source.State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
             return source.Bind(selector);
         }
@@ -274,6 +311,7 @@ namespace Tiger.Types
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherSelector"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="resultSelector"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure, LinqTunnel, EditorBrowsable(EditorBrowsableState.Never)]
         public static Either<TLeftSource, TResult> SelectMany<TLeftSource, TRightSource, TEither, TResult>(
             this Either<TLeftSource, TRightSource> source,
@@ -282,6 +320,7 @@ namespace Tiger.Types
         {
             if (eitherSelector == null) { throw new ArgumentNullException(nameof(eitherSelector)); }
             if (resultSelector == null) { throw new ArgumentNullException(nameof(resultSelector)); }
+            if (source.State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
             return source.Bind(sv => source.Bind(eitherSelector).Map(cv => resultSelector(sv, cv)));
         }
@@ -296,6 +335,7 @@ namespace Tiger.Types
         /// <returns>The final accumulator value.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="seed"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure, NotNull, EditorBrowsable(EditorBrowsableState.Never)]
         public static TAccumulate Aggregate<TLeftSource, TRightSource, TAccumulate>(
             this Either<TLeftSource, TRightSource> source,
@@ -304,6 +344,7 @@ namespace Tiger.Types
         {
             if (seed == null) { throw new ArgumentNullException(nameof(seed)); }
             if (func == null) { throw new ArgumentNullException(nameof(func)); }
+            if (source.State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
             return source.Fold(seed, func);
         }
@@ -327,6 +368,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="seed"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="resultSelector"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [Pure, NotNull, EditorBrowsable(EditorBrowsableState.Never)]
         public static TResult Aggregate<TLeftSource, TRightSource, TAccumulate, TResult>(
@@ -338,9 +380,10 @@ namespace Tiger.Types
             if (seed == null) { throw new ArgumentNullException(nameof(seed)); }
             if (func == null) { throw new ArgumentNullException(nameof(func)); }
             if (resultSelector == null) { throw new ArgumentNullException(nameof(resultSelector)); }
+            if (source.State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
             var result = source.Fold(seed, func).Pipe(resultSelector);
-            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
+            Assume(result != null, Resources.ResultIsNull);
             return result;
         }
 

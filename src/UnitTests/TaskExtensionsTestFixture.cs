@@ -49,10 +49,10 @@ namespace Tiger.Types.UnitTests
         {
             // arrange
             Task<string> value = Task.FromResult(sentinel);
-            Func<string, int> mapper = v => v.Length;
+            Func<string, int> some = v => v.Length;
 
             // act
-            var actual = await value.Map(mapper);
+            var actual = await value.Map(some);
 
             // assert
             Assert.That(actual, Is.EqualTo(sentinel.Length));

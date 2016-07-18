@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Tiger.Types.Properties;
+using static System.Diagnostics.Contracts.Contract;
 
 namespace Tiger.Types
 {
@@ -21,6 +22,30 @@ namespace Tiger.Types
             where TSome : struct => value.IsNone
                 ? (TSome?)null
                 : value.SomeValue;
+
+        /// <summary>
+        /// Converts an <see cref="Option{TSome}"/> into an <see cref="Either{TLeft,TRight}"/>.
+        /// </summary>
+        /// <typeparam name="TLeft">The type of <paramref name="fallback"/>.</typeparam>
+        /// <typeparam name="TSome">The Some type of <paramref name="value"/></typeparam>
+        /// <param name="value">The value to be converted.</param>
+        /// <param name="fallback"></param>
+        /// <returns>
+        /// An <see cref="Either{TLeft,TRight}"/> in the Right state with its Right value
+        /// set to the Some value of <paramref name="value"/> if <paramref name="value"/>
+        /// is in the Some state; otherwise, an <see cref="Either{TLeft,TRight}"/> in the
+        /// Left state with its Left value set to <paramref name="fallback"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="fallback"/> is <see langword="null"/>.</exception>
+        [Pure]
+        public static Either<TLeft, TSome> ToEither<TLeft, TSome>(
+            this Option<TSome> value,
+            [NotNull] TLeft fallback)
+        {
+            if (fallback == null) { throw new ArgumentNullException(nameof(fallback)); }
+
+            return value.Map(Either.Right<TLeft, TSome>).GetValueOrDefault(fallback);
+        }
 
         #region LINQ
 
@@ -338,7 +363,6 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="seed"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="resultSelector"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [Pure, NotNull, EditorBrowsable(EditorBrowsableState.Never)]
         public static TResult Aggregate<TSource, TAccumulate, TResult>(
             this Option<TSource> source,
@@ -351,7 +375,7 @@ namespace Tiger.Types
             if (resultSelector == null) { throw new ArgumentNullException(nameof(resultSelector)); }
 
             var result = source.Fold(seed, func).Pipe(resultSelector);
-            if (result == null) { throw new InvalidOperationException(Resources.ResultIsNull); }
+            Assume(result != null, Resources.ResultIsNull);
             return result;
         }
 
