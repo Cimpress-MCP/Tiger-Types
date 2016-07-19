@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 using LINQPad;
@@ -13,6 +14,7 @@ namespace Tiger.Types
     /// <summary>Represents a value that can represent one of two values.</summary>
     /// <typeparam name="TLeft">The Left type of the value that may be represented.</typeparam>
     /// <typeparam name="TRight">The Right type of the value that may be represented.</typeparam>
+    [DebuggerTypeProxy(typeof(EitherDebuggerTypeProxy<,>))]
     public struct Either<TLeft, TRight>
         : ICustomMemberProvider
     {

@@ -27,9 +27,9 @@ namespace Tiger.Types
         /// Converts an <see cref="Option{TSome}"/> into an <see cref="Either{TLeft,TRight}"/>.
         /// </summary>
         /// <typeparam name="TLeft">The type of <paramref name="fallback"/>.</typeparam>
-        /// <typeparam name="TRight">The Some type of <paramref name="value"/></typeparam>
+        /// <typeparam name="TSome">The Some type of <paramref name="value"/></typeparam>
         /// <param name="value">The value to be converted.</param>
-        /// <param name="fallback"></param>
+        /// <param name="fallback">the value to use as a fallback.</param>
         /// <returns>
         /// An <see cref="Either{TLeft,TRight}"/> in the Right state with its Right value
         /// set to the Some value of <paramref name="value"/> if <paramref name="value"/>
@@ -38,14 +38,16 @@ namespace Tiger.Types
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="fallback"/> is <see langword="null"/>.</exception>
         [Pure]
-        public static Either<TLeft, TRight> ToEither<TLeft, TRight>(
-            this Option<TRight> value,
+        public static Either<TLeft, TSome> ToEither<TLeft, TSome>(
+            this Option<TSome> value,
             [NotNull] TLeft fallback)
         {
             if (fallback == null) { throw new ArgumentNullException(nameof(fallback)); }
 
-            return value.Map(v => new Either<TLeft,TRight>(v)).GetValueOrDefault(fallback);
+            return value.Map(v => new Either<TLeft,TSome>(v)).GetValueOrDefault(fallback);
         }
+
+        // todo(cosborn) Are Func and Task versions of ToEither worth anything?
 
         #region LINQ
 

@@ -20,14 +20,23 @@ Tells Cake to use the latest Roslyn release.
 .PARAMETER WhatIf
 Performs a dry run of the build script.
 No tasks will be executed.
+.PARAMETER Mono
+Tells Cake to use the Mono scripting engine.
+.PARAMETER SkipToolPackageRestore
+Skips restoring of packages.
+.PARAMETER ScriptArgs
+Remaining arguments are added here.
 
 .LINK
 http://cakebuild.net
+
 #>
 
+[CmdletBinding()]
 Param(
     [string]$Script = "build.cake",
     [string]$Target = "Default",
+    [ValidateSet("Release", "Debug")]
     [string]$Configuration = "Release",
     [ValidateSet("Quiet", "Minimal", "Normal", "Verbose", "Diagnostic")]
     [string]$Verbosity = "Quiet",
@@ -35,10 +44,15 @@ Param(
     [Alias("DryRun","Noop")]
     [switch]$WhatIf,
     [switch]$SkipToolPackageRestore,
-    [switch]$Verbose
+    [Parameter(Position=0,Mandatory=$false,ValueFromRemainingArguments=$true)]
+    [string[]]$ScriptArgs
 )
 
 Write-Host "Preparing to run build script..."
+
+if(!$PSScriptRoot){
+    $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent
+}
 
 # Should we show verbose messages?
 if($Verbose.IsPresent)
@@ -92,5 +106,5 @@ if(-Not $SkipToolPackageRestore.IsPresent -Or !(Test-Path $PACKAGES_CONFIG))
 
 # Start Cake
 Write-Host "Running build script..."
-Invoke-Expression "cake `"$Script`" -target=`"$Target`" -configuration=`"$Configuration`" -verbosity=`"$Verbosity`" $UseDryRun $UseExperimental"
+Invoke-Expression "cake `"$Script`" -target=`"$Target`" -configuration=`"$Configuration`" -verbosity=`"$Verbosity`" $UseDryRun $UseExperimental $ScriptArgs"
 exit $LASTEXITCODE
