@@ -108,7 +108,7 @@ Most of this library is allergic to `null`. It advertises where `null` is allowe
 
 ## How You Develop It
 
-You’re in the right place for that. Once you have this directory forked and cloned, the provided Visual Studio solution file should contain everything you need to get going. The NuGet packages will be restored and the NUnit unit tests will be detected (if your version of Visual Studio supports NUnit3, that is). If you’re interested in the command-line builds, they use a system called [Cake](http://cakebuild.net). While it is possible to run the cakefile (`build.cake`) directly, the preferred method is to run the build bootstrapper (`build.ps1`). The build bootstrapper ensures that you have the development and testing tools installed in your environment. It is a powershell script, so the way to execute it will vary by your command line.
+You’re in the right place for that. Once you have this directory forked and cloned, the provided Visual Studio solution file should contain everything you need to get going. The NuGet packages will be restored and the NUnit unit tests will be detected (if your version of Visual Studio supports NUnit3, that is). If you’re interested in the command-line builds, they use a system called [Cake](http://cakebuild.net). While it is possible to run the cakefile (`build.cake`) directly, the preferred method is to run the build bootstrapper (`build.ps1`). The build bootstrapper ensures that you have the development and testing tools installed in your environment. The only manual requirement is that Chocolatey is installed and available on your PATH. It is a powershell script, so the way to execute it will vary by your command line.
 
 - Powershell: `./build.ps1`
 - cmd: `powershell ./build.ps1`
