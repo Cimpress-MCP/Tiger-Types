@@ -87,7 +87,7 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "A Right Either should be in the Right state.")]
-        public void FromLeftBoth_IsRight_Right()
+        public void FromRightBoth_IsRight_Right()
         {
             // arrange, act
             var actual = Either<int, string>.FromRight(sentinel);
@@ -97,7 +97,7 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "A Right Either should be in the Right state.")]
-        public void FromLeftOne_IsRight_Right()
+        public void FromRightOne_IsRight_Right()
         {
             // arrange, act
             var actual = Either.Right<int, string>(sentinel);

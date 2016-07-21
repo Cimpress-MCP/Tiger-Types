@@ -1398,7 +1398,7 @@ namespace Tiger.Types
         /// Returns an enumerator that iterates through the <see cref="Either{TLeft,TRight}"/>.
         /// </summary>
         /// <returns>An <see cref="IEnumerator{T}"/> for the <see cref="Either{TLeft,TRight}"/>.</returns>
-        [Pure, EditorBrowsable(EditorBrowsableState.Never)]
+        [NotNull, Pure, EditorBrowsable(EditorBrowsableState.Never)]
         public IEnumerator<TRight> GetEnumerator()
         {
             if (IsRight)

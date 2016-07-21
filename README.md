@@ -104,7 +104,7 @@ This result can also be accomplished with the `Let` operation.
 
 ### A Note on `null`
 
-Most of this library is allergic to `null`. It advertises where `null` is allowed, and where it is not – heavily tilted to the latter. If returning `null` from a passed function would violate the semantics of an operation, then that operation will thow an uncatchable exception. For example, the contract of `Map` is that it will only return an optional value in the <i>None</i> state if the original value is in the <i>None</i> state. However, if returning `null` from the passed function were allowed, that would put the returned value from an oroginal value in the <i>Some</i> state into the <i>None</i> state. This should be refactored into a method of type `Func<TSome, Option<U>>`, and used with the `Bind` operation.
+Most of this library is allergic to `null`. It advertises where `null` is allowed, and where it is not – heavily tilted to the latter. If returning `null` from a passed function would violate the semantics of an operation, then that operation will throw an uncatchable exception. For example, the contract of `Map` is that it will only return an optional value in the <i>None</i> state if the original value is in the <i>None</i> state. However, if returning `null` from the passed function were allowed, that would put the returned value from an original value in the <i>Some</i> state into the <i>None</i> state. This should be refactored into a method of type `Func<TSome, Option<U>>`, and used with the `Bind` operation.
 
 ## How You Develop It
 

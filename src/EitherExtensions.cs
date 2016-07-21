@@ -84,7 +84,7 @@ namespace Tiger.Types
         /// </param>
         /// <param name="predicate">A function to test the Right value for a condition.</param>
         /// <returns>
-        /// <see langword="true"/> if the Right value if the source either value passes the test
+        /// <see langword="true"/> if the Right value of the source either value passes the test
         /// in the specified predicate, or if the source either is in the Left state;
         /// otherwise, <see langword="false"/>.
         /// </returns>
@@ -181,7 +181,7 @@ namespace Tiger.Types
         /// <param name="source">
         /// The either value to return a default value for if it is not in the Right state.
         /// </param>
-        /// <param name="defaultValue">The value to return id the either value is not in the Right state.</param>
+        /// <param name="defaultValue">The value to return if the either value is not in the Right state.</param>
         /// <returns>
         /// An <see cref="Either{TLeft,TRight}"/> in the Right state with <paramref name="defaultValue"/>
         /// as the Right value if <paramref name="source"/> is not in the Right state;
@@ -205,14 +205,12 @@ namespace Tiger.Types
         /// <param name="onNext">An action to invoke.</param>
         /// <returns>The original value, exhibiting the specified side effects.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="onNext"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [LinqTunnel, EditorBrowsable(EditorBrowsableState.Never)]
         public static Either<TLeftSource, TRightSource> Do<TLeftSource, TRightSource>(
             this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Action<TRightSource> onNext)
         {
             if (onNext == null) { throw new ArgumentNullException(nameof(onNext)); }
-            if (source.State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
             return source.Tap(onNext);
         }
@@ -223,14 +221,12 @@ namespace Tiger.Types
         /// <param name="source">An either value on which to perform an action.</param>
         /// <param name="onNext">An action to invoke.</param>
         /// <exception cref="ArgumentNullException"><paramref name="onNext"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void ForEach<TLeftSource, TRightSource>(
             this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Action<TRightSource> onNext)
         {
             if (onNext == null) { throw new ArgumentNullException(nameof(onNext)); }
-            if (source.State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
             source.Let(onNext);
         }
