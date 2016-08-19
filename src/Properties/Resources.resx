@@ -141,4 +141,8 @@
     <value>This result evaluated to null.</value>
     <comment>Explains evaluating an lambda and getting null.</comment>
   </data>
+  <data name="UnionDoesNotMatch" xml:space="preserve">
+    <value>This instance is not in the specified state.</value>
+    <comment>Explains forcibly unwrapping a Union incorrectly.</comment>
+  </data>
 </root>

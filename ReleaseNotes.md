@@ -1,3 +1,7 @@
+### What's new in 2.1.0 (Released 2016-08-19)
+
+* A Union type has been added, which is an unbiased union of two types.
+
 ### What's new in 2.0.0 (Released 2016-07-19)
 
 * A greater number of methods have been marked as pure.

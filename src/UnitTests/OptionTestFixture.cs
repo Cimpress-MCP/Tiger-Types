@@ -106,7 +106,7 @@ namespace Tiger.Types.UnitTests
                 some: v => v.Length);
 
             // assert
-            Assert.That(actual, Is.EqualTo(0));
+            Assert.That(actual, Is.Zero);
         }
 
         [Test(Description = "Matching a Some Option should return the Some func branch, " +
@@ -561,21 +561,19 @@ namespace Tiger.Types.UnitTests
         #region Filter
 
         [Test(Description = "Filtering a None Option should produce a None Option.")]
-        [Category("Extension")]
         public void FuncFilter_None()
         {
             // arrange
             var value = Option<int>.None;
 
             // act
-            var actual = value.Filter(v => v <= 0);
+            var actual = value.Filter(v => v > 0);
 
             // assert
             Assert.That(actual, Is.EqualTo(Option<int>.None));
         }
 
         [Test(Description = "Filtering a Some Option with a false predicate should produce a None Option.")]
-        [Category("Extension")]
         public void FuncFilter_SomeFalse()
         {
             // arrange
@@ -588,8 +586,7 @@ namespace Tiger.Types.UnitTests
             Assert.That(actual, Is.EqualTo(Option<int>.None));
         }
 
-        [Test(Description = "Filtering a Some Option with a true predicate should produce a None Option.")]
-        [Category("Extension")]
+        [Test(Description = "Filtering a Some Option with a true predicate should produce a Some Option.")]
         public void FuncFilter_SomeTrue()
         {
             // arrange
@@ -603,21 +600,19 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "Filtering a None Option should produce a None Option.")]
-        [Category("Extension")]
         public async Task TaskFilter_None()
         {
             // arrange
             var value = Option<int>.None;
 
             // act
-            var actual = await value.Filter(v => Task.FromResult(v <= 0));
+            var actual = await value.Filter(v => Task.FromResult(v > 0));
 
             // assert
             Assert.That(actual, Is.EqualTo(Option<int>.None));
         }
 
         [Test(Description = "Filtering a Some Option with a false predicate should produce a None Option.")]
-        [Category("Extension")]
         public async Task TaskFilter_SomeFalse()
         {
             // arrange
@@ -631,7 +626,6 @@ namespace Tiger.Types.UnitTests
         }
 
         [Test(Description = "Filtering a Some Option with a true predicate should produce a None Option.")]
-        [Category("Extension")]
         public async Task TaskFilter_SomeTrue()
         {
             // arrange
@@ -661,7 +655,7 @@ namespace Tiger.Types.UnitTests
             Assert.That(actual, Is.EqualTo(34));
         }
 
-        [Test(Description = "Folding over a Some Option should return result of invoking the accumulator" +
+        [Test(Description = "Folding over a Some Option should return the result of invoking the accumulator" +
                             "over the seed value and the Some value.")]
         public void FuncFold_Some()
         {
@@ -1052,10 +1046,9 @@ namespace Tiger.Types.UnitTests
         {
             // arrange
             var value = Option.From(sentinel);
-            Func<Task<string>> other = () => Task.FromResult(string.Empty);
 
             // act
-            var actual = await value.GetValueOrDefault(other);
+            var actual = await value.GetValueOrDefault(() => Task.FromResult(string.Empty));
 
             // assert
             Assert.That(actual, Is.EqualTo(sentinel));
@@ -1132,7 +1125,7 @@ namespace Tiger.Types.UnitTests
             var right = Option<string>.None;
 
             // act
-            var actual = left.Equals((object)right);
+            var actual = left.Equals(right);
 
             // assert
             Assert.That(actual, Is.True);
@@ -1164,8 +1157,8 @@ namespace Tiger.Types.UnitTests
             var right = Option.From(sentinel);
 
             // act
-            var actualLeftFirst = left.Equals((object)right);
-            var actualRightFirst = right.Equals((object)left);
+            var actualLeftFirst = left.Equals(right);
+            var actualRightFirst = right.Equals(left);
 
             // assert
             Assert.That(actualLeftFirst, Is.False);
@@ -1198,8 +1191,8 @@ namespace Tiger.Types.UnitTests
             var right = Option.From("megatron");
 
             // act
-            var actualLeftFirst = left.Equals((object)right);
-            var actualRightFirst = right.Equals((object)left);
+            var actualLeftFirst = left.Equals(right);
+            var actualRightFirst = right.Equals(left);
 
             // assert
             Assert.That(actualLeftFirst, Is.False);
@@ -1215,8 +1208,8 @@ namespace Tiger.Types.UnitTests
             var right = Option.From(sentinel);
 
             // act
-            var actualLeftFirst = left.Equals((object)right);
-            var actualRightFirst = right.Equals((object)left);
+            var actualLeftFirst = left.Equals(right);
+            var actualRightFirst = right.Equals(left);
 
             // assert
             Assert.That(actualLeftFirst, Is.True);

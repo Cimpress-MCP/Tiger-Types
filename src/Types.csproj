@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Development\EitherDebuggerTypeProxy.cs" />
+    <Compile Include="Development\UnionDebuggerTypeProxy.cs" />
     <Compile Include="EitherExtensions.cs" />
     <Compile Include="EitherState.cs" />
     <Compile Include="Properties\Annotations.cs" />
@@ -64,6 +65,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="TaskExtensions.cs" />
+    <Compile Include="Union.cs" />
+    <Compile Include="Union`2.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

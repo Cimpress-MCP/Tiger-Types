@@ -113,5 +113,14 @@ namespace Tiger.Types.Properties {
                 return ResourceManager.GetString("ResultIsNull", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This instance is not in the specified state..
+        /// </summary>
+        internal static string UnionDoesNotMatch {
+            get {
+                return ResourceManager.GetString("UnionDoesNotMatch", resourceCulture);
+            }
+        }
     }
 }
