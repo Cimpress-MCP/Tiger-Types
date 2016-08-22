@@ -52,11 +52,12 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="DictionaryTestFixture.cs" />
     <Compile Include="Union2TestFixture.cs" />
     <Compile Include="EitherTestFixture.cs" />
     <Compile Include="OptionTypeConverterTestFixture.cs" />
     <Compile Include="TaskExtensionsTestFixture.cs" />
-    <Compile Include="ObjectTestFixture.cs" />
+    <Compile Include="ObjectExtensionsTestFixture.cs" />
     <Compile Include="OptionTestFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

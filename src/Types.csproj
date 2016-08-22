@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Development\EitherDebuggerTypeProxy.cs" />
     <Compile Include="Development\UnionDebuggerTypeProxy.cs" />
+    <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="EitherExtensions.cs" />
     <Compile Include="EitherState.cs" />
     <Compile Include="Properties\Annotations.cs" />

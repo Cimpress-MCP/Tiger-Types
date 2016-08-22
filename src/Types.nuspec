@@ -11,7 +11,7 @@
     <projectUrl>https://mcpstash.cimpress.net/projects/PMI/repos/types</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes><![CDATA[A Union type has been added, which is an unbiased union of two types.]]></releaseNotes>
+    <releaseNotes><![CDATA[A method of optional dictionary value retrieval has been added.]]></releaseNotes>
     <copyright>$copyright$</copyright>
     <tags>option either task functional</tags>
   </metadata>

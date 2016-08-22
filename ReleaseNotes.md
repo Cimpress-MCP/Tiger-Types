@@ -1,3 +1,7 @@
+### What's new in 2.2.0 (Released 2016-08-22)
+
+* A method of optional dictionary value retrieval has been added.
+
 ### What's new in 2.1.0 (Released 2016-08-19)
 
 * A Union type has been added, which is an unbiased union of two types.

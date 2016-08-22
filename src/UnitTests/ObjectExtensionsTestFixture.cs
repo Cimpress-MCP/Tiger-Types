@@ -4,8 +4,9 @@ using System;
 
 namespace Tiger.Types.UnitTests
 {
-    [TestFixture]
-    public sealed class ObjectTestFixture
+    /// <summary>Tests related to <see cref="ObjectExtensions"/>.</summary>
+    [TestFixture(TestOf = typeof(ObjectExtensions))]
+    public sealed class ObjectExtensionsTestFixture
     {
         #region Pipe
 
