@@ -121,6 +121,10 @@
     <value>This instance has not been initialized.</value>
     <comment>Explains use of a Bottom Either.</comment>
   </data>
+  <data name="EitherIsNotLeft" xml:space="preserve">
+    <value>This instance is in an invalid state.</value>
+    <comment>Explains unwrapping of an Either in a state that is not Left.</comment>
+  </data>
   <data name="EitherIsNotRight" xml:space="preserve">
     <value>This instance is in an invalid state.</value>
     <comment>Explains unwrapping of an Either in a state that is not Right.</comment>

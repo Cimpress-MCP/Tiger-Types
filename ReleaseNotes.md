@@ -1,3 +1,7 @@
+### What's new in 2.2.1 (Released 2016-10-18)
+
+* An `Either` value may be cast to its Left type.
+
 ### What's new in 2.2.0 (Released 2016-08-22)
 
 * A method of optional dictionary value retrieval has been added.

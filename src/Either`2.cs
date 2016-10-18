@@ -1468,6 +1468,16 @@ namespace Tiger.Types
             return value.RightValue;
         }
 
+        /// <summary>Unwraps the Left value of this instance.</summary>
+        /// <param name="value">The value to be unwrapped.</param>
+        /// <exception cref="InvalidOperationException">This instance is in an invalid state.</exception>
+        public static explicit operator TLeft(Either<TLeft, TRight> value)
+        {
+            if (!value.IsLeft) { throw new InvalidOperationException(Resources.EitherIsNotLeft); }
+
+            return value.LeftValue;
+        }
+
         #endregion
     }
 }

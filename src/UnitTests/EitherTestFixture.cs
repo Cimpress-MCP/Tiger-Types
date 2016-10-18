@@ -2253,6 +2253,19 @@ namespace Tiger.Types.UnitTests
             Assert.That(actual, Is.EqualTo(42));
         }
 
+        [Test(Description = "Unwrapping a Left Either should return the Left value.")]
+        public void Cast_Left()
+        {
+            // arrange
+            var value = Either.Left<string, int>(sentinel);
+
+            // act
+            var actual = (string)value;
+
+            // assert
+            Assert.That(actual, Is.EqualTo(sentinel));
+        }
+
         [Test(Description = "Unwrapping a Right Either should return its Right value.")]
         public void Cast_Right()
         {

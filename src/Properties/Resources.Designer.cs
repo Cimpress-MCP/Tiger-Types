@@ -72,6 +72,15 @@ namespace Tiger.Types.Properties {
         /// <summary>
         ///   Looks up a localized string similar to This instance is in an invalid state..
         /// </summary>
+        internal static string EitherIsNotLeft {
+            get {
+                return ResourceManager.GetString("EitherIsNotLeft", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This instance is in an invalid state..
+        /// </summary>
         internal static string EitherIsNotRight {
             get {
                 return ResourceManager.GetString("EitherIsNotRight", resourceCulture);
