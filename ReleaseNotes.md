@@ -1,3 +1,7 @@
+### What's new in 2.3.0 (Released 2016-10-28)
+
+* `Option` and `Either` values can be created by splitting a conventional value on a condition.
+
 ### What's new in 2.2.1 (Released 2016-10-18)
 
 * An `Either` value may be cast to its Left type.

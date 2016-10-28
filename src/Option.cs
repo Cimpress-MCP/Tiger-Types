@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Tiger.Types
 {
@@ -38,6 +39,96 @@ namespace Tiger.Types
         /// A value that can be converted to an <see cref="Option{TSome}"/> of any Some type.
         /// </summary>
         public static readonly OptionNone None = default(OptionNone);
+
+        /// <summary>Splits a value into an optional value based on a provided condition.</summary>
+        /// <typeparam name="TSome">The type of <paramref name="value"/>.</typeparam>
+        /// <param name="value">A value to test for a condition.</param>
+        /// <param name="splitter">A condition by which <paramref name="value"/> can be split.</param>
+        /// <returns>
+        /// An <see cref="Option{TSome}"/> in the None state if <paramref name="value"/>
+        /// is equal to <see langword="null"/> or if the condition <paramref name="splitter"/> 
+        /// is not satisfied by <paramref name="value"/>; otherwise, an <see cref="Option{TSome}"/>
+        /// in the Some state with its Some value set to <paramref name="value"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="splitter"/> is <see langword="null"/>.</exception>
+        [Pure]
+        public static Option<TSome> Split<TSome>(
+            [CanBeNull] TSome value,
+            [NotNull, InstantHandle] Func<TSome, bool> splitter)
+        {
+            if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
+
+            return From(value).Filter(splitter);
+        }
+
+        /// <summary>Splits a value into an optional value based on a provided condition.</summary>
+        /// <typeparam name="TSome">The type of <paramref name="value"/>.</typeparam>
+        /// <param name="value">A value to test for a condition.</param>
+        /// <param name="splitter">A condition by which <paramref name="value"/> can be split.</param>
+        /// <returns>
+        /// An <see cref="Option{TSome}"/> in the None state if <paramref name="value"/>
+        /// is equal to <see langword="null"/> or if the condition <paramref name="splitter"/> 
+        /// is not satisfied by <paramref name="value"/>; otherwise, an <see cref="Option{TSome}"/>
+        /// in the Some state with its Some value set to <paramref name="value"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="splitter"/> is <see langword="null"/>.</exception>
+        [Pure]
+        public static Option<TSome> Split<TSome>(
+            [CanBeNull] TSome? value,
+            [NotNull, InstantHandle] Func<TSome, bool> splitter)
+            where TSome: struct
+        {
+            if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
+
+            return From(value).Filter(splitter);
+        }
+
+        /// <summary>Splits a value into an optional value based on a provided condition, asynchronously.</summary>
+        /// <typeparam name="TSome">The type of <paramref name="value"/>.</typeparam>
+        /// <param name="value">A value to test for a condition.</param>
+        /// <param name="splitter">
+        /// An asynchronous condition by which <paramref name="value"/> can be split.
+        /// </param>
+        /// <returns>
+        /// An <see cref="Option{TSome}"/> in the None state if <paramref name="value"/>
+        /// is equal to <see langword="null"/> or if the condition <paramref name="splitter"/> 
+        /// is not satisfied by <paramref name="value"/>; otherwise, an <see cref="Option{TSome}"/>
+        /// in the Some state with its Some value set to <paramref name="value"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="splitter"/> is <see langword="null"/>.</exception>
+        [NotNull, PublicAPI]
+        public static Task<Option<TSome>> Split<TSome>(
+            [CanBeNull] TSome value,
+            [NotNull, InstantHandle] Func<TSome, Task<bool>> splitter)
+        {
+            if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
+
+            return From(value).Filter(splitter);
+        }
+
+        /// <summary>Splits a value into an optional value based on a provided condition, asynchronously.</summary>
+        /// <typeparam name="TSome">The type of <paramref name="value"/>.</typeparam>
+        /// <param name="value">A value to test for a condition.</param>
+        /// <param name="splitter">
+        /// An asynchronous condition by which <paramref name="value"/> can be split.
+        /// </param>
+        /// <returns>
+        /// An <see cref="Option{TSome}"/> in the None state if <paramref name="value"/>
+        /// is equal to <see langword="null"/> or if the condition <paramref name="splitter"/> 
+        /// is not satisfied by <paramref name="value"/>; otherwise, an <see cref="Option{TSome}"/>
+        /// in the Some state with its Some value set to <paramref name="value"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="splitter"/> is <see langword="null"/>.</exception>
+        [NotNull, Pure]
+        public static Task<Option<TSome>> Split<TSome>(
+            [CanBeNull] TSome? value,
+            [NotNull] [InstantHandle] Func<TSome, Task<bool>> splitter)
+            where TSome : struct
+        {
+            if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
+
+            return From(value).Filter(splitter);
+        }
 
         #region Utilities
 

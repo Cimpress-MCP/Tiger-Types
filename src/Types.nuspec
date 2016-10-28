@@ -11,7 +11,7 @@
     <projectUrl>https://mcpstash.cimpress.net/projects/PMI/repos/types</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes><![CDATA[An Either value may be cast to its Left type.]]></releaseNotes>
+    <releaseNotes><![CDATA[Option and Either values can be created by splitting a conventional value on a condition.]]></releaseNotes>
     <copyright>$copyright$</copyright>
     <tags>option either task functional</tags>
   </metadata>

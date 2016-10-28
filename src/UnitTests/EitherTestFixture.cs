@@ -2296,6 +2296,70 @@ namespace Tiger.Types.UnitTests
 
         #endregion
 
+        #region Split
+
+        [Test(Description = "Splitting a value over a func, failing the condition, " +
+                            "should return a Left Either.")]
+        public void FuncSplit_Left()
+        {
+            // arrange
+            var value = sentinel;
+
+            // act
+            var actual = Either.Split(value, v => v.Length == 0);
+
+            // assert
+            Assert.That(actual.IsLeft, Is.True);
+            Assert.That(actual.IsRight, Is.False);
+        }
+
+        [Test(Description = "Splitting a value over a func, passing the condition, " +
+                            "should return a Left Either.")]
+        public void FuncSplit_Right()
+        {
+            // arrange
+            var value = sentinel;
+
+            // act
+            var actual = Either.Split(value, v => v.Length == 8);
+
+            // assert
+            Assert.That(actual.IsLeft, Is.False);
+            Assert.That(actual.IsRight, Is.True);
+        }
+
+        [Test(Description = "Splitting a value over a task, failing the condition, " +
+                            "should return a Left Either.")]
+        public async Task TaskSplit_Left()
+        {
+            // arrange
+            var value = sentinel;
+
+            // act
+            var actual = await Either.Split(value, v => Task.FromResult(v.Length == 0));
+
+            // assert
+            Assert.That(actual.IsLeft, Is.True);
+            Assert.That(actual.IsRight, Is.False);
+        }
+
+        [Test(Description = "Splitting a value over a task, passing the condition, " +
+                            "should return a Left Either.")]
+        public async Task TaskSplit_Right()
+        {
+            // arrange
+            var value = sentinel;
+
+            // act
+            var actual = await Either.Split(value, v => Task.FromResult(v.Length == 8));
+
+            // assert
+            Assert.That(actual.IsLeft, Is.False);
+            Assert.That(actual.IsRight, Is.True);
+        }
+
+        #endregion
+
         #region Extensions
 
         #region LINQ

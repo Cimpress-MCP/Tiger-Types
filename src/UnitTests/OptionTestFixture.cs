@@ -2044,7 +2044,7 @@ namespace Tiger.Types.UnitTests
             // assert
             Assert.That(ex, Has.Message.Contains(Resources.OptionIsNone));
             Assert.That(actual, Is.EqualTo(sentinel));
-            
+
         }
 
         [Test(Description = "Unwrapping a Some Option should return its Some value.")]
@@ -2058,6 +2058,174 @@ namespace Tiger.Types.UnitTests
 
             // assert
             Assert.That(actual, Is.EqualTo(sentinel));
+        }
+
+        #endregion
+
+        #region Split
+
+        [Test(Description = "Splitting a null value over a func should return a None Option.")]
+        public void FuncSplit_Null_None()
+        {
+            // arrange
+            var value = (string)null;
+
+            // act
+            var actual = Option.Split(value, v => v.Length == 8);
+
+            // assert
+            Assert.That(actual.IsNone, Is.True);
+        }
+
+        [Test(Description = "Splitting a null nullable value over a func should return a None Option.")]
+        public void FuncSplit_NullableNull_None()
+        {
+            // arrange
+            var value = (int?)null;
+
+            // act
+            var actual = Option.Split(value, (int v) => v == 8);
+
+            // assert
+            Assert.That(actual.IsNone, Is.True);
+        }
+
+        [Test(Description = "Splitting a value over a func, failing the condition, " +
+                            "should return a None Option.")]
+        public void FuncSplit_ReturnFalse_None()
+        {
+            // arrange
+            var value = sentinel;
+
+            // act
+            var actual = Option.Split(value, v => v.Length == 33);
+
+            // assert
+            Assert.That(actual.IsNone, Is.True);
+        }
+
+        [Test(Description = "Splitting a nullable value over a func, failing the condition, " +
+                            "should return a None Option.")]
+        public void FuncSplit_NullableReturnFalse_None()
+        {
+            // arrange
+            var value = (int?)42;
+
+            // act
+            var actual = Option.Split(value, (int v) => v == 33);
+
+            // assert
+            Assert.That(actual.IsNone, Is.True);
+        }
+
+        [Test(Description = "Splitting a value over a func, passing the condition, " +
+                            "should return a Some Option.")]
+        public void FuncSplit_Some()
+        {
+            // arrange
+            var value = sentinel;
+
+            // act
+            var actual = Option.Split(value, v => v.Length == 8);
+
+            // assert
+            Assert.That(actual.IsSome, Is.True);
+        }
+
+        [Test(Description = "Splitting a nullable value over a func, passing the condition, " +
+                            "should return a Some Option.")]
+        public void FuncSplit_Nullable_Some()
+        {
+            // arrange
+            var value = (int?)42;
+
+            // act
+            var actual = Option.Split(value, (int v) => v == 42);
+
+            // assert
+            Assert.That(actual.IsSome, Is.True);
+        }
+
+        [Test(Description = "Splitting a null value over a task should return a None Option.")]
+        public async Task TaskSplit_Null_None()
+        {
+            // arrange
+            var value = (string)null;
+
+            // act
+            var actual = await Option.Split(value, v => Task.FromResult(v.Length == 8));
+
+            // assert
+            Assert.That(actual.IsNone, Is.True);
+        }
+
+        [Test(Description = "Splitting a nullable null value over a task should return a None Option.")]
+        public async Task TaskSplit_NullableNull_None()
+        {
+            // arrange
+            var value = (int?)null;
+
+            // act
+            var actual = await Option.Split(value, (int v) => Task.FromResult(v == 8));
+
+            // assert
+            Assert.That(actual.IsNone, Is.True);
+        }
+
+        [Test(Description = "Splitting a value over a task, failing the condition, " +
+                            "should return a None Option.")]
+        public async Task TaskSplit_ReturnFalse_None()
+        {
+            // arrange
+            var value = sentinel;
+
+            // act
+            var actual = await Option.Split(value, v => Task.FromResult(v.Length == 33));
+
+            // assert
+            Assert.That(actual.IsNone, Is.True);
+        }
+
+        [Test(Description = "Splitting a nullable value over a task, failing the condition, " +
+                            "should return a None Option.")]
+        public async Task TaskSplit_NullableReturnFalse_None()
+        {
+            // arrange
+            var value = (int?)42;
+
+            // act
+            var actual = await Option.Split(value, (int v) => Task.FromResult(v == 33));
+
+            // assert
+            Assert.That(actual.IsNone, Is.True);
+        }
+
+        [Test(Description = "Splitting a value over a func, passing the condition, " +
+                            "should return a Some Option.")]
+        public async Task TaskSplit_Some()
+        {
+            // arrange
+            var value = sentinel;
+
+            // act
+            var actual = await Option.Split(value, v => Task.FromResult(v.Length == 8));
+
+            // assert
+            Assert.That(actual.IsSome, Is.True);
+        }
+
+        [Test(Description = "Splitting a nullable value over a func, passing the condition, " +
+                            "should return a Some Option.")]
+        public async Task TaskSplit_Nullable_Some()
+        {
+            // arrange
+            var value = (int?)42;
+
+            // act
+            var actual = await Option.Split(value, (int v) => Task.FromResult(v == 42));
+
+            // assert
+            Assert.That(actual.IsSome, Is.True);
         }
 
         #endregion
