@@ -4,10 +4,11 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using LINQPad;
 using static System.Diagnostics.Contracts.Contract;
+using static System.Runtime.InteropServices.LayoutKind;
 
 namespace Tiger.Types
 {
@@ -15,8 +16,8 @@ namespace Tiger.Types
     /// <typeparam name="TSome">The Some type of the value that may be represented.</typeparam>
     [TypeConverter(typeof(OptionTypeConverter))]
     [DebuggerTypeProxy(typeof(OptionDebuggerTypeProxy<>))]
+    [StructLayout(Auto)]
     public struct Option<TSome>
-        : ICustomMemberProvider
     {
         /// <summary>Gets a value representing no value.</summary>
         public static Option<TSome> None => default(Option<TSome>);
@@ -572,6 +573,7 @@ namespace Tiger.Types
         /// <param name="some">An action to perform.</param>
         /// <returns>The same value as this instance.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
+        [MustUseReturnValue]
         public Option<TSome> Tap([NotNull, InstantHandle] Action<TSome> some)
         {
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
@@ -591,7 +593,7 @@ namespace Tiger.Types
         /// <param name="some">An action to perform asynchronously.</param>
         /// <returns>The same value as this instance.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
-        [NotNull]
+        [NotNull, MustUseReturnValue]
         public async Task<Option<TSome>> Tap([NotNull, InstantHandle] Func<TSome, Task> some)
         {
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
@@ -851,23 +853,10 @@ namespace Tiger.Types
             }
         }
 
-        /// <inheritdoc />
-        IEnumerable<string> ICustomMemberProvider.GetNames()
-        {
-            yield return string.Empty;
-        }
-
-        /// <inheritdoc />
-        IEnumerable<Type> ICustomMemberProvider.GetTypes()
-        {
-            yield return typeof(string);
-        }
-
-        /// <inheritdoc />
-        IEnumerable<object> ICustomMemberProvider.GetValues()
-        {
-            yield return ToString();
-        }
+        [NotNull, Pure, PublicAPI]
+        object ToDump() => Match<object>(
+            none: new { State = "None" },
+            some: v => new { State = "Some", Value = v });
 
         #endregion
 

@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using LINQPad;
 
 namespace Tiger.Types
 {
@@ -15,7 +13,6 @@ namespace Tiger.Types
     /// <typeparam name="T2">The second type of the value that is a composite.</typeparam>
     [DebuggerTypeProxy(typeof(UnionDebuggerTypeProxy<,>))]
     public class Union<T1, T2>
-        : ICustomMemberProvider
     {
         /// <summary>Creates a <see cref="Union{T1,T2}"/> from the provided value.</summary>
         /// <param name="value">The value to wrap.</param>
@@ -399,23 +396,10 @@ namespace Tiger.Types
 
         #region Implementations
 
-        /// <inheritdoc />
-        IEnumerable<string> ICustomMemberProvider.GetNames()
-        {
-            yield return string.Empty;
-        }
-
-        /// <inheritdoc />
-        IEnumerable<Type> ICustomMemberProvider.GetTypes()
-        {
-            yield return typeof(string);
-        }
-
-        /// <inheritdoc />
-        IEnumerable<object> ICustomMemberProvider.GetValues()
-        {
-            yield return ToString();
-        }
+        [NotNull, Pure, PublicAPI]
+        object ToDump() => Match<object>(
+            one: o => new { State = 1, Value = o },
+            two: t => new { State = 2, Value = t }) ?? new { };
 
         #endregion
 
@@ -428,7 +412,7 @@ namespace Tiger.Types
         /// <see langword="true"/> if <paramref name="left"/> is equal to the <paramref name="right"/>;
         /// otherwise, <see langword="false"/>.
         /// </returns>
-        public static bool operator ==(Union<T1, T2> left, Union<T1, T2> right)
+        public static bool operator ==([CanBeNull] Union<T1, T2> left, [CanBeNull] Union<T1, T2> right)
         {
             if (ReferenceEquals(left, right))
             {
@@ -450,30 +434,32 @@ namespace Tiger.Types
         /// <see langword="true"/> if <paramref name="left"/> is not equal to the <paramref name="right"/>;
         /// otherwise, <see langword="false"/>.
         /// </returns>
-        public static bool operator !=(Union<T1, T2> left, Union<T1, T2> right) =>
+        public static bool operator !=([CanBeNull] Union<T1, T2> left, [CanBeNull] Union<T1, T2> right) =>
             !(left == right);
 
         /// <summary>Wraps a value in <see cref="Union{T1,T2}"/>.</summary>
         /// <param name="value">The value to be wrapped.</param>
-        public static implicit operator Union<T1, T2>(T1 value) => value == null
+        [CanBeNull]
+        public static implicit operator Union<T1, T2>([CanBeNull] T1 value) => value == null
             ? null
             : new Union<T1, T2>(value);
 
         /// <summary>Wraps a value in <see cref="Union{T1,T2}"/>.</summary>
         /// <param name="value">The value to be wrapped.</param>
-        public static implicit operator Union<T1, T2>(T2 value) => value == null
+        [CanBeNull]
+        public static implicit operator Union<T1, T2>([CanBeNull] T2 value) => value == null
             ? null
             : new Union<T1, T2>(value);
 
         /// <summary>Unwraps the first value of this instance.</summary>
         /// <param name="value">The value to be unwrapped.</param>
         /// <exception cref="InvalidOperationException">This instance is not in the specified state.</exception>
-        public static explicit operator T1(Union<T1, T2> value) => value.Value1;
+        public static explicit operator T1([NotNull] Union<T1, T2> value) => value.Value1;
 
         /// <summary>Unwraps the second value of this instance.</summary>
         /// <param name="value">The value to be unwrapped.</param>
         /// <exception cref="InvalidOperationException">This instance is not in the specified state.</exception>
-        public static explicit operator T2(Union<T1, T2> value) => value.Value2;
+        public static explicit operator T2([NotNull] Union<T1, T2> value) => value.Value2;
 
         #endregion
     }

@@ -29,6 +29,25 @@ namespace Tiger.Types
             return new Either<TLeft, TRight>(leftValue);
         }
 
+        /// <summary>Creates an <see cref="EitherLeft{TLeft}"/> from the provided value.</summary>
+        /// <typeparam name="TLeft">
+        /// The Left type of the <see cref="Either{TLeft,TRight}"/> to be created.
+        /// </typeparam>
+        /// <param name="leftValue">
+        /// The value from which to create the <see cref="Either{TLeft,TRight}"/>.
+        /// </param>
+        /// <returns>
+        /// An <see cref="EitherLeft{TLeft}"/> that can be converted to an <see cref="Either{TLeft,TRight}"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="leftValue"/> is <see langword="null"/>.</exception>
+        [Pure]
+        public static EitherLeft<TLeft> Left<TLeft>([NotNull] TLeft leftValue)
+        {
+            if (leftValue == null) { throw new ArgumentNullException(nameof(leftValue)); }
+
+            return new EitherLeft<TLeft>(leftValue);
+        }
+
         /// <summary>
         /// Creates an <see cref="Either{TLeft,TRight}"/> in the Right state from the provided value.
         /// </summary>
@@ -49,6 +68,25 @@ namespace Tiger.Types
             if (rightValue == null) { throw new ArgumentNullException(nameof(rightValue)); }
 
             return new Either<TLeft, TRight>(rightValue);
+        }
+
+        /// <summary>Creates an <see cref="EitherRight{TRight}"/> from the provided value.</summary>
+        /// <typeparam name="TRight">
+        /// The Right type of the <see cref="Either{TLeft,TRight}"/> to be created.
+        /// </typeparam>
+        /// <param name="rightValue">
+        /// The value from which to create the <see cref="Either{TLeft,TRight}"/>.
+        /// </param>
+        /// <returns>
+        /// An <see cref="EitherRight{TRight}"/> that can be converted to an <see cref="Either{TLeft,TRight}"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="rightValue"/> is <see langword="null"/>.</exception>
+        [Pure]
+        public static EitherRight<TRight> Right<TRight>([NotNull] TRight rightValue)
+        {
+            if (rightValue == null) { throw new ArgumentNullException(nameof(rightValue)); }
+
+            return new EitherRight<TRight>(rightValue);
         }
 
         /// <summary>Splits a value into an either value based on a provided condition.</summary>

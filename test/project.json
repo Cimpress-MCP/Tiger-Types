@@ -8,7 +8,7 @@
     "xunit.core": "2.2.0-beta3-build3402",
     "Tiger.Types": {
       "target": "project"
-    } 
+    }
   },
 
   "frameworks": {

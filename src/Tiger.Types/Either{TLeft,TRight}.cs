@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using LINQPad;
 using static System.Diagnostics.Contracts.Contract;
+using static System.Runtime.InteropServices.LayoutKind;
 
 namespace Tiger.Types
 {
@@ -14,8 +15,8 @@ namespace Tiger.Types
     /// <typeparam name="TLeft">The Left type of the value that may be represented.</typeparam>
     /// <typeparam name="TRight">The Right type of the value that may be represented.</typeparam>
     [DebuggerTypeProxy(typeof(EitherDebuggerTypeProxy<,>))]
+    [StructLayout(Auto)]
     public struct Either<TLeft, TRight>
-        : ICustomMemberProvider
     {
         /// <summary>
         /// Creates an <see cref="Either{TLeft,TRight}"/> in the Left state from the provided value.
@@ -1421,30 +1422,17 @@ namespace Tiger.Types
         /// <returns>An <see cref="IEnumerator{T}"/> for the <see cref="Either{TLeft,TRight}"/>.</returns>
         [NotNull, Pure, EditorBrowsable(EditorBrowsableState.Never)]
         public IEnumerator<TRight> GetEnumerator()
-        {
+        { // note(cosborn) OK, it's kind of an implementation.
             if (IsRight)
             {
                 yield return RightValue;
             }
         }
 
-        /// <inheritdoc />
-        IEnumerable<string> ICustomMemberProvider.GetNames()
-        {
-            yield return string.Empty;
-        }
-
-        /// <inheritdoc />
-        IEnumerable<Type> ICustomMemberProvider.GetTypes()
-        {
-            yield return typeof(string);
-        }
-
-        /// <inheritdoc />
-        IEnumerable<object> ICustomMemberProvider.GetValues()
-        {
-            yield return ToString();
-        }
+        [NotNull, Pure, PublicAPI]
+        object ToDump() => Match<object>(
+            left: l => new { State = EitherState.Left, Value = l },
+            right: r => new { State = EitherState.Right, Value = r });
 
         #endregion
 
@@ -1481,6 +1469,16 @@ namespace Tiger.Types
         public static implicit operator Either<TLeft, TRight>([CanBeNull] TRight rightValue) => rightValue == null
             ? default(Either<TLeft, TRight>)
             : new Either<TLeft, TRight>(rightValue);
+
+        /// <summary>Wraps a value in <see cref="Either{TLeft,TRight}"/>.</summary>
+        /// <param name="leftValue">The value to be wrapped.</param>
+        public static implicit operator Either<TLeft, TRight>(EitherLeft<TLeft> leftValue) =>
+            new Either<TLeft, TRight>(leftValue.Value);
+
+        /// <summary>Wraps a value in <see cref="Either{TLeft,TRight}"/>.</summary>
+        /// <param name="rightValue">The value to be wrapped.</param>
+        public static implicit operator Either<TLeft, TRight>(EitherRight<TRight> rightValue) =>
+            new Either<TLeft, TRight>(rightValue.Value);
 
         /// <summary>Unwraps the Right value of this instance.</summary>
         /// <param name="value">The value to be unwrapped.</param>

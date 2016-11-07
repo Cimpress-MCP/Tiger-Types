@@ -2183,6 +2183,49 @@ namespace Tiger.Types.UnitTests
             Assert.False(actual);
         }
 
+        [Fact(DisplayName = "An EitherLeft converts implicitly to a Left Either.")]
+        public void EitherLeft_ToEither()
+        {
+            // arrange, act
+            Either<string, int> actual = Either.Left(sentinel);
+
+            // assert
+            var innerValue = Assert.Left(actual);
+            Assert.Equal(sentinel, innerValue);
+        }
+
+        [Fact(DisplayName = "An EitherRight converts implicitly to a Right Either.")]
+        public void EitherRight_ToEither()
+        {
+            // arrange, act
+            Either<int, string> actual = Either.Right(sentinel);
+
+            // assert
+            var innerValue = Assert.Right(actual);
+            Assert.Equal(sentinel, innerValue);
+        }
+
+        [Fact(DisplayName = "An EitherLeft and EitherRight behave together with type inference.")]
+        public void EitherSided_Combine()
+        {
+            // arrange
+            Func<int, Either<string, bool>> func = i =>
+            {
+                if (i <= 0)
+                {
+                    return Either.Right(true);
+                }
+                return Either.Left(sentinel);
+            };
+
+            // act
+            var actual = func(42);
+
+            // assert
+            var innerValue = Assert.Left(actual);
+            Assert.Equal(sentinel, innerValue);
+        }
+
         [Fact(DisplayName = "A value of the Left type converts to a Left Either.")]
         public void Left_IsLeft()
         {

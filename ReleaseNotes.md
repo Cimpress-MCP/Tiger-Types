@@ -1,6 +1,10 @@
 ### What's new in 3.0.0 (Released TK-TK-TKTK)
 
 * Thanks to the magic of the .NET Standard, Tiger libraries are available to a wider set of platforms than ever before. The project now targets .NET Standard 1.0.
+* The `Either` static class has learned from `Option.None` and can indirectly create `Either` instances without specifying type parameters.
+* The main types of the library have had their struct layouts specified, leading to reduced memory usage when boxed.
+* LINQPad's custom dumping has bee upgraded to the new method, leading to improved display and debugging.
+  * This and other fixes have led to a moderate reduction in the size of the library's assembly.
 
 ### What's new in 2.3.0 (Released 2016-10-28)
 
@@ -23,7 +27,7 @@
 * A greater number of methods have been marked as pure.
 * Equality comparisons have been made simpler.
 * The `Some` static method has been removed from `Option`, as its usage was identical to `From`, and saved no cycles.
-* Arguments to `Map` or `Bind` that could lead to a violation of laws now throw uncatchable exceptions.  Circumstances under which these exceptions occur are to be considered "[boneheaded](https://blogs.msdn.microsoft.com/ericlippert/2008/09/10/vexing-exceptions/)", and represent a bug in the calling code.
+* Arguments to `Map` or `Bind` that could lead to a violation of laws now throw uncatchable exceptions. Circumstances under which these exceptions occur are to be considered "[boneheaded](https://blogs.msdn.microsoft.com/ericlippert/2008/09/10/vexing-exceptions/)", and represent a bug in the calling code.
 * The `null`-safety of some methods has been adjusted to match reality.
 * A greater number of `Either` methods will panic upon being passed an `Either` in the Bottom state.
 * The performance of a number of methods has been slightly improved by reducing indirect method calls.
