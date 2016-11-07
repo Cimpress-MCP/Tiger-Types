@@ -457,4 +457,16 @@
     <Rule Id="C6995" Action="None" />
     <Rule Id="C6997" Action="None" />
   </Rules>
+  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+    <Rule Id="SA1101" Action="None" />
+    <Rule Id="SA1124" Action="None" />
+    <Rule Id="SA1133" Action="None" />
+    <Rule Id="SA1201" Action="None" />
+    <Rule Id="SA1202" Action="None" />
+    <Rule Id="SA1309" Action="None" />
+    <Rule Id="SA1400" Action="None" />
+    <Rule Id="SA1408" Action="None" />
+    <Rule Id="SA1501" Action="None" />
+    <Rule Id="SA1633" Action="None" />
+  </Rules>
 </RuleSet>

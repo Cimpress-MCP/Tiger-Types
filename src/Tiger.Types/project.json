@@ -1,0 +1,61 @@
+{
+  "version": "3.0.0-*",
+  "name": "Tiger.Types",
+  "title": "Tiger Types",
+  "description": "A collection of useful types and operations on types.",
+  "authors": [ "cosborn@cimpress.com" ],
+  "copyright": "Copyright ©Cimpress 2016",
+
+  "buildOptions": {
+    "debugType": "portable",
+    "preserveCompilationContext": true,
+    "xmlDoc": true,
+    "warningsAsErrors": true,
+    "define": [ "TRACE", "CODE_ANALYSIS", "CONTRACTS_FULL" ],
+    "additionalArguments": [
+      "/ruleset:../../Tiger.ruleset",
+      "/additionalfile:../../stylecop.json"
+    ]
+  },
+  "configurations": {
+    "Debug": {
+      "buildOptions": {
+        "define": [ "DEBUG" ]
+      }
+    },
+    "Release": {
+      "buildOptions": {
+        "define": [ "RELEASE" ],
+        "optimize": true
+      }
+    }
+  },
+
+  "dependencies": {
+    "StyleCop.Analyzers": {
+      "type": "build",
+      "version": "1.0.0"
+    }
+  },
+
+  "frameworks": {
+    "netstandard1.0": {
+      "dependencies": {
+        "NETStandard.Library": "1.6.0",
+        "System.ComponentModel.TypeConverter": "4.1.0",
+        "System.Diagnostics.Contracts": "4.0.1"
+      }
+    }
+  },
+
+  "packOptions": {
+    "releaseNotes": "Thanks to the magic of the .NET Standard, Tiger libraries are available to a wider set of platforms than ever before. The project now targets .NET Standard 1.0.",
+    "owners": [ "cosborn@cimpress.com" ],
+    "repository": {
+      "type": "git",
+      "url": "https://mcpstash.cimpress.net/projects/PMI/repos/types"
+    },
+    "requireLicenseAcceptance": false,
+    "tags": [ "option", "maybe", "either", "union", "task", "functional" ]
+  }
+}

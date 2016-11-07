@@ -1,3 +1,7 @@
+### What's new in 3.0.0 (Released TK-TK-TKTK)
+
+* Thanks to the magic of the .NET Standard, Tiger libraries are available to a wider set of platforms than ever before. The project now targets .NET Standard 1.0.
+
 ### What's new in 2.3.0 (Released 2016-10-28)
 
 * `Option` and `Either` values can be created by splitting a conventional value on a condition.
