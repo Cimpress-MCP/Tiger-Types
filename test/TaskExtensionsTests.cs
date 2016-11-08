@@ -1,8 +1,9 @@
 ﻿// ReSharper disable All
 
-using System;
 using System.Threading.Tasks;
 using Xunit;
+using static System.Threading.Tasks.Task;
+using static System.TimeSpan;
 
 namespace Tiger.Types.UnitTests
 {
@@ -14,7 +15,7 @@ namespace Tiger.Types.UnitTests
         public async Task Apply()
         {
             // arrange
-            var task = Task.Delay(TimeSpan.FromSeconds(3));
+            var task = Delay(FromSeconds(3));
 
             // act
             var actual = await task.Apply(() => sentinel);
@@ -28,10 +29,10 @@ namespace Tiger.Types.UnitTests
         public async Task Then()
         {
             // arrange
-            var task = Task.Delay(TimeSpan.FromSeconds(3));
+            var task = Delay(FromSeconds(3));
 
             // act
-            var actual = await task.Then(() => Task.FromResult(sentinel));
+            var actual = await task.Then(() => FromResult(sentinel));
 
             // assert
             Assert.True(task.IsCompleted);
@@ -45,7 +46,7 @@ namespace Tiger.Types.UnitTests
             // arrange
             
             // act
-            var actual = await Task.FromResult(sentinel).Map(v => v.Length);
+            var actual = await FromResult(sentinel).Map(v => v.Length);
 
             // assert
             Assert.Equal(sentinel.Length, actual);
@@ -58,7 +59,7 @@ namespace Tiger.Types.UnitTests
             // arrange
             
             // act
-            var actual = await Task.FromResult(sentinel).Bind(v => Task.FromResult(v.Length));
+            var actual = await FromResult(sentinel).Bind(v => FromResult(v.Length));
 
             // assert
             Assert.Equal(sentinel.Length, actual);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using static System.Diagnostics.Contracts.Contract;
 
@@ -28,7 +29,7 @@ namespace Tiger.Types
         /// <typeparam name="TLeft">The type of <paramref name="fallback"/>.</typeparam>
         /// <typeparam name="TSome">The Some type of <paramref name="value"/></typeparam>
         /// <param name="value">The value to be converted.</param>
-        /// <param name="fallback">the value to use as a fallback.</param>
+        /// <param name="fallback">The value to use as a fallback.</param>
         /// <returns>
         /// An <see cref="Either{TLeft,TRight}"/> in the Right state with its Right value
         /// set to the Some value of <paramref name="value"/> if <paramref name="value"/>
@@ -46,7 +47,54 @@ namespace Tiger.Types
             return value.Map(v => new Either<TLeft, TSome>(v)).GetValueOrDefault(fallback);
         }
 
-        /* todo(cosborn) Are Func and Task versions of ToEither worth anything? */
+        /// <summary>
+        /// Converts an <see cref="Option{TSome}"/> into an <see cref="Either{TLeft,TRight}"/>.
+        /// </summary>
+        /// <typeparam name="TLeft">The type of <paramref name="fallback"/>.</typeparam>
+        /// <typeparam name="TSome">The Some type of <paramref name="value"/></typeparam>
+        /// <param name="value">The value to be converted.</param>
+        /// <param name="fallback">A function producing the value to use as a fallback.</param>
+        /// <returns>
+        /// An <see cref="Either{TLeft,TRight}"/> in the Right state with its Right value
+        /// set to the Some value of <paramref name="value"/> if <paramref name="value"/>
+        /// is in the Some state; otherwise, an <see cref="Either{TLeft,TRight}"/> in the
+        /// Left state with its Left value set to <paramref name="fallback"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="fallback"/> is <see langword="null"/>.</exception>
+        [Pure]
+        public static Either<TLeft, TSome> ToEither<TLeft, TSome>(
+            this Option<TSome> value,
+            [NotNull, InstantHandle] Func<TLeft> fallback)
+        {
+            if (fallback == null) { throw new ArgumentNullException(nameof(fallback)); }
+
+            return value.Map(v => new Either<TLeft, TSome>(v)).GetValueOrDefault(() => fallback());
+        }
+
+        /// <summary>
+        /// Converts an <see cref="Option{TSome}"/> into an <see cref="Either{TLeft,TRight}"/>.
+        /// </summary>
+        /// <typeparam name="TLeft">The type of <paramref name="fallback"/>.</typeparam>
+        /// <typeparam name="TSome">The Some type of <paramref name="value"/></typeparam>
+        /// <param name="value">The value to be converted.</param>
+        /// <param name="fallback">A function producing the value to use as a fallback.</param>
+        /// <returns>
+        /// An <see cref="Either{TLeft,TRight}"/> in the Right state with its Right value
+        /// set to the Some value of <paramref name="value"/> if <paramref name="value"/>
+        /// is in the Some state; otherwise, an <see cref="Either{TLeft,TRight}"/> in the
+        /// Left state with its Left value set to <paramref name="fallback"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="fallback"/> is <see langword="null"/>.</exception>
+        [NotNull, Pure]
+        public static Task<Either<TLeft, TSome>> ToEither<TLeft, TSome>(
+            this Option<TSome> value,
+            [NotNull, InstantHandle] Func<Task<TLeft>> fallback)
+        {
+            if (fallback == null) { throw new ArgumentNullException(nameof(fallback)); }
+
+            return value.Map(v => new Either<TLeft, TSome>(v))
+                .GetValueOrDefault(async () => await fallback().ConfigureAwait(false));
+        }
 
         #region LINQ
 
@@ -209,15 +257,16 @@ namespace Tiger.Types
         /// <typeparam name="TSource">The Some type of <paramref name="source"/>.</typeparam>
         /// <param name="source">An optional value on which to perform an action.</param>
         /// <param name="onNext">An action to invoke.</param>
+        /// <returns>A unit.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="onNext"/> is <see langword="null"/>.</exception>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void ForEach<TSource>(
+        public static Unit ForEach<TSource>(
             this Option<TSource> source,
             [NotNull, InstantHandle] Action<TSource> onNext)
         {
             if (onNext == null) { throw new ArgumentNullException(nameof(onNext)); }
 
-            source.Let(onNext);
+            return source.Let(onNext);
         }
 
         /// <summary>Filters the Some value of an optional value based on a predicate.</summary>

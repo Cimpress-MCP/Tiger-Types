@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
+using static System.Threading.Tasks.Task;
 
 namespace Tiger.Types.UnitTests
 {
@@ -13,31 +14,6 @@ namespace Tiger.Types.UnitTests
         const string sentinel = "sentinel";
 
         #region IsNone, IsSome
-
-        [Theory(DisplayName = "Non-null values create Some Options using the typed static From method.")]
-        [InlineData(sentinel)]
-        [InlineData("")]
-        public void TypedFrom_Value_IsSome(string innerValue)
-        {
-            // arrange, act
-            var actual = Option<string>.From(innerValue);
-
-            // assert
-
-            Assert.False(actual.IsNone);
-            Assert.True(actual.IsSome);
-        }
-
-        [Fact(DisplayName = "Null values create None Options using the typed static From method.")]
-        public void TypedFrom_Null_IsNone()
-        {
-            // arrange, act
-            var actual = Option<string>.From(null);
-
-            // assert
-            Assert.True(actual.IsNone);
-            Assert.False(actual.IsSome);
-        }
 
         [Theory(DisplayName = "Non-null values create Some Options using the untyped static From method.")]
         [InlineData(sentinel)]
@@ -134,7 +110,7 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = await value.Match(
                 none: 42,
-                some: v => v.Length.Pipe(Task.FromResult));
+                some: v => v.Length.Pipe(FromResult));
 
             // assert
             Assert.Equal(42, actual);
@@ -150,7 +126,7 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = await value.Match(
                 none: 42,
-                some: v => v.Length.Pipe(Task.FromResult));
+                some: v => v.Length.Pipe(FromResult));
 
             // assert
             Assert.Equal(sentinel.Length, actual);
@@ -198,7 +174,7 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = await value.Match(
                 none: () => 42,
-                some: v => v.Length.Pipe(Task.FromResult));
+                some: v => v.Length.Pipe(FromResult));
 
             // assert
             Assert.Equal(42, actual);
@@ -214,7 +190,7 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = await value.Match(
                 none: () => 42,
-                some: v => v.Length.Pipe(Task.FromResult));
+                some: v => v.Length.Pipe(FromResult));
 
             // assert
             Assert.Equal(sentinel.Length, actual);
@@ -229,7 +205,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Match(
-                none: () => Task.FromResult(42),
+                none: () => FromResult(42),
                 some: v => v.Length);
 
             // assert
@@ -245,7 +221,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Match(
-                none: () => Task.FromResult(42),
+                none: () => FromResult(42),
                 some: v => v.Length);
 
             // assert
@@ -261,8 +237,8 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Match(
-                none: () => Task.FromResult(42),
-                some: v => v.Length.Pipe(Task.FromResult));
+                none: () => FromResult(42),
+                some: v => v.Length.Pipe(FromResult));
 
             // assert
             Assert.Equal(42, actual);
@@ -277,8 +253,8 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Match(
-                none: () => Task.FromResult(42),
-                some: v => v.Length.Pipe(Task.FromResult));
+                none: () => FromResult(42),
+                some: v => v.Length.Pipe(FromResult));
 
             // assert
             Assert.Equal(sentinel.Length, actual);
@@ -329,7 +305,7 @@ namespace Tiger.Types.UnitTests
             var actual = string.Empty;
             await value.Match(
                 none: () => actual = sentinel,
-                some: v => Task.CompletedTask);
+                some: v => CompletedTask);
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -346,7 +322,7 @@ namespace Tiger.Types.UnitTests
             var actual = string.Empty;
             await value.Match(
                 none: () => { },
-                some: v => Task.Run(() => actual = v));
+                some: v => Run(() => actual = v));
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -362,7 +338,7 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = string.Empty;
             await value.Match(
-                none: () => Task.Run(() => actual = sentinel),
+                none: () => Run(() => actual = sentinel),
                 some: v => { });
 
             // assert
@@ -379,7 +355,7 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = string.Empty;
             await value.Match(
-                none: () => Task.CompletedTask,
+                none: () => CompletedTask,
                 some: v => actual = v);
 
             // assert
@@ -396,8 +372,8 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = string.Empty;
             await value.Match(
-                none: () => Task.Run(() => actual = sentinel),
-                some: v => Task.CompletedTask);
+                none: () => Run(() => actual = sentinel),
+                some: v => CompletedTask);
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -413,8 +389,8 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = string.Empty;
             await value.Match(
-                none: () => Task.CompletedTask,
-                some: v => Task.Run(() => actual = v));
+                none: () => CompletedTask,
+                some: v => Run(() => actual = v));
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -458,7 +434,7 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act
-            var actual = await value.Map(v => v.Length.Pipe(Task.FromResult));
+            var actual = await value.Map(v => v.Length.Pipe(FromResult));
 
             // assert
             Assert.None(actual);
@@ -471,7 +447,7 @@ namespace Tiger.Types.UnitTests
             var value = Option.From(sentinel);
 
             // act
-            var actual = await value.Map(v => v.Length.Pipe(Task.FromResult));
+            var actual = await value.Map(v => v.Length.Pipe(FromResult));
 
             // assert
             var length = Assert.Some(actual);
@@ -533,7 +509,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Bind(v =>
-                Task.FromResult(v.Length == 0
+                FromResult(v.Length == 0
                     ? Option.None
                     : Option.From(v.Length)));
 
@@ -550,7 +526,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Bind(v =>
-                Task.FromResult(v.Length == 0
+                FromResult(v.Length == 0
                     ? Option.None
                     : Option.From(v.Length)));
 
@@ -610,7 +586,7 @@ namespace Tiger.Types.UnitTests
             var value = Option<int>.None;
 
             // act
-            var actual = await value.Filter(v => Task.FromResult(v > 0));
+            var actual = await value.Filter(v => FromResult(v > 0));
 
             // assert
             Assert.None(actual);
@@ -623,7 +599,7 @@ namespace Tiger.Types.UnitTests
             var value = Option.From(42);
 
             // act
-            var actual = await value.Filter(_ => Task.FromResult(false));
+            var actual = await value.Filter(_ => FromResult(false));
 
             // assert
             Assert.None(actual);
@@ -636,7 +612,7 @@ namespace Tiger.Types.UnitTests
             var value = Option.From(42);
 
             // act
-            var actual = await value.Filter(v => Task.FromResult(true));
+            var actual = await value.Filter(v => FromResult(true));
 
             // assert
             var filteredValue = Assert.Some(actual);
@@ -681,7 +657,7 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act
-            var actual = await value.Fold(34, (s, v) => Task.FromResult(s + v.Length));
+            var actual = await value.Fold(34, (s, v) => FromResult(s + v.Length));
 
             // assert
             Assert.Equal(34, actual);
@@ -695,7 +671,7 @@ namespace Tiger.Types.UnitTests
             var value = Option.From(sentinel);
 
             // act
-            var actual = await value.Fold(34, (s, v) => Task.FromResult(s + v.Length));
+            var actual = await value.Fold(34, (s, v) => FromResult(s + v.Length));
 
             // assert
             Assert.Equal(42, actual);
@@ -733,7 +709,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Tap(v => output = sentinel);
 
             // assert
-            Assert.Equal(value, actual);
+            var innerValue = Assert.Some(actual);
+            Assert.Equal(sentinel, innerValue);
             Assert.Equal(sentinel, output);
         }
 
@@ -746,7 +723,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var output = sentinel;
-            var actual = await value.Tap(v => Task.Run(() => output = string.Empty));
+            var actual = await value.Tap(v => Run(() => output = string.Empty));
 
             // assert
             Assert.None(actual);
@@ -762,10 +739,11 @@ namespace Tiger.Types.UnitTests
 
             // act
             var output = string.Empty;
-            var actual = await value.Tap(v => Task.Run(() => output = sentinel));
+            var actual = await value.Tap(v => Run(() => output = sentinel));
 
             // assert
-            Assert.Equal(value, actual);
+            var innerValue = Assert.Some(actual);
+            Assert.Equal(sentinel, innerValue);
             Assert.Equal(sentinel, output);
         }
 
@@ -809,7 +787,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = sentinel;
-            await value.Let(v => Task.Run(() => actual = string.Empty));
+            await value.Let(v => Run(() => actual = string.Empty));
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -823,7 +801,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = string.Empty;
-            await value.Let(v => Task.Run(() => actual = v));
+            await value.Let(v => Run(() => actual = v));
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -896,7 +874,7 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act
-            var actual = await value.Recover(() => Task.FromResult(sentinel));
+            var actual = await value.Recover(() => FromResult(sentinel));
 
             // assert
             var recoveredValue = Assert.Some(actual);
@@ -910,7 +888,7 @@ namespace Tiger.Types.UnitTests
             var value = Option.From(sentinel);
 
             // act
-            var actual = await value.Recover(() => Task.FromResult("megatron"));
+            var actual = await value.Recover(() => FromResult("megatron"));
 
             // assert
             var recoveredValue = Assert.Some(actual);
@@ -1040,7 +1018,7 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act
-            var actual = await value.GetValueOrDefault(() => Task.FromResult(sentinel));
+            var actual = await value.GetValueOrDefault(() => FromResult(sentinel));
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -1054,7 +1032,7 @@ namespace Tiger.Types.UnitTests
             var value = Option.From(sentinel);
 
             // act
-            var actual = await value.GetValueOrDefault(() => Task.FromResult(string.Empty));
+            var actual = await value.GetValueOrDefault(() => FromResult(string.Empty));
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -2103,7 +2081,7 @@ namespace Tiger.Types.UnitTests
             var value = (string)null;
 
             // act
-            var actual = await Option.Split(value, v => Task.FromResult(v.Length == 8));
+            var actual = await Option.Split(value, v => FromResult(v.Length == 8));
 
             // assert
             Assert.True(actual.IsNone);
@@ -2116,7 +2094,7 @@ namespace Tiger.Types.UnitTests
             var value = (int?)null;
 
             // act
-            var actual = await Option.Split(value, (int v) => Task.FromResult(v == 8));
+            var actual = await Option.Split(value, (int v) => FromResult(v == 8));
 
             // assert
             Assert.True(actual.IsNone);
@@ -2130,7 +2108,7 @@ namespace Tiger.Types.UnitTests
             var value = sentinel;
 
             // act
-            var actual = await Option.Split(value, v => Task.FromResult(v.Length == 33));
+            var actual = await Option.Split(value, v => FromResult(v.Length == 33));
 
             // assert
             Assert.True(actual.IsNone);
@@ -2144,7 +2122,7 @@ namespace Tiger.Types.UnitTests
             var value = (int?)42;
 
             // act
-            var actual = await Option.Split(value, (int v) => Task.FromResult(v == 33));
+            var actual = await Option.Split(value, (int v) => FromResult(v == 33));
 
             // assert
             Assert.True(actual.IsNone);
@@ -2158,7 +2136,7 @@ namespace Tiger.Types.UnitTests
             var value = sentinel;
 
             // act
-            var actual = await Option.Split(value, v => Task.FromResult(v.Length == 8));
+            var actual = await Option.Split(value, v => FromResult(v.Length == 8));
 
             // assert
             Assert.True(actual.IsSome);
@@ -2172,7 +2150,7 @@ namespace Tiger.Types.UnitTests
             var value = (int?)42;
 
             // act
-            var actual = await Option.Split(value, (int v) => Task.FromResult(v == 42));
+            var actual = await Option.Split(value, (int v) => FromResult(v == 42));
 
             // assert
             Assert.True(actual.IsSome);

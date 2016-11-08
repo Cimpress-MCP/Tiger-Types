@@ -22,29 +22,13 @@ namespace Tiger.Types
         /// <summary>Gets a value representing no value.</summary>
         public static Option<TSome> None => default(Option<TSome>);
 
-        /// <summary>Creates an <see cref="Option{TSome}"/> from the provided value.</summary>
-        /// <param name="value">The value to wrap.</param>
-        /// <returns>
-        /// An <see cref="Option{TSome}"/> in the None state if <paramref name="value"/>
-        /// is equal to <see langword="null"/>; otherwise, an <see cref="Option{TSome}"/>
-        /// in the Some state.
-        /// </returns>
-        /// <remarks>Passing a nullable struct into this method is likely to confuse
-        /// both the type system and the programmer.</remarks>
-        [Pure]
-        public static Option<TSome> From([CanBeNull] TSome value) =>
-            value == null ? None : new Option<TSome>(value);
-
         /// <summary>Gets a value indicating whether this instance is in the None state.</summary>
-        /// <remarks>There are usually better ways to do this.</remarks>
+        /// <remarks><para>There are usually better ways to do this.</para></remarks>
         public bool IsNone => !IsSome;
 
         /// <summary>Gets a value indicating whether this instance is in the Some state.</summary>
-        /// <remarks>There are usually better ways to do this.</remarks>
-        // ReSharper disable once ConvertToAutoPropertyWhenPossible because(cosborn) Performance???
-        public bool IsSome => _isSome;
-
-        readonly bool _isSome;
+        /// <remarks><para>There are usually better ways to do this.</para></remarks>
+        public bool IsSome { get; }
 
         readonly TSome _value;
 
@@ -55,7 +39,7 @@ namespace Tiger.Types
         internal Option([NotNull] TSome value)
         {
             _value = value;
-            _isSome = true;
+            IsSome = true;
         }
 
         #region Match
@@ -107,7 +91,7 @@ namespace Tiger.Types
             if (none == null) { throw new ArgumentNullException(nameof(none)); }
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            var result = _isSome
+            var result = IsSome
                 ? await some(_value).ConfigureAwait(false)
                 : none;
             Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
@@ -134,7 +118,7 @@ namespace Tiger.Types
             if (none == null) { throw new ArgumentNullException(nameof(none)); }
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            var result = _isSome
+            var result = IsSome
                 ? some(_value)
                 : none();
             Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
@@ -161,7 +145,7 @@ namespace Tiger.Types
             if (none == null) { throw new ArgumentNullException(nameof(none)); }
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            var result = _isSome
+            var result = IsSome
                 ? await some(_value).ConfigureAwait(false)
                 : none();
             Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
@@ -188,7 +172,7 @@ namespace Tiger.Types
             if (none == null) { throw new ArgumentNullException(nameof(none)); }
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            var result = _isSome
+            var result = IsSome
                 ? some(_value)
                 : await none().ConfigureAwait(false);
             Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
@@ -215,7 +199,7 @@ namespace Tiger.Types
             if (none == null) { throw new ArgumentNullException(nameof(none)); }
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            var result = _isSome
+            var result = IsSome
                 ? await some(_value).ConfigureAwait(false)
                 : await none().ConfigureAwait(false);
             Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
@@ -234,16 +218,17 @@ namespace Tiger.Types
         /// An action to be invoked with the Some value of this instance as
         /// the argument if this instance is in the Some state.
         /// </param>
+        /// <returns>A unit.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
-        public void Match(
+        public Unit Match(
             [NotNull, InstantHandle] Action none,
             [NotNull, InstantHandle] Action<TSome> some)
         {
             if (none == null) { throw new ArgumentNullException(nameof(none)); }
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            if (_isSome)
+            if (IsSome)
             {
                 some(_value);
             }
@@ -251,6 +236,8 @@ namespace Tiger.Types
             {
                 none();
             }
+
+            return Unit.Value;
         }
 
         /// <summary>Performs an action with this instance by matching on its state, asynchronously.</summary>
@@ -272,7 +259,7 @@ namespace Tiger.Types
             if (none == null) { throw new ArgumentNullException(nameof(none)); }
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            if (_isSome)
+            if (IsSome)
             {
                 await some(_value).ConfigureAwait(false);
             }
@@ -301,7 +288,7 @@ namespace Tiger.Types
             if (none == null) { throw new ArgumentNullException(nameof(none)); }
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            if (_isSome)
+            if (IsSome)
             {
                 some(_value);
             }
@@ -330,7 +317,7 @@ namespace Tiger.Types
             if (none == null) { throw new ArgumentNullException(nameof(none)); }
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            if (_isSome)
+            if (IsSome)
             {
                 await some(_value).ConfigureAwait(false);
             }
@@ -363,7 +350,7 @@ namespace Tiger.Types
         {
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            if (_isSome)
+            if (IsSome)
             {
                 var result = some(_value);
                 Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
@@ -390,7 +377,7 @@ namespace Tiger.Types
         {
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            if (_isSome)
+            if (IsSome)
             {
                 var result = await some(_value).ConfigureAwait(false);
                 Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
@@ -423,7 +410,7 @@ namespace Tiger.Types
         {
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            return _isSome
+            return IsSome
                 ? some(_value)
                 : Option<TOut>.None;
         }
@@ -447,7 +434,7 @@ namespace Tiger.Types
         {
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            return _isSome
+            return IsSome
                 ? await some(_value).ConfigureAwait(false)
                 : Option<TOut>.None;
         }
@@ -472,7 +459,7 @@ namespace Tiger.Types
         {
             if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
 
-            return _isSome
+            return IsSome
                 ? predicate(_value) ? this : None
                 : None;
         }
@@ -495,7 +482,7 @@ namespace Tiger.Types
         {
             if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
 
-            return _isSome
+            return IsSome
                 ? await predicate(_value).ConfigureAwait(false) ? this : None
                 : None;
         }
@@ -525,7 +512,7 @@ namespace Tiger.Types
             if (state == null) { throw new ArgumentNullException(nameof(state)); }
             if (folder == null) { throw new ArgumentNullException(nameof(folder)); }
 
-            var result = _isSome
+            var result = IsSome
                 ? folder(state, _value)
                 : state;
             Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
@@ -555,7 +542,7 @@ namespace Tiger.Types
             if (state == null) { throw new ArgumentNullException(nameof(state)); }
             if (folder == null) { throw new ArgumentNullException(nameof(folder)); }
 
-            var result = _isSome
+            var result = IsSome
                 ? await folder(state, _value).ConfigureAwait(false)
                 : state;
             Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
@@ -578,7 +565,7 @@ namespace Tiger.Types
         {
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            if (_isSome)
+            if (IsSome)
             {
                 some(_value);
             }
@@ -598,7 +585,7 @@ namespace Tiger.Types
         {
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            if (_isSome)
+            if (IsSome)
             {
                 await some(_value).ConfigureAwait(false);
             }
@@ -612,15 +599,18 @@ namespace Tiger.Types
 
         /// <summary>Performs an action on the Some value of this instance.</summary>
         /// <param name="some">An action to perform.</param>
+        /// <returns>A unit.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
-        public void Let([NotNull, InstantHandle] Action<TSome> some)
+        public Unit Let([NotNull, InstantHandle] Action<TSome> some)
         {
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            if (_isSome)
+            if (IsSome)
             {
                 some(_value);
             }
+
+            return Unit.Value;
         }
 
         /// <summary>Performs an action on the Some value of this instance, asynchronously.</summary>
@@ -632,7 +622,7 @@ namespace Tiger.Types
         {
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            if (_isSome)
+            if (IsSome)
             {
                 await some(_value);
             }
@@ -655,7 +645,7 @@ namespace Tiger.Types
         {
             if (recoverer == null) { throw new ArgumentNullException(nameof(recoverer)); }
 
-            return _isSome
+            return IsSome
                 ? this
                 : new Option<TSome>(recoverer);
         }
@@ -673,7 +663,7 @@ namespace Tiger.Types
         {
             if (recoverer == null) { throw new ArgumentNullException(nameof(recoverer)); }
 
-            if (_isSome) { return this; }
+            if (IsSome) { return this; }
 
             var result = recoverer();
             Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
@@ -693,7 +683,7 @@ namespace Tiger.Types
         {
             if (recoverer == null) { throw new ArgumentNullException(nameof(recoverer)); }
 
-            if (_isSome) { return this; }
+            if (IsSome) { return this; }
 
             var result = await recoverer().ConfigureAwait(false);
             Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
@@ -705,7 +695,9 @@ namespace Tiger.Types
         #region Value
 
         /// <summary>Gets the Some value of this instance.</summary>
-        /// <remarks>This property is unsafe, as it can throw if this instance is in the None state.</remarks>
+        /// <remarks>
+        /// <para>This property is unsafe, as it can throw if this instance is in the None state.</para>
+        /// </remarks>
         /// <exception cref="InvalidOperationException" accessor="get">
         /// This instance is in an invalid state.
         /// </exception>
@@ -714,7 +706,7 @@ namespace Tiger.Types
         {
             get
             {
-                if (!_isSome) { throw new InvalidOperationException(Resources.OptionIsNone); }
+                if (!IsSome) { throw new InvalidOperationException(Resources.OptionIsNone); }
 
                 return _value;
             }
@@ -728,8 +720,10 @@ namespace Tiger.Types
         /// The Some value of this instance if this instance is in the Some state;
         /// otherwise, the default value of <typeparamref name="TSome"/>.
         /// </returns>
-        /// <remarks>This method is unsafe, as it can return <see langword="null"/>
-        /// if <typeparamref name="TSome"/> satisfies <see langword="class"/>.</remarks>
+        /// <remarks>
+        /// <para>This method is unsafe, as it can return <see langword="null"/>
+        /// if <typeparamref name="TSome"/> satisfies <see langword="class"/>.</para>
+        /// </remarks>
         [CanBeNull, Pure]
         public TSome GetValueOrDefault() => _value;
 
@@ -748,7 +742,7 @@ namespace Tiger.Types
         {
             if (other == null) { throw new ArgumentNullException(nameof(other)); }
 
-            return _isSome
+            return IsSome
                 ? _value
                 : other;
         }
@@ -768,7 +762,7 @@ namespace Tiger.Types
         {
             if (other == null) { throw new ArgumentNullException(nameof(other)); }
 
-            var result = _isSome
+            var result = IsSome
                 ? _value
                 : other();
             Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
@@ -790,7 +784,7 @@ namespace Tiger.Types
         {
             if (other == null) { throw new ArgumentNullException(nameof(other)); }
 
-            var result = _isSome
+            var result = IsSome
                 ? _value
                 : await other().ConfigureAwait(false);
             Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
@@ -801,21 +795,13 @@ namespace Tiger.Types
 
         #region Overrides
 
-        /// <summary>Converts this instance to a string.</summary>
-        /// <returns>A <see cref="string"/> containing the value of this instance.</returns>
-        /// <filterpriority>2</filterpriority>
-        [Pure]
+        /// <inheritdoc />
+        [NotNull, Pure]
         public override string ToString() => IsNone
             ? @"None"
             : string.Format(CultureInfo.InvariantCulture, @"Some({0})", _value);
 
-        /// <summary>Indicates whether this instance and a specified object are equal.</summary>
-        /// <param name="obj">The object to compare with the current instance.</param>
-        /// <returns>
-        /// <see langword="true"/> if <paramref name="obj"/> and this instance
-        /// are the same type and represent the same value; otherwise, <see langword="false"/>.
-        /// </returns>
-        /// <filterpriority>2</filterpriority>
+        /// <inheritdoc />
         [Pure]
         public override bool Equals(object obj) =>
             obj is Option<TSome> && EqualsCore((Option<TSome>)obj);
@@ -830,9 +816,7 @@ namespace Tiger.Types
             return _value.Equals(other._value);
         }
 
-        /// <summary>Returns the hash code for this instance.</summary>
-        /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
-        /// <filterpriority>2</filterpriority>
+        /// <inheritdoc />
         [Pure]
         public override int GetHashCode() => IsNone
             ? 0
@@ -901,7 +885,7 @@ namespace Tiger.Types
         /// </returns>
         // note(cosborn) Yes, BitwiseOr is the alternate name for the operator.
         [Pure, EditorBrowsable(EditorBrowsableState.Never)]
-        public Option<TSome> BitwiseOr(Option<TSome> other) => _isSome ? this : other;
+        public Option<TSome> BitwiseOr(Option<TSome> other) => IsSome ? this : other;
 
         /// <summary>Performs logical conjunction between two objects of the same type.</summary>
         /// <param name="left">An object to conjoin with <paramref name="right"/>.</param>
@@ -924,7 +908,7 @@ namespace Tiger.Types
         /// </returns>
         // note(cosborn) Yes, BitwiseAnd is the alternate name for the operator.
         [Pure, EditorBrowsable(EditorBrowsableState.Never)]
-        public Option<TSome> BitwiseAnd(Option<TSome> other) => _isSome ? other : None;
+        public Option<TSome> BitwiseAnd(Option<TSome> other) => IsSome ? other : None;
 
         // note(cosborn) Implementing true and false operators allows || and && operators to short-circuit.
 
@@ -938,7 +922,7 @@ namespace Tiger.Types
 
         /// <summary>Gets a value indicating whether this instance is in the Some state.</summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool IsTrue => _isSome;
+        public bool IsTrue => IsSome;
 
         /// <summary>Tests whether <paramref name="value"/> is in the None state.</summary>
         /// <param name="value">The value to be tested.</param>
@@ -950,7 +934,7 @@ namespace Tiger.Types
 
         /// <summary>Gets a value indicating whether this instance is in the None state.</summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool IsFalse => !_isSome;
+        public bool IsFalse => !IsSome;
 
         /// <summary>
         /// Tests the logical inverse of whether <paramref name="value"/>
@@ -972,7 +956,7 @@ namespace Tiger.Types
         /// otherwise <see langword="false"/>.
         /// </returns>
         [Pure, EditorBrowsable(EditorBrowsableState.Never)]
-        public bool LogicalNot() => !_isSome;
+        public bool LogicalNot() => !IsSome;
 
         /// <summary>Wraps a value in <see cref="Option{TSome}"/>.</summary>
         /// <param name="value">The value to be wrapped.</param>

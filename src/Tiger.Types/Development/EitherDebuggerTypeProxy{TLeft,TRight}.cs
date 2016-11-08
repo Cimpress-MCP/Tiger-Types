@@ -13,18 +13,22 @@ namespace Tiger.Types
     {
         /// <summary>Gets an internal value of the <see cref="Either{TLeft,TRight}"/>.</summary>
         [CanBeNull]
-        TLeft LeftValue => _value.LeftValue;
+        public TLeft LeftValue => _value.LeftValue;
 
         /// <summary>Gets an internal value of the <see cref="Either{TLeft,TRight}"/>.</summary>
         [CanBeNull]
-        TRight RightValue => _value.RightValue;
+        public TRight RightValue => _value.RightValue;
 
         /// <summary>Gets the internal state of the <see cref="Either{TLeft,TRight}"/>.</summary>
-        string State => _value.State.ToString();
+        public string State => _value.State.ToString();
 
         readonly Either<TLeft, TRight> _value;
 
-        EitherDebuggerTypeProxy(Either<TLeft, TRight> value)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EitherDebuggerTypeProxy{TLeft,TRight}"/> class.
+        /// </summary>
+        /// <param name="value">The either value to be proxied.</param>
+        public EitherDebuggerTypeProxy(Either<TLeft, TRight> value)
         {
             _value = value;
         }

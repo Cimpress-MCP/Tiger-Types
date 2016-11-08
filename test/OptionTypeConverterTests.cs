@@ -2,8 +2,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using Xunit;
+using static System.ComponentModel.TypeDescriptor;
 
 namespace Tiger.Types.UnitTests
 {
@@ -22,7 +22,7 @@ namespace Tiger.Types.UnitTests
         public void CanConvertFrom(Type converterType, Type conversionType, bool expected)
         {
             // arrange
-            var converter = TypeDescriptor.GetConverter(converterType);
+            var converter = GetConverter(converterType);
 
             // act
             var actual = converter.CanConvertFrom(conversionType);
@@ -46,7 +46,7 @@ namespace Tiger.Types.UnitTests
         public void ConvertFrom(Type converterType, object value, object expected)
         {
             // arrange
-            var converter = TypeDescriptor.GetConverter(converterType);
+            var converter = GetConverter(converterType);
 
             // act
             var actual = converter.ConvertFrom(value);
@@ -59,7 +59,7 @@ namespace Tiger.Types.UnitTests
         public void ConvertFrom_Fail()
         {
             // arrange
-            var converter = TypeDescriptor.GetConverter(typeof(Option<int>));
+            var converter = GetConverter(typeof(Option<int>));
 
             // act
             var actual = Record.Exception(() => converter.ConvertFrom(33L));
@@ -81,7 +81,7 @@ namespace Tiger.Types.UnitTests
         public void CanConvertTo(Type converterType, Type conversionType, bool expected)
         {
             // arrange
-            var converter = TypeDescriptor.GetConverter(converterType);
+            var converter = GetConverter(converterType);
 
             // act
             var actual = converter.CanConvertTo(conversionType);
@@ -106,7 +106,7 @@ namespace Tiger.Types.UnitTests
         public void ConvertTo(Type converterType, Type conversionType, object value, object expected)
         {
             // arrange
-            var converter = TypeDescriptor.GetConverter(converterType);
+            var converter = GetConverter(converterType);
 
             // act
             var actual =  converter.ConvertTo(value, conversionType);
@@ -129,7 +129,7 @@ namespace Tiger.Types.UnitTests
         public void ConvertTo_Fail(Type converterType, Type conversionType, object value)
         {
             // arrange
-            var converter = TypeDescriptor.GetConverter(converterType);
+            var converter = GetConverter(converterType);
 
             // act
             var actual = Record.Exception(() => converter.ConvertTo(value, conversionType));

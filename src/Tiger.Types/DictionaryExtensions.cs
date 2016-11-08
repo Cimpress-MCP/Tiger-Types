@@ -10,7 +10,7 @@ namespace Tiger.Types
      * (Which was for reasonable reasons.) I duplicate the extension methods in order to
      * disambiguate the cases for calling one on an instance of Dictionary<TKey, TValue>.
      * This still messes up, say, ImmutableDictionary<TKey, TValue>, but I like not pulling in that
-     * dependency yet, and the bridge is trivial. When I need Systems.Collections.Immutable for
+     * dependency yet, and the bridge is trivial. If I need Systems.Collections.Immutable for
      * something unavoidable, I'll augment this collection of extension methods.
      */
 

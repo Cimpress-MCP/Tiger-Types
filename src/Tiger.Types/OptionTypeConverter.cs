@@ -38,29 +38,13 @@ namespace Tiger.Types
             _underlyingTypeConverter = TypeDescriptor.GetConverter(_underlyingType);
         }
 
-        /// <summary>
-        /// Returns whether this converter can convert an object of the given type
-        /// to the type of this converter, using the specified context.
-        /// </summary>
-        /// <param name="context">An <see cref="ITypeDescriptorContext"/> that provides a format context.</param>
-        /// <param name="sourceType">A <see cref="Type"/> that represents the type you want to convert from.</param>
-        /// <returns>
-        /// <see langword="true"/> if this converter can perform the conversion; otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <inheritdoc />
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) =>
             sourceType == _underlyingType || // note(cosborn) TSome can become Option<TSome>.
             Nullable.GetUnderlyingType(sourceType) == _underlyingType || // note(cosborn) 1–1 mapping wtih TSome?.
             _underlyingTypeConverter.CanConvertFrom(context, sourceType);
 
-        /// <summary>
-        /// Converts the given object to the type of this converter,
-        /// using the specified context and culture information.
-        /// </summary>
-        /// <returns>An <see cref="object"/> that represents the converted value.</returns>
-        /// <param name="context">An <see cref="ITypeDescriptorContext"/> that provides a format context.</param>
-        /// <param name="culture">The <see cref="CultureInfo"/> to use as the current culture.</param>
-        /// <param name="value">The <see cref="object"/> to convert.</param>
-        /// <exception cref="NotSupportedException">The conversion cannot be performed.</exception>
+        /// <inheritdoc />
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             if (value == null) { return Activator.CreateInstance(_conversionType); }
@@ -89,39 +73,14 @@ namespace Tiger.Types
             }
         }
 
-        /// <summary>
-        /// Returns whether this converter can convert the object to the specified type,
-        /// using the specified context.
-        /// </summary>
-        /// <param name="context">An <see cref="ITypeDescriptorContext"/> that provides a format context.</param>
-        /// <param name="destinationType">
-        /// A <see cref="Type"/> that represents the type you want to convert to.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> if this converter can perform the conversion; otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <inheritdoc />
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType) =>
             destinationType == _underlyingType || // note(cosborn) Option<TSome> can (usually) become TSome.
             destinationType == _conversionType || // note(cosborn) Natch.
             Nullable.GetUnderlyingType(destinationType) == _underlyingType || // note(cosborn) 1–1 mapping wtih TSome?.
             _underlyingTypeConverter.CanConvertTo(context, destinationType);
 
-        /// <summary>
-        /// Converts the given value object to the specified type,
-        /// using the specified context and culture information.
-        /// </summary>
-        /// <param name="context">An <see cref="ITypeDescriptorContext"/> that provides a format context.</param>
-        /// <param name="culture">
-        /// A <see cref="CultureInfo"/>. If null is passed, the current culture is assumed.
-        /// </param>
-        /// <param name="value">The <see cref="object"/> to convert.</param>
-        /// <param name="destinationType">
-        /// The <see cref="Type"/> to convert the <paramref name="value"/> parameter to.</param>
-        /// <returns>An <see cref="object"/> that represents the converted value.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// The <paramref name="destinationType"/> parameter is <see langword="null"/>.
-        /// </exception>
-        /// <exception cref="NotSupportedException">The conversion cannot be performed.</exception>
+        /// <inheritdoc />
         public override object ConvertTo(
             ITypeDescriptorContext context,
             CultureInfo culture,

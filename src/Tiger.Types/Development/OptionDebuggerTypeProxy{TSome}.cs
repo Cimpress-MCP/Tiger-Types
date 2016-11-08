@@ -12,17 +12,30 @@ namespace Tiger.Types
     {
         /// <summary>Gets the internal value of the <see cref="Option{TSome}"/>.</summary>
         [NotNull]
-        TSome Value => _value.Value;
+        public TSome Value => _value.Value;
 
         /// <summary>Gets the internal state of the <see cref="Option{TSome}"/>.</summary>
         [NotNull]
-        string State => _value.IsSome ? @"Some" : @"None";
+        public string State => _value.IsSome ? @"Some" : @"None";
 
         readonly Option<TSome> _value;
 
-        OptionDebuggerTypeProxy(Option<TSome> value)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OptionDebuggerTypeProxy{TSome}"/> class.
+        /// </summary>
+        /// <param name="value">The optional value to be proxied.</param>
+        public OptionDebuggerTypeProxy(Option<TSome> value)
         {
             _value = value;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OptionDebuggerTypeProxy{TSome}"/> class.
+        /// </summary>
+        /// <param name="value">The optional value to be proxied.</param>
+        public OptionDebuggerTypeProxy(OptionNone value)
+        {
+            _value = Option<TSome>.None;
         }
     }
 }

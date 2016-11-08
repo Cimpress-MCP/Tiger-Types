@@ -3,6 +3,7 @@
 using System;
 using System.Threading.Tasks;
 using Xunit;
+using static System.Threading.Tasks.Task;
 
 namespace Tiger.Types.UnitTests
 {
@@ -139,7 +140,7 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = await value.Match(
                 one: o => o.Length,
-                two: Task.FromResult);
+                two: FromResult);
 
             // assert
             Assert.Equal(sentinel.Length, actual);
@@ -155,7 +156,7 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = await value.Match(
                 one: o => o,
-                two: t => t.Length.Pipe(Task.FromResult));
+                two: t => t.Length.Pipe(FromResult));
 
             // assert
             Assert.Equal(sentinel.Length, actual);
@@ -170,7 +171,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Match(
-                one: o => o.Length.Pipe(Task.FromResult),
+                one: o => o.Length.Pipe(FromResult),
                 two: t => t);
 
             // assert
@@ -186,7 +187,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Match(
-                one: Task.FromResult,
+                one: FromResult,
                 two: t => t.Length);
 
             // assert
@@ -202,8 +203,8 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Match(
-                one: o => o.Length.Pipe(Task.FromResult),
-                two: Task.FromResult);
+                one: o => o.Length.Pipe(FromResult),
+                two: FromResult);
 
             // assert
             Assert.Equal(sentinel.Length, actual);
@@ -218,8 +219,8 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Match(
-                one: Task.FromResult,
-                two: t => t.Length.Pipe(Task.FromResult));
+                one: FromResult,
+                two: t => t.Length.Pipe(FromResult));
 
             // assert
             Assert.Equal(sentinel.Length, actual);
@@ -270,7 +271,7 @@ namespace Tiger.Types.UnitTests
             var actual = string.Empty;
             await value.Match(
                 one: o => actual = sentinel,
-                two: t => Task.WhenAll());
+                two: t => CompletedTask);
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -287,7 +288,7 @@ namespace Tiger.Types.UnitTests
             var actual = string.Empty;
             await value.Match(
                 one: o => { },
-                two: t => Task.Run(() => actual = sentinel));
+                two: t => Run(() => actual = sentinel));
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -303,7 +304,7 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = string.Empty;
             await value.Match(
-                one: o => Task.Run(() => actual = sentinel),
+                one: o => Run(() => actual = sentinel),
                 two: t => { });
 
             // assert
@@ -320,7 +321,7 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = string.Empty;
             await value.Match(
-                one: o => Task.WhenAll(),
+                one: o => CompletedTask,
                 two: t => actual = sentinel);
 
             // assert
@@ -337,8 +338,8 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = string.Empty;
             await value.Match(
-                one: o => Task.Run(() => actual = sentinel),
-                two: t => Task.WhenAll());
+                one: o => Run(() => actual = sentinel),
+                two: t => CompletedTask);
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -354,8 +355,8 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = string.Empty;
             await value.Match(
-                one: o => Task.WhenAll(),
-                two: t => Task.Run(() => actual = sentinel));
+                one: o => CompletedTask,
+                two: t => Run(() => actual = sentinel));
 
             // assert
             Assert.Equal(sentinel, actual);

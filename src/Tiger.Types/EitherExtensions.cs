@@ -25,7 +25,7 @@ namespace Tiger.Types
         {
             if (value.State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
 
-            return value.Map(v => new Option<TRight>(v)).GetValueOrDefault(Option<TRight>.None);
+            return value.Map(v => new Option<TRight>(v)).GetValueOrDefault();
         }
 
         #region LINQ
@@ -219,15 +219,16 @@ namespace Tiger.Types
         /// <typeparam name="TRightSource">The Right type of <paramref name="source"/>.</typeparam>
         /// <param name="source">An either value on which to perform an action.</param>
         /// <param name="onNext">An action to invoke.</param>
+        /// <returns>A unit.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="onNext"/> is <see langword="null"/>.</exception>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void ForEach<TLeftSource, TRightSource>(
+        public static Unit ForEach<TLeftSource, TRightSource>(
             this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Action<TRightSource> onNext)
         {
             if (onNext == null) { throw new ArgumentNullException(nameof(onNext)); }
 
-            source.Let(onNext);
+            return source.Let(onNext);
         }
 
         /// <summary>Projects the Right value of an either value into a new form.</summary>

@@ -36,8 +36,10 @@ namespace Tiger.Types
         internal int State { get; }
 
         /// <summary>Gets the first value of this instance.</summary>
-        /// <remarks>This property is unsafe, as it can throw
-        /// if this instance is not in the first state.</remarks>
+        /// <remarks>
+        /// <para>This property is unsafe, as it can throw
+        /// if this instance is not in the first state.</para>
+        /// </remarks>
         /// <exception cref="InvalidOperationException" accessor="get">
         /// This instance is not in the specified state.
         /// </exception>
@@ -52,8 +54,10 @@ namespace Tiger.Types
         }
 
         /// <summary>Gets the second value of this instance.</summary>
-        /// <remarks>This property is unsafe, as it can throw
-        /// if this instance is not in the second state.</remarks>
+        /// <remarks>
+        /// <para>This property is unsafe, as it can throw
+        /// if this instance is not in the second state.</para>
+        /// </remarks>
         /// <exception cref="InvalidOperationException" accessor="get">
         /// This instance is not in the specified state.
         /// </exception>
@@ -227,9 +231,10 @@ namespace Tiger.Types
         /// An action to be invoked with the second value of this isntance
         /// as the argument if this instance is in the second state.
         /// </param>
+        /// <returns>A unit.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="one"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="two"/> is <see langword="null"/>.</exception>
-        public void Match(
+        public Unit Match(
             [NotNull, InstantHandle] Action<T1> one,
             [NotNull, InstantHandle] Action<T2> two)
         {
@@ -240,11 +245,13 @@ namespace Tiger.Types
             {
                 case 1:
                     one(_value1);
-                    return;
+                    break;
                 case 2:
                     two(_value2);
-                    return;
+                    break;
             }
+
+            return Unit.Value;
         }
 
         /// <summary>Performs an action on with this instance by matching on its state, asynchronously.</summary>
@@ -348,33 +355,27 @@ namespace Tiger.Types
 
         #region object
 
-        /// <summary>Returns a string that represents the current object.</summary>
-        /// <returns>A string that represents the current object.</returns>
-        /// <filterpriority>2</filterpriority>
+        /// <inheritdoc />
+        [NotNull, Pure]
         public override string ToString() => Match(
             one: o => string.Format(CultureInfo.InvariantCulture, "One({0})", o),
             two: t => string.Format(CultureInfo.InvariantCulture, "Two({0})", t)) ?? string.Empty;
 
-        /// <summary>Serves as the default hash function. </summary>
-        /// <returns>A hash code for the current object.</returns>
-        /// <filterpriority>2</filterpriority>
+        /// <inheritdoc />
+        [Pure]
         public override int GetHashCode() => Match(
             one: o => o.GetHashCode(),
             two: t => t.GetHashCode());
 
-        /// <summary>Determines whether the specified object is equal to the current object.</summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns>
-        /// <see langword="true"/> if the specified object  is equal to the current object;
-        /// otherwise, <see langword="false"/>.
-        /// </returns>
-        /// <filterpriority>2</filterpriority>
+        /// <inheritdoc />
+        [Pure]
         public override bool Equals(object obj)
         {
             var union = obj as Union<T1, T2>;
             return !ReferenceEquals(union, null) && EqualsCore(union);
         }
 
+        [Pure]
         bool EqualsCore([NotNull] Union<T1, T2> other)
         {
             if (State != other.State) { return false; }

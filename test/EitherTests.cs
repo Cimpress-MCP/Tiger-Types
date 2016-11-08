@@ -3,6 +3,7 @@
 using System;
 using System.Threading.Tasks;
 using Xunit;
+using static System.Threading.Tasks.Task;
 
 namespace Tiger.Types.UnitTests
 {
@@ -159,7 +160,7 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = await value.Match(
                 left: l => l.Length,
-                right: Task.FromResult);
+                right: FromResult);
 
             // assert
             Assert.Equal(sentinel.Length, actual);
@@ -175,7 +176,7 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = await value.Match(
                 left: l => l,
-                right: r => r.Length.Pipe(Task.FromResult));
+                right: r => r.Length.Pipe(FromResult));
 
             // assert
             Assert.Equal(sentinel.Length, actual);
@@ -190,7 +191,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Match(
-                left: l => l.Length.Pipe(Task.FromResult),
+                left: l => l.Length.Pipe(FromResult),
                 right: r => r);
 
             // assert
@@ -206,7 +207,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Match(
-                left: Task.FromResult,
+                left: FromResult,
                 right: r => r.Length);
 
             // assert
@@ -222,8 +223,8 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Match(
-                left: l => l.Length.Pipe(Task.FromResult),
-                right: Task.FromResult);
+                left: l => l.Length.Pipe(FromResult),
+                right: FromResult);
 
             // assert
             Assert.Equal(sentinel.Length, actual);
@@ -238,8 +239,8 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Match(
-                left: Task.FromResult,
-                right: r => r.Length.Pipe(Task.FromResult));
+                left: FromResult,
+                right: r => r.Length.Pipe(FromResult));
 
             // assert
             Assert.Equal(sentinel.Length, actual);
@@ -290,7 +291,7 @@ namespace Tiger.Types.UnitTests
             var actual = string.Empty;
             await value.Match(
                 left: l => actual = sentinel,
-                right: r => Task.WhenAll());
+                right: r => CompletedTask);
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -307,7 +308,7 @@ namespace Tiger.Types.UnitTests
             var actual = string.Empty;
             await value.Match(
                 left: l => { },
-                right: r => Task.Run(() => actual = sentinel));
+                right: r => Run(() => actual = sentinel));
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -323,7 +324,7 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = string.Empty;
             await value.Match(
-                left: l => Task.Run(() => actual = sentinel),
+                left: l => Run(() => actual = sentinel),
                 right: r => { });
 
             // assert
@@ -340,7 +341,7 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = string.Empty;
             await value.Match(
-                left: l => Task.WhenAll(),
+                left: l => CompletedTask,
                 right: r => actual = sentinel);
 
             // assert
@@ -357,8 +358,8 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = string.Empty;
             await value.Match(
-                left: l => Task.Run(() => actual = sentinel),
-                right: r => Task.WhenAll());
+                left: l => Run(() => actual = sentinel),
+                right: r => CompletedTask);
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -374,8 +375,8 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = string.Empty;
             await value.Match(
-                left: l => Task.WhenAll(),
-                right: r => Task.Run(() => actual = sentinel));
+                left: l => CompletedTask,
+                right: r => Run(() => actual = sentinel));
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -420,7 +421,7 @@ namespace Tiger.Types.UnitTests
             var value = Either.Left<string, int>("megatron");
 
             // act
-            var actual = await value.Map(left: _ => Task.FromResult(sentinel));
+            var actual = await value.Map(left: _ => FromResult(sentinel));
 
             // assert
             var innerValue = Assert.Left(actual);
@@ -434,7 +435,7 @@ namespace Tiger.Types.UnitTests
             var value = Either.Right<int, string>(sentinel);
 
             // act
-            var actual = await value.Map(left: _ => Task.FromResult(false));
+            var actual = await value.Map(left: _ => FromResult(false));
 
             // assert
             var innerValue = Assert.Right(actual);
@@ -477,7 +478,7 @@ namespace Tiger.Types.UnitTests
             var value = Either.Left<string, int>(sentinel);
 
             // act
-            var actual = await value.Map(right: _ => Task.FromResult(42));
+            var actual = await value.Map(right: _ => FromResult(42));
 
             // assert
             var innerValue = Assert.Left(actual);
@@ -491,7 +492,7 @@ namespace Tiger.Types.UnitTests
             var value = Either.Right<int, string>("megatron");
 
             // act
-            var actual = await value.Map(right: _ => Task.FromResult(sentinel));
+            var actual = await value.Map(right: _ => FromResult(sentinel));
 
             // assert
             var innerValue = Assert.Right(actual);
@@ -538,7 +539,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Map(
-                left: _ => Task.FromResult(sentinel),
+                left: _ => FromResult(sentinel),
                 right: r => r);
 
             // assert
@@ -554,7 +555,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Map(
-                left: _ => Task.FromResult(false),
+                left: _ => FromResult(false),
                 right: r => r);
 
             // assert
@@ -571,7 +572,7 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = await value.Map(
                 left: _ => sentinel,
-                right: Task.FromResult);
+                right: FromResult);
 
             // assert
             var innerValue = Assert.Left(actual);
@@ -587,7 +588,7 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = await value.Map(
                 left: _ => false,
-                right: Task.FromResult);
+                right: FromResult);
 
             // assert
             var innerValue = Assert.Right(actual);
@@ -602,8 +603,8 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Map(
-                left: _ => Task.FromResult(sentinel),
-                right: Task.FromResult);
+                left: _ => FromResult(sentinel),
+                right: FromResult);
 
             // assert
             var innerValue = Assert.Left(actual);
@@ -618,8 +619,8 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Map(
-                left: _ => Task.FromResult(false),
-                right: Task.FromResult);
+                left: _ => FromResult(false),
+                right: FromResult);
 
             // assert
             var innerValue = Assert.Right(actual);
@@ -733,7 +734,7 @@ namespace Tiger.Types.UnitTests
             var value = Either.Left<int, string>(42);
 
             // act
-            var actual = await value.Bind(v => Task.FromResult(v == sentinel
+            var actual = await value.Bind(v => FromResult(v == sentinel
                 ? Either.Right<int, bool>(true)
                 : Either.Left<int, bool>(33)));
 
@@ -750,7 +751,7 @@ namespace Tiger.Types.UnitTests
             var value = Either.Right<int, string>(sentinel);
 
             // act
-            var actual = await value.Bind(v => Task.FromResult(v == sentinel
+            var actual = await value.Bind(v => FromResult(v == sentinel
                 ? Either.Left<int, bool>(33)
                 : Either.Right<int, bool>(true)));
 
@@ -767,7 +768,7 @@ namespace Tiger.Types.UnitTests
             var value = Either.Right<int, string>(sentinel);
 
             // act
-            var actual = await value.Bind(v => Task.FromResult(v == sentinel
+            var actual = await value.Bind(v => FromResult(v == sentinel
                 ? Either.Right<int, bool>(true)
                 : Either.Left<int, bool>(33)));
 
@@ -783,7 +784,7 @@ namespace Tiger.Types.UnitTests
             var value = Either.Right<string, int>(42);
 
             // act
-            var actual = await value.Bind(v => Task.FromResult(v == sentinel
+            var actual = await value.Bind(v => FromResult(v == sentinel
                 ? Either.Left<bool, int>(true)
                 : Either.Right<bool, int>(33)));
 
@@ -800,7 +801,7 @@ namespace Tiger.Types.UnitTests
             var value = Either.Left<int, string>(42);
 
             // act
-            var actual = await value.Bind(v => Task.FromResult(v == 42
+            var actual = await value.Bind(v => FromResult(v == 42
                 ? Either.Right<bool, string>(sentinel)
                 : Either.Left<bool, string>(true)));
 
@@ -817,7 +818,7 @@ namespace Tiger.Types.UnitTests
             var value = Either.Left<int, string>(42);
 
             // act
-            var actual = await value.Bind(v => Task.FromResult(v == 42
+            var actual = await value.Bind(v => FromResult(v == 42
                 ? Either.Left<bool, string>(true)
                 : Either.Right<bool, string>(sentinel)));
 
@@ -919,7 +920,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Bind(
-                left: s => Task.FromResult(s == sentinel
+                left: s => FromResult(s == sentinel
                     ? Either.Right<long, bool>(true)
                     : Either.Left<long, bool>(33L)),
                 right: i => i == 42
@@ -940,7 +941,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Bind(
-                left: s => Task.FromResult(s == sentinel
+                left: s => FromResult(s == sentinel
                     ? Either.Right<long, bool>(true)
                     : Either.Left<long, bool>(33L)),
                 right: i => i == 42
@@ -961,7 +962,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Bind(
-                left: s => Task.FromResult(s == sentinel
+                left: s => FromResult(s == sentinel
                     ? Either.Right<long, bool>(true)
                     : Either.Left<long, bool>(33L)),
                 right: i => i == 42
@@ -982,7 +983,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Bind(
-                left: s => Task.FromResult(s == sentinel
+                left: s => FromResult(s == sentinel
                     ? Either.Right<long, bool>(true)
                     : Either.Left<long, bool>(33L)),
                 right: i => i == 42
@@ -1006,7 +1007,7 @@ namespace Tiger.Types.UnitTests
                 left: s => s == sentinel
                     ? Either.Right<long, bool>(true)
                     : Either.Left<long, bool>(33L),
-                right: i => Task.FromResult(i == 42
+                right: i => FromResult(i == 42
                     ? Either.Right<long, bool>(false)
                     : Either.Left<long, bool>(99L)));
 
@@ -1027,7 +1028,7 @@ namespace Tiger.Types.UnitTests
                 left: s => s == sentinel
                     ? Either.Right<long, bool>(true)
                     : Either.Left<long, bool>(33L),
-                right: i => Task.FromResult(i == 42
+                right: i => FromResult(i == 42
                     ? Either.Right<long, bool>(false)
                     : Either.Left<long, bool>(99L)));
 
@@ -1048,7 +1049,7 @@ namespace Tiger.Types.UnitTests
                 left: s => s == sentinel
                     ? Either.Right<long, bool>(true)
                     : Either.Left<long, bool>(33L),
-                right: i => Task.FromResult(i == 42
+                right: i => FromResult(i == 42
                     ? Either.Right<long, bool>(false)
                     : Either.Left<long, bool>(99L)));
 
@@ -1069,7 +1070,7 @@ namespace Tiger.Types.UnitTests
                 left: s => s == sentinel
                     ? Either.Right<long, bool>(true)
                     : Either.Left<long, bool>(33L),
-                right: i => Task.FromResult(i == 42
+                right: i => FromResult(i == 42
                     ? Either.Right<long, bool>(false)
                     : Either.Left<long, bool>(99L)));
 
@@ -1087,10 +1088,10 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Bind(
-                left: s => Task.FromResult(s == sentinel
+                left: s => FromResult(s == sentinel
                     ? Either.Right<long, bool>(true)
                     : Either.Left<long, bool>(33L)),
-                right: i => Task.FromResult(i == 42
+                right: i => FromResult(i == 42
                     ? Either.Right<long, bool>(false)
                     : Either.Left<long, bool>(99L)));
 
@@ -1108,10 +1109,10 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Bind(
-                left: s => Task.FromResult(s == sentinel
+                left: s => FromResult(s == sentinel
                     ? Either.Right<long, bool>(true)
                     : Either.Left<long, bool>(33L)),
-                right: i => Task.FromResult(i == 42
+                right: i => FromResult(i == 42
                     ? Either.Right<long, bool>(false)
                     : Either.Left<long, bool>(99L)));
 
@@ -1129,10 +1130,10 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Bind(
-                left: s => Task.FromResult(s == sentinel
+                left: s => FromResult(s == sentinel
                     ? Either.Right<long, bool>(true)
                     : Either.Left<long, bool>(33L)),
-                right: i => Task.FromResult(i == 42
+                right: i => FromResult(i == 42
                     ? Either.Right<long, bool>(false)
                     : Either.Left<long, bool>(99L)));
 
@@ -1150,10 +1151,10 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Bind(
-                left: s => Task.FromResult(s == sentinel
+                left: s => FromResult(s == sentinel
                     ? Either.Right<long, bool>(true)
                     : Either.Left<long, bool>(33L)),
-                right: i => Task.FromResult(i == 42
+                right: i => FromResult(i == 42
                     ? Either.Right<long, bool>(false)
                     : Either.Left<long, bool>(99L)));
 
@@ -1227,7 +1228,7 @@ namespace Tiger.Types.UnitTests
             var value = Either.Left<int, string>(42);
 
             // act
-            var actual = await value.Fold(34, (s, v) => Task.FromResult(s + v.Length));
+            var actual = await value.Fold(34, (s, v) => FromResult(s + v.Length));
 
             // assert
             Assert.Equal(34, actual);
@@ -1241,7 +1242,7 @@ namespace Tiger.Types.UnitTests
             var value = Either.Right<int, string>(sentinel);
 
             // act
-            var actual = await value.Fold(34, (s, v) => Task.FromResult(s + v.Length));
+            var actual = await value.Fold(34, (s, v) => FromResult(s + v.Length));
 
             // assert
             Assert.Equal(42, actual);
@@ -1254,7 +1255,7 @@ namespace Tiger.Types.UnitTests
             var value = Either.Right<string, int>(42);
 
             // act
-            var actual = await value.Fold(34, (s, v) => Task.FromResult(s + v.Length));
+            var actual = await value.Fold(34, (s, v) => FromResult(s + v.Length));
 
             // assert
             Assert.Equal(34, actual);
@@ -1268,7 +1269,7 @@ namespace Tiger.Types.UnitTests
             var value = Either.Left<string, int>(sentinel);
 
             // act
-            var actual = await value.Fold(34, (s, v) => Task.FromResult(s + v.Length));
+            var actual = await value.Fold(34, (s, v) => FromResult(s + v.Length));
 
             // assert
             Assert.Equal(42, actual);
@@ -1351,7 +1352,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var output = 33;
-            var actual = await value.Tap(v => Task.Run(() => output = v));
+            var actual = await value.Tap(v => Run(() => output = v));
 
             // assert
             var innerValue = Assert.Left(actual);
@@ -1367,7 +1368,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var output = sentinel;
-            var actual = await value.Tap(v => Task.Run(() => output = v));
+            var actual = await value.Tap(v => Run(() => output = v));
 
             // assert
             var innerValue = Assert.Right(actual);
@@ -1383,7 +1384,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var output = sentinel;
-            var actual = await value.Tap(v => Task.Run(() => output = v));
+            var actual = await value.Tap(v => Run(() => output = v));
 
             // assert
             var innerValue = Assert.Left(actual);
@@ -1399,7 +1400,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var output = 33;
-            var actual = await value.Tap(v => Task.Run(() => output = v));
+            var actual = await value.Tap(v => Run(() => output = v));
 
             // assert
             var innerValue = Assert.Right(actual);
@@ -1476,7 +1477,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = "megatron";
-            await value.Let(v => Task.Run(() => actual = v));
+            await value.Let(v => Run(() => actual = v));
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -1491,7 +1492,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = 42;
-            await value.Let(v => Task.Run(() => actual = v));
+            await value.Let(v => Run(() => actual = v));
 
             // assert
             Assert.Equal(42, actual);
@@ -1506,7 +1507,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = 42;
-            await value.Let(v => Task.Run(() => actual = v));
+            await value.Let(v => Run(() => actual = v));
 
             // assert
             Assert.Equal(42, actual);
@@ -1520,7 +1521,7 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = "megatron";
-            await value.Let(v => Task.Run(() => actual = v));
+            await value.Let(v => Run(() => actual = v));
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -1593,7 +1594,7 @@ namespace Tiger.Types.UnitTests
             var value = Either.Left<string, int>(sentinel);
 
             // act
-            var actual = await value.Recover(() => Task.FromResult(42));
+            var actual = await value.Recover(() => FromResult(42));
 
             // assert
             var innerValue = Assert.Right(actual);
@@ -1607,7 +1608,7 @@ namespace Tiger.Types.UnitTests
             var value = Either.Right<int, string>(sentinel);
 
             // act
-            var actual = await value.Recover(() => Task.FromResult("megatron"));
+            var actual = await value.Recover(() => FromResult("megatron"));
 
             // assert
             var innerValue = Assert.Right(actual);
@@ -1737,7 +1738,7 @@ namespace Tiger.Types.UnitTests
             var value = Either.Left<int, string>(42);
 
             // act
-            var actual = await value.GetValueOrDefault(() => Task.FromResult(sentinel));
+            var actual = await value.GetValueOrDefault(() => FromResult(sentinel));
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -1751,7 +1752,7 @@ namespace Tiger.Types.UnitTests
             var value = Either.Right<int, string>(sentinel);
 
             // act
-            var actual = await value.GetValueOrDefault(() => Task.FromResult("megatron"));
+            var actual = await value.GetValueOrDefault(() => FromResult("megatron"));
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -2359,7 +2360,7 @@ namespace Tiger.Types.UnitTests
             var value = sentinel;
 
             // act
-            var actual = await Either.Split(value, v => Task.FromResult(v.Length == 0));
+            var actual = await Either.Split(value, v => FromResult(v.Length == 0));
 
             // assert
             Assert.True(actual.IsLeft);
@@ -2374,7 +2375,7 @@ namespace Tiger.Types.UnitTests
             var value = sentinel;
 
             // act
-            var actual = await Either.Split(value, v => Task.FromResult(v.Length == 8));
+            var actual = await Either.Split(value, v => FromResult(v.Length == 8));
 
             // assert
             Assert.False(actual.IsLeft);

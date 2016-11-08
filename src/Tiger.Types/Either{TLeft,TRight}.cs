@@ -47,11 +47,11 @@ namespace Tiger.Types
         }
 
         /// <summary>Gets a value indicating whether this instance is in the Left state.</summary>
-        /// <remarks>There are usually better ways to do this.</remarks>
+        /// <remarks><para>There are usually better ways to do this.</para></remarks>
         public bool IsLeft => State == EitherState.Left;
 
         /// <summary>Gets a value indicating whether this instance is in the Right state.</summary>
-        /// <remarks>There are usually better ways to do this.</remarks>
+        /// <remarks><para>There are usually better ways to do this.</para></remarks>
         public bool IsRight => State == EitherState.Right;
 
         /// <summary>Gets the internal state of this instance.</summary>
@@ -228,10 +228,11 @@ namespace Tiger.Types
         /// An action to be invoked with the Right value of this instance
         /// as the argument if this instance is in the Right state.
         /// </param>
+        /// <returns>A unit.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
-        public void Match(
+        public Unit Match(
             [NotNull, InstantHandle] Action<TLeft> left,
             [NotNull, InstantHandle] Action<TRight> right)
         {
@@ -247,6 +248,8 @@ namespace Tiger.Types
             {
                 right(RightValue);
             }
+
+            return Unit.Value;
         }
 
         /// <summary>Performs an action with this instance by matching on its state, asynchronously.</summary>
@@ -1124,8 +1127,9 @@ namespace Tiger.Types
 
         /// <summary>Performs an action on the Left value of this instance.</summary>
         /// <param name="left">An action to perform.</param>
+        /// <returns>A unit.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
-        public void Let([NotNull, InstantHandle] Action<TLeft> left)
+        public Unit Let([NotNull, InstantHandle] Action<TLeft> left)
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
 
@@ -1133,12 +1137,15 @@ namespace Tiger.Types
             {
                 left(LeftValue);
             }
+
+            return Unit.Value;
         }
 
         /// <summary>Performs an action on the Right value of this instance.</summary>
         /// <param name="right">An action to perform.</param>
+        /// <returns>A unit.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
-        public void Let([NotNull, InstantHandle] Action<TRight> right)
+        public Unit Let([NotNull, InstantHandle] Action<TRight> right)
         {
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
 
@@ -1146,6 +1153,8 @@ namespace Tiger.Types
             {
                 right(RightValue);
             }
+
+            return Unit.Value;
         }
 
         /// <summary>Performs an action on the Left value of this instance, asynchronously.</summary>
@@ -1245,10 +1254,10 @@ namespace Tiger.Types
         #region Value
 
         /// <summary>Gets the Right value of this instance.</summary>
-        /// <remarks>This property is unsafe, as it can throw if this instance is not in the Right state.</remarks>
-        /// <exception cref="InvalidOperationException" accessor="get">
-        /// This instance is in an invalid state.
-        /// </exception>
+        /// <remarks>
+        /// <para>This property is unsafe, as it can throw if this instance is not in the Right state.</para>
+        /// </remarks>
+        /// <exception cref="InvalidOperationException" accessor="get">This instance is in an invalid state.</exception>
         [NotNull]
         public TRight Value
         {
@@ -1268,8 +1277,10 @@ namespace Tiger.Types
         /// The Right value of this instance if this instance is in the Right state;
         /// otherwise, the default value of <typeparamref name="TRight"/>.
         /// </returns>
-        /// <remarks>This method is unsafe, as it can return <see langword="null"/>
-        /// if <typeparamref name="TRight"/> satisfies <see langword="class"/>.</remarks>
+        /// <remarks>
+        /// <para>This method is unsafe, as it can return <see langword="null"/>
+        /// if <typeparamref name="TRight"/> satisfies <see langword="class"/>.</para>
+        /// </remarks>
         [CanBeNull, Pure]
         public TRight GetValueOrDefault() => RightValue;
 
@@ -1341,10 +1352,8 @@ namespace Tiger.Types
 
         #region Overrides
 
-        /// <summary>Converts this instance to a string.</summary>
-        /// <returns>A <see cref="string"/> containing the value of this instance.</returns>
-        /// <filterpriority>2</filterpriority>
-        [Pure]
+        /// <inheritdoc />
+        [NotNull, Pure]
         public override string ToString()
         {
             switch (State)
@@ -1360,13 +1369,7 @@ namespace Tiger.Types
             }
         }
 
-        /// <summary>Indicates whether this instance and a specified object are equal.</summary>
-        /// <param name="obj">The object to compare with the current instance.</param>
-        /// <returns>
-        /// <see langword="true"/> if <paramref name="obj"/> and this instance
-        /// are the same type and represent the same value; otherwise, <see langword="false"/>.
-        /// </returns>
-        /// <filterpriority>2</filterpriority>
+        /// <inheritdoc />
         [Pure]
         public override bool Equals(object obj) =>
             obj is Either<TLeft, TRight> && EqualsCore((Either<TLeft, TRight>)obj);
@@ -1393,9 +1396,7 @@ namespace Tiger.Types
             return false;
         }
 
-        /// <summary>Returns the hash code for this instance.</summary>
-        /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
-        /// <filterpriority>2</filterpriority>
+        /// <inheritdoc />
         [Pure]
         public override int GetHashCode()
         {

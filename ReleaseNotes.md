@@ -3,8 +3,14 @@
 * Thanks to the magic of the .NET Standard, Tiger libraries are available to a wider set of platforms than ever before. The project now targets .NET Standard 1.0.
 * The `Either` static class has learned from `Option.None` and can indirectly create `Either` instances without specifying type parameters.
 * The main types of the library have had their struct layouts specified, leading to reduced memory usage when boxed.
-* LINQPad's custom dumping has bee upgraded to the new method, leading to improved display and debugging.
-  * This and other fixes have led to a moderate reduction in the size of the library's assembly.
+* LINQPad's custom dumping has been upgraded to the new method, leading to improved display and debugging.
+  * This and other improvements have led to a moderate reduction in the size of the library's assembly.
+* Debugger proxies have been attached to the main types of the library, vastly improving debugging.
+* Potentially confusing methods of creating `Option` instances have been removed.
+* Methods have been added that allow monadic operations to be performed through `Task`s.
+* A `Unit` type, a type with only one value, has been added.
+  * Some `void`-returning methods have been modified to return `Unit`. This value may safely be ignored.
+* `IEnumerable<T>` has learned a few monadic operations.
 
 ### What's new in 2.3.0 (Released 2016-10-28)
 
