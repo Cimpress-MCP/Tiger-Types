@@ -17,7 +17,7 @@ namespace Tiger.Types
 
         /// <summary>
         /// Transforms the result of <paramref name="optionTaskValue"/>
-        /// based on its current state.
+        /// based on its state.
         /// </summary>
         /// <typeparam name="TIn">
         /// The Some type of the Result type of <paramref name="optionTaskValue"/>.
@@ -54,7 +54,7 @@ namespace Tiger.Types
 
         /// <summary>
         /// Transforms the result of <paramref name="optionTaskValue"/>
-        /// based on its current state, asynchronously.
+        /// based on its state, asynchronously.
         /// </summary>
         /// <typeparam name="TIn">The Some type of the Result type of <paramref name="optionTaskValue"/>.</typeparam>
         /// <typeparam name="TOut">The type to which to transform.</typeparam>
@@ -89,7 +89,7 @@ namespace Tiger.Types
 
         /// <summary>
         /// Transforms the result of <paramref name="optionTaskValue"/>
-        /// based on its current state, asynchronously.
+        /// based on its state, asynchronously.
         /// </summary>
         /// <typeparam name="TIn">
         /// The Some type of the Result type of <paramref name="optionTaskValue"/>.
@@ -126,7 +126,7 @@ namespace Tiger.Types
 
         /// <summary>
         /// Transforms the result of <paramref name="optionTaskValue"/>
-        /// based on its current state, asynchronously.
+        /// based on its state, asynchronously.
         /// </summary>
         /// <typeparam name="TIn">
         /// The Some type of the Result type of <paramref name="optionTaskValue"/>.

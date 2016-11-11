@@ -355,19 +355,19 @@ namespace Tiger.Types
 
         #region object
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         [NotNull, Pure]
         public override string ToString() => Match(
             one: o => string.Format(CultureInfo.InvariantCulture, "One({0})", o),
             two: t => string.Format(CultureInfo.InvariantCulture, "Two({0})", t)) ?? string.Empty;
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         [Pure]
         public override int GetHashCode() => Match(
             one: o => o.GetHashCode(),
             two: t => t.GetHashCode());
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         [Pure]
         public override bool Equals(object obj)
         {

@@ -13,6 +13,138 @@ namespace Tiger.Types
     [DebuggerStepThrough]
     public static class EitherTaskExtensions
     {
+        #region MatchT
+
+        /// <summary>
+        /// Transforms the result of <paramref name="eitherTaskValue"/> based on its state.
+        /// </summary>
+        /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
+        /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
+        /// <typeparam name="TOut">The type to which to transform.</typeparam>
+        /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to be matched.</param>
+        /// <param name="left">A transformation from <typeparamref name="TLeft"/> to <typeparamref name="TOut"/> to perform in the Left case.</param>
+        /// <param name="right">A transformation from <typeparamref name="TRight"/> to <typeparamref name="TOut"/> to perform in the Right case.</param>
+        /// <returns>
+        /// An instance of <typeparamref name="TOut"/> created from one of <paramref name="left"/> or <paramref name="right"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException"><paramref name="eitherTaskValue"/> produced a result that has not been initialized.</exception>
+        [NotNull, Pure]
+        public static Task<TOut> MatchT<TLeft, TRight, TOut>(
+            [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
+            [NotNull, InstantHandle] Func<TLeft, TOut> left,
+            [NotNull, InstantHandle] Func<TRight, TOut> right)
+        {
+            if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
+            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+
+            return eitherTaskValue.Map(ev => ev.Match(left: left, right: right));
+        }
+
+        /// <summary>
+        /// Transforms the result of <paramref name="eitherTaskValue"/> based on its state, asynchronously.
+        /// </summary>
+        /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
+        /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
+        /// <typeparam name="TOut">The type to which to transform.</typeparam>
+        /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to be matched.</param>
+        /// <param name="left">
+        /// A transformation from <typeparamref name="TLeft"/> to <typeparamref name="TOut"/> to perform in the Left case.
+        /// </param>
+        /// <param name="right">
+        /// An asynchronous transformation from <typeparamref name="TRight"/> to <typeparamref name="TOut"/> to perform in the Right case.
+        /// </param>
+        /// <returns>
+        /// An instance of <typeparamref name="TOut"/> created from one of <paramref name="left"/> or <paramref name="right"/>, asynchronously.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException"><paramref name="eitherTaskValue"/> produced a result that has not been initialized.</exception>
+        [NotNull, Pure]
+        public static Task<TOut> MatchT<TLeft, TRight, TOut>(
+            [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
+            [NotNull, InstantHandle] Func<TLeft, TOut> left,
+            [NotNull, InstantHandle] Func<TRight, Task<TOut>> right)
+        {
+            if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
+            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+
+            return eitherTaskValue.Bind(ev => ev.Match(left: left, right: right));
+        }
+
+        /// <summary>
+        /// Transforms the result of <paramref name="eitherTaskValue"/> asynchronously based on its state.
+        /// </summary>
+        /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
+        /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
+        /// <typeparam name="TOut">The type to which to transform.</typeparam>
+        /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to be matched.</param>
+        /// <param name="left">
+        /// An asynchronous transformation from <typeparamref name="TLeft"/> to <typeparamref name="TOut"/> to perform in the Left case.
+        /// </param>
+        /// <param name="right">
+        /// A transformation from <typeparamref name="TRight"/> to <typeparamref name="TOut"/> to perform in the Right case.
+        /// </param>
+        /// <returns>
+        /// An instance of <typeparamref name="TOut"/> created from one of <paramref name="left"/> or <paramref name="right"/>, asynchronously.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException"><paramref name="eitherTaskValue"/> produced a result that has not been initialized.</exception>
+        [NotNull, Pure]
+        public static Task<TOut> MatchT<TLeft, TRight, TOut>(
+            [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
+            [NotNull, InstantHandle] Func<TLeft, Task<TOut>> left,
+            [NotNull, InstantHandle] Func<TRight, TOut> right)
+        {
+            if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
+            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+
+            return eitherTaskValue.Bind(ev => ev.Match(left: left, right: right));
+        }
+
+        /// <summary>
+        /// Transforms the result of <paramref name="eitherTaskValue"/> asynchronously based on its state.
+        /// </summary>
+        /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
+        /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
+        /// <typeparam name="TOut">The type to which to transform.</typeparam>
+        /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to be matched.</param>
+        /// <param name="left">
+        /// An asynchronous transformation from <typeparamref name="TLeft"/> to <typeparamref name="TOut"/> to perform in the Left case.
+        /// </param>
+        /// <param name="right">
+        /// An asynchronous transformation from <typeparamref name="TRight"/> to <typeparamref name="TOut"/> to perform in the Right case.
+        /// </param>
+        /// <returns>
+        /// An instance of <typeparamref name="TOut"/> created from one of <paramref name="left"/> or <paramref name="right"/>, asynchronously.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException"><paramref name="eitherTaskValue"/> produced a result that has not been initialized.</exception>
+        [NotNull, Pure]
+        public static Task<TOut> MatchT<TLeft, TRight, TOut>(
+            [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
+            [NotNull, InstantHandle] Func<TLeft, Task<TOut>> left,
+            [NotNull, InstantHandle] Func<TRight, Task<TOut>> right)
+        {
+            if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
+            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+
+            return eitherTaskValue.Bind(ev => ev.Match(left: left, right: right));
+        }
+
+        #endregion
+
         #region MapT
 
         /// <summary>
@@ -238,138 +370,6 @@ namespace Tiger.Types
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
 
             return eitherTaskValue.Bind(ev => ev.Bind(left: left));
-        }
-
-        #endregion
-
-        #region MatchT
-
-        /// <summary>
-        /// Transforms the result of <paramref name="eitherTaskValue"/> based on its current state.
-        /// </summary>
-        /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
-        /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
-        /// <typeparam name="TOut">The type to which to transform.</typeparam>
-        /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to be matched.</param>
-        /// <param name="left">A transformation from <typeparamref name="TLeft"/> to <typeparamref name="TOut"/> to perform in the Left case.</param>
-        /// <param name="right">A transformation from <typeparamref name="TRight"/> to <typeparamref name="TOut"/> to perform in the Right case.</param>
-        /// <returns>
-        /// An instance of <typeparamref name="TOut"/> created from one of <paramref name="left"/> or <paramref name="right"/>.
-        /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException"><paramref name="eitherTaskValue"/> produced a result that has not been initialized.</exception>
-        [NotNull, Pure]
-        public static Task<TOut> MatchT<TLeft, TRight, TOut>(
-            [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
-            [NotNull, InstantHandle] Func<TLeft, TOut> left,
-            [NotNull, InstantHandle] Func<TRight, TOut> right)
-        {
-            if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
-
-            return eitherTaskValue.Map(ev => ev.Match(left: left, right: right));
-        }
-
-        /// <summary>
-        /// Transforms the result of <paramref name="eitherTaskValue"/> based on its current state, asynchronously.
-        /// </summary>
-        /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
-        /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
-        /// <typeparam name="TOut">The type to which to transform.</typeparam>
-        /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to be matched.</param>
-        /// <param name="left">
-        /// A transformation from <typeparamref name="TLeft"/> to <typeparamref name="TOut"/> to perform in the Left case.
-        /// </param>
-        /// <param name="right">
-        /// An asynchronous transformation from <typeparamref name="TRight"/> to <typeparamref name="TOut"/> to perform in the Right case.
-        /// </param>
-        /// <returns>
-        /// An instance of <typeparamref name="TOut"/> created from one of <paramref name="left"/> or <paramref name="right"/>, asynchronously.
-        /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException"><paramref name="eitherTaskValue"/> produced a result that has not been initialized.</exception>
-        [NotNull, Pure]
-        public static Task<TOut> MatchT<TLeft, TRight, TOut>(
-            [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
-            [NotNull, InstantHandle] Func<TLeft, TOut> left,
-            [NotNull, InstantHandle] Func<TRight, Task<TOut>> right)
-        {
-            if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
-
-            return eitherTaskValue.Bind(ev => ev.Match(left: left, right: right));
-        }
-
-        /// <summary>
-        /// Transforms the result of <paramref name="eitherTaskValue"/> asynchronously based on its current state.
-        /// </summary>
-        /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
-        /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
-        /// <typeparam name="TOut">The type to which to transform.</typeparam>
-        /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to be matched.</param>
-        /// <param name="left">
-        /// An asynchronous transformation from <typeparamref name="TLeft"/> to <typeparamref name="TOut"/> to perform in the Left case.
-        /// </param>
-        /// <param name="right">
-        /// A transformation from <typeparamref name="TRight"/> to <typeparamref name="TOut"/> to perform in the Right case.
-        /// </param>
-        /// <returns>
-        /// An instance of <typeparamref name="TOut"/> created from one of <paramref name="left"/> or <paramref name="right"/>, asynchronously.
-        /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException"><paramref name="eitherTaskValue"/> produced a result that has not been initialized.</exception>
-        [NotNull, Pure]
-        public static Task<TOut> MatchT<TLeft, TRight, TOut>(
-            [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
-            [NotNull, InstantHandle] Func<TLeft, Task<TOut>> left,
-            [NotNull, InstantHandle] Func<TRight, TOut> right)
-        {
-            if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
-
-            return eitherTaskValue.Bind(ev => ev.Match(left: left, right: right));
-        }
-
-        /// <summary>
-        /// Transforms the result of <paramref name="eitherTaskValue"/> asynchronously based on its current state.
-        /// </summary>
-        /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
-        /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
-        /// <typeparam name="TOut">The type to which to transform.</typeparam>
-        /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to be matched.</param>
-        /// <param name="left">
-        /// An asynchronous transformation from <typeparamref name="TLeft"/> to <typeparamref name="TOut"/> to perform in the Left case.
-        /// </param>
-        /// <param name="right">
-        /// An asynchronous transformation from <typeparamref name="TRight"/> to <typeparamref name="TOut"/> to perform in the Right case.
-        /// </param>
-        /// <returns>
-        /// An instance of <typeparamref name="TOut"/> created from one of <paramref name="left"/> or <paramref name="right"/>, asynchronously.
-        /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidOperationException"><paramref name="eitherTaskValue"/> produced a result that has not been initialized.</exception>
-        [NotNull, Pure]
-        public static Task<TOut> MatchT<TLeft, TRight, TOut>(
-            [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
-            [NotNull, InstantHandle] Func<TLeft, Task<TOut>> left,
-            [NotNull, InstantHandle] Func<TRight, Task<TOut>> right)
-        {
-            if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
-
-            return eitherTaskValue.Bind(ev => ev.Match(left: left, right: right));
         }
 
         #endregion

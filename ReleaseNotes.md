@@ -1,4 +1,4 @@
-### What's new in 3.0.0 (Released TK-TK-TKTK)
+### What's new in 3.0.0 (Released 2016-11-14)
 
 * Thanks to the magic of the .NET Standard, Tiger libraries are available to a wider set of platforms than ever before. The project now targets .NET Standard 1.0.
 * The `Either` static class has learned from `Option.None` and can indirectly create `Either` instances without specifying type parameters.

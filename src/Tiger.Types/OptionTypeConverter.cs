@@ -38,13 +38,13 @@ namespace Tiger.Types
             _underlyingTypeConverter = TypeDescriptor.GetConverter(_underlyingType);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) =>
             sourceType == _underlyingType || // note(cosborn) TSome can become Option<TSome>.
             Nullable.GetUnderlyingType(sourceType) == _underlyingType || // note(cosborn) 1–1 mapping wtih TSome?.
             _underlyingTypeConverter.CanConvertFrom(context, sourceType);
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             if (value == null) { return Activator.CreateInstance(_conversionType); }
@@ -73,18 +73,18 @@ namespace Tiger.Types
             }
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType) =>
             destinationType == _underlyingType || // note(cosborn) Option<TSome> can (usually) become TSome.
             destinationType == _conversionType || // note(cosborn) Natch.
             Nullable.GetUnderlyingType(destinationType) == _underlyingType || // note(cosborn) 1–1 mapping wtih TSome?.
             _underlyingTypeConverter.CanConvertTo(context, destinationType);
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override object ConvertTo(
             ITypeDescriptorContext context,
             CultureInfo culture,
-            object value,
+            [CanBeNull] object value,
             Type destinationType)
         { // todo(cosborn) There is a strong possibility that this can be more efficient.
             if (value == null)

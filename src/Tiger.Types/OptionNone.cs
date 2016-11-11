@@ -15,11 +15,11 @@ namespace Tiger.Types
 
         #region object
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         [NotNull, Pure]
         public override string ToString() => "None";
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         [Pure]
         public override int GetHashCode() => 0;
 
@@ -30,10 +30,7 @@ namespace Tiger.Types
         #region Implementations
 
         [NotNull, Pure, PublicAPI]
-        object ToDump() => new
-        {
-            State = "None"
-        };
+        object ToDump() => new { State = "None" };
 
         #endregion
     }

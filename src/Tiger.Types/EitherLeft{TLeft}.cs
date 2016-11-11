@@ -15,7 +15,7 @@ namespace Tiger.Types
     public struct EitherLeft<TLeft>
     {
         /// <summary>Gets the internal value of this instance.</summary>
-        internal readonly TLeft Value;
+        internal TLeft Value { get; }
 
         /// <summary>Initializes a new instance of the <see cref="EitherLeft{TLeft}"/> struct.</summary>
         /// <param name="value">The value to be wrapped.</param>
@@ -30,12 +30,12 @@ namespace Tiger.Types
 
         #region object
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         [NotNull, Pure]
         public override string ToString() =>
             string.Format(CultureInfo.InvariantCulture, @"Left({0})", Value);
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         [Pure]
         public override int GetHashCode() => Value.GetHashCode();
 

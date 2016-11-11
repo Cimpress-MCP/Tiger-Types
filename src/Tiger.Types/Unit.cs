@@ -20,15 +20,15 @@ namespace Tiger.Types
 
         #region object
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         [NotNull, Pure, EditorBrowsable(Never)]
         public override string ToString() => "()";
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         [Pure, EditorBrowsable(Never)]
         public override bool Equals(object obj) => obj is Unit;
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         [Pure, EditorBrowsable(Never)]
         public override int GetHashCode() => 1;
 

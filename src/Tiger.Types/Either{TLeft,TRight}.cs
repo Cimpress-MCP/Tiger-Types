@@ -1050,6 +1050,7 @@ namespace Tiger.Types
         /// <param name="left">An action to perform.</param>
         /// <returns>The same value as this instance.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null" />.</exception>
+        [MustUseReturnValue]
         public Either<TLeft, TRight> Tap([NotNull, InstantHandle] Action<TLeft> left)
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
@@ -1069,6 +1070,7 @@ namespace Tiger.Types
         /// <param name="right">An action to perform.</param>
         /// <returns>The same value as this instance.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null" />.</exception>
+        [MustUseReturnValue]
         public Either<TLeft, TRight> Tap([NotNull, InstantHandle] Action<TRight> right)
         {
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
@@ -1088,7 +1090,7 @@ namespace Tiger.Types
         /// <param name="left">An action to perform asynchronously.</param>
         /// <returns>The same value as this instance.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null" />.</exception>
-        [NotNull]
+        [NotNull, MustUseReturnValue]
         public async Task<Either<TLeft, TRight>> Tap([NotNull, InstantHandle] Func<TLeft, Task> left)
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
@@ -1108,7 +1110,7 @@ namespace Tiger.Types
         /// <param name="right">An action to perform asynchronously.</param>
         /// <returns>The same value as this instance.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null" />.</exception>
-        [NotNull]
+        [NotNull, MustUseReturnValue]
         public async Task<Either<TLeft, TRight>> Tap([NotNull, InstantHandle] Func<TRight, Task> right)
         {
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
@@ -1352,7 +1354,7 @@ namespace Tiger.Types
 
         #region Overrides
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         [NotNull, Pure]
         public override string ToString()
         {
@@ -1369,7 +1371,7 @@ namespace Tiger.Types
             }
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         [Pure]
         public override bool Equals(object obj) =>
             obj is Either<TLeft, TRight> && EqualsCore((Either<TLeft, TRight>)obj);
@@ -1396,7 +1398,7 @@ namespace Tiger.Types
             return false;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         [Pure]
         public override int GetHashCode()
         {
@@ -1484,6 +1486,7 @@ namespace Tiger.Types
         /// <summary>Unwraps the Right value of this instance.</summary>
         /// <param name="value">The value to be unwrapped.</param>
         /// <exception cref="InvalidOperationException">This instance is in an invalid state.</exception>
+        [NotNull]
         public static explicit operator TRight(Either<TLeft, TRight> value)
         {
             if (!value.IsRight) { throw new InvalidOperationException(Resources.EitherIsNotRight); }
@@ -1494,6 +1497,7 @@ namespace Tiger.Types
         /// <summary>Unwraps the Left value of this instance.</summary>
         /// <param name="value">The value to be unwrapped.</param>
         /// <exception cref="InvalidOperationException">This instance is in an invalid state.</exception>
+        [NotNull]
         public static explicit operator TLeft(Either<TLeft, TRight> value)
         {
             if (!value.IsLeft) { throw new InvalidOperationException(Resources.EitherIsNotLeft); }

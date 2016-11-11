@@ -795,13 +795,13 @@ namespace Tiger.Types
 
         #region Overrides
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         [NotNull, Pure]
         public override string ToString() => IsNone
             ? @"None"
             : string.Format(CultureInfo.InvariantCulture, @"Some({0})", _value);
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         [Pure]
         public override bool Equals(object obj) =>
             obj is Option<TSome> && EqualsCore((Option<TSome>)obj);
@@ -816,7 +816,7 @@ namespace Tiger.Types
             return _value.Equals(other._value);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         [Pure]
         public override int GetHashCode() => IsNone
             ? 0
