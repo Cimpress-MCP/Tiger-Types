@@ -1,5 +1,5 @@
 {
-  "version": "3.0.0-*",
+  "version": "3.0.1-*",
   "name": "Tiger.Types",
   "title": "Tiger Types",
   "description": "A collection of useful types and operations on types.",
