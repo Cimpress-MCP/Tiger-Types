@@ -1,3 +1,7 @@
+### What's new in 3.1.0 (Released 2016-11-21)
+
+* The `Split` method of `Either` has learned a few convenient overloads.
+
 ### What's new in 3.0.0 (Released 2016-11-14)
 
 * Thanks to the magic of the .NET Standard, Tiger libraries are available to a wider set of platforms than ever before. The project now targets .NET Standard 1.0.
