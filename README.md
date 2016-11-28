@@ -36,7 +36,7 @@ public string ToAllUpperCase(string input)
 }
 ```
 
-This looks better, but is even worse! Our callers still believe that we can only return actual `string` values, but we can also return `null`. Now we are checking for `null`, *and* our callers must check, as well. This is where `Option<TSome>` comes in. Similar to the .NET concept of `Nullable<T>` (also written as `T?`), `Option<TSome>` allows us to represent the concept of “no value”, and explicitly advertise it to our callers.
+This looks better, but is even worse! Our callers still believe that we can only return actual `string` values, but we can also return `null`. Now we are checking for `null`, *and* our callers must check, as well. This is where `Option<TSome>` comes in. Similar to the .NET concept of `Nullable<T>` (also written as `T?`), `Option<TSome>` allows us to explicitly advertise the concept of “no value” to our callers.
 
 The pattern that emerges is this: If we get no value, return no value. If we get a value, we process it. This pattern is built into the type, and it is called `Map`. That allows us to write the original verison of `ToAllUpperCase` defined above, the one that operates only on values, and call it like this:
 
