@@ -71,8 +71,8 @@ var left = Option.From(3); // Some(3)
 var right = Option.From(4); // Some(4)
 
 var sum = from l in left
-    from r in right
-    select l + r; // Some(7)
+          from r in right
+          select l + r; // Some(7)
 ```
 
 However, if either of the input values is in the <i>None</i> state, the operation fails.
@@ -82,8 +82,8 @@ var left = Option<int>.None; // None
 var right = Option.From(4); // Some(4)
 
 var sum = from l in left
-    from r in right
-    select l + r; // None
+          from r in right
+          select l + r; // None
 ```
 
 Additionally, implementing `GetEnumerator` allows an `Option<TSome>` to be used with the `foreach` statement, which will execute its body only if the optional value is in the <i>Some</i> state.
@@ -108,11 +108,7 @@ Most of this library is allergic to `null`. It advertises where `null` is allowe
 
 ## How You Develop It
 
-You’re in the right place for that. Once you have this directory forked and cloned, the provided Visual Studio solution file should contain everything you need to get going. The NuGet packages will be restored and the NUnit unit tests will be detected (if your version of Visual Studio supports NUnit3, that is). If you’re interested in the command-line builds, they use a system called [Cake](http://cakebuild.net). While it is possible to run the cakefile (`build.cake`) directly, the preferred method is to run the build bootstrapper (`build.ps1`). The build bootstrapper ensures that you have the development and testing tools installed in your environment. The only manual requirement is that Chocolatey is installed and available on your PATH. It is a powershell script, so the way to execute it will vary by your command line.
-
-- Powershell: `./build.ps1`
-- cmd: `powershell ./build.ps1`
-- bash: `powershell ./build.ps1`
+This project is using the standard [`dotnet`](https://dot.net) build tool.
 
 This repository is attempting to use the [GitFlow](http://jeffkreeftmeijer.com/2010/why-arent-you-using-git-flow/) branching methodology. Results may be mixed, please be aware.
 

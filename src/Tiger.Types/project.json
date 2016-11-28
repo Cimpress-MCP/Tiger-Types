@@ -53,10 +53,10 @@
     "owners": [ "cosborn@cimpress.com" ],
     "repository": {
       "type": "git",
-      "url": "https://mcpstash.cimpress.net/projects/PMI/repos/types"
+      "url": "https://mcpstash.cimpress.net/projects/TIGER/repos/types"
     },
     "requireLicenseAcceptance": false,
     "tags": [ "option", "maybe", "either", "union", "task", "functional" ],
-    "iconUrl": "https://mcpstash.cimpress.net/projects/PMI/repos/types/browse/tiger_team_logo_dark.png?raw"
+    "iconUrl": "https://mcpstash.cimpress.net/projects/TIGER/repos/types/browse/tiger_logo.png?raw"
   }
 }
