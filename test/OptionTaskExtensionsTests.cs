@@ -155,7 +155,7 @@ namespace Tiger.Types.UnitTests
             var actual = await value.MapT(v => v.Length);
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Mapping a Some Option over a func returns a Some Option.")]
@@ -168,7 +168,8 @@ namespace Tiger.Types.UnitTests
             var actual = await value.MapT(v => v.Length);
 
             // assert
-            var length = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var length = actual.Value;
             Assert.Equal(sentinel.Length, length);
         }
 
@@ -182,7 +183,7 @@ namespace Tiger.Types.UnitTests
             var actual = await value.MapT(v => v.Length.Pipe(FromResult));
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Mapping a Some Option over a task returns a Some Option.")]
@@ -195,7 +196,8 @@ namespace Tiger.Types.UnitTests
             var actual = await value.MapT(v => v.Length.Pipe(FromResult));
 
             // assert
-            var length = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var length = actual.Value;
             Assert.Equal(sentinel.Length, length);
         }
 
@@ -210,10 +212,12 @@ namespace Tiger.Types.UnitTests
             var value = FromResult(Option<string>.None);
 
             // act
-            var actual = await value.BindT(v => v.Length == 0 ? Option.None : Option.From(v.Length));
+            var actual = await value.BindT(v => v.Length == 0
+                ? Option<int>.None
+                : Option.From(v.Length));
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Binding a Some Option over a func returning a None Option " +
@@ -224,10 +228,12 @@ namespace Tiger.Types.UnitTests
             var value = FromResult(Option.From(string.Empty));
 
             // act
-            var actual = await value.BindT(v => v.Length == 0 ? Option.None : Option.From(v.Length));
+            var actual = await value.BindT(v => v.Length == 0
+                ? Option<int>.None
+                : Option.From(v.Length));
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Binding a Some Option over a func returning a Some Option " +
@@ -238,10 +244,13 @@ namespace Tiger.Types.UnitTests
             var value = FromResult(Option.From(sentinel));
 
             // act
-            var actual = await value.BindT(v => v.Length == 0 ? Option.None : Option.From(v.Length));
+            var actual = await value.BindT(v => v.Length == 0
+                ? Option<int>.None
+                : Option.From(v.Length));
 
             // assert
-            var length = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var length = actual.Value;
             Assert.Equal(sentinel.Length, actual);
         }
 
@@ -255,11 +264,11 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = await value.BindT(v =>
                 FromResult(v.Length == 0
-                    ? Option.None
+                    ? Option<int>.None
                     : Option.From(v.Length)));
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Binding a Some Option over a task returning a Some Option " +
@@ -272,11 +281,12 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = await value.BindT(v =>
                 FromResult(v.Length == 0
-                    ? Option.None
+                    ? Option<int>.None
                     : Option.From(v.Length)));
 
             // assert
-            var length = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var length = actual.Value;
             Assert.Equal(sentinel.Length, actual);
         }
 
@@ -296,7 +306,7 @@ namespace Tiger.Types.UnitTests
             var actual = await value.TapT(v => output = string.Empty);
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
             Assert.Equal(sentinel, output);
         }
 
@@ -312,7 +322,8 @@ namespace Tiger.Types.UnitTests
             var actual = await value.TapT(v => output = sentinel);
 
             // assert
-            var innerValue = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var innerValue = actual.Value;
             Assert.Equal(sentinel, innerValue);
             Assert.Equal(sentinel, output);
         }
@@ -329,7 +340,7 @@ namespace Tiger.Types.UnitTests
             var actual = await value.TapT(v => Run(() => output = string.Empty));
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
             Assert.Equal(sentinel, output);
         }
 
@@ -345,7 +356,8 @@ namespace Tiger.Types.UnitTests
             var actual = await value.TapT(v => Run(() => output = sentinel));
 
             // assert
-            var innerValue = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var innerValue = actual.Value;
             Assert.Equal(sentinel, innerValue);
             Assert.Equal(sentinel, output);
         }

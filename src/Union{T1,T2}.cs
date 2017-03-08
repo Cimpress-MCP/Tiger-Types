@@ -6,9 +6,7 @@ using JetBrains.Annotations;
 
 namespace Tiger.Types
 {
-    /// <summary>
-    /// Represents a value that is a composite of two values.
-    /// </summary>
+    /// <summary>Represents a value that is a composite of two values.</summary>
     /// <typeparam name="T1">The first type of the value that is a composite.</typeparam>
     /// <typeparam name="T2">The second type of the value that is a composite.</typeparam>
     [DebuggerTypeProxy(typeof(UnionDebuggerTypeProxy<,>))]
@@ -18,13 +16,13 @@ namespace Tiger.Types
         /// <param name="value">The value to wrap.</param>
         /// <returns>An <see cref="Union{T1,T2}"/> in the first state.</returns>
         [NotNull]
-        public static Union<T1, T2> From(T1 value) => new Union<T1, T2>(value);
+        public static Union<T1, T2> From([NotNull] T1 value) => new Union<T1, T2>(value);
 
         /// <summary>Creates a <see cref="Union{T1,T2}"/> from the provided value.</summary>
         /// <param name="value">The value to wrap.</param>
         /// <returns>An <see cref="Union{T1,T2}"/> in the second state.</returns>
         [NotNull]
-        public static Union<T1, T2> From(T2 value) => new Union<T1, T2>(value);
+        public static Union<T1, T2> From([NotNull] T2 value) => new Union<T1, T2>(value);
 
         /// <summary>Gets a value indicating whether this instance is in the first state.</summary>
         public bool IsState1 => State == 1;
@@ -43,6 +41,7 @@ namespace Tiger.Types
         /// <exception cref="InvalidOperationException" accessor="get">
         /// This instance is not in the specified state.
         /// </exception>
+        [NotNull]
         public T1 Value1
         {
             get
@@ -61,6 +60,7 @@ namespace Tiger.Types
         /// <exception cref="InvalidOperationException" accessor="get">
         /// This instance is not in the specified state.
         /// </exception>
+        [NotNull]
         public T2 Value2
         {
             get
@@ -74,14 +74,20 @@ namespace Tiger.Types
         readonly T1 _value1;
         readonly T2 _value2;
 
-        Union(T1 value)
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
+        Union([NotNull] T1 value)
         {
+            if (value == null) { throw new ArgumentNullException(nameof(value)); }
+
             _value1 = value;
             State = 1;
         }
 
-        Union(T2 value)
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
+        Union([NotNull] T2 value)
         {
+            if (value == null) { throw new ArgumentNullException(nameof(value)); }
+
             _value2 = value;
             State = 2;
         }
@@ -455,11 +461,13 @@ namespace Tiger.Types
         /// <summary>Unwraps the first value of this instance.</summary>
         /// <param name="value">The value to be unwrapped.</param>
         /// <exception cref="InvalidOperationException">This instance is not in the specified state.</exception>
+        [NotNull]
         public static explicit operator T1([NotNull] Union<T1, T2> value) => value.Value1;
 
         /// <summary>Unwraps the second value of this instance.</summary>
         /// <param name="value">The value to be unwrapped.</param>
         /// <exception cref="InvalidOperationException">This instance is not in the specified state.</exception>
+        [NotNull]
         public static explicit operator T2([NotNull] Union<T1, T2> value) => value.Value2;
 
         #endregion

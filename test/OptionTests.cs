@@ -269,11 +269,12 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = string.Empty;
-            value.Match(
+            var unit = value.Match(
                 none: () => actual = sentinel,
                 some: v => { });
 
             // assert
+            Assert.Equal(Unit.Value, unit);
             Assert.Equal(sentinel, actual);
         }
 
@@ -286,11 +287,12 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = string.Empty;
-            value.Match(
+            var unit = value.Match(
                 none: () => { },
                 some: v => actual = v);
 
             // assert
+            Assert.Equal(Unit.Value, unit);
             Assert.Equal(sentinel, actual);
         }
 
@@ -410,7 +412,7 @@ namespace Tiger.Types.UnitTests
             var actual = value.Map(v => v.Length);
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Mapping a Some Option over a func returns a Some Option.")]
@@ -423,7 +425,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Map(v => v.Length);
 
             // assert
-            var length = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var length = actual.Value;
             Assert.Equal(sentinel.Length, length);
         }
 
@@ -437,7 +440,7 @@ namespace Tiger.Types.UnitTests
             var actual = await value.Map(v => v.Length.Pipe(FromResult));
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Mapping a Some Option over a task returns a Some Option.")]
@@ -450,7 +453,8 @@ namespace Tiger.Types.UnitTests
             var actual = await value.Map(v => v.Length.Pipe(FromResult));
 
             // assert
-            var length = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var length = actual.Value;
             Assert.Equal(sentinel.Length, length);
         }
 
@@ -465,10 +469,12 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act
-            var actual = value.Bind(v => v.Length == 0 ? Option.None : Option.From(v.Length));
+            var actual = value.Bind(v => v.Length == 0
+                ? Option<int>.None
+                : Option.From(v.Length));
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Binding a Some Option over a func returning a None Option " +
@@ -479,10 +485,12 @@ namespace Tiger.Types.UnitTests
             var value = Option.From(string.Empty);
 
             // act
-            var actual = value.Bind(v => v.Length == 0 ? Option.None : Option.From(v.Length));
+            var actual = value.Bind(v => v.Length == 0
+                ? Option<int>.None
+                : Option.From(v.Length));
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Binding a Some Option over a func returning a Some Option " +
@@ -493,10 +501,13 @@ namespace Tiger.Types.UnitTests
             var value = Option.From(sentinel);
 
             // act
-            var actual = value.Bind(v => v.Length == 0 ? Option.None : Option.From(v.Length));
+            var actual = value.Bind(v => v.Length == 0
+                ? Option<int>.None
+                : Option.From(v.Length));
 
             // assert
-            var length = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var length = actual.Value;
             Assert.Equal(sentinel.Length, actual);
         }
 
@@ -510,11 +521,11 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = await value.Bind(v =>
                 FromResult(v.Length == 0
-                    ? Option.None
+                    ? Option<int>.None
                     : Option.From(v.Length)));
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Binding a Some Option over a task returning a Some Option " +
@@ -527,11 +538,12 @@ namespace Tiger.Types.UnitTests
             // act
             var actual = await value.Bind(v =>
                 FromResult(v.Length == 0
-                    ? Option.None
+                    ? Option<int>.None
                     : Option.From(v.Length)));
 
             // assert
-            var length = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var length = actual.Value;
             Assert.Equal(sentinel.Length, actual);
         }
 
@@ -549,7 +561,7 @@ namespace Tiger.Types.UnitTests
             var actual = value.Filter(v => v > 0);
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Filtering a Some Option with a false predicate produces a None Option.")]
@@ -562,7 +574,7 @@ namespace Tiger.Types.UnitTests
             var actual = value.Filter(_ => false);
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Filtering a Some Option with a true predicate produces a Some Option.")]
@@ -575,7 +587,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Filter(_ => true);
 
             // assert
-            var filteredValue = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var filteredValue = actual.Value;
             Assert.Equal(42, filteredValue);
         }
 
@@ -589,7 +602,7 @@ namespace Tiger.Types.UnitTests
             var actual = await value.Filter(v => FromResult(v > 0));
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Filtering a Some Option with a false predicate produces a None Option.")]
@@ -602,7 +615,7 @@ namespace Tiger.Types.UnitTests
             var actual = await value.Filter(_ => FromResult(false));
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Filtering a Some Option with a true predicate produces a None Option.")]
@@ -615,7 +628,8 @@ namespace Tiger.Types.UnitTests
             var actual = await value.Filter(v => FromResult(true));
 
             // assert
-            var filteredValue = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var filteredValue = actual.Value;
             Assert.Equal(42, filteredValue);
         }
 
@@ -693,7 +707,7 @@ namespace Tiger.Types.UnitTests
             var actual = value.Tap(v => output = string.Empty);
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
             Assert.Equal(sentinel, output);
         }
 
@@ -709,7 +723,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Tap(v => output = sentinel);
 
             // assert
-            var innerValue = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var innerValue = actual.Value;
             Assert.Equal(sentinel, innerValue);
             Assert.Equal(sentinel, output);
         }
@@ -726,7 +741,7 @@ namespace Tiger.Types.UnitTests
             var actual = await value.Tap(v => Run(() => output = string.Empty));
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
             Assert.Equal(sentinel, output);
         }
 
@@ -742,7 +757,8 @@ namespace Tiger.Types.UnitTests
             var actual = await value.Tap(v => Run(() => output = sentinel));
 
             // assert
-            var innerValue = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var innerValue = actual.Value;
             Assert.Equal(sentinel, innerValue);
             Assert.Equal(sentinel, output);
         }
@@ -821,7 +837,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Recover(sentinel);
 
             // assert
-            var recoveredValue = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var recoveredValue = actual.Value;
             Assert.Equal(sentinel, recoveredValue);
         }
 
@@ -835,7 +852,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Recover("megatron");
 
             // assert
-            var recoveredValue = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var recoveredValue = actual.Value;
             Assert.Equal(sentinel, recoveredValue);
         }
 
@@ -849,7 +867,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Recover(() => sentinel);
 
             // assert
-            var recoveredValue = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var recoveredValue = actual.Value;
             Assert.Equal(sentinel, recoveredValue);
         }
 
@@ -863,7 +882,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Recover(() => "megatron");
 
             // assert
-            var recoveredValue = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var recoveredValue = actual.Value;
             Assert.Equal(sentinel, recoveredValue);
         }
 
@@ -875,9 +895,10 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = await value.Recover(() => FromResult(sentinel));
-
+            
             // assert
-            var recoveredValue = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var recoveredValue = actual.Value;
             Assert.Equal(sentinel, recoveredValue);
         }
 
@@ -891,7 +912,8 @@ namespace Tiger.Types.UnitTests
             var actual = await value.Recover(() => FromResult("megatron"));
 
             // assert
-            var recoveredValue = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var recoveredValue = actual.Value;
             Assert.Equal(sentinel, recoveredValue);
         }
 
@@ -1425,8 +1447,8 @@ namespace Tiger.Types.UnitTests
             var actualRightFirst = right | left;
 
             // assert
-            Assert.None(actualLeftFirst);
-            Assert.None(actualRightFirst);
+            Assert.True(actualLeftFirst.IsNone);
+            Assert.True(actualRightFirst.IsNone);
         }
 
         [Fact(DisplayName = "The disjunction of two None Options is a None Option.")]
@@ -1441,8 +1463,8 @@ namespace Tiger.Types.UnitTests
             var actualRightFirst = right.BitwiseOr(left);
 
             // assert
-            Assert.None(actualLeftFirst);
-            Assert.None(actualRightFirst);
+            Assert.True(actualLeftFirst.IsNone);
+            Assert.True(actualRightFirst.IsNone);
         }
 
         [Fact(DisplayName = "The disjunction of two None Options is a None Option.")]
@@ -1457,8 +1479,8 @@ namespace Tiger.Types.UnitTests
             var actualRightFirst = right || left;
 
             // assert
-            Assert.None(actualLeftFirst);
-            Assert.None(actualRightFirst);
+            Assert.True(actualLeftFirst.IsNone);
+            Assert.True(actualRightFirst.IsNone);
         }
 
         [Fact(DisplayName = "The disjunction of a None Option and a Some Option is the Some Option.")]
@@ -1713,7 +1735,7 @@ namespace Tiger.Types.UnitTests
             Func<Option<string>> right = () =>
             {
                 actual = string.Empty;
-                return Option.None;
+                return Option<string>.None;
             };
 
             // act
@@ -1754,8 +1776,8 @@ namespace Tiger.Types.UnitTests
             var actualRightFirst = right & left;
 
             // assert
-            Assert.None(actualLeftFirst);
-            Assert.None(actualRightFirst);
+            Assert.True(actualLeftFirst.IsNone);
+            Assert.True(actualRightFirst.IsNone);
         }
 
         [Fact(DisplayName = "The conjunction of two None Options is a None Option.")]
@@ -1770,8 +1792,8 @@ namespace Tiger.Types.UnitTests
             var actualRightFirst = right.BitwiseAnd(left);
 
             // assert
-            Assert.None(actualLeftFirst);
-            Assert.None(actualRightFirst);
+            Assert.True(actualLeftFirst.IsNone);
+            Assert.True(actualRightFirst.IsNone);
         }
 
         [Fact(DisplayName = "The conjunction of two None Options is a None Option.")]
@@ -1786,8 +1808,8 @@ namespace Tiger.Types.UnitTests
             var actualRightFirst = right && left;
 
             // assert
-            Assert.None(actualLeftFirst);
-            Assert.None(actualRightFirst);
+            Assert.True(actualLeftFirst.IsNone);
+            Assert.True(actualRightFirst.IsNone);
         }
 
         [Fact(DisplayName = "The conjunction of a None Option and a Some Option is a None Option.")]
@@ -1895,7 +1917,7 @@ namespace Tiger.Types.UnitTests
             Func<Option<string>> right = () =>
             {
                 actual = string.Empty;
-                return Option.None;
+                return Option<string>.None;
             };
 
             // act
@@ -2436,7 +2458,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.DefaultIfEmpty();
 
             // assert
-            var innerValue = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var innerValue = actual.Value;
             Assert.Equal(0, innerValue);
         }
 
@@ -2451,7 +2474,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.DefaultIfEmpty();
 
             // assert
-            var innerValue = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var innerValue = actual.Value;
             Assert.Equal(42, innerValue);
         }
 
@@ -2466,7 +2490,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.DefaultIfEmpty(sentinel);
 
             // assert
-            var innerValue = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var innerValue = actual.Value;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -2481,7 +2506,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.DefaultIfEmpty("megatron");
 
             // assert
-            var innerValue = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var innerValue = actual.Value;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -2498,7 +2524,7 @@ namespace Tiger.Types.UnitTests
             var actual = value.Do(v => output = string.Empty);
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
             Assert.Equal(sentinel, output);
         }
 
@@ -2563,7 +2589,7 @@ namespace Tiger.Types.UnitTests
                          select v + 1;
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Selecting a Some Option produces a Some Option.")]
@@ -2578,7 +2604,8 @@ namespace Tiger.Types.UnitTests
                          select v + 1;
 
             // assert
-            var innerValue = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var innerValue = actual.Value;
             Assert.Equal(43, innerValue);
         }
 
@@ -2595,7 +2622,7 @@ namespace Tiger.Types.UnitTests
                          select v;
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Filtering a Some Option with a false predicate produces a None Option.")]
@@ -2611,7 +2638,7 @@ namespace Tiger.Types.UnitTests
                          select v;
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Filtering a Some Option with a true predicate produces a None Option.")]
@@ -2627,7 +2654,8 @@ namespace Tiger.Types.UnitTests
                          select v;
 
             // assert
-            var innerValue = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var innerValue = actual.Value;
             Assert.Equal(42, innerValue);
         }
 
@@ -2645,7 +2673,7 @@ namespace Tiger.Types.UnitTests
                          select l + r;
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Selecting from a Some Option and a None Option produces a None Option.")]
@@ -2662,7 +2690,7 @@ namespace Tiger.Types.UnitTests
                          select l + r;
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Selecting from a None Option and a Some Option produces a None Option.")]
@@ -2679,7 +2707,7 @@ namespace Tiger.Types.UnitTests
                          select l + r;
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Selecting from two Some Options produces a Some Option.")]
@@ -2696,7 +2724,8 @@ namespace Tiger.Types.UnitTests
                          select l + r;
 
             // assert
-            var innerValue = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var innerValue = actual.Value;
             Assert.Equal(3, innerValue);
         }
 
@@ -2707,10 +2736,12 @@ namespace Tiger.Types.UnitTests
             var value = Option<string>.None;
 
             // act
-            var actual = value.SelectMany(v => v.Length == 0 ? Option.None : Option.From(v.Length));
+            var actual = value.SelectMany(v => v.Length == 0
+                ? Option<int>.None
+                : Option.From(v.Length));
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Binding a Some Option over a func returning a None Option " +
@@ -2721,10 +2752,12 @@ namespace Tiger.Types.UnitTests
             var value = Option.From(string.Empty);
 
             // act
-            var actual = value.SelectMany(v => v.Length == 0 ? Option.None : Option.From(v.Length));
+            var actual = value.SelectMany(v => v.Length == 0
+                ? Option<int>.None
+                : Option.From(v.Length));
 
             // assert
-            Assert.None(actual);
+            Assert.True(actual.IsNone);
         }
 
         [Fact(DisplayName = "Binding a Some Option over a func returning a Some Option " +
@@ -2735,10 +2768,13 @@ namespace Tiger.Types.UnitTests
             var value = Option.From(sentinel);
 
             // act
-            var actual = value.SelectMany(v => v.Length == 0 ? Option.None : Option.From(v.Length));
+            var actual = value.SelectMany(v => v.Length == 0
+                ? Option<int>.None
+                : Option.From(v.Length));
 
             // assert
-            var innerValue = Assert.Some(actual);
+            Assert.True(actual.IsSome);
+            var innerValue = actual.Value;
             Assert.Equal(sentinel.Length, innerValue);
         }
 

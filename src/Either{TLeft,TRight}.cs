@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using static System.Diagnostics.Contracts.Contract;
 using static System.Runtime.InteropServices.LayoutKind;
+using static Tiger.Types.EitherState;
+using static Tiger.Types.Resources;
 
 namespace Tiger.Types
 {
@@ -48,11 +50,11 @@ namespace Tiger.Types
 
         /// <summary>Gets a value indicating whether this instance is in the Left state.</summary>
         /// <remarks><para>There are usually better ways to do this.</para></remarks>
-        public bool IsLeft => State == EitherState.Left;
+        public bool IsLeft => State == Left;
 
         /// <summary>Gets a value indicating whether this instance is in the Right state.</summary>
         /// <remarks><para>There are usually better ways to do this.</para></remarks>
-        public bool IsRight => State == EitherState.Right;
+        public bool IsRight => State == Right;
 
         /// <summary>Gets the internal state of this instance.</summary>
         internal EitherState State { get; }
@@ -74,7 +76,7 @@ namespace Tiger.Types
             if (leftValue == null) { throw new ArgumentNullException(nameof(leftValue)); }
 
             LeftValue = leftValue;
-            State = EitherState.Left;
+            State = Left;
         }
 
         /// <summary>
@@ -88,7 +90,7 @@ namespace Tiger.Types
             if (rightValue == null) { throw new ArgumentNullException(nameof(rightValue)); }
 
             RightValue = rightValue;
-            State = EitherState.Right;
+            State = Right;
         }
 
         #region Match
@@ -116,12 +118,12 @@ namespace Tiger.Types
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             var result = IsLeft
                 ? left(LeftValue)
                 : right(RightValue);
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -146,12 +148,12 @@ namespace Tiger.Types
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             var result = IsLeft
                 ? left(LeftValue)
                 : await right(RightValue).ConfigureAwait(false);
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -176,12 +178,12 @@ namespace Tiger.Types
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             var result = IsLeft
                 ? await left(LeftValue).ConfigureAwait(false)
                 : right(RightValue);
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -206,12 +208,12 @@ namespace Tiger.Types
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             var result = IsLeft
                 ? await left(LeftValue).ConfigureAwait(false)
                 : await right(RightValue).ConfigureAwait(false);
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -238,7 +240,7 @@ namespace Tiger.Types
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft)
             {
@@ -271,7 +273,7 @@ namespace Tiger.Types
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft)
             {
@@ -302,7 +304,7 @@ namespace Tiger.Types
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft)
             {
@@ -333,7 +335,7 @@ namespace Tiger.Types
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft)
             {
@@ -366,12 +368,12 @@ namespace Tiger.Types
         public Either<TOut, TRight> Map<TOut>([NotNull, InstantHandle] Func<TLeft, TOut> left)
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft)
             {
                 var result = left(LeftValue);
-                Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+                Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
                 return new Either<TOut, TRight>(result);
             }
 
@@ -395,12 +397,12 @@ namespace Tiger.Types
         public async Task<Either<TOut, TRight>> Map<TOut>([NotNull, InstantHandle] Func<TLeft, Task<TOut>> left)
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft)
             {
                 var result = await left(LeftValue).ConfigureAwait(false);
-                Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+                Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
                 return new Either<TOut, TRight>(result);
             }
 
@@ -424,12 +426,12 @@ namespace Tiger.Types
         public Either<TLeft, TOut> Map<TOut>([NotNull, InstantHandle] Func<TRight, TOut> right)
         {
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft) { return new Either<TLeft, TOut>(LeftValue); }
 
             var result = right(RightValue);
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return new Either<TLeft, TOut>(result);
         }
 
@@ -450,12 +452,12 @@ namespace Tiger.Types
         public async Task<Either<TLeft, TOut>> Map<TOut>([NotNull, InstantHandle] Func<TRight, Task<TOut>> right)
         {
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft) { return new Either<TLeft, TOut>(LeftValue); }
 
             var result = await right(RightValue).ConfigureAwait(false);
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return new Either<TLeft, TOut>(result);
         }
 
@@ -489,17 +491,17 @@ namespace Tiger.Types
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft)
             {
                 var leftResult = left(LeftValue);
-                Assume(leftResult != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+                Assume(leftResult != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
                 return new Either<TLeftOut, TRightOut>(leftResult);
             }
 
             var rightResult = right(RightValue);
-            Assume(rightResult != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(rightResult != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return new Either<TLeftOut, TRightOut>(rightResult);
         }
 
@@ -534,17 +536,17 @@ namespace Tiger.Types
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft)
             {
                 var leftResult = left(LeftValue);
-                Assume(leftResult != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+                Assume(leftResult != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
                 return new Either<TLeftOut, TRightOut>(leftResult);
             }
 
             var rightResult = await right(RightValue).ConfigureAwait(false);
-            Assume(rightResult != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(rightResult != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return new Either<TLeftOut, TRightOut>(rightResult);
         }
 
@@ -579,17 +581,17 @@ namespace Tiger.Types
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft)
             {
                 var leftResult = await left(LeftValue).ConfigureAwait(false);
-                Assume(leftResult != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute // ReSharper disable once AssignNullToNotNullAttribute
+                Assume(leftResult != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute // ReSharper disable once AssignNullToNotNullAttribute
                 return new Either<TLeftOut, TRightOut>(leftResult);
             }
 
             var rightResult = right(RightValue);
-            Assume(rightResult != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute  // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(rightResult != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute  // ReSharper disable once AssignNullToNotNullAttribute
             return new Either<TLeftOut, TRightOut>(rightResult);
         }
 
@@ -624,17 +626,17 @@ namespace Tiger.Types
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft)
             {
                 var leftResult = await left(LeftValue).ConfigureAwait(false);
-                Assume(leftResult != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+                Assume(leftResult != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
                 return new Either<TLeftOut, TRightOut>(leftResult);
             }
 
             var rightResult = await right(RightValue).ConfigureAwait(false);
-            Assume(rightResult != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(rightResult != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return new Either<TLeftOut, TRightOut>(rightResult);
         }
 
@@ -661,11 +663,9 @@ namespace Tiger.Types
         public Either<TOut, TRight> Bind<TOut>([NotNull, InstantHandle] Func<TLeft, Either<TOut, TRight>> left)
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return IsLeft
-                ? left(LeftValue)
-                : new Either<TOut, TRight>(RightValue);
+            return Map(left).Pipe(Either.Join);
         }
 
         /// <summary>
@@ -686,15 +686,13 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, Pure]
-        public async Task<Either<TOut, TRight>> Bind<TOut>(
+        public Task<Either<TOut, TRight>> Bind<TOut>(
             [NotNull, InstantHandle] Func<TLeft, Task<Either<TOut, TRight>>> left)
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return IsLeft
-                ? await left(LeftValue).ConfigureAwait(false)
-                : new Either<TOut, TRight>(RightValue);
+            return Map(left).Map(Either.Join);
         }
 
         /// <summary>Binds a function over the Right value of this instance, if present.</summary>
@@ -716,11 +714,9 @@ namespace Tiger.Types
         public Either<TLeft, TOut> Bind<TOut>([NotNull, InstantHandle] Func<TRight, Either<TLeft, TOut>> right)
         {
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return IsLeft
-                ? new Either<TLeft, TOut>(LeftValue)
-                : right(RightValue);
+            return Map(right).Pipe(Either.Join);
         }
 
         /// <summary>
@@ -741,15 +737,13 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, Pure]
-        public async Task<Either<TLeft, TOut>> Bind<TOut>(
+        public Task<Either<TLeft, TOut>> Bind<TOut>(
             [NotNull, InstantHandle] Func<TRight, Task<Either<TLeft, TOut>>> right)
         {
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return IsLeft
-                ? new Either<TLeft, TOut>(LeftValue)
-                : await right(RightValue).ConfigureAwait(false);
+            return Map(right).Map(Either.Join);
         }
 
         /// <summary>
@@ -785,11 +779,9 @@ namespace Tiger.Types
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return IsLeft
-                ? left(LeftValue)
-                : right(RightValue);
+            return Map(left, right).Pipe(Either.Collapse);
         }
 
         /// <summary>
@@ -820,17 +812,15 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure, NotNull]
-        public async Task<Either<TOutLeft, TOutRight>> Bind<TOutLeft, TOutRight>(
+        public Task<Either<TOutLeft, TOutRight>> Bind<TOutLeft, TOutRight>(
             [NotNull, InstantHandle] Func<TLeft, Task<Either<TOutLeft, TOutRight>>> left,
             [NotNull, InstantHandle] Func<TRight, Either<TOutLeft, TOutRight>> right)
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return IsLeft
-                ? await left(LeftValue).ConfigureAwait(false)
-                : right(RightValue);
+            return Map(left, right).Map(Either.Collapse);
         }
 
         /// <summary>
@@ -861,17 +851,15 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure, NotNull]
-        public async Task<Either<TOutLeft, TOutRight>> Bind<TOutLeft, TOutRight>(
+        public Task<Either<TOutLeft, TOutRight>> Bind<TOutLeft, TOutRight>(
             [NotNull, InstantHandle] Func<TLeft, Either<TOutLeft, TOutRight>> left,
             [NotNull, InstantHandle] Func<TRight, Task<Either<TOutLeft, TOutRight>>> right)
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return IsLeft
-                ? left(LeftValue)
-                : await right(RightValue).ConfigureAwait(false);
+            return Map(left, right).Map(Either.Collapse);
         }
 
         /// <summary>
@@ -902,17 +890,15 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure, NotNull]
-        public async Task<Either<TOutLeft, TOutRight>> Bind<TOutLeft, TOutRight>(
+        public Task<Either<TOutLeft, TOutRight>> Bind<TOutLeft, TOutRight>(
             [NotNull, InstantHandle] Func<TLeft, Task<Either<TOutLeft, TOutRight>>> left,
             [NotNull, InstantHandle] Func<TRight, Task<Either<TOutLeft, TOutRight>>> right)
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return IsLeft
-                ? await left(LeftValue).ConfigureAwait(false)
-                : await right(RightValue).ConfigureAwait(false);
+            return Map(left, right).Map(Either.Collapse);
         }
 
         #endregion
@@ -940,12 +926,12 @@ namespace Tiger.Types
         {
             if (state == null) { throw new ArgumentNullException(nameof(state)); }
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             var result = IsLeft
                 ? left(state, LeftValue)
                 : state;
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -970,12 +956,12 @@ namespace Tiger.Types
         {
             if (state == null) { throw new ArgumentNullException(nameof(state)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             var result = IsRight
                 ? right(state, RightValue)
                 : state;
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -1000,12 +986,12 @@ namespace Tiger.Types
         {
             if (state == null) { throw new ArgumentNullException(nameof(state)); }
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             var result = IsLeft
                 ? await left(state, LeftValue).ConfigureAwait(false)
                 : state;
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -1030,12 +1016,12 @@ namespace Tiger.Types
         {
             if (state == null) { throw new ArgumentNullException(nameof(state)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
-            if (State == EitherState.Bottom) { throw new InvalidOperationException(Resources.EitherIsBottom); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             var result = IsRight
                 ? await right(state, RightValue).ConfigureAwait(false)
                 : state;
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -1227,7 +1213,7 @@ namespace Tiger.Types
             if (IsRight) { return this; }
 
             var result = recoverer();
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return new Either<TLeft, TRight>(result);
         }
 
@@ -1247,7 +1233,7 @@ namespace Tiger.Types
             if (IsRight) { return this; }
 
             var result = await recoverer().ConfigureAwait(false);
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -1265,7 +1251,7 @@ namespace Tiger.Types
         {
             get
             {
-                if (!IsRight) { throw new InvalidOperationException(Resources.EitherIsNotRight); }
+                if (!IsRight) { throw new InvalidOperationException(EitherIsNotRight); }
 
                 return RightValue;
             }
@@ -1324,7 +1310,7 @@ namespace Tiger.Types
             var result = IsRight
                 ? RightValue
                 : other();
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -1346,7 +1332,7 @@ namespace Tiger.Types
             var result = IsRight
                 ? RightValue
                 : await other().ConfigureAwait(false);
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -1360,11 +1346,11 @@ namespace Tiger.Types
         {
             switch (State)
             {
-                case EitherState.Left:
+                case Left:
                     return string.Format(CultureInfo.InvariantCulture, @"Left({0})", LeftValue);
-                case EitherState.Right:
+                case Right:
                     return string.Format(CultureInfo.InvariantCulture, @"Right({0})", RightValue);
-                case EitherState.Bottom:
+                case Bottom:
                     return @"Bottom";
                 default: // note(cosborn) Why would you change this enum???
                     return string.Empty;
@@ -1379,7 +1365,7 @@ namespace Tiger.Types
         [Pure]
         bool EqualsCore(Either<TLeft, TRight> other)
         { // note(cosborn) Eh, this gets gnarly using other implementations.
-            if (State == EitherState.Bottom && other.State == EitherState.Bottom)
+            if (State == Bottom && other.State == Bottom)
             {
                 return true;
             }
@@ -1404,11 +1390,11 @@ namespace Tiger.Types
         {
             switch (State)
             {
-                case EitherState.Left:
+                case Left:
                     return LeftValue.GetHashCode();
-                case EitherState.Right:
+                case Right:
                     return RightValue.GetHashCode();
-                case EitherState.Bottom:
+                case Bottom:
                     return 0;
                 default: // note(cosborn) Why would you change this enum???
                     return 0;
@@ -1434,8 +1420,8 @@ namespace Tiger.Types
 
         [NotNull, Pure, PublicAPI]
         object ToDump() => Match<object>(
-            left: l => new { State = EitherState.Left, Value = l },
-            right: r => new { State = EitherState.Right, Value = r });
+            left: l => new { State = Left, Value = l },
+            right: r => new { State = Right, Value = r });
 
         #endregion
 
@@ -1489,7 +1475,7 @@ namespace Tiger.Types
         [NotNull]
         public static explicit operator TRight(Either<TLeft, TRight> value)
         {
-            if (!value.IsRight) { throw new InvalidOperationException(Resources.EitherIsNotRight); }
+            if (!value.IsRight) { throw new InvalidOperationException(EitherIsNotRight); }
 
             return value.RightValue;
         }
@@ -1500,7 +1486,7 @@ namespace Tiger.Types
         [NotNull]
         public static explicit operator TLeft(Either<TLeft, TRight> value)
         {
-            if (!value.IsLeft) { throw new InvalidOperationException(Resources.EitherIsNotLeft); }
+            if (!value.IsLeft) { throw new InvalidOperationException(EitherIsNotLeft); }
 
             return value.LeftValue;
         }

@@ -39,8 +39,7 @@ namespace Tiger.Types
             if (dictionary == null) { throw new ArgumentNullException(nameof(dictionary)); }
             if (key == null) { throw new ArgumentNullException(nameof(key)); }
 
-            TValue value;
-            return !dictionary.TryGetValue(key, out value)
+            return !dictionary.TryGetValue(key, out var value)
                 ? Option<TValue>.None
                 : value;
         }
@@ -67,8 +66,7 @@ namespace Tiger.Types
             if (dictionary == null) { throw new ArgumentNullException(nameof(dictionary)); }
             if (key == null) { throw new ArgumentNullException(nameof(key)); }
 
-            TValue value;
-            return !dictionary.TryGetValue(key, out value)
+            return !dictionary.TryGetValue(key, out var value)
                 ? Option<TValue>.None
                 : value;
         }
@@ -95,8 +93,7 @@ namespace Tiger.Types
             if (dictionary == null) { throw new ArgumentNullException(nameof(dictionary)); }
             if (key == null) { throw new ArgumentNullException(nameof(key)); }
 
-            TValue value;
-            return !dictionary.TryGetValue(key, out value)
+            return !dictionary.TryGetValue(key, out var value)
                 ? Option<TValue>.None
                 : value;
         }

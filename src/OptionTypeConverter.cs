@@ -45,7 +45,10 @@ namespace Tiger.Types
             _underlyingTypeConverter.CanConvertFrom(context, sourceType);
 
         /// <inheritdoc/>
-        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+        public override object ConvertFrom(
+            ITypeDescriptorContext context,
+            CultureInfo culture,
+            [CanBeNull] object value)
         {
             if (value == null) { return Activator.CreateInstance(_conversionType); }
 

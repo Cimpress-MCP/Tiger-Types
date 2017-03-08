@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
 
 using System;
+using static System.AttributeTargets;
 
 #pragma warning disable 1591
 // ReSharper disable UnusedMember.Global
@@ -46,10 +47,7 @@ namespace JetBrains.Annotations
     ///   var s = p.ToString(); // Warning: Possible 'System.NullReferenceException'
     /// }
     /// </code></example>
-    [AttributeUsage(
-      AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.Property |
-      AttributeTargets.Delegate | AttributeTargets.Field | AttributeTargets.Event |
-      AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.GenericParameter)]
+    [AttributeUsage(Method | Parameter | Property | AttributeTargets.Delegate | Field | Event | Class | Interface | GenericParameter)]
     sealed class CanBeNullAttribute : Attribute { }
 
     /// <summary>
@@ -60,10 +58,7 @@ namespace JetBrains.Annotations
     ///   return null; // Warning: Possible 'null' assignment
     /// }
     /// </code></example>
-    [AttributeUsage(
-      AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.Property |
-      AttributeTargets.Delegate | AttributeTargets.Field | AttributeTargets.Event |
-      AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.GenericParameter)]
+    [AttributeUsage(Method | Parameter | Property | AttributeTargets.Delegate | Field | Event | Class | Interface | GenericParameter)]
     sealed class NotNullAttribute : Attribute { }
 
     /// <summary>
@@ -71,9 +66,7 @@ namespace JetBrains.Annotations
     /// and Lazy classes to indicate that the value of a collection item, of the Task.Result property
     /// or of the Lazy.Value property can never be null.
     /// </summary>
-    [AttributeUsage(
-      AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.Property |
-      AttributeTargets.Delegate | AttributeTargets.Field)]
+    [AttributeUsage(Method | Parameter | Property | AttributeTargets.Delegate | Field)]
     sealed class ItemNotNullAttribute : Attribute { }
 
     /// <summary>
@@ -81,9 +74,7 @@ namespace JetBrains.Annotations
     /// and Lazy classes to indicate that the value of a collection item, of the Task.Result property
     /// or of the Lazy.Value property can be null.
     /// </summary>
-    [AttributeUsage(
-      AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.Property |
-      AttributeTargets.Delegate | AttributeTargets.Field)]
+    [AttributeUsage(Method | Parameter | Property | AttributeTargets.Delegate | Field)]
     sealed class ItemCanBeNullAttribute : Attribute { }
 
     /// <summary>
@@ -99,9 +90,7 @@ namespace JetBrains.Annotations
     ///   ShowError("Failed: {0}"); // Warning: Non-existing argument in format string
     /// }
     /// </code></example>
-    [AttributeUsage(
-      AttributeTargets.Constructor | AttributeTargets.Method |
-      AttributeTargets.Property | AttributeTargets.Delegate)]
+    [AttributeUsage(Constructor | Method | Property | AttributeTargets.Delegate)]
     sealed class StringFormatMethodAttribute : Attribute
     {
         /// <param name="formatParameterName">
@@ -112,9 +101,37 @@ namespace JetBrains.Annotations
             FormatParameterName = formatParameterName;
         }
 
-        [NotNull]
-        public string FormatParameterName { get; private set; }
+        [NotNull] public string FormatParameterName { get; private set; }
     }
+
+    /// <summary>
+    /// For a parameter that is expected to be one of the limited set of values.
+    /// Specify fields of which type should be used as values for this parameter.
+    /// </summary>
+    [AttributeUsage(Parameter | Property | Field, AllowMultiple = true)]
+    sealed class ValueProviderAttribute : Attribute
+    {
+        public ValueProviderAttribute([NotNull] string name)
+        {
+            Name = name;
+        }
+
+        [NotNull] public string Name { get; private set; }
+    }
+
+    /// <summary>
+    /// Indicates that the function argument should be string literal and match one
+    /// of the parameters of the caller function. For example, ReSharper annotates
+    /// the parameter of <see cref="System.ArgumentNullException"/>.
+    /// </summary>
+    /// <example><code>
+    /// void Foo(string param) {
+    ///   if (param == null)
+    ///     throw new ArgumentNullException("par"); // Warning: Cannot resolve symbol
+    /// }
+    /// </code></example>
+    [AttributeUsage(Parameter)]
+    sealed class InvokerParameterNameAttribute : Attribute { }
 
     /// <summary>
     /// Describes dependency between method input and output.
@@ -129,15 +146,16 @@ namespace JetBrains.Annotations
     /// <item>Value    ::= true | false | null | notnull | canbenull</item>
     /// </list>
     /// If method has single input parameter, it's name could be omitted.<br/>
-    /// Using <c>halt</c> (or <c>void</c>/<c>nothing</c>, which is the same)
-    /// for method output means that the methos doesn't return normally.<br/>
-    /// <c>canbenull</c> annotation is only applicable for output parameters.<br/>
-    /// You can use multiple <c>[ContractAnnotation]</c> for each FDT row,
-    /// or use single attribute with rows separated by semicolon.<br/>
+    /// Using <c>halt</c> (or <c>void</c>/<c>nothing</c>, which is the same) for method output
+    /// means that the methos doesn't return normally (throws or terminates the process).<br/>
+    /// Value <c>canbenull</c> is only applicable for output parameters.<br/>
+    /// You can use multiple <c>[ContractAnnotation]</c> for each FDT row, or use single attribute
+    /// with rows separated by semicolon. There is no notion of order rows, all rows are checked
+    /// for applicability and applied per each program state tracked by R# analysis.<br/>
     /// </syntax>
     /// <examples><list>
     /// <item><code>
-    /// [ContractAnnotation("=> halt")]
+    /// [ContractAnnotation("=&gt; halt")]
     /// public void TerminationMethod()
     /// </code></item>
     /// <item><code>
@@ -145,21 +163,21 @@ namespace JetBrains.Annotations
     /// public void Assert(bool condition, string text) // regular assertion method
     /// </code></item>
     /// <item><code>
-    /// [ContractAnnotation("s:null => true")]
+    /// [ContractAnnotation("s:null =&gt; true")]
     /// public bool IsNullOrEmpty(string s) // string.IsNullOrEmpty()
     /// </code></item>
     /// <item><code>
     /// // A method that returns null if the parameter is null,
     /// // and not null if the parameter is not null
-    /// [ContractAnnotation("null => null; notnull => notnull")]
-    /// public object Transform(object data) 
+    /// [ContractAnnotation("null =&gt; null; notnull =&gt; notnull")]
+    /// public object Transform(object data)
     /// </code></item>
     /// <item><code>
-    /// [ContractAnnotation("s:null=>false; =>true,result:notnull; =>false, result:null")]
+    /// [ContractAnnotation("=&gt; true, result: notnull; =&gt; false, result: null")]
     /// public bool TryParse(string s, out Person result)
     /// </code></item>
     /// </list></examples>
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    [AttributeUsage(Method, AllowMultiple = true)]
     sealed class ContractAnnotationAttribute : Attribute
     {
         public ContractAnnotationAttribute([NotNull] string contract)
@@ -171,9 +189,31 @@ namespace JetBrains.Annotations
             ForceFullStates = forceFullStates;
         }
 
-        [NotNull]
-        public string Contract { get; private set; }
+        [NotNull] public string Contract { get; private set; }
+
         public bool ForceFullStates { get; private set; }
+    }
+
+    /// <summary>
+    /// Indicates that marked element should be localized or not.
+    /// </summary>
+    /// <example><code>
+    /// [LocalizationRequiredAttribute(true)]
+    /// class Foo {
+    ///   string str = "my string"; // Warning: Localizable string
+    /// }
+    /// </code></example>
+    [AttributeUsage(All)]
+    sealed class LocalizationRequiredAttribute : Attribute
+    {
+        public LocalizationRequiredAttribute() : this(true) { }
+
+        public LocalizationRequiredAttribute(bool required)
+        {
+            Required = required;
+        }
+
+        public bool Required { get; private set; }
     }
 
     /// <summary>
@@ -196,14 +236,37 @@ namespace JetBrains.Annotations
     ///   }
     /// }
     /// </code></example>
-    [AttributeUsage(AttributeTargets.Interface | AttributeTargets.Class | AttributeTargets.Struct)]
+    [AttributeUsage(Interface | Class | Struct)]
     sealed class CannotApplyEqualityOperatorAttribute : Attribute { }
+
+    /// <summary>
+    /// When applied to a target attribute, specifies a requirement for any type marked
+    /// with the target attribute to implement or inherit specific type or types.
+    /// </summary>
+    /// <example><code>
+    /// [BaseTypeRequired(typeof(IComponent)] // Specify requirement
+    /// class ComponentAttribute : Attribute { }
+    /// 
+    /// [Component] // ComponentAttribute requires implementing IComponent interface
+    /// class MyComponent : IComponent { }
+    /// </code></example>
+    [AttributeUsage(Class, AllowMultiple = true)]
+    [BaseTypeRequired(typeof(Attribute))]
+    sealed class BaseTypeRequiredAttribute : Attribute
+    {
+        public BaseTypeRequiredAttribute([NotNull] Type baseType)
+        {
+            BaseType = baseType;
+        }
+
+        [NotNull] public Type BaseType { get; private set; }
+    }
 
     /// <summary>
     /// Indicates that the marked symbol is used implicitly (e.g. via reflection, in external library),
     /// so this symbol will not be marked as unused (as well as by other usage inspections).
     /// </summary>
-    [AttributeUsage(AttributeTargets.All)]
+    [AttributeUsage(All)]
     sealed class UsedImplicitlyAttribute : Attribute
     {
         public UsedImplicitlyAttribute()
@@ -222,6 +285,7 @@ namespace JetBrains.Annotations
         }
 
         public ImplicitUseKindFlags UseKindFlags { get; private set; }
+
         public ImplicitUseTargetFlags TargetFlags { get; private set; }
     }
 
@@ -229,7 +293,7 @@ namespace JetBrains.Annotations
     /// Should be used on attributes and causes ReSharper to not mark symbols marked with such attributes
     /// as unused (as well as by other usage inspections)
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.GenericParameter)]
+    [AttributeUsage(Class | GenericParameter)]
     sealed class MeansImplicitUseAttribute : Attribute
     {
         public MeansImplicitUseAttribute()
@@ -247,10 +311,9 @@ namespace JetBrains.Annotations
             TargetFlags = targetFlags;
         }
 
-        [UsedImplicitly]
-        public ImplicitUseKindFlags UseKindFlags { get; private set; }
-        [UsedImplicitly]
-        public ImplicitUseTargetFlags TargetFlags { get; private set; }
+        [UsedImplicitly] public ImplicitUseKindFlags UseKindFlags { get; private set; }
+
+        [UsedImplicitly] public ImplicitUseTargetFlags TargetFlags { get; private set; }
     }
 
     [Flags]
@@ -293,13 +356,13 @@ namespace JetBrains.Annotations
     sealed class PublicAPIAttribute : Attribute
     {
         public PublicAPIAttribute() { }
+
         public PublicAPIAttribute([NotNull] string comment)
         {
             Comment = comment;
         }
 
-        [CanBeNull]
-        public string Comment { get; private set; }
+        [CanBeNull] public string Comment { get; private set; }
     }
 
     /// <summary>
@@ -307,7 +370,7 @@ namespace JetBrains.Annotations
     /// If the parameter is a delegate, indicates that delegate is executed while the method is executed.
     /// If the parameter is an enumerable, indicates that it is enumerated while the method is executed.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Parameter)]
+    [AttributeUsage(Parameter)]
     sealed class InstantHandleAttribute : Attribute { }
 
     /// <summary>
@@ -321,23 +384,58 @@ namespace JetBrains.Annotations
     ///   Multiply(123, 42); // Waring: Return value of pure method is not used
     /// }
     /// </code></example>
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(Method)]
     sealed class PureAttribute : Attribute { }
 
     /// <summary>
     /// Indicates that the return value of method invocation must be used.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(Method)]
     sealed class MustUseReturnValueAttribute : Attribute
     {
         public MustUseReturnValueAttribute() { }
+
         public MustUseReturnValueAttribute([NotNull] string justification)
         {
             Justification = justification;
         }
 
-        [CanBeNull]
-        public string Justification { get; private set; }
+        [CanBeNull] public string Justification { get; private set; }
+    }
+
+    /// <summary>
+    /// Indicates the type member or parameter of some type, that should be used instead of all other ways
+    /// to get the value that type. This annotation is useful when you have some "context" value evaluated
+    /// and stored somewhere, meaning that all other ways to get this value must be consolidated with existing one.
+    /// </summary>
+    /// <example><code>
+    /// class Foo {
+    ///   [ProvidesContext] IBarService _barService = ...;
+    /// 
+    ///   void ProcessNode(INode node) {
+    ///     DoSomething(node, node.GetGlobalServices().Bar);
+    ///     //              ^ Warning: use value of '_barService' field
+    ///   }
+    /// }
+    /// </code></example>
+    [AttributeUsage(Field | Property | Parameter | Method | Class | Interface | Struct | GenericParameter)]
+    sealed class ProvidesContextAttribute : Attribute { }
+
+    /// <summary>
+    /// Indicates that a parameter is a path to a file or a folder within a web project.
+    /// Path can be relative or absolute, starting from web root (~).
+    /// </summary>
+    [AttributeUsage(Parameter)]
+    sealed class PathReferenceAttribute : Attribute
+    {
+        public PathReferenceAttribute() { }
+
+        public PathReferenceAttribute([NotNull, PathReference] string basePath)
+        {
+            BasePath = basePath;
+        }
+
+        [CanBeNull] public string BasePath { get; private set; }
     }
 
     /// <summary>
@@ -363,7 +461,7 @@ namespace JetBrains.Annotations
     /// }
     /// </code>
     /// </example>
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(Method)]
     sealed class SourceTemplateAttribute : Attribute { }
 
     /// <summary>
@@ -394,14 +492,14 @@ namespace JetBrains.Annotations
     /// }
     /// </code>
     /// </example>
-    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method, AllowMultiple = true)]
+    [AttributeUsage(Parameter | Method, AllowMultiple = true)]
     sealed class MacroAttribute : Attribute
     {
         /// <summary>
         /// Allows specifying a macro that will be executed for a <see cref="SourceTemplateAttribute">source template</see>
         /// parameter when the template is expanded.
         /// </summary>
-        public string Expression { get; set; }
+        [CanBeNull] public string Expression { get; set; }
 
         /// <summary>
         /// Allows specifying which occurrence of the target parameter becomes editable when the template is deployed.
@@ -417,14 +515,14 @@ namespace JetBrains.Annotations
         /// Identifies the target parameter of a <see cref="SourceTemplateAttribute">source template</see> if the
         /// <see cref="MacroAttribute"/> is applied on a template method.
         /// </summary>
-        public string Target { get; set; }
+        [CanBeNull] public string Target { get; set; }
     }
 
     /// <summary>
     /// Indicates how method, constructor invocation or property access
     /// over collection type affects content of the collection.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor | AttributeTargets.Property)]
+    [AttributeUsage(Method | Constructor | Property)]
     sealed class CollectionAccessAttribute : Attribute
     {
         public CollectionAccessAttribute(CollectionAccessType collectionAccessType)
@@ -450,10 +548,10 @@ namespace JetBrains.Annotations
 
     /// <summary>
     /// Indicates that the marked method is assertion method, i.e. it halts control flow if
-    /// one of the conditions is satisfied. To set the condition, mark one of the parameters with 
+    /// one of the conditions is satisfied. To set the condition, mark one of the parameters with
     /// <see cref="AssertionConditionAttribute"/> attribute.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(Method)]
     sealed class AssertionMethodAttribute : Attribute { }
 
     /// <summary>
@@ -461,7 +559,7 @@ namespace JetBrains.Annotations
     /// marked by <see cref="AssertionMethodAttribute"/> attribute. The mandatory argument of
     /// the attribute is the assertion type.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Parameter)]
+    [AttributeUsage(Parameter)]
     sealed class AssertionConditionAttribute : Attribute
     {
         public AssertionConditionAttribute(AssertionConditionType conditionType)
@@ -493,7 +591,7 @@ namespace JetBrains.Annotations
     /// For example, it could unconditionally throw exception.
     /// </summary>
     [Obsolete("Use [ContractAnnotation('=> halt')] instead")]
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(Method)]
     sealed class TerminatesProgramAttribute : Attribute { }
 
     /// <summary>
@@ -501,14 +599,20 @@ namespace JetBrains.Annotations
     /// .Where). This annotation allows inference of [InstantHandle] annotation for parameters
     /// of delegate type by analyzing LINQ method chains.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(Method)]
     sealed class LinqTunnelAttribute : Attribute { }
 
     /// <summary>
     /// Indicates that IEnumerable, passed as parameter, is not enumerated.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Parameter)]
+    [AttributeUsage(Parameter)]
     sealed class NoEnumerationAttribute : Attribute { }
+
+    /// <summary>
+    /// Indicates that parameter is regular expression pattern.
+    /// </summary>
+    [AttributeUsage(Parameter)]
+    sealed class RegexPatternAttribute : Attribute { }
 
     /// <summary>
     /// Prevents the Member Reordering feature from tossing members of the marked class.
@@ -516,6 +620,7 @@ namespace JetBrains.Annotations
     /// <remarks>
     /// The attribute must be mentioned in your member reordering patterns
     /// </remarks>
-    [AttributeUsage(AttributeTargets.All)]
-    sealed class NoReorder : Attribute { }
+    [AttributeUsage(
+      Class | Interface | Struct | AttributeTargets.Enum)]
+    sealed class NoReorderAttribute : Attribute { }
 }

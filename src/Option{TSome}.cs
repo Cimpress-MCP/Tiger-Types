@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using static System.Diagnostics.Contracts.Contract;
 using static System.Runtime.InteropServices.LayoutKind;
+using static Tiger.Types.Resources;
 
 namespace Tiger.Types
 {
@@ -67,7 +68,7 @@ namespace Tiger.Types
             var result = IsSome
                 ? some(_value)
                 : none;
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -94,7 +95,7 @@ namespace Tiger.Types
             var result = IsSome
                 ? await some(_value).ConfigureAwait(false)
                 : none;
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -121,7 +122,7 @@ namespace Tiger.Types
             var result = IsSome
                 ? some(_value)
                 : none();
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -148,7 +149,7 @@ namespace Tiger.Types
             var result = IsSome
                 ? await some(_value).ConfigureAwait(false)
                 : none();
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -175,7 +176,7 @@ namespace Tiger.Types
             var result = IsSome
                 ? some(_value)
                 : await none().ConfigureAwait(false);
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -202,7 +203,7 @@ namespace Tiger.Types
             var result = IsSome
                 ? await some(_value).ConfigureAwait(false)
                 : await none().ConfigureAwait(false);
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -353,7 +354,7 @@ namespace Tiger.Types
             if (IsSome)
             {
                 var result = some(_value);
-                Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+                Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
                 return new Option<TOut>(result);
             }
 
@@ -380,7 +381,7 @@ namespace Tiger.Types
             if (IsSome)
             {
                 var result = await some(_value).ConfigureAwait(false);
-                Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+                Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
                 return new Option<TOut>(result);
             }
 
@@ -410,9 +411,7 @@ namespace Tiger.Types
         {
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            return IsSome
-                ? some(_value)
-                : Option<TOut>.None;
+            return Map(some).Pipe(Option.Join);
         }
 
         /// <summary>Binds a function over the Some value of this instance, if present, asynchronously.</summary>
@@ -430,13 +429,11 @@ namespace Tiger.Types
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
         [NotNull, Pure]
-        public async Task<Option<TOut>> Bind<TOut>([NotNull, InstantHandle] Func<TSome, Task<Option<TOut>>> some)
+        public Task<Option<TOut>> Bind<TOut>([NotNull, InstantHandle] Func<TSome, Task<Option<TOut>>> some)
         {
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            return IsSome
-                ? await some(_value).ConfigureAwait(false)
-                : Option<TOut>.None;
+            return Map(some).Map(Option.Join);
         }
 
         #endregion
@@ -515,7 +512,7 @@ namespace Tiger.Types
             var result = IsSome
                 ? folder(state, _value)
                 : state;
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -545,7 +542,7 @@ namespace Tiger.Types
             var result = IsSome
                 ? await folder(state, _value).ConfigureAwait(false)
                 : state;
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -666,7 +663,7 @@ namespace Tiger.Types
             if (IsSome) { return this; }
 
             var result = recoverer();
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return new Option<TSome>(result);
         }
 
@@ -686,7 +683,7 @@ namespace Tiger.Types
             if (IsSome) { return this; }
 
             var result = await recoverer().ConfigureAwait(false);
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return new Option<TSome>(result);
         }
 
@@ -706,7 +703,7 @@ namespace Tiger.Types
         {
             get
             {
-                if (!IsSome) { throw new InvalidOperationException(Resources.OptionIsNone); }
+                if (!IsSome) { throw new InvalidOperationException(OptionIsNone); }
 
                 return _value;
             }
@@ -765,7 +762,7 @@ namespace Tiger.Types
             var result = IsSome
                 ? _value
                 : other();
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -787,7 +784,7 @@ namespace Tiger.Types
             var result = IsSome
                 ? _value
                 : await other().ConfigureAwait(false);
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 

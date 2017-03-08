@@ -235,11 +235,12 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = string.Empty;
-            value.Match(
+            var unit = value.Match(
                 one: o => actual = sentinel,
                 two: t => { });
 
             // assert
+            Assert.Equal(Unit.Value, unit);
             Assert.Equal(sentinel, actual);
         }
 
@@ -252,11 +253,12 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = string.Empty;
-            value.Match(
+            var unit = value.Match(
                 one: o => { },
                 two: t => actual = sentinel);
 
             // assert
+            Assert.Equal(Unit.Value, unit);
             Assert.Equal(sentinel, actual);
         }
 

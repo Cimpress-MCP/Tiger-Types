@@ -255,11 +255,12 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = string.Empty;
-            value.Match(
+            var unit = value.Match(
                 left: l => actual = sentinel,
                 right: r => { });
 
             // assert
+            Assert.Equal(Unit.Value, unit);
             Assert.Equal(sentinel, actual);
         }
 
@@ -272,11 +273,12 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = string.Empty;
-            value.Match(
+            var unit = value.Match(
                 left: l => { },
                 right: r => actual = sentinel);
 
             // assert
+            Assert.Equal(Unit.Value, unit);
             Assert.Equal(sentinel, actual);
         }
 
@@ -396,7 +398,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Map(left: _ => sentinel);
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -410,7 +413,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Map(left: _ => false);
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -424,7 +428,8 @@ namespace Tiger.Types.UnitTests
             var actual = await value.Map(left: _ => FromResult(sentinel));
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -438,7 +443,8 @@ namespace Tiger.Types.UnitTests
             var actual = await value.Map(left: _ => FromResult(false));
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -452,7 +458,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Map(right: _ => 42);
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -467,7 +474,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Map(right: _ => sentinel);
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -481,7 +489,8 @@ namespace Tiger.Types.UnitTests
             var actual = await value.Map(right: _ => FromResult(42));
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -495,7 +504,8 @@ namespace Tiger.Types.UnitTests
             var actual = await value.Map(right: _ => FromResult(sentinel));
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -511,7 +521,8 @@ namespace Tiger.Types.UnitTests
                 right: r => r);
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -527,7 +538,8 @@ namespace Tiger.Types.UnitTests
                 right: r => r);
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -543,7 +555,8 @@ namespace Tiger.Types.UnitTests
                 right: r => r);
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -559,7 +572,8 @@ namespace Tiger.Types.UnitTests
                 right: r => r);
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -575,7 +589,8 @@ namespace Tiger.Types.UnitTests
                 right: FromResult);
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -591,7 +606,8 @@ namespace Tiger.Types.UnitTests
                 right: FromResult);
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -607,7 +623,8 @@ namespace Tiger.Types.UnitTests
                 right: FromResult);
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -623,7 +640,8 @@ namespace Tiger.Types.UnitTests
                 right: FromResult);
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -643,7 +661,8 @@ namespace Tiger.Types.UnitTests
                 : Either.Left<int, bool>(33));
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (int)actual;
             Assert.Equal(42, innerValue);
         }
 
@@ -660,7 +679,8 @@ namespace Tiger.Types.UnitTests
                 : Either.Right<int, bool>(true));
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (int)actual;
             Assert.Equal(33, innerValue);
         }
 
@@ -677,7 +697,8 @@ namespace Tiger.Types.UnitTests
                 : Either.Left<int, bool>(33));
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (bool)actual;
             Assert.Equal(true, innerValue);
         }
 
@@ -693,7 +714,8 @@ namespace Tiger.Types.UnitTests
                 : Either.Right<bool, int>(33));
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (int)actual;
             Assert.Equal(42, innerValue);
         }
 
@@ -705,10 +727,13 @@ namespace Tiger.Types.UnitTests
             var value = Either.Left<int, string>(42);
 
             // act
-            var actual = value.Bind(v => v == 42 ? Either.Right<bool, string>(sentinel) : Either.Left<bool, string>(true));
+            var actual = value.Bind(v => v == 42
+                ? Either.Right<bool, string>(sentinel)
+                : Either.Left<bool, string>(true));
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -720,10 +745,13 @@ namespace Tiger.Types.UnitTests
             var value = Either.Left<int, string>(42);
 
             // act
-            var actual = value.Bind(v => v == 42 ? Either.Left<bool, string>(true) : Either.Right<bool, string>(sentinel));
+            var actual = value.Bind(v => v == 42
+                ? Either.Left<bool, string>(true)
+                : Either.Right<bool, string>(sentinel));
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (bool)actual;
             Assert.Equal(true, innerValue);
         }
 
@@ -739,7 +767,8 @@ namespace Tiger.Types.UnitTests
                 : Either.Left<int, bool>(33)));
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (int)actual;
             Assert.Equal(42, innerValue);
         }
 
@@ -756,7 +785,8 @@ namespace Tiger.Types.UnitTests
                 : Either.Right<int, bool>(true)));
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (int)actual;
             Assert.Equal(33, innerValue);
         }
 
@@ -773,7 +803,8 @@ namespace Tiger.Types.UnitTests
                 : Either.Left<int, bool>(33)));
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (bool)actual;
             Assert.Equal(true, innerValue);
         }
 
@@ -789,7 +820,8 @@ namespace Tiger.Types.UnitTests
                 : Either.Right<bool, int>(33)));
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (int)actual;
             Assert.Equal(42, innerValue);
         }
 
@@ -806,7 +838,8 @@ namespace Tiger.Types.UnitTests
                 : Either.Left<bool, string>(true)));
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -823,7 +856,8 @@ namespace Tiger.Types.UnitTests
                 : Either.Right<bool, string>(sentinel)));
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (bool)actual;
             Assert.Equal(true, innerValue);
         }
 
@@ -844,7 +878,8 @@ namespace Tiger.Types.UnitTests
                     : Either.Left<long, bool>(99L));
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (bool)actual;
             Assert.Equal(false, innerValue);
         }
 
@@ -865,7 +900,8 @@ namespace Tiger.Types.UnitTests
                     : Either.Left<long, bool>(99L));
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (long)actual;
             Assert.Equal(99L, innerValue);
         }
 
@@ -886,7 +922,8 @@ namespace Tiger.Types.UnitTests
                     : Either.Left<long, bool>(99L));
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (bool)actual;
             Assert.Equal(true, innerValue);
         }
 
@@ -907,7 +944,8 @@ namespace Tiger.Types.UnitTests
                     : Either.Left<long, bool>(99L));
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (int)actual;
             Assert.Equal(33L, innerValue);
         }
 
@@ -928,7 +966,8 @@ namespace Tiger.Types.UnitTests
                     : Either.Left<long, bool>(99L));
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (bool)actual;
             Assert.Equal(false, innerValue);
         }
 
@@ -949,7 +988,8 @@ namespace Tiger.Types.UnitTests
                     : Either.Left<long, bool>(99L));
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (long)actual;
             Assert.Equal(99L, innerValue);
         }
 
@@ -970,7 +1010,8 @@ namespace Tiger.Types.UnitTests
                     : Either.Left<long, bool>(99L));
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (bool)actual;
             Assert.Equal(true, innerValue);
         }
 
@@ -991,7 +1032,8 @@ namespace Tiger.Types.UnitTests
                     : Either.Left<long, bool>(99L));
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (long)actual;
             Assert.Equal(33L, innerValue);
         }
 
@@ -1012,7 +1054,8 @@ namespace Tiger.Types.UnitTests
                     : Either.Left<long, bool>(99L)));
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (bool)actual;
             Assert.Equal(false, innerValue);
         }
 
@@ -1033,7 +1076,8 @@ namespace Tiger.Types.UnitTests
                     : Either.Left<long, bool>(99L)));
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (long)actual;
             Assert.Equal(99L, innerValue);
         }
 
@@ -1054,7 +1098,8 @@ namespace Tiger.Types.UnitTests
                     : Either.Left<long, bool>(99L)));
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (bool)actual;
             Assert.Equal(true, innerValue);
         }
 
@@ -1075,7 +1120,8 @@ namespace Tiger.Types.UnitTests
                     : Either.Left<long, bool>(99L)));
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (long)actual;
             Assert.Equal(33L, innerValue);
         }
 
@@ -1096,7 +1142,8 @@ namespace Tiger.Types.UnitTests
                     : Either.Left<long, bool>(99L)));
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (bool)actual;
             Assert.Equal(false, innerValue);
         }
 
@@ -1117,7 +1164,8 @@ namespace Tiger.Types.UnitTests
                     : Either.Left<long, bool>(99L)));
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (long)actual;
             Assert.Equal(99L, innerValue);
         }
 
@@ -1138,7 +1186,8 @@ namespace Tiger.Types.UnitTests
                     : Either.Left<long, bool>(99L)));
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (bool)actual;
             Assert.Equal(true, innerValue);
         }
 
@@ -1159,7 +1208,8 @@ namespace Tiger.Types.UnitTests
                     : Either.Left<long, bool>(99L)));
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (long)actual;
             Assert.Equal(33L, innerValue);
         }
 
@@ -1291,7 +1341,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Tap(v => output = v);
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (int)actual;
             Assert.Equal(42, innerValue);
         }
 
@@ -1307,7 +1358,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Tap(v => output = v);
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (int)actual;
             Assert.Equal(42, innerValue);
         }
 
@@ -1323,7 +1375,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Tap(v => output = v);
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (int)actual;
             Assert.Equal(42, innerValue);
         }
 
@@ -1339,7 +1392,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Tap(v => output = v);
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (int)actual;
             Assert.Equal(42, innerValue);
         }
 
@@ -1355,7 +1409,8 @@ namespace Tiger.Types.UnitTests
             var actual = await value.Tap(v => Run(() => output = v));
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (int)actual;
             Assert.Equal(42, innerValue);
         }
 
@@ -1371,7 +1426,8 @@ namespace Tiger.Types.UnitTests
             var actual = await value.Tap(v => Run(() => output = v));
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (int)actual;
             Assert.Equal(42, innerValue);
         }
 
@@ -1387,7 +1443,8 @@ namespace Tiger.Types.UnitTests
             var actual = await value.Tap(v => Run(() => output = v));
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (int)actual;
             Assert.Equal(42, innerValue);
         }
 
@@ -1403,7 +1460,8 @@ namespace Tiger.Types.UnitTests
             var actual = await value.Tap(v => Run(() => output = v));
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (int)actual;
             Assert.Equal(42, innerValue);
         }
 
@@ -1419,9 +1477,10 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = "megatron";
-            value.Let(v => actual = v);
+            var unit = value.Let(v => actual = v);
 
             // assert
+            Assert.Equal(Unit.Value, unit);
             Assert.Equal(sentinel, actual);
         }
 
@@ -1434,9 +1493,10 @@ namespace Tiger.Types.UnitTests
 
             // act
             var actual = 42;
-            value.Let(v => actual = v);
+            var unit = value.Let(v => actual = v);
 
             // assert
+            Assert.Equal(Unit.Value, unit);
             Assert.Equal(42, actual);
         }
 
@@ -1541,7 +1601,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Recover(42);
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (int)actual;
             Assert.Equal(42, innerValue);
         }
 
@@ -1555,7 +1616,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Recover("megatron");
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -1569,7 +1631,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Recover(() => 42);
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (int)actual;
             Assert.Equal(42, innerValue);
         }
 
@@ -1583,7 +1646,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Recover(() => "megatron");
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -1597,7 +1661,8 @@ namespace Tiger.Types.UnitTests
             var actual = await value.Recover(() => FromResult(42));
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (int)actual;
             Assert.Equal(42, innerValue);
         }
 
@@ -1611,7 +1676,8 @@ namespace Tiger.Types.UnitTests
             var actual = await value.Recover(() => FromResult("megatron"));
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -2191,7 +2257,8 @@ namespace Tiger.Types.UnitTests
             Either<string, int> actual = Either.Left(sentinel);
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -2202,7 +2269,8 @@ namespace Tiger.Types.UnitTests
             Either<int, string> actual = Either.Right(sentinel);
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -2223,7 +2291,8 @@ namespace Tiger.Types.UnitTests
             var actual = func(42);
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -2236,7 +2305,8 @@ namespace Tiger.Types.UnitTests
             // assert
             Assert.True(actual.IsLeft);
             Assert.False(actual.IsRight);
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -2249,7 +2319,8 @@ namespace Tiger.Types.UnitTests
             // assert
             Assert.False(actual.IsLeft);
             Assert.True(actual.IsRight);
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -2616,7 +2687,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.DefaultIfEmpty();
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (int)actual;
             Assert.Equal(0, innerValue);
         }
 
@@ -2630,7 +2702,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Recover("megatron");
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -2644,7 +2717,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.DefaultIfEmpty();
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (int)actual;
             Assert.Equal(0, innerValue);
         }
 
@@ -2660,7 +2734,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Do(v => output = v);
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
             Assert.Equal(42, output);
         }
@@ -2677,7 +2752,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Do(v => output = v);
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
             Assert.Equal(sentinel, output);
         }
@@ -2735,7 +2811,8 @@ namespace Tiger.Types.UnitTests
             var actual = value.Select(_ => true);
 
             // assert
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (bool)actual;
             Assert.Equal(true, innerValue);
         }
 
@@ -2766,7 +2843,8 @@ namespace Tiger.Types.UnitTests
                          select l + r;
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -2783,7 +2861,8 @@ namespace Tiger.Types.UnitTests
                          select l + r;
 
             // assert
-            var innerValue = Assert.Left(actual);
+            Assert.True(actual.IsLeft);
+            var innerValue = (string)actual;
             Assert.Equal(sentinel, innerValue);
         }
 
@@ -2802,7 +2881,8 @@ namespace Tiger.Types.UnitTests
             // assert
             Assert.False(actual.IsLeft);
             Assert.True(actual.IsRight);
-            var innerValue = Assert.Right(actual);
+            Assert.True(actual.IsRight);
+            var innerValue = (int)actual;
             Assert.Equal(75, innerValue);
         }
 

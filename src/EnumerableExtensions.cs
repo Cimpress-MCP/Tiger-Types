@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using static System.Diagnostics.Contracts.Contract;
+using static Tiger.Types.Resources;
 
 namespace Tiger.Types
 {
     /// <summary>Extensions to the functionality of <see cref="IEnumerable{T}"/>.</summary>
+    [PublicAPI]
     public static class EnumerableExtensions
     {
         /// <summary>
@@ -25,8 +29,8 @@ namespace Tiger.Types
         {
             if (source == null) { throw new ArgumentNullException(nameof(source)); }
 
-            var list = source as IList<TSource>;
-            if (list != null && list.Count > 0)
+            // note(cosborn) Logic cribbed from FirstOrDefault.
+            if (source is IList<TSource> list && list.Count > 0)
             {
                 return list[0];
             }
@@ -61,6 +65,7 @@ namespace Tiger.Types
             if (source == null) { throw new ArgumentNullException(nameof(source)); }
             if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
 
+            // note(cosborn) Logic cribbed from FirstOrDefault.
             foreach (var element in source)
             {
                 if (predicate(element)) { return element; }
@@ -69,16 +74,63 @@ namespace Tiger.Types
             return Option<TSource>.None;
         }
 
-        /// <summary>Combines the provided seed state with each value of this instance.</summary>
-        /// <typeparam name="T">The type of the items contained in <paramref name="collection"/>.</typeparam>
-        /// <typeparam name="TState">The type of the seed value.</typeparam>
-        /// <param name="collection">The collection to be folded.</param>
-        /// <param name="state">The seed value to be combined with each value of this instance.</param>
-        /// <param name="folder">
-        /// A function to invoke with the seed value and each value of this instance as the arguments.
+        /// <summary>
+        /// Maps a transformation over each element of an <see cref="IEnumerable{T}"/>.
+        /// </summary>
+        /// <typeparam name="TIn">The element type of <paramref name="enumerableValue"/>.</typeparam>
+        /// <typeparam name="TOut">The return type of <paramref name="mapper"/>.</typeparam>
+        /// <param name="enumerableValue">The value to map.</param>
+        /// <param name="mapper">
+        /// A transformation from <typeparamref name="TIn"/> to <typeparamref name="TOut"/>.
         /// </param>
         /// <returns>
-        /// The result of combining the provided seed value with each value of this instance
+        /// An <see cref="IEnumerable{T}"/> that is the result of applying <paramref name="mapper"/>
+        /// to each element of <paramref name="enumerableValue"/>.</returns>
+        [NotNull, ItemNotNull, Pure, LinqTunnel]
+        public static IEnumerable<TOut> Map<TIn, TOut>(
+            [NotNull, ItemNotNull] this IEnumerable<TIn> enumerableValue,
+            [NotNull, InstantHandle] Func<TIn, TOut> mapper)
+        {
+            if (enumerableValue == null) { throw new ArgumentNullException(nameof(enumerableValue)); }
+            if (mapper == null) { throw new ArgumentNullException(nameof(mapper)); }
+
+            return enumerableValue.Select(mapper);
+        }
+
+        /// <summary>
+        /// Maps a transformation over each element of an <see cref="IEnumerable{T}"/>, asynchronously.
+        /// </summary>
+        /// <typeparam name="TIn">The element type of <paramref name="enumerableValue"/>.</typeparam>
+        /// <typeparam name="TOut">The return type of <paramref name="mapper"/>.</typeparam>
+        /// <param name="enumerableValue">The value to map.</param>
+        /// <param name="mapper">
+        /// An asynchronous transformation from <typeparamref name="TIn"/>
+        /// to <typeparamref name="TOut"/>.
+        /// </param>
+        /// <returns>
+        /// An <see cref="IEnumerable{T}"/> that is the result of applying <paramref name="mapper"/>
+        /// to each element of <paramref name="enumerableValue"/>.</returns>
+        [NotNull, ItemNotNull, Pure, LinqTunnel]
+        public static Task<IEnumerable<TOut>> Map<TIn, TOut>(
+            [NotNull, ItemNotNull] this IEnumerable<TIn> enumerableValue,
+            [NotNull, InstantHandle] Func<TIn, Task<TOut>> mapper)
+        {
+            if (enumerableValue == null) { throw new ArgumentNullException(nameof(enumerableValue)); }
+            if (mapper == null) { throw new ArgumentNullException(nameof(mapper)); }
+
+            return enumerableValue.Select(mapper).Pipe(Task.WhenAll).Map(Enumerable.AsEnumerable);
+        }
+
+        /// <summary>Combines the provided seed state with each element of this instance.</summary>
+        /// <typeparam name="T">The element type of <paramref name="collection"/>.</typeparam>
+        /// <typeparam name="TState">The type of the seed value.</typeparam>
+        /// <param name="collection">The collection to be folded.</param>
+        /// <param name="state">The seed value to be combined with each element of this instance.</param>
+        /// <param name="folder">
+        /// A function to invoke with the seed value and each element of this instance as the arguments.
+        /// </param>
+        /// <returns>
+        /// The result of combining the provided seed value with each element of this instance
         /// if this instance is not empty; otherwise, the seed value.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="collection"/> is <see langword="null"/>.</exception>
@@ -98,7 +150,7 @@ namespace Tiger.Types
             foreach (var item in collection)
             {
                 result = folder(result, item);
-                Assume(result != null, Resources.ResultIsNull);
+                Assume(result != null, ResultIsNull);
             } // ReSharper disable once AssignNullToNotNullAttribute
 
             return result;
@@ -112,7 +164,7 @@ namespace Tiger.Types
         /// <param name="collection">The collection to be folded.</param>
         /// <param name="state">The seed value to be combined with each value of this instance.</param>
         /// <param name="folder">
-        /// A n asynchronous function to invoke with the seed value
+        /// An asynchronous function to invoke with the seed value
         /// and each value of this instance as the arguments.
         /// </param>
         /// <returns>
@@ -136,10 +188,9 @@ namespace Tiger.Types
             foreach (var item in collection)
             {
                 result = await folder(result, item).ConfigureAwait(false);
-                Assume(result != null, Resources.ResultIsNull);
-            }
+                Assume(result != null, ResultIsNull);
+            } // ReSharper disable once AssignNullToNotNullAttribute
 
-            // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
     }

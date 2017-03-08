@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using static System.Diagnostics.Contracts.Contract;
+using static Tiger.Types.Resources;
 
 namespace Tiger.Types
 {
@@ -25,7 +26,7 @@ namespace Tiger.Types
 
             await task.ConfigureAwait(false);
             var result = applier();
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
@@ -48,13 +49,11 @@ namespace Tiger.Types
             if (mapper == null) { throw new ArgumentNullException(nameof(mapper)); }
 
             var result = mapper(await taskValue.ConfigureAwait(false));
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
+            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
         }
 
-        /// <summary>
-        /// Performs actions in a sequence.
-        /// </summary>
+        /// <summary>Performs actions in a sequence.</summary>
         /// <typeparam name="TOut">The return type of <paramref name="thenner"/>.</typeparam>
         /// <param name="task">The <see cref="Task"/> to perform first.</param>
         /// <param name="thenner">A function producing a <typeparamref name="TOut"/>, asynchronously.</param>
@@ -62,17 +61,14 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="task"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="thenner"/> is <see langword="null"/>.</exception>
         [NotNull, ItemNotNull]
-        public static async Task<TOut> Then<TOut>(
+        public static Task<TOut> Then<TOut>(
             [NotNull] this Task task,
             [NotNull, InstantHandle] Func<Task<TOut>> thenner)
         {
             if (task == null) { throw new ArgumentNullException(nameof(task)); }
             if (thenner == null) { throw new ArgumentNullException(nameof(thenner)); }
 
-            await task.ConfigureAwait(false);
-            var result = await thenner().ConfigureAwait(false);
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
-            return result;
+            return task.Apply(thenner).Unwrap();
         }
 
         /// <summary>
@@ -86,16 +82,14 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="taskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="binder"/> is <see langword="null"/>.</exception>
         [NotNull, ItemNotNull]
-        public static async Task<TOut> Bind<TIn, TOut>(
+        public static Task<TOut> Bind<TIn, TOut>(
             [NotNull, ItemNotNull] this Task<TIn> taskValue,
             [NotNull, InstantHandle] Func<TIn, Task<TOut>> binder)
         {
             if (taskValue == null) { throw new ArgumentNullException(nameof(taskValue)); }
             if (binder == null) { throw new ArgumentNullException(nameof(binder)); }
 
-            var result = await binder(await taskValue.ConfigureAwait(false)).ConfigureAwait(false);
-            Assume(result != null, Resources.ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
-            return result;
+            return taskValue.Map(binder).Unwrap();
         }
     }
 }
