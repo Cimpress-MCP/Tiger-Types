@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Tiger.Types.csproj"/>
+    <ProjectReference Include="..\Types\Tiger.Types.csproj"/>
   </ItemGroup>
 
   <ItemGroup>
