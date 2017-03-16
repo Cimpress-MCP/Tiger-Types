@@ -28,9 +28,10 @@ pipeline {
       }
     }
     stage('Deploy') {
-      when  { branch 'develop' }
+      when  { branch 'master' }
       steps {
-        echo 'Nice!'
+        echo 'oh no this is not master'
+        // sh 'dotnet nuget push artifacts/*.nupkg" --no-symbols --config-file NuGet.config'
       }
     }
   }
