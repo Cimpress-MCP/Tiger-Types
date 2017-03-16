@@ -3,7 +3,7 @@
 using System;
 using Xunit;
 
-namespace Tiger.Types.UnitTests
+namespace Tiger.Types.UnitTest
 {
     /// <summary>Tests related to <see cref="ObjectExtensions"/>.</summary>
     public sealed class ObjectExtensionsTests

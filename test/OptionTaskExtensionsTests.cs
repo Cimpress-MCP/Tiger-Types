@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Xunit;
 using static System.Threading.Tasks.Task;
 
-namespace Tiger.Types.UnitTests
+namespace Tiger.Types.UnitTest
 {
     /// <summary>Tests related to <see cref="OptionTaskExtensions"/>.</summary>
     public sealed class OptionTaskExtensionsTests

@@ -5,7 +5,7 @@ using Xunit;
 using static System.Threading.Tasks.Task;
 using static System.TimeSpan;
 
-namespace Tiger.Types.UnitTests
+namespace Tiger.Types.UnitTest
 {
     public sealed class TaskExtensionsTests
     {

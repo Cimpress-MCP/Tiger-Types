@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Xunit;
 using static System.ComponentModel.TypeDescriptor;
 
-namespace Tiger.Types.UnitTests
+namespace Tiger.Types.UnitTest
 {
     /// <summary>Tests related to <see cref="OptionTypeConverter"/>.</summary>
     public sealed class OptionTypeConverterTests

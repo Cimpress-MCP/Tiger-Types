@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using Xunit;
 
-namespace Tiger.Types.UnitTests
+namespace Tiger.Types.UnitTest
 {
     /// <summary>Tests related to <see cref="DictionaryExtensions"/>.</summary>
     public sealed class DictionaryExtensionsTests

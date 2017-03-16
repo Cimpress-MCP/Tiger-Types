@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Xunit;
 
-namespace Tiger.Types.UnitTests
+namespace Tiger.Types.UnitTest
 {
     /// <summary>
     /// Represents a set of data for a theory with 2 parameters. Theory data will be

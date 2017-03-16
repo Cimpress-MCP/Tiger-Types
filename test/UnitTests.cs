@@ -2,7 +2,7 @@
 
 using Xunit;
 
-namespace Tiger.Types.UnitTests
+namespace Tiger.Types.UnitTest
 {
     /// <summary>Tests related to the functionality of <see cref="Unit"/>.</summary>
     public sealed class UnitTests // note(cosborn) lol

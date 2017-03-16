@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Xunit;
 using static System.Threading.Tasks.Task;
 
-namespace Tiger.Types.UnitTests
+namespace Tiger.Types.UnitTest
 {
     /// <summary>Tests related to <see cref="Union{T1,T2}"/>.</summary>
     public sealed class Union2Tests

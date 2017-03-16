@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Xunit;
 using static System.Threading.Tasks.Task;
 
-namespace Tiger.Types.UnitTests
+namespace Tiger.Types.UnitTest
 {
     /// <summary>Tests related to <see cref="Option{TSome}"/>.</summary>
     public sealed class OptionTests
