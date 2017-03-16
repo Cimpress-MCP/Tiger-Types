@@ -29,7 +29,9 @@ pipeline {
     }
     stage('Deploy') {
       when  { branch 'develop' }
-      echo 'Nice!'
+      steps {
+        echo 'Nice!'
+      }
     }
   }
 }
