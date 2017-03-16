@@ -5,6 +5,7 @@
     <DebugType>portable</DebugType>
     <AssemblyName>Test</AssemblyName>
     <RootNamespace>Tiger.Types.UnitTests</RootNamespace>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
