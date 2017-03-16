@@ -27,5 +27,9 @@ pipeline {
         sh 'dotnet pack -c Release -o "$(pwd)/artifacts"'
       }
     }
+    stage('Deploy') {
+      when  { branch 'develop' }
+      echo 'Nice!'
+    }
   }
 }
