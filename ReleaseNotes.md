@@ -1,9 +1,12 @@
-### What's new in 3.2.0 (Released 2017-03-09)
+### What's new in 3.2.0 (Released ????-??-??)
 
 * Types that obey the monad laws have grown a `Join` method.
 * The `Bind` operation on many types has been made more efficient.
 * Asynchronous operations have been made significantly more efficient.
 * Collections have learned some new tricks, such as folding asynchronously.
+* Equlity operations have been made slightly more efficient.
+* Many extension methods have been moved into a more easily imported namespace.
+* The project has moved to the latest versions of tools in the .NET ecosystem, and refactorings have been made accordingly.
 
 ### What's new in 3.1.0 (Released 2016-11-21)
 

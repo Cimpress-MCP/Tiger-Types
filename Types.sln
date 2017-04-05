@@ -2,9 +2,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tiger.Types", "Types\Tiger.Types.csproj", "{B66DEA6D-03B7-46EE-8525-CA9FCBA952C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tiger.Types", "src\Tiger.Types.csproj", "{B66DEA6D-03B7-46EE-8525-CA9FCBA952C8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "test\Test.csproj", "{1C5FB1B5-18C8-462A-8EBE-8E8FC46EE944}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "unit\Test.csproj", "{1C5FB1B5-18C8-462A-8EBE-8E8FC46EE944}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

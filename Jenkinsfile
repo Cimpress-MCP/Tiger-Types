@@ -1,9 +1,12 @@
 pipeline {
   agent {
     docker {
-      image 'microsoft/dotnet:1.1-sdk'
-      args '-u root'
+      image 'tiger/dotnet:exp'
     }
+  }
+  
+  options {
+    timestamps()
   }
   
   stages {
@@ -19,7 +22,7 @@ pipeline {
     }
     stage('Test') {
       steps {
-        sh 'dotnet test -c Release test/Test.csproj'
+        sh 'dotnet test -c Release ./unit/Test.csproj'
       }
     }
     stage('Pack') {
@@ -29,9 +32,18 @@ pipeline {
     }
     stage('Deploy') {
       when  { branch 'master' }
-      steps {
-        sh 'dotnet nuget push artifacts/*.nupkg" --no-symbols --config-file NuGet.config'
+      environment {
+        NUGET_API_KEY = credentials('NuGet')
       }
+      steps {
+        sh 'dotnet nuget push artifacts/*.nupkg -k "${NUGET_API_KEY}"'
+      }
+    }
+  }
+
+  post {
+    always {
+      deleteDir()
     }
   }
 }
