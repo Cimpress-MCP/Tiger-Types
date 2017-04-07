@@ -14,7 +14,7 @@ These types and operations allow you to treat more operations in your .NET appli
 
 Let’s use `Option<TSome>` for an example. In the following code, we’ll write a short method that converts a string to all upper-case.
 
-```
+```csharp
 public string ToAllUpperCase(string input)
 {
   return input.ToUpper();
@@ -25,7 +25,7 @@ public string ToAllUpperCase(string input)
 
 There is already a somewhat major error that could occur: If `input` is `null`, then the method will throw `NullReferenceException`. This is a bug, and the type system did nothing to help us detect it. Our method can accept any `string` value *and* the kind-of-value `null`. We can check for `null`, and throw `ArgumentNullException`, but let’s say that we need to allow the concept of “no value” into the method.
 
-```
+```csharp
 public string ToAllUpperCase(string input)
 {
   if (input == null)
@@ -40,7 +40,7 @@ This looks better, but is even worse! Our callers still believe that we can only
 
 The pattern that emerges is this: If we get no value, return no value. If we get a value, we process it. This pattern is built into the type, and it is called `Map`. That allows us to write the original verison of `ToAllUpperCase` defined above, the one that operates only on values, and call it like this:
 
-```
+```csharp
 potentialString.Map(s => ToAllUpperCase(s));
 ```
 
@@ -66,7 +66,7 @@ Here, the type of `potentialString` is explicitly `Option<string>`, and the retu
 
 Many of the methods on these types are aliased to LINQ-standard names. This is for reasons of developer familiarity and activating certain C# features. For example, implementing `Select`, `SelectMany`, and `Where` allows the LINQ query syntax to be used. Using `Option<TSome>` again:
 
-```
+```csharp
 var left = Option.From(3); // Some(3)
 var right = Option.From(4); // Some(4)
 
@@ -77,7 +77,7 @@ var sum = from l in left
 
 However, if either of the input values is in the <i>None</i> state, the operation fails.
 
-```
+```csharp
 var left = Option<int>.None; // None
 var right = Option.From(4); // Some(4)
 
@@ -88,7 +88,7 @@ var sum = from l in left
 
 Additionally, implementing `GetEnumerator` allows an `Option<TSome>` to be used with the `foreach` statement, which will execute its body only if the optional value is in the <i>Some</i> state.
 
-```
+```csharp
 foreach (var value in Option.From("world"))
 {
   Console.WriteLine($"Hello, {value}!"); // Hello, world!
