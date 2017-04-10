@@ -1,4 +1,4 @@
-### What's new in 3.2.0 (Released ????-??-??)
+### What's new in 4.0.0 (Released 2017-04-10)
 
 * Types that obey the monad laws have grown a `Join` method.
 * The `Bind` operation on many types has been made more efficient.

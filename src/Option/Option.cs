@@ -132,7 +132,7 @@ namespace Tiger.Types
         /// <summary>
         /// Joins an optional <see cref="Option{TSome}"/> into an <see cref="Option{TSome}"/>.
         /// </summary>
-        /// <typeparam name="TSome">The some type of <paramref name="optionOptionValue"/>.</typeparam>
+        /// <typeparam name="TSome">The Some type of <paramref name="optionOptionValue"/>.</typeparam>
         /// <param name="optionOptionValue">The value to be joined.</param>
         /// <returns>
         /// An <see cref="Option{TSome}"/> in the None state if <paramref name="optionOptionValue"/>
