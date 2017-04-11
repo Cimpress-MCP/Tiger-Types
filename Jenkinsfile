@@ -36,7 +36,8 @@ pipeline {
         NUGET_API_KEY = credentials('NuGet')
       }
       steps {
-        sh 'dotnet nuget push artifacts/*.nupkg -k "${NUGET_API_KEY}"'
+        sh 'ping mcpartifactory.cimpress.net'
+        sh 'dotnet nuget -v Diagnostic push artifacts/*.nupkg -k "${NUGET_API_KEY}"'
       }
     }
   }
