@@ -166,26 +166,27 @@ namespace Tiger.Types
             return From(value).Filter(splitter);
         }
 
-        /// <summary>Splits a value into an optional value based on a provided condition.</summary>
-        /// <typeparam name="TSome">The type of <paramref name="value"/>.</typeparam>
-        /// <param name="value">A value to test for a condition.</param>
-        /// <param name="splitter">A condition by which <paramref name="value"/> can be split.</param>
+        /// <summary>Splits a nullable value into an optional value based on a provided condition.</summary>
+        /// <typeparam name="TSome">The value type of <paramref name="nullableValue"/>.</typeparam>
+        /// <param name="nullableValue">A nullable value to test for a condition.</param>
+        /// <param name="splitter">A condition by which the value of <paramref name="nullableValue"/> can be split.</param>
         /// <returns>
-        /// An <see cref="Option{TSome}"/> in the None state if <paramref name="value"/>
+        /// An <see cref="Option{TSome}"/> in the None state if <paramref name="nullableValue"/>
         /// is equal to <see langword="null"/> or if the condition <paramref name="splitter"/>
-        /// is not satisfied by <paramref name="value"/>; otherwise, an <see cref="Option{TSome}"/>
-        /// in the Some state with its Some value set to <paramref name="value"/>.
+        /// is not satisfied by the value of <paramref name="nullableValue"/>; otherwise,
+        /// an <see cref="Option{TSome}"/> in the Some state with its Some value set to the value of
+        /// <paramref name="nullableValue"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="splitter"/> is <see langword="null"/>.</exception>
         [Pure]
         public static Option<TSome> Split<TSome>(
-            [CanBeNull] TSome? value,
+            [CanBeNull] TSome? nullableValue,
             [NotNull, InstantHandle] Func<TSome, bool> splitter)
             where TSome : struct
         {
             if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
 
-            return From(value).Filter(splitter);
+            return From(nullableValue).Filter(splitter);
         }
 
         /// <summary>Splits a value into an optional value based on a provided condition, asynchronously.</summary>

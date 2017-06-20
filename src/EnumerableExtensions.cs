@@ -97,6 +97,31 @@ namespace Tiger.Types
         }
 
         /// <summary>
+        /// Maps a transformation over each element of an <see cref="IEnumerable{T}"/>,
+        /// then maps the collection of optional values to their Some values..
+        /// </summary>
+        /// <typeparam name="TIn">The element type of <paramref name="enumerableValue"/>.</typeparam>
+        /// <typeparam name="TOut">The Some type of the return type of <paramref name="mapper"/>.</typeparam>
+        /// <param name="enumerableValue">The value to map.</param>
+        /// <param name="mapper">
+        /// A transformation from <typeparamref name="TIn"/> to <see cref="Option{TSome}"/>.
+        /// </param>
+        /// <returns>
+        /// An <see cref="IEnumerable{T}"/> that is the result of applying <paramref name="mapper"/>
+        /// to each element of <paramref name="enumerableValue"/>, then extracting the Some values thereof.
+        /// </returns>
+        [NotNull, ItemNotNull, Pure, LinqTunnel]
+        public static IEnumerable<TOut> MapCat<TIn, TOut>(
+            [NotNull, ItemNotNull] this IEnumerable<TIn> enumerableValue,
+            [NotNull, InstantHandle] Func<TIn, Option<TOut>> mapper)
+        {
+            if (enumerableValue == null) { throw new ArgumentNullException(nameof(enumerableValue)); }
+            if (mapper == null) { throw new ArgumentNullException(nameof(mapper)); }
+
+            return enumerableValue.Select(mapper).Cat();
+        }
+
+        /// <summary>
         /// Maps a transformation over each element of an <see cref="IEnumerable{T}"/>, asynchronously.
         /// </summary>
         /// <typeparam name="TIn">The element type of <paramref name="enumerableValue"/>.</typeparam>

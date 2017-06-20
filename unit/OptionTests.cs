@@ -1,35 +1,32 @@
-﻿// ReSharper disable All
-
+﻿using FsCheck;
+using FsCheck.Xunit;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 using static System.Threading.Tasks.Task;
+// ReSharper disable All
 
 namespace Tiger.Types.UnitTest
 {
     /// <summary>Tests related to <see cref="Option{TSome}"/>.</summary>
-    public sealed class OptionTests
+    public static class OptionTests
     {
-        const string sentinel = "sentinel";
-
         #region IsNone, IsSome
 
-        [Theory(DisplayName = "Non-null values create Some Options using the untyped static From method.")]
-        [InlineData(sentinel)]
-        [InlineData("")]
-        public void UntypedFrom_Value_IsSome(string innerValue)
+        [Property(DisplayName = "Non-null values create Some Options using the untyped static From method.")]
+        public static void UntypedFrom_Value_IsSome(NonNull<string> some)
         {
             // arrange, act
-            var actual = Option.From(innerValue);
+            var actual = Option.From(some.Get);
 
             // assert
             Assert.False(actual.IsNone);
             Assert.True(actual.IsSome);
         }
 
-        [Fact(DisplayName = "Null values create None Options using the untyped static From method.")]
-        public void UntypedFrom_Null_IsNone()
+        [Property(DisplayName = "Null values create None Options using the untyped static From method.")]
+        public static void UntypedFrom_Null_IsNone()
         {
             // arrange, act
             var actual = Option.From((string)null);
@@ -39,22 +36,19 @@ namespace Tiger.Types.UnitTest
             Assert.False(actual.IsSome);
         }
 
-        [Theory(DisplayName = "Non-null nullable values create Some Options.")]
-        [InlineData(0)]
-        [InlineData(3)]
-        [InlineData(-1)]
-        public void UntypedFrom_NullableValue_IsSome(int? innerValue)
+        [Property(DisplayName = "Non-null nullable values create Some Options.")]
+        public static void UntypedFrom_NullableValue_IsSome(int some)
         {
             // arrange, act
-            var actual = Option.From(innerValue);
+            var actual = Option.From((int?)some);
 
             // assert
             Assert.False(actual.IsNone);
             Assert.True(actual.IsSome);
         }
 
-        [Fact(DisplayName = "Null nullable values create None Options.")]
-        public void UntypedFrom_NullableNull_IsNone()
+        [Property(DisplayName = "Null nullable values create None Options.")]
+        public static void UntypedFrom_NullableNull_IsNone()
         {
             // arrange, act
             var actual = Option.From((int?)null);
@@ -68,334 +62,334 @@ namespace Tiger.Types.UnitTest
 
         #region Match
 
-        [Fact(DisplayName = "Matching a None Option returns the None value branch, " +
-                            "not the Some func branch.")]
-        public void ValueFuncMatchReturn_None()
+        [Property(DisplayName = "Matching a None Option returns the None value branch, " +
+            "not the Some func branch.")]
+        public static void ValueFuncMatchReturn_None(int noneValue)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
             var actual = value.Match(
-                none: 42,
+                none: noneValue,
                 some: v => v.Length);
 
             // assert
-            Assert.Equal(42, actual);
+            Assert.Equal(noneValue, actual);
         }
 
-        [Fact(DisplayName = "Matching a Some Option returns the Some func branch, " +
-                            "not the None value branch.")]
-        public void ValueFuncMatchReturn_Some()
+        [Property(DisplayName = "Matching a Some Option returns the Some func branch, " +
+            "not the None value branch.")]
+        public static void ValueFuncMatchReturn_Some(NonNull<string> some, int noneValue)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
             var actual = value.Match(
-                none: 42,
+                none: noneValue,
                 some: v => v.Length);
 
             // assert
-            Assert.Equal(sentinel.Length, actual);
+            Assert.Equal(some.Get.Length, actual);
         }
 
-        [Fact(DisplayName = "Matching a None Option returns the None value branch, " +
-                            "not the Some task branch.")]
-        public async Task ValueTaskMatchReturn_None()
+        [Theory(DisplayName = "Matching a None Option returns the None value branch, " +
+            "not the Some task branch.")]
+        [InlineData(500)]
+        public static async Task ValueTaskMatchReturn_None(int noneValue)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
             var actual = await value.Match(
-                none: 42,
+                none: noneValue,
                 some: v => v.Length.Pipe(FromResult));
 
             // assert
-            Assert.Equal(42, actual);
+            Assert.Equal(noneValue, actual);
         }
 
-        [Fact(DisplayName = "Matching a Some Option returns the Some task branch, " +
-                            "not the None value branch.")]
-        public async Task ValueTaskMatchReturn_Some()
+        [Property(DisplayName = "Matching a Some Option returns the Some task branch, " +
+            "not the None value branch.")]
+        public static void ValueTaskMatchReturn_Some(NonNull<string> some, int noneValue)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = await value.Match(
-                none: 42,
-                some: v => v.Length.Pipe(FromResult));
+            var actual = value.Match(
+                none: noneValue,
+                some: v => v.Length.Pipe(FromResult)).Result;
 
             // assert
-            Assert.Equal(sentinel.Length, actual);
+            Assert.Equal(some.Get.Length, actual);
         }
 
-        [Fact(DisplayName = "Matching a None Option returns the None func branch, " +
-                            "not the Some func branch.")]
-        public void FuncFuncMatchReturn_None()
+        [Property(DisplayName = "Matching a None Option returns the None func branch, " +
+            "not the Some func branch.")]
+        public static void FuncFuncMatchReturn_None(int noneValue)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
             var actual = value.Match(
-                none: () => 42,
+                none: () => noneValue,
                 some: v => v.Length);
 
             // assert
-            Assert.Equal(42, actual);
+            Assert.Equal(noneValue, actual);
         }
 
-        [Fact(DisplayName = "Matching a Some Option returns the Some func branch, " +
-                            "not the None func branch.")]
-        public void FuncFuncMatchReturn_Some()
+        [Property(DisplayName = "Matching a Some Option returns the Some func branch, " +
+            "not the None func branch.")]
+        public static void FuncFuncMatchReturn_Some(NonNull<string> some, int noneValue)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
             var actual = value.Match(
-                none: () => 42,
+                none: () => noneValue,
                 some: v => v.Length);
 
             // assert
-            Assert.Equal(sentinel.Length, actual);
+            Assert.Equal(some.Get.Length, actual);
         }
 
-        [Fact(DisplayName = "Matching a None Option returns the None func branch, " +
-                            "not the Some task branch.")]
-        public async Task FuncTaskMatchReturn_None()
+        [Property(DisplayName = "Matching a None Option returns the None func branch, " +
+            "not the Some task branch.")]
+        public static void FuncTaskMatchReturn_None(int noneValue)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = await value.Match(
-                none: () => 42,
-                some: v => v.Length.Pipe(FromResult));
+            var actual = value.Match(
+                none: () => noneValue,
+                some: v => v.Length.Pipe(FromResult)).Result;
 
             // assert
-            Assert.Equal(42, actual);
+            Assert.Equal(noneValue, actual);
         }
 
-        [Fact(DisplayName = "Matching a Some Option returns the Some task branch, " +
-                            "not the None func branch.")]
-        public async Task FuncTaskMatchReturn_Some()
+        [Property(DisplayName = "Matching a Some Option returns the Some task branch, " +
+            "not the None func branch.")]
+        public static void FuncTaskMatchReturn_Some(NonNull<string> some, int noneValue)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = await value.Match(
-                none: () => 42,
-                some: v => v.Length.Pipe(FromResult));
+            var actual = value.Match(
+                none: () => noneValue,
+                some: v => v.Length.Pipe(FromResult)).Result;
 
             // assert
-            Assert.Equal(sentinel.Length, actual);
+            Assert.Equal(some.Get.Length, actual);
         }
 
-        [Fact(DisplayName = "Matching a None Option returns the None task branch, " +
-                            "not the Some func branch.")]
-        public async Task TaskFuncMatchReturn_None()
-        {
-            // arrange
-            var value = Option<string>.None;
-
-            // act
-            var actual = await value.Match(
-                none: () => FromResult(42),
-                some: v => v.Length);
-
-            // assert
-            Assert.Equal(42, actual);
-        }
-
-        [Fact(DisplayName = "Matching a Some Option returns the Some func branch, " +
-                            "not the None task branch.")]
-        public async Task TaskFuncMatchReturn_Some()
-        {
-            // arrange
-            var value = Option.From(sentinel);
-
-            // act
-            var actual = await value.Match(
-                none: () => FromResult(42),
-                some: v => v.Length);
-
-            // assert
-            Assert.Equal(sentinel.Length, actual);
-        }
-
-        [Fact(DisplayName = "Matching a None Option returns the None task branch, " +
-                            "not the Some task branch.")]
-        public async Task TaskTaskMatchReturn_None()
+        [Property(DisplayName = "Matching a None Option returns the None task branch, " +
+            "not the Some func branch.")]
+        public static void TaskFuncMatchReturn_None(int noneValue)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = await value.Match(
-                none: () => FromResult(42),
-                some: v => v.Length.Pipe(FromResult));
+            var actual = value.Match(
+                none: () => FromResult(noneValue),
+                some: v => v.Length).Result;
 
             // assert
-            Assert.Equal(42, actual);
+            Assert.Equal(noneValue, actual);
         }
 
-        [Fact(DisplayName = "Matching a Some Option returns the Some task branch, " +
-                            "not the None task branch.")]
-        public async Task TaskTaskMatchReturn_Some()
+        [Property(DisplayName = "Matching a Some Option returns the Some func branch, " +
+            "not the None task branch.")]
+        public static void TaskFuncMatchReturn_Some(NonNull<string> some, int noneValue)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = await value.Match(
-                none: () => FromResult(42),
-                some: v => v.Length.Pipe(FromResult));
+            var actual = value.Match(
+                none: () => FromResult(noneValue),
+                some: v => v.Length).Result;
 
             // assert
-            Assert.Equal(sentinel.Length, actual);
+            Assert.Equal(some.Get.Length, actual);
         }
 
-        [Fact(DisplayName = "Matching a None Option executes the None action branch, " +
-                            "not the Some action branch.")]
-        public void ActionActionMatchVoid_None()
+        [Property(DisplayName = "Matching a None Option returns the None task branch, " +
+            "not the Some task branch.")]
+        public static void TaskTaskMatchReturn_None(int noneValue)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = string.Empty;
+            var actual = value.Match(
+                none: () => FromResult(noneValue),
+                some: v => v.Length.Pipe(FromResult)).Result;
+
+            // assert
+            Assert.Equal(noneValue, actual);
+        }
+
+        [Property(DisplayName = "Matching a Some Option returns the Some task branch, " +
+            "not the None task branch.")]
+        public static void TaskTaskMatchReturn_Some(NonNull<string> some, int noneValue)
+        {
+            // arrange
+            var value = Option.From(some.Get);
+
+            // act
+            var actual = value.Match(
+                none: () => FromResult(noneValue),
+                some: v => v.Length.Pipe(FromResult)).Result;
+
+            // assert
+            Assert.Equal(some.Get.Length, actual);
+        }
+
+        [Property(DisplayName = "Matching a None Option executes the None action branch, " +
+            "not the Some action branch.")]
+        public static void ActionActionMatchVoid_None(NonNull<string> before, NonNull<string> sentinel, int noneValue)
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = before.Get;
             var unit = value.Match(
-                none: () => actual = sentinel,
+                none: () => actual = sentinel.Get,
                 some: v => { });
 
             // assert
             Assert.Equal(Unit.Value, unit);
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(sentinel.Get, actual);
         }
 
-        [Fact(DisplayName = "Matching a Some Option executes the Some action branch, " +
-                            "not the None action branch.")]
-        public void ActionActionMatchVoid_Some()
+        [Property(DisplayName = "Matching a Some Option executes the Some action branch, not the None action branch.")]
+        public static void ActionActionMatchVoid_Some(NonNull<string> before, NonNull<string> some, int noneValue)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = string.Empty;
+            var actual = before.Get;
             var unit = value.Match(
                 none: () => { },
                 some: v => actual = v);
 
             // assert
             Assert.Equal(Unit.Value, unit);
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(some.Get, actual);
         }
 
-        [Fact(DisplayName = "Matching a None Option executes the None action branch, " +
-                            "not the Some task branch.")]
-        public async Task ActionTaskMatchVoid_None()
+        [Property(DisplayName = "Matching a None Option executes the None action branch, " +
+            "not the Some task branch.")]
+        public static void ActionTaskMatchVoid_None(NonNull<string> before, NonNull<string> sentinel, int noneValue)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = string.Empty;
-            await value.Match(
-                none: () => actual = sentinel,
-                some: v => CompletedTask);
+            var actual = before.Get;
+            value.Match(
+                none: () => actual = sentinel.Get,
+                some: v => CompletedTask).Wait();
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(sentinel.Get, actual);
         }
 
-        [Fact(DisplayName = "Matching a Some Option executes the Some task branch, " +
-                            "not the None action branch.")]
-        public async Task ActionTaskMatchVoid_Some()
+        [Property(DisplayName = "Matching a Some Option executes the Some task branch, " +
+            "not the None action branch.")]
+        public static void ActionTaskMatchVoid_Some(NonNull<string> before, NonNull<string> some, int noneValue)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = string.Empty;
-            await value.Match(
+            var actual = before.Get;
+            value.Match(
                 none: () => { },
-                some: v => Run(() => actual = v));
+                some: v => Run(() => actual = v)).Wait();
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(some.Get, actual);
         }
 
-        [Fact(DisplayName = "Matching a None Option executes the None task branch, " +
-                            "not the Some action branch.")]
-        public async Task TaskActionMatchVoid_None()
+        [Property(DisplayName = "Matching a None Option executes the None task branch, " +
+            "not the Some action branch.")]
+        public static void TaskActionMatchVoid_None(NonNull<string> before, NonNull<string> sentinel, int noneValue)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = string.Empty;
-            await value.Match(
-                none: () => Run(() => actual = sentinel),
-                some: v => { });
+            var actual = before.Get;
+            value.Match(
+                none: () => Run(() => actual = sentinel.Get),
+                some: v => { }).Wait();
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(sentinel.Get, actual);
         }
 
-        [Fact(DisplayName = "Matching a Some Option executes the Some action branch, " +
-                            "not the None task branch.")]
-        public async Task TaskActionMatchVoid_Some()
+        [Property(DisplayName = "Matching a Some Option executes the Some action branch, " +
+            "not the None task branch.")]
+        public static void TaskActionMatchVoid_Some(NonNull<string> before, NonNull<string> some, int noneValue)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = string.Empty;
-            await value.Match(
+            var actual = before.Get;
+            value.Match(
                 none: () => CompletedTask,
-                some: v => actual = v);
+                some: v => actual = v).Wait();
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(some.Get, actual);
         }
 
-        [Fact(DisplayName = "Matching a None Option executes the None task branch, " +
-                            "not the Some task branch.")]
-        public async Task TaskTaskMatchVoid_None()
+        [Property(DisplayName = "Matching a None Option executes the None task branch, " +
+            "not the Some task branch.")]
+        public static void TaskTaskMatchVoid_None(NonNull<string> before, NonNull<string> sentinel, int noneValue)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = string.Empty;
-            await value.Match(
-                none: () => Run(() => actual = sentinel),
-                some: v => CompletedTask);
+            var actual = before.Get;
+            value.Match(
+                none: () => Run(() => actual = sentinel.Get),
+                some: v => CompletedTask).Wait();
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(sentinel.Get, actual);
         }
 
-        [Fact(DisplayName = "Matching a Some Option executes the Some task branch, " +
-                            "not the None task branch.")]
-        public async Task TaskTaskMatchVoid_Some()
+        [Property(DisplayName = "Matching a Some Option executes the Some task branch, " +
+            "not the None task branch.")]
+        public static void TaskTaskMatchVoid_Some(NonNull<string> before, NonNull<string> some, int noneValue)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = string.Empty;
-            await value.Match(
+            var actual = before.Get;
+            value.Match(
                 none: () => CompletedTask,
-                some: v => Run(() => actual = v));
+                some: v => Run(() => actual = v)).Wait();
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(some.Get, actual);
         }
 
         #endregion
@@ -403,7 +397,7 @@ namespace Tiger.Types.UnitTest
         #region Map
 
         [Fact(DisplayName = "Mapping a None Option over a func returns a None Option.")]
-        public void FuncMap_None()
+        public static void FuncMap_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -415,11 +409,11 @@ namespace Tiger.Types.UnitTest
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Mapping a Some Option over a func returns a Some Option.")]
-        public void FuncMap_Some()
+        [Property(DisplayName = "Mapping a Some Option over a func returns a Some Option.")]
+        public static void FuncMap_Some(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
             var actual = value.Map(v => v.Length);
@@ -427,148 +421,149 @@ namespace Tiger.Types.UnitTest
             // assert
             Assert.True(actual.IsSome);
             var length = actual.Value;
-            Assert.Equal(sentinel.Length, length);
+            Assert.Equal(some.Get.Length, length);
         }
 
         [Fact(DisplayName = "Mapping a None Option over a task returns a None Option.")]
-        public async Task TaskMap_None()
+        public static void TaskMap_None()
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = await value.Map(v => v.Length.Pipe(FromResult));
+            var actual = value.Map(v => v.Length.Pipe(FromResult)).Result;
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Mapping a Some Option over a task returns a Some Option.")]
-        public async Task TaskMap_Some()
+        [Property(DisplayName = "Mapping a Some Option over a task returns a Some Option.")]
+        public static void TaskMap_Some(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = await value.Map(v => v.Length.Pipe(FromResult));
+            var actual = value.Map(v => v.Length.Pipe(FromResult)).Result;
 
             // assert
             Assert.True(actual.IsSome);
             var length = actual.Value;
-            Assert.Equal(sentinel.Length, length);
+            Assert.Equal(some.Get.Length, length);
         }
 
         #endregion
 
         #region Bind
 
-        [Fact(DisplayName = "Binding a None Option over a func returns a None Option.")]
-        public void FuncBind_None()
+        [Fact(DisplayName = "Binding a None Option over a func returning a None Option returns a None Option.")]
+        public static void FuncBind_ReturnNone_None()
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = value.Bind(v => v.Length == 0
-                ? Option<int>.None
-                : Option.From(v.Length));
+            var actual = value.Bind(_ => Option<int>.None);
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Binding a Some Option over a func returning a None Option " +
-                            "returns a None Option.")]
-        public void FuncBind_ReturnNone_Some()
+        [Fact(DisplayName = "Binding a None Option over a func returning a Some Option returns a None Option.")]
+        public static void FuncBind_ReturnSome_None()
         {
             // arrange
-            var value = Option.From(string.Empty);
+            var value = Option<string>.None;
 
             // act
-            var actual = value.Bind(v => v.Length == 0
-                ? Option<int>.None
-                : Option.From(v.Length));
+            var actual = value.Bind(v => Option.From(v.Length));
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Binding a Some Option over a func returning a Some Option " +
-                            "returns a Some Option.")]
-        public void FuncBindReturnSome_Some()
+        [Property(DisplayName = "Binding a Some Option over a func returning a None Option " +
+            "returns a None Option.")]
+        public static void FuncBind_ReturnNone_Some(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = value.Bind(v => v.Length == 0
-                ? Option<int>.None
-                : Option.From(v.Length));
+            var actual = value.Bind(_ => Option<int>.None);
+
+            // assert
+            Assert.True(actual.IsNone);
+        }
+
+        [Property(DisplayName = "Binding a Some Option over a func returning a Some Option " +
+            "returns a Some Option.")]
+        public static void FuncBindReturnSome_Some(NonNull<string> some)
+        {
+            // arrange
+            var value = Option.From(some.Get);
+
+            // act
+            var actual = value.Bind(v => Option.From(v.Length));
 
             // assert
             Assert.True(actual.IsSome);
             var length = actual.Value;
-            Assert.Equal(sentinel.Length, actual);
+            Assert.Equal(some.Get.Length, length);
         }
 
-        [Fact(DisplayName = "Binding a Some Option over a task returning a None Option " +
-                            "returns a None Option.")]
-        public async Task TaskBind_ReturnNone_Some()
+        [Property(DisplayName = "Binding a Some Option over a task returning a None Option " +
+            "returns a None Option.")]
+        public static void TaskBind_ReturnNone_Some(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(string.Empty);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = await value.Bind(v =>
-                FromResult(v.Length == 0
-                    ? Option<int>.None
-                    : Option.From(v.Length)));
+            var actual = value.Bind(_ => FromResult(Option<int>.None)).Result;
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Binding a Some Option over a task returning a Some Option " +
-                            "returns a Some Option.")]
-        public async Task TaskBindReturnSome_Some()
+        [Property(DisplayName = "Binding a Some Option over a task returning a Some Option " +
+            "returns a Some Option.")]
+        public static void TaskBindReturnSome_Some(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = await value.Bind(v =>
-                FromResult(v.Length == 0
-                    ? Option<int>.None
-                    : Option.From(v.Length)));
+            var actual = value.Bind(v => FromResult(Option.From(v.Length))).Result;
 
             // assert
             Assert.True(actual.IsSome);
             var length = actual.Value;
-            Assert.Equal(sentinel.Length, actual);
+            Assert.Equal(some.Get.Length, length);
         }
 
         #endregion
 
         #region Filter
 
-        [Fact(DisplayName = "Filtering a None Option produces a None Option.")]
-        public void FuncFilter_None()
+        [Property(DisplayName = "Filtering a None Option produces a None Option.")]
+        public static void FuncFilter_NoneFalse(bool filter)
         {
             // arrange
             var value = Option<int>.None;
 
             // act
-            var actual = value.Filter(v => v > 0);
+            var actual = value.Filter(_ => filter);
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Filtering a Some Option with a false predicate produces a None Option.")]
-        public void FuncFilter_SomeFalse()
+        [Property(DisplayName = "Filtering a Some Option with a false predicate produces a None Option.")]
+        public static void FuncFilter_SomeFalse(int some)
         {
             // arrange
-            var value = Option.From(42);
+            var value = Option.From(some);
 
             // act
             var actual = value.Filter(_ => false);
@@ -577,11 +572,11 @@ namespace Tiger.Types.UnitTest
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Filtering a Some Option with a true predicate produces a Some Option.")]
-        public void FuncFilter_SomeTrue()
+        [Property(DisplayName = "Filtering a Some Option with a true predicate produces a Some Option.")]
+        public static void FuncFilter_SomeTrue(int some)
         {
             // arrange
-            var value = Option.From(42);
+            var value = Option.From(some);
 
             // act
             var actual = value.Filter(_ => true);
@@ -589,332 +584,332 @@ namespace Tiger.Types.UnitTest
             // assert
             Assert.True(actual.IsSome);
             var filteredValue = actual.Value;
-            Assert.Equal(42, filteredValue);
+            Assert.Equal(some, filteredValue);
         }
 
-        [Fact(DisplayName = "Filtering a None Option produces a None Option.")]
-        public async Task TaskFilter_None()
+        [Property(DisplayName = "Filtering a None Option produces a None Option.")]
+        public static void TaskFilter_None(bool filter)
         {
             // arrange
             var value = Option<int>.None;
 
             // act
-            var actual = await value.Filter(v => FromResult(v > 0));
+            var actual = value.Filter(v => FromResult(filter)).Result;
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Filtering a Some Option with a false predicate produces a None Option.")]
-        public async Task TaskFilter_SomeFalse()
+        [Property(DisplayName = "Filtering a Some Option with a false predicate produces a None Option.")]
+        public static void TaskFilter_SomeFalse(int some)
         {
             // arrange
-            var value = Option.From(42);
+            var value = Option.From(some);
 
             // act
-            var actual = await value.Filter(_ => FromResult(false));
+            var actual = value.Filter(_ => FromResult(false)).Result;
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Filtering a Some Option with a true predicate produces a None Option.")]
-        public async Task TaskFilter_SomeTrue()
+        [Property(DisplayName = "Filtering a Some Option with a true predicate produces a None Option.")]
+        public static void TaskFilter_SomeTrue(int some)
         {
             // arrange
-            var value = Option.From(42);
+            var value = Option.From(some);
 
             // act
-            var actual = await value.Filter(v => FromResult(true));
+            var actual = value.Filter(v => FromResult(true)).Result;
 
             // assert
             Assert.True(actual.IsSome);
             var filteredValue = actual.Value;
-            Assert.Equal(42, filteredValue);
+            Assert.Equal(some, filteredValue);
         }
 
         #endregion
 
         #region Fold
 
-        [Fact(DisplayName = "Folding over a None Option returns the seed value.")]
-        public void FuncFold_None()
+        [Property(DisplayName = "Folding over a None Option returns the seed value.")]
+        public static void FuncFold_None(int seed)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = value.Fold(34, (s, v) => s + v.Length);
+            var actual = value.Fold(seed, (s, v) => s + v.Length);
 
             // assert
-            Assert.Equal(34, actual);
+            Assert.Equal(seed, actual);
         }
 
-        [Fact(DisplayName = "Folding over a Some Option returns the result of invoking the accumulator" +
-                            "over the seed value and the Some value.")]
-        public void FuncFold_Some()
+        [Property(DisplayName = "Folding over a Some Option returns the result of invoking the accumulator" +
+            "over the seed value and the Some value.")]
+        public static void FuncFold_Some(NonNull<string> some, int seed)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = value.Fold(34, (s, v) => s + v.Length);
+            var actual = value.Fold(seed, (s, v) => s + v.Length);
 
             // assert
-            Assert.Equal(42, actual);
+            Assert.Equal(seed + some.Get.Length, actual);
         }
 
-        [Fact(DisplayName = "Folding over a None Option returns the seed value.")]
-        public async Task TaskFold_None()
+        [Property(DisplayName = "Folding over a None Option returns the seed value.")]
+        public static void TaskFold_None(int seed)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = await value.Fold(34, (s, v) => FromResult(s + v.Length));
+            var actual = value.Fold(seed, (s, v) => FromResult(s + v.Length)).Result;
 
             // assert
-            Assert.Equal(34, actual);
+            Assert.Equal(seed, actual);
         }
 
-        [Fact(DisplayName = "Folding over a Some Option returns result of invoking the accumulator" +
-                            "over the seed value and the Some value.")]
-        public async Task TaskFold_Some()
+        [Property(DisplayName = "Folding over a Some Option returns result of invoking the accumulator" +
+            "over the seed value and the Some value.")]
+        public static void TaskFold_Some(NonNull<string> some, int seed)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = await value.Fold(34, (s, v) => FromResult(s + v.Length));
+            var actual = value.Fold(seed, (s, v) => FromResult(s + v.Length)).Result;
 
             // assert
-            Assert.Equal(42, actual);
+            Assert.Equal(seed + some.Get.Length, actual);
         }
 
         #endregion
 
         #region Tap
 
-        [Fact(DisplayName = "Tapping a None Option over a func returns a None Option " +
-                            "and performs no action.")]
-        public void FuncTap_None()
+        [Property(DisplayName = "Tapping a None Option over a func returns a None Option " +
+            "and performs no action.")]
+        public static void FuncTap_None(NonNull<string> before, NonNull<string> sentinel)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var output = sentinel;
-            var actual = value.Tap(v => output = string.Empty);
+            var output = before.Get;
+            var actual = value.Tap(v => output = sentinel.Get);
 
             // assert
             Assert.True(actual.IsNone);
-            Assert.Equal(sentinel, output);
+            Assert.Equal(before.Get, output);
         }
 
-        [Fact(DisplayName = "Tapping a Some Option over a func returns a Some Option " +
-                            "and performs an action.")]
-        public void FuncTap_Some()
+        [Property(DisplayName = "Tapping a Some Option over a func returns a Some Option " +
+            "and performs an action.")]
+        public static void FuncTap_Some(NonNull<string> some, NonNull<string> before, NonNull<string> sentinel)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var output = string.Empty;
-            var actual = value.Tap(v => output = sentinel);
+            var output = before.Get;
+            var actual = value.Tap(v => output = sentinel.Get);
 
             // assert
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
-            Assert.Equal(sentinel, innerValue);
-            Assert.Equal(sentinel, output);
+            Assert.Equal(some.Get, innerValue);
+            Assert.Equal(sentinel.Get, output);
         }
 
-        [Fact(DisplayName = "Tapping a None Option over a task returns a None Option " +
-                            "and performs no action.")]
-        public async Task TaskTap_None()
+        [Property(DisplayName = "Tapping a None Option over a task returns a None Option " +
+            "and performs no action.")]
+        public static void TaskTap_None(NonNull<string> before, NonNull<string> sentinel)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var output = sentinel;
-            var actual = await value.Tap(v => Run(() => output = string.Empty));
+            var output = before.Get;
+            var actual = value.Tap(v => Run(() => output = sentinel.Get)).Result;
 
             // assert
             Assert.True(actual.IsNone);
-            Assert.Equal(sentinel, output);
+            Assert.Equal(before.Get, output);
         }
 
-        [Fact(DisplayName = "Tapping a Some Option over a task returns a Some Option " +
-                            "and performs an action.")]
-        public async Task TaskTap_Some()
+        [Property(DisplayName = "Tapping a Some Option over a task returns a Some Option " +
+            "and performs an action.")]
+        public static void TaskTap_Some(NonNull<string> some, NonNull<string> before, NonNull<string> sentinel)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var output = string.Empty;
-            var actual = await value.Tap(v => Run(() => output = sentinel));
+            var output = before.Get;
+            var actual = value.Tap(v => Run(() => output = sentinel.Get)).Result;
 
             // assert
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
-            Assert.Equal(sentinel, innerValue);
-            Assert.Equal(sentinel, output);
+            Assert.Equal(some.Get, innerValue);
+            Assert.Equal(sentinel.Get, output);
         }
 
         #endregion
 
         #region Let
 
-        [Fact(DisplayName = "Conditionally executing an action based on a None Option does not execute.")]
-        public void ActionLet_None()
+        [Property(DisplayName = "Conditionally executing an action based on a None Option does not execute.")]
+        public static void ActionLet_None(NonNull<string> before, NonNull<string> sentinel)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = sentinel;
-            value.Let(v => actual = string.Empty);
+            var actual = before.Get;
+            value.Let(v => actual = sentinel.Get);
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(before.Get, actual);
         }
 
-        [Fact(DisplayName = "Conditionally executing an action based on a Some Option executes.")]
-        public void ActionLet_Some()
+        [Property(DisplayName = "Conditionally executing an action based on a Some Option executes.")]
+        public static void ActionLet_Some(NonNull<string> some, NonNull<string> before)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = string.Empty;
+            var actual = before.Get;
             value.Let(v => actual = v);
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(some.Get, actual);
         }
 
-        [Fact(DisplayName = "Conditionally executing a task based on a None Option does not execute.")]
-        public async Task TaskLet_None()
+        [Property(DisplayName = "Conditionally executing a task based on a None Option does not execute.")]
+        public static void TaskLet_None(NonNull<string> before, NonNull<string> sentinel)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = sentinel;
-            await value.Let(v => Run(() => actual = string.Empty));
+            var actual = before.Get;
+            value.Let(v => Run(() => actual = sentinel.Get)).Wait();
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(before.Get, actual);
         }
 
-        [Fact(DisplayName = "Conditionally executing a task based on a Some Option executes.")]
-        public async Task TaskLet_Some()
+        [Property(DisplayName = "Conditionally executing a task based on a Some Option executes.")]
+        public static void TaskLet_Some(NonNull<string> some, NonNull<string> before)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = string.Empty;
-            await value.Let(v => Run(() => actual = v));
+            var actual = before.Get;
+            value.Let(v => Run(() => actual = v)).Wait();
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(some.Get, actual);
         }
 
         #endregion
 
         #region Recover
 
-        [Fact(DisplayName = "Recovering a None Option returns the recovery value.")]
-        public void ValueRecover_None()
+        [Property(DisplayName = "Recovering a None Option returns the recovery value.")]
+        public static void ValueRecover_None(NonNull<string> recovery)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = value.Recover(sentinel);
+            var actual = value.Recover(recovery.Get);
 
             // assert
             Assert.True(actual.IsSome);
             var recoveredValue = actual.Value;
-            Assert.Equal(sentinel, recoveredValue);
+            Assert.Equal(recovery.Get, recoveredValue);
         }
 
-        [Fact(DisplayName = "Recovering a Some Option returns the original value.")]
-        public void ValueRecover_Some()
+        [Property(DisplayName = "Recovering a Some Option returns the original value.")]
+        public static void ValueRecover_Some(NonNull<string> some, NonNull<string> recovery)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = value.Recover("megatron");
+            var actual = value.Recover(recovery.Get);
 
             // assert
             Assert.True(actual.IsSome);
             var recoveredValue = actual.Value;
-            Assert.Equal(sentinel, recoveredValue);
+            Assert.Equal(some.Get, recoveredValue);
         }
 
-        [Fact(DisplayName = "Recovering a None Option returns the recovery value.")]
-        public void FuncRecover_None()
-        {
-            // arrange
-            var value = Option<string>.None;
-
-            // act
-            var actual = value.Recover(() => sentinel);
-
-            // assert
-            Assert.True(actual.IsSome);
-            var recoveredValue = actual.Value;
-            Assert.Equal(sentinel, recoveredValue);
-        }
-
-        [Fact(DisplayName = "Recovering a Some Option returns the original value.")]
-        public void FuncRecover_Some()
-        {
-            // arrange
-            var value = Option.From(sentinel);
-
-            // act
-            var actual = value.Recover(() => "megatron");
-
-            // assert
-            Assert.True(actual.IsSome);
-            var recoveredValue = actual.Value;
-            Assert.Equal(sentinel, recoveredValue);
-        }
-
-        [Fact(DisplayName = "Recovering a None Option returns the recovery value.")]
-        public async Task TaskRecover_None()
+        [Property(DisplayName = "Recovering a None Option returns the recovery value.")]
+        public static void FuncRecover_None(NonNull<string> recovery)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = await value.Recover(() => FromResult(sentinel));
-            
+            var actual = value.Recover(() => recovery.Get);
+
             // assert
             Assert.True(actual.IsSome);
             var recoveredValue = actual.Value;
-            Assert.Equal(sentinel, recoveredValue);
+            Assert.Equal(recovery.Get, recoveredValue);
         }
 
-        [Fact(DisplayName = "Recovering a Some Option returns the original value.")]
-        public async Task TaskRecover_Some()
+        [Property(DisplayName = "Recovering a Some Option returns the original value.")]
+        public static void FuncRecover_Some(NonNull<string> some, NonNull<string> recovery)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = await value.Recover(() => FromResult("megatron"));
+            var actual = value.Recover(() => recovery.Get);
 
             // assert
             Assert.True(actual.IsSome);
             var recoveredValue = actual.Value;
-            Assert.Equal(sentinel, recoveredValue);
+            Assert.Equal(some.Get, recoveredValue);
+        }
+
+        [Property(DisplayName = "Recovering a None Option returns the recovery value.")]
+        public static void TaskRecover_None(NonNull<string> recovery)
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = value.Recover(() => FromResult(recovery.Get)).Result;
+
+            // assert
+            Assert.True(actual.IsSome);
+            var recoveredValue = actual.Value;
+            Assert.Equal(recovery.Get, recoveredValue);
+        }
+
+        [Property(DisplayName = "Recovering a Some Option returns the original value.")]
+        public static void TaskRecover_Some(NonNull<string> some, NonNull<string> recovery)
+        {
+            // arrange
+            var value = Option.From(some.Get);
+
+            // act
+            var actual = value.Recover(() => FromResult(recovery.Get)).Result;
+
+            // assert
+            Assert.True(actual.IsSome);
+            var recoveredValue = actual.Value;
+            Assert.Equal(some.Get, recoveredValue);
         }
 
         #endregion
@@ -922,7 +917,7 @@ namespace Tiger.Types.UnitTest
         #region Value
 
         [Fact(DisplayName = "Forcibly unwrapping a None Option throws.")]
-        public void Value_None_Throws()
+        public static void Value_None_Throws()
         {
             // arrange
             var value = Option<string>.None;
@@ -935,22 +930,22 @@ namespace Tiger.Types.UnitTest
             Assert.Contains(Resources.OptionIsNone, ex.Message);
         }
 
-        [Fact(DisplayName = "Forcibly unwrapping a Some Option returns the Some value.")]
-        public void Value_Some()
+        [Property(DisplayName = "Forcibly unwrapping a Some Option returns the Some value.")]
+        public static void Value_Some(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
             var actual = value.Value;
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(some.Get, actual);
         }
 
         [Fact(DisplayName = "Coalescing a None Option with an alternative value " +
-                            "returns the alternative value.")]
-        public void GetValueOrDefault_None()
+            "returns the alternative value.")]
+        public static void GetValueOrDefault_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -962,102 +957,102 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(default(string), actual);
         }
 
-        [Fact(DisplayName = "Coalescing a Some Option with an alternative value " +
-                            "returns the Some value.")]
-        public void GetValueOrDefault_Some()
+        [Property(DisplayName = "Coalescing a Some Option with an alternative value " +
+            "returns the Some value.")]
+        public static void GetValueOrDefault_Some(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
             var actual = value.GetValueOrDefault();
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(some.Get, actual);
         }
 
-        [Fact(DisplayName = "Coalescing a None Option with an alternative value " +
-                            "returns the alternative value.")]
-        public void ValueGetValueOrDefault_None()
+        [Property(DisplayName = "Coalescing a None Option with an alternative value " +
+            "returns the alternative value.")]
+        public static void ValueGetValueOrDefault_None(NonNull<string> coalescey)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = value.GetValueOrDefault(sentinel);
+            var actual = value.GetValueOrDefault(coalescey.Get);
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(coalescey.Get, actual);
         }
 
-        [Fact(DisplayName = "Coalescing a Some Option with an alternative value " +
-                            "returns the Some value.")]
-        public void ValueGetValueOrDefault_Some()
+        [Property(DisplayName = "Coalescing a Some Option with an alternative value " +
+            "returns the Some value.")]
+        public static void ValueGetValueOrDefault_Some(NonNull<string> some, NonNull<string> coalescey)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = value.GetValueOrDefault(string.Empty);
+            var actual = value.GetValueOrDefault(coalescey.Get);
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(some.Get, actual);
         }
 
-        [Fact(DisplayName = "Coalescing a None Option with a func producing an alternative value " +
-                            "returns the alternative value.")]
-        public void FuncGetValueOrDefault_None()
-        {
-            // arrange
-            var value = Option<string>.None;
-
-            // act
-            var actual = value.GetValueOrDefault(() => sentinel);
-
-            // assert
-            Assert.Equal(sentinel, actual);
-        }
-
-        [Fact(DisplayName = "Coalescing a Some Option with a func producing an alternative value " +
-                            "returns the Some value.")]
-        public void FuncGetValueOrDefault_Some()
-        {
-            // arrange
-            var value = Option.From(sentinel);
-
-            // act
-            var actual = value.GetValueOrDefault(() => string.Empty);
-
-            // assert
-            Assert.Equal(sentinel, actual);
-        }
-
-        [Fact(DisplayName = "Coalescing a None Option with a task producing an alternative value " +
-                            "returns the alternative value.")]
-        public async Task TaskGetValueOrDefault_None()
+        [Property(DisplayName = "Coalescing a None Option with a func producing an alternative value " +
+            "returns the alternative value.")]
+        public static void FuncGetValueOrDefault_None(NonNull<string> coalescey)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = await value.GetValueOrDefault(() => FromResult(sentinel));
+            var actual = value.GetValueOrDefault(() => coalescey.Get);
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(coalescey.Get, actual);
         }
 
-        [Fact(DisplayName = "Coalescing a Some Option with a task producing an alternative value " +
-                            "returns the Some value.")]
-        public async Task TaskGetValueOrDefault_Some()
+        [Property(DisplayName = "Coalescing a Some Option with a func producing an alternative value " +
+            "returns the Some value.")]
+        public static void FuncGetValueOrDefault_Some(NonNull<string> some, NonNull<string> coalescey)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = await value.GetValueOrDefault(() => FromResult(string.Empty));
+            var actual = value.GetValueOrDefault(() => coalescey.Get);
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(some.Get, actual);
+        }
+
+        [Property(DisplayName = "Coalescing a None Option with a task producing an alternative value " +
+            "returns the alternative value.")]
+        public static void TaskGetValueOrDefault_None(NonNull<string> coalescey)
+        {
+            // arrange
+            var value = Option<string>.None;
+
+            // act
+            var actual = value.GetValueOrDefault(() => FromResult(coalescey.Get)).Result;
+
+            // assert
+            Assert.Equal(coalescey.Get, actual);
+        }
+
+        [Property(DisplayName = "Coalescing a Some Option with a task producing an alternative value " +
+            "returns the Some value.")]
+        public static void TaskGetValueOrDefault_Some(NonNull<string> some, NonNull<string> coalescey)
+        {
+            // arrange
+            var value = Option.From(some.Get);
+
+            // act
+            var actual = value.GetValueOrDefault(() => FromResult(coalescey.Get)).Result;
+
+            // assert
+            Assert.Equal(some.Get, actual);
         }
 
         #endregion
@@ -1065,8 +1060,7 @@ namespace Tiger.Types.UnitTest
         #region Overrides
 
         [Fact(DisplayName = "A None Option stringifies to None.")]
-        
-        public void ToString_None()
+        public static void ToString_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -1078,27 +1072,25 @@ namespace Tiger.Types.UnitTest
             Assert.Equal("None", actual);
         }
 
-        [Fact(DisplayName = "A Some Option stringifies to a wrapped value.")]
-        
-        public void ToString_Some()
+        [Property(DisplayName = "A Some Option stringifies to a wrapped value.")]
+        public static void ToString_Some(int some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some);
 
             // act
             var actual = value.ToString();
 
             // assert
-            Assert.Equal($"Some({sentinel})", actual);
+            Assert.Equal($"Some({some})", actual);
         }
 
         [Fact(DisplayName = "A None Option is not equal to null.")]
-        
-        public void ObjectEquals_NoneNull()
+        public static void ObjectEquals_NoneNull()
         {
             // arrange
             var left = Option<string>.None;
-            object right = null;
+            var right = default(object);
 
             // act
             var actual = left.Equals(right);
@@ -1107,13 +1099,12 @@ namespace Tiger.Types.UnitTest
             Assert.False(actual);
         }
 
-        [Fact(DisplayName = "A Some Option is not equal to null.")]
-        
-        public void ObjectEquals_SomeNull()
+        [Property(DisplayName = "A Some Option is not equal to null.")]
+        public static void ObjectEquals_SomeNull(NonNull<string> some)
         {
             // arrange
-            var left = Option.From(sentinel);
-            object right = null;
+            var left = Option.From(some.Get);
+            var right = default(object);
 
             // act
             var actual = left.Equals(right);
@@ -1123,8 +1114,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Two None Options of the same type are equal.")]
-        
-        public void ObjectEquals_NoneNone_SameType()
+        public static void ObjectEquals_NoneNone_SameType()
         {
             // arrange
             var left = Option<string>.None;
@@ -1138,8 +1128,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Two None Options of different types are not equal.")]
-        
-        public void ObjectEquals_NoneNone_DifferentType()
+        public static void ObjectEquals_NoneNone_DifferentType()
         {
             // arrange
             var left = Option<string>.None;
@@ -1154,13 +1143,12 @@ namespace Tiger.Types.UnitTest
             Assert.False(actualRightFirst);
         }
 
-        [Fact(DisplayName = "A None Option and a Some Option of the same type are not equal.")]
-        
-        public void ObjectEquals_NoneSome_SameType()
+        [Property(DisplayName = "A None Option and a Some Option of the same type are not equal.")]
+        public static void ObjectEquals_NoneSome_SameType(NonNull<string> some)
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(sentinel);
+            var right = Option.From(some.Get);
 
             // act
             var actualLeftFirst = left.Equals(right);
@@ -1171,13 +1159,12 @@ namespace Tiger.Types.UnitTest
             Assert.False(actualRightFirst);
         }
 
-        [Fact(DisplayName = "A None Option and a Some Option of different types are not equal.")]
-        
-        public void ObjectEquals_NoneSome_DifferentType()
+        [Property(DisplayName = "A None Option and a Some Option of different types are not equal.")]
+        public static void ObjectEquals_NoneSome_DifferentType(NonNull<string> some)
         {
             // arrange
             var left = Option<int>.None;
-            var right = Option.From(sentinel);
+            var right = Option.From(some.Get);
 
             // act
             var actualLeftFirst = left.Equals(right);
@@ -1188,13 +1175,13 @@ namespace Tiger.Types.UnitTest
             Assert.False(actualRightFirst);
         }
 
-        [Fact(DisplayName = "Two Some Options of the same type with different values are not equal.")]
-        
-        public void ObjectEquals_SomeSome_SameType_DifferentValue()
+        [Property(DisplayName = "Two Some Options of the same type with different values are not equal.",
+            Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        public static void ObjectEquals_SomeSome_SameType_DifferentValue(UnequalNonNullPair<string> pair)
         {
             // arrange
-            var left = Option.From(sentinel);
-            var right = Option.From("megatron");
+            var left = Option.From(pair.Left);
+            var right = Option.From(pair.Right);
 
             // act
             var actualLeftFirst = left.Equals(right);
@@ -1205,13 +1192,12 @@ namespace Tiger.Types.UnitTest
             Assert.False(actualRightFirst);
         }
 
-        [Fact(DisplayName = "Two Some Options of the same type with the same values are equal.")]
-        
-        public void ObjectEquals_SomeSome_SameType_SameValue()
+        [Property(DisplayName = "Two Some Options of the same type with the same values are equal.")]
+        public static void ObjectEquals_SomeSome_SameType_SameValue(NonNull<string> some)
         {
             // arrange
-            var left = Option.From(sentinel);
-            var right = Option.From(sentinel);
+            var left = Option.From(some.Get);
+            var right = Option.From(some.Get);
 
             // act
             var actualLeftFirst = left.Equals(right);
@@ -1222,13 +1208,12 @@ namespace Tiger.Types.UnitTest
             Assert.True(actualRightFirst);
         }
 
-        [Fact(DisplayName = "Two Some Options of different types are not equal.")]
-        
-        public void ObjectEquals_SomeSome_DifferentType()
+        [Property(DisplayName = "Two Some Options of different types are not equal.")]
+        public static void ObjectEquals_SomeSome_DifferentType(NonNull<string> someLeft, int someRight)
         {
             // arrange
-            var left = Option.From(sentinel);
-            var right = Option.From(0);
+            var left = Option.From(someLeft.Get);
+            var right = Option.From(someRight);
 
             // act
             var actualLeftFirst = left.Equals(right);
@@ -1240,8 +1225,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "A None Option has a hashcode of 0.")]
-        
-        public void GetHashCode_None()
+        public static void GetHashCode_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -1253,58 +1237,55 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(0, actual);
         }
 
-        [Fact(DisplayName = "A Some Option has the hashcode of its Some value.")]
-        
-        public void GetHashCode_Some()
+        [Property(DisplayName = "A Some Option has the hashcode of its Some value.")]
+        public static void GetHashCode_Some(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
             var actual = value.GetHashCode();
 
             // assert
-            Assert.Equal(sentinel.GetHashCode(), actual);
+            Assert.Equal(some.Get.GetHashCode(), actual);
         }
 
         #endregion
 
         #region Implementations
 
-        [Fact(DisplayName = "A None Option does not iterate.")]
-        
-        public void GetEnumerator_None()
+        [Property(DisplayName = "A None Option does not iterate.")]
+        public static void GetEnumerator_None(NonNull<string> before, NonNull<string> sentinel)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = sentinel;
+            var actual = before.Get;
             foreach (var v in value)
             {
-                actual = string.Empty;
+                actual = sentinel.Get;
             }
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(before.Get, actual);
         }
 
-        [Fact(DisplayName = "A Some Option iterates.")]
-        
-        public void GetEnumerator_Some()
+        [Property(DisplayName = "A Some Option iterates.")]
+        public static void GetEnumerator_Some(NonNull<string> some, NonNull<string> before)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = string.Empty;
+            var actual = before.Get;
             foreach (var v in value)
             {
                 actual = v;
             }
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(some.Get, actual);
         }
 
         #endregion
@@ -1312,7 +1293,7 @@ namespace Tiger.Types.UnitTest
         #region Operators and Named Alternates
 
         [Fact(DisplayName = "Two None Options are equal.")]
-        public void OperatorEquals_NoneNone()
+        public static void OperatorEquals_NoneNone()
         {
             // arrange
             var left = Option<string>.None;
@@ -1325,12 +1306,12 @@ namespace Tiger.Types.UnitTest
             Assert.True(actual);
         }
 
-        [Fact(DisplayName = "A None Option and a Some Option are not equal.")]
-        public void OperatorEquals_NoneSome()
+        [Property(DisplayName = "A None Option and a Some Option are not equal.")]
+        public static void OperatorEquals_NoneSome(NonNull<string> some)
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(sentinel);
+            var right = Option.From(some.Get);
 
             // act
             var actualLeftFirst = left == right;
@@ -1341,12 +1322,13 @@ namespace Tiger.Types.UnitTest
             Assert.False(actualRightFirst);
         }
 
-        [Fact(DisplayName = "Two Some Options with different values are not equal.")]
-        public void OperatorEquals_SomeSome_DifferentValue()
+        [Property(DisplayName = "Two Some Options with different values are not equal.",
+            Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        public static void OperatorEquals_SomeSome_DifferentValue(UnequalNonNullPair<string> pair)
         {
             // arrange
-            var left = Option.From(sentinel);
-            var right = Option.From("megatron");
+            var left = Option.From(pair.Left);
+            var right = Option.From(pair.Right);
 
             // act
             var actualLeftFirst = left == right;
@@ -1357,12 +1339,12 @@ namespace Tiger.Types.UnitTest
             Assert.False(actualRightFirst);
         }
 
-        [Fact(DisplayName = "Two Some Options with the same values are equal.")]
-        public void OperatorEquals_SomeSome_SameValue()
+        [Property(DisplayName = "Two Some Options with the same values are equal.")]
+        public static void OperatorEquals_SomeSome_SameValue(NonNull<string> some)
         {
             // arrange
-            var left = Option.From(sentinel);
-            var right = Option.From(sentinel);
+            var left = Option.From(some.Get);
+            var right = Option.From(some.Get);
 
             // act
             var actualLeftFirst = left == right;
@@ -1374,7 +1356,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Two None Options are not unequal.")]
-        public void OperatorNotEquals_NoneNone()
+        public static void OperatorNotEquals_NoneNone()
         {
             // arrange
             var left = Option<string>.None;
@@ -1387,12 +1369,12 @@ namespace Tiger.Types.UnitTest
             Assert.False(actual);
         }
 
-        [Fact(DisplayName = "A None Option and a Some Option are unequal.")]
-        public void OperatorNotEquals_NoneSome()
+        [Property(DisplayName = "A None Option and a Some Option are unequal.")]
+        public static void OperatorNotEquals_NoneSome(NonNull<string> some)
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(sentinel);
+            var right = Option.From(some.Get);
 
             // act
             var actualLeftFirst = left != right;
@@ -1403,12 +1385,13 @@ namespace Tiger.Types.UnitTest
             Assert.True(actualRightFirst);
         }
 
-        [Fact(DisplayName = "Two Some Options with different values are unequal.")]
-        public void OperatorNotEquals_SomeSome_DifferentValue()
+        [Property(DisplayName = "Two Some Options with different values are unequal.",
+            Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        public static void OperatorNotEquals_SomeSome_DifferentValue(UnequalNonNullPair<string> pair)
         {
             // arrange
-            var left = Option.From(sentinel);
-            var right = Option.From("megatron");
+            var left = Option.From(pair.Left);
+            var right = Option.From(pair.Right);
 
             // act
             var actualLeftFirst = left != right;
@@ -1419,12 +1402,12 @@ namespace Tiger.Types.UnitTest
             Assert.True(actualRightFirst);
         }
 
-        [Fact(DisplayName = "Two Some Options with the same values are not unequal.")]
-        public void OperatorNotEquals_SomeSome_SameValue()
+        [Property(DisplayName = "Two Some Options with the same values are not unequal.")]
+        public static void OperatorNotEquals_SomeSome_SameValue(NonNull<string> some)
         {
             // arrange
-            var left = Option.From(sentinel);
-            var right = Option.From(sentinel);
+            var left = Option.From(some.Get);
+            var right = Option.From(some.Get);
 
             // act
             var actualLeftFirst = left != right;
@@ -1436,7 +1419,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "The disjunction of two None Options is a None Option.")]
-        public void OperatorBitwiseOr_NoneNone()
+        public static void OperatorBitwiseOr_NoneNone()
         {
             // arrange
             var left = Option<string>.None;
@@ -1452,7 +1435,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "The disjunction of two None Options is a None Option.")]
-        public void NamedBitwiseOr_NoneNone()
+        public static void NamedBitwiseOr_NoneNone()
         {
             // arrange
             var left = Option<string>.None;
@@ -1468,7 +1451,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "The disjunction of two None Options is a None Option.")]
-        public void OperatorLogicalOr_NoneNone()
+        public static void OperatorLogicalOr_NoneNone()
         {
             // arrange
             var left = Option<string>.None;
@@ -1483,12 +1466,12 @@ namespace Tiger.Types.UnitTest
             Assert.True(actualRightFirst.IsNone);
         }
 
-        [Fact(DisplayName = "The disjunction of a None Option and a Some Option is the Some Option.")]
-        public void OperatorBitwiseOr_NoneSome()
+        [Property(DisplayName = "The disjunction of a None Option and a Some Option is the Some Option.")]
+        public static void OperatorBitwiseOr_NoneSome(NonNull<string> some)
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(sentinel);
+            var right = Option.From(some.Get);
 
             // act
             var actualLeftFirst = left | right;
@@ -1499,12 +1482,12 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(right, actualRightFirst);
         }
 
-        [Fact(DisplayName = "The disjunction of a None Option and a Some Option is the Some Option.")]
-        public void NamedBitwiseOr_NoneSome()
+        [Property(DisplayName = "The disjunction of a None Option and a Some Option is the Some Option.")]
+        public static void NamedBitwiseOr_NoneSome(NonNull<string> some)
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(sentinel);
+            var right = Option.From(some.Get);
 
             // act
             var actualLeftFirst = left.BitwiseOr(right);
@@ -1515,12 +1498,12 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(right, actualRightFirst);
         }
 
-        [Fact(DisplayName = "The disjunction of a None Option and a Some Option is the Some Option.")]
-        public void OperatorLogicalOr_NoneSome()
+        [Property(DisplayName = "The disjunction of a None Option and a Some Option is the Some Option.")]
+        public static void OperatorLogicalOr_NoneSome(NonNull<string> some)
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(sentinel);
+            var right = Option.From(some.Get);
 
             // act
             var actualLeftFirst = left || right;
@@ -1531,12 +1514,13 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(right, actualRightFirst);
         }
 
-        [Fact(DisplayName = "The disjunction of two Some Options is the former Some Option.")]
-        public void OperatorBitwiseOr_SomeSome()
+        [Property(DisplayName = "The disjunction of two Some Options is the former Some Option.",
+            Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        public static void OperatorBitwiseOr_SomeSome(UnequalNonNullPair<string> pair)
         {
             // arrange
-            var left = Option.From("megatron");
-            var right = Option.From(sentinel);
+            var left = Option.From(pair.Left);
+            var right = Option.From(pair.Right);
 
             // act
             var actualLeftFirst = left | right;
@@ -1547,12 +1531,13 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(right, actualRightFirst);
         }
 
-        [Fact(DisplayName = "The disjunction of two Some Options is the latter Some Option.")]
-        public void NamedBitwiseOr_SomeSome()
+        [Property(DisplayName = "The disjunction of two Some Options is the latter Some Option.",
+            Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        public static void NamedBitwiseOr_SomeSome(UnequalNonNullPair<string> pair)
         {
             // arrange
-            var left = Option.From("megatron");
-            var right = Option.From(sentinel);
+            var left = Option.From(pair.Left);
+            var right = Option.From(pair.Right);
 
             // act
             var actualLeftFirst = left.BitwiseOr(right);
@@ -1563,12 +1548,13 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(right, actualRightFirst);
         }
 
-        [Fact(DisplayName = "The disjunction of two Some Options is the former Some Option.")]
-        public void OperatorLogicalOr_SomeSome()
+        [Property(DisplayName = "The disjunction of two Some Options is the former Some Option.",
+            Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        public static void OperatorLogicalOr_SomeSome(UnequalNonNullPair<string> pair)
         {
             // arrange
-            var left = Option.From("megatron");
-            var right = Option.From(sentinel);
+            var left = Option.From(pair.Left);
+            var right = Option.From(pair.Right);
 
             // act
             var actualLeftFirst = left || right;
@@ -1580,7 +1566,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "A None Option does not evaluate as true.")]
-        public void OperatorIsTrue_None()
+        public static void OperatorIsTrue_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -1601,7 +1587,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "A None Option does not evaluate as true.")]
-        public void NamedIsTrue_None()
+        public static void NamedIsTrue_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -1613,11 +1599,11 @@ namespace Tiger.Types.UnitTest
             Assert.False(actual);
         }
 
-        [Fact(DisplayName = "A Some Option evaluates as true.")]
-        public void NamedIsTrue_Some()
+        [Property(DisplayName = "A Some Option evaluates as true.")]
+        public static void NamedIsTrue_Some(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
             var actual = value.IsTrue;
@@ -1626,11 +1612,11 @@ namespace Tiger.Types.UnitTest
             Assert.True(actual);
         }
 
-        [Fact(DisplayName = "A None Option evaluates as false.")]
-        public void OperatorIsTrue_Some()
+        [Property(DisplayName = "A None Option evaluates as false.")]
+        public static void OperatorIsTrue_Some(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
             bool actual;
 
             // act
@@ -1648,7 +1634,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "A None Option evaluates as false.")]
-        public void NamedIsFalse_None()
+        public static void NamedIsFalse_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -1660,11 +1646,11 @@ namespace Tiger.Types.UnitTest
             Assert.True(actual);
         }
 
-        [Fact(DisplayName = "A Some Option does not evaluate as true.")]
-        public void NamedIsFalse_Some()
+        [Property(DisplayName = "A Some Option does not evaluate as true.")]
+        public static void NamedIsFalse_Some(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
             var actual = value.IsFalse;
@@ -1674,7 +1660,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "The logical inverse of a None Option is true.")]
-        public void NamedLogicalNot_None()
+        public static void NamedLogicalNot_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -1687,7 +1673,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "The logical inverse of a None Option is true.")]
-        public void OperatorLogicalNot_None()
+        public static void OperatorLogicalNot_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -1699,12 +1685,12 @@ namespace Tiger.Types.UnitTest
             Assert.True(actual);
         }
 
-        [Fact(DisplayName = "The logical inverse of a Some Option is false.")]
-        
-        public void NamedLogicalNot_Some()
+        [Property(DisplayName = "The logical inverse of a Some Option is false.")]
+
+        public static void NamedLogicalNot_Some(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
             var actual = value.LogicalNot();
@@ -1713,11 +1699,11 @@ namespace Tiger.Types.UnitTest
             Assert.False(actual);
         }
 
-        [Fact(DisplayName = "The logical inverse of a Some Option is false.")]
-        public void OperatorNot_None()
+        [Property(DisplayName = "The logical inverse of a Some Option is false.")]
+        public static void OperatorNot_None(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
             var actual = !value;
@@ -1726,46 +1712,49 @@ namespace Tiger.Types.UnitTest
             Assert.False(actual);
         }
 
-        [Fact(DisplayName = "The disjunction of a Some Option and a None Option short-circuits.")]
-        public void OperatorLogicalOr_SomeNone_ShortCircuits()
+        [Property(DisplayName = "The disjunction of a Some Option and a None Option short-circuits.")]
+        public static void OperatorLogicalOr_SomeNone_ShortCircuits(NonNull<string> some, NonNull<string> before, NonNull<string> sentinel)
         { // note(cosborn) This tests "operator true"/IsTrue
             // arrange
-            var left = Option.From(sentinel);
-            string actual = sentinel;
-            Func<Option<string>> right = () =>
+            var left = Option.From(some.Get);
+            var actual = before.Get;
+            Option<string> Right()
             {
-                actual = string.Empty;
+                actual = sentinel.Get;
                 return Option<string>.None;
-            };
+            }
 
             // act
-            var dummy = left || right();
+            var dummy = left || Right();
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(before.Get, actual);
         }
 
-        [Fact(DisplayName = "The disjunction of two Some Options short-circuits.")]
-        public void OperatorLogicalOr_SomeSome_ShortCircuits()
+        [Property(DisplayName = "The disjunction of two Some Options short-circuits.")]
+        public static void OperatorLogicalOr_SomeSome_ShortCircuits(
+            NonNull<string> some,
+            NonNull<string> before,
+            NonNull<string> sentinel)
         { // note(cosborn) This tests "operator true"/IsTrue
             // arrange
-            var left = Option.From(sentinel);
-            string actual = sentinel;
-            Func<Option<string>> right = () =>
+            var left = Option.From(some.Get);
+            var actual = before.Get;
+            Option<string> Right()
             {
-                actual = string.Empty;
-                return Option.From(sentinel);
-            };
+                actual = sentinel.Get;
+                return Option.From(some.Get);
+            }
 
             // act
-            var dummy = left || right();
+            var dummy = left || Right();
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(before.Get, actual);
         }
 
         [Fact(DisplayName = "The conjunction of two None Options is a None Option.")]
-        public void OperatorBitwiseAnd_NoneNone()
+        public static void OperatorBitwiseAnd_NoneNone()
         {
             // arrange
             var left = Option<string>.None;
@@ -1781,7 +1770,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "The conjunction of two None Options is a None Option.")]
-        public void NamedBitwiseAnd_NoneNone()
+        public static void NamedBitwiseAnd_NoneNone()
         {
             // arrange
             var left = Option<string>.None;
@@ -1797,7 +1786,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "The conjunction of two None Options is a None Option.")]
-        public void OperatorLogicalAnd_NoneNone()
+        public static void OperatorLogicalAnd_NoneNone()
         {
             // arrange
             var left = Option<string>.None;
@@ -1812,12 +1801,12 @@ namespace Tiger.Types.UnitTest
             Assert.True(actualRightFirst.IsNone);
         }
 
-        [Fact(DisplayName = "The conjunction of a None Option and a Some Option is a None Option.")]
-        public void OperatorBitwiseAnd_NoneSome()
+        [Property(DisplayName = "The conjunction of a None Option and a Some Option is a None Option.")]
+        public static void OperatorBitwiseAnd_NoneSome(NonNull<string> some)
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(sentinel);
+            var right = Option.From(some.Get);
 
             // act
             var actualLeftFirst = left & right;
@@ -1828,12 +1817,12 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(left, actualRightFirst);
         }
 
-        [Fact(DisplayName = "The conjunction of a None Option and a Some Option is a None Option.")]
-        public void NamedBitwiseAnd_NoneSome()
+        [Property(DisplayName = "The conjunction of a None Option and a Some Option is a None Option.")]
+        public static void NamedBitwiseAnd_NoneSome(NonNull<string> some)
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(sentinel);
+            var right = Option.From(some.Get);
 
             // act
             var actualLeftFirst = left.BitwiseAnd(right);
@@ -1844,12 +1833,12 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(left, actualRightFirst);
         }
 
-        [Fact(DisplayName = "The conjunction of a None Option and a Some Option is a None Option.")]
-        public void OperatorLogicalAnd_NoneSome()
+        [Property(DisplayName = "The conjunction of a None Option and a Some Option is a None Option.")]
+        public static void OperatorLogicalAnd_NoneSome(NonNull<string> some)
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(sentinel);
+            var right = Option.From(some.Get);
 
             // act
             var actualLeftFirst = left && right;
@@ -1860,12 +1849,12 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(left, actualRightFirst);
         }
 
-        [Fact(DisplayName = "The conjunction of two Some Options is the latter Some Option.")]
-        public void OperatorBitwiseAnd_SomeSome()
+        [Property(DisplayName = "The conjunction of two Some Options is the latter Some Option.")]
+        public static void OperatorBitwiseAnd_SomeSome(NonNull<string> someLeft, NonNull<string> someRight)
         {
             // arrange
-            var left = Option.From("megatron");
-            var right = Option.From(sentinel);
+            var left = Option.From(someLeft.Get);
+            var right = Option.From(someRight.Get);
 
             // act
             var actualLeftFirst = left & right;
@@ -1876,12 +1865,12 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(left, actualRightFirst);
         }
 
-        [Fact(DisplayName = "The conjunction of two Some Options is the latter Some Option.")]
-        public void NamedBitwiseAnd_SomeSome()
+        [Property(DisplayName = "The conjunction of two Some Options is the latter Some Option.")]
+        public static void NamedBitwiseAnd_SomeSome(NonNull<string> someLeft, NonNull<string> someRight)
         {
             // arrange
-            var left = Option.From("megatron");
-            var right = Option.From(sentinel);
+            var left = Option.From(someLeft.Get);
+            var right = Option.From(someRight.Get);
 
             // act
             var actualLeftFirst = left.BitwiseAnd(right);
@@ -1892,12 +1881,12 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(left, actualRightFirst);
         }
 
-        [Fact(DisplayName = "The conjunction of two Some Options is the latter Some Option.")]
-        public void OperatorLogicalAnd_SomeSome()
+        [Property(DisplayName = "The conjunction of two Some Options is the latter Some Option.")]
+        public static void OperatorLogicalAnd_SomeSome(NonNull<string> someLeft, NonNull<string> someRight)
         {
             // arrange
-            var left = Option.From("megatron");
-            var right = Option.From(sentinel);
+            var left = Option.From(someLeft.Get);
+            var right = Option.From(someRight.Get);
 
             // act
             var actualLeftFirst = left && right;
@@ -1908,46 +1897,46 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(left, actualRightFirst);
         }
 
-        [Fact(DisplayName = "The conjunction of two None Options short-circuits.")]
-        public void OperatorLogicalAnd_NoneNone_ShortCircuits()
+        [Property(DisplayName = "The conjunction of two None Options short-circuits.")]
+        public static void OperatorLogicalAnd_NoneNone_ShortCircuits(NonNull<string> before, NonNull<string> sentinel)
         { // note(cosborn) This tests "operator false"/IsFalse
             // arrange
             var left = Option<string>.None;
-            string actual = sentinel;
-            Func<Option<string>> right = () =>
+            var actual = before.Get;
+            Option<string> Right()
             {
-                actual = string.Empty;
+                actual = sentinel.Get;
                 return Option<string>.None;
-            };
+            }
 
             // act
-            var dummy = left && right();
+            var dummy = left && Right();
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(before.Get, actual);
         }
 
-        [Fact(DisplayName = "The conjunction of a None Option and a Some Option short-circuits.")]
-        public void OperatorLogicalAnd_NoneSome_ShortCircuits()
+        [Property(DisplayName = "The conjunction of a None Option and a Some Option short-circuits.")]
+        public static void OperatorLogicalAnd_NoneSome_ShortCircuits(NonNull<string> before, NonNull<string> sentinel)
         { // note(cosborn) This tests "operator false"/IsFalse
             // arrange
             var left = Option<string>.None;
-            string actual = sentinel;
-            Func<Option<string>> right = () =>
+            var actual = before.Get;
+            Option<string> Right()
             {
-                actual = string.Empty;
-                return Option.From(sentinel);
-            };
+                actual = sentinel.Get;
+                return Option.From(sentinel.Get);
+            }
 
             // act
-            var dummy = left && right();
+            var dummy = left && Right();
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(before.Get, actual);
         }
 
         [Fact(DisplayName = "The untyped None converts to a None Option.")]
-        public void LiteralNone_IsNone()
+        public static void LiteralNone_IsNone()
         {
             // arrange, act
             Option<string> actual = Option.None;
@@ -1958,7 +1947,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Null converts to a None Option.")]
-        public void Null_IsNone()
+        public static void Null_IsNone()
         {
             // arrange, act
             Option<string> actual = null;
@@ -1968,14 +1957,11 @@ namespace Tiger.Types.UnitTest
             Assert.False(actual.IsSome);
         }
 
-        [Theory(DisplayName = "Values convert to Some Options.")]
-        [InlineData(0)]
-        [InlineData(3)]
-        [InlineData(-1)]
-        public void Value_IsSome(int innerValue)
+        [Property(DisplayName = "Values convert to Some Options.")]
+        public static void Value_IsSome(int some)
         {
             // arrange, act
-            Option<int> actual = innerValue;
+            Option<int> actual = some;
 
             // assert
             Assert.False(actual.IsNone);
@@ -1983,7 +1969,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Unwrapping a None Option throws.")]
-        public void Cast_None_Throws()
+        public static void Cast_None_Throws()
         {
             // arrange
             var value = Option<string>.None;
@@ -1997,182 +1983,180 @@ namespace Tiger.Types.UnitTest
 
         }
 
-        [Fact(DisplayName = "Unwrapping a Some Option returns its Some value.")]
-        public void Cast_Some()
+        [Property(DisplayName = "Unwrapping a Some Option returns its Some value.")]
+        public static void Cast_Some(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
             var actual = (string)value;
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(some.Get, actual);
         }
 
         #endregion
 
         #region Split
 
-        [Fact(DisplayName = "Splitting a null value over a func returns a None Option.")]
-        public void FuncSplit_Null_None()
+        [Property(DisplayName = "Splitting a null value over a func returns a None Option.")]
+        public static void FuncSplit_Null_None(bool split)
         {
             // arrange
-            var value = (string)null;
+            const string value = null;
 
             // act
-            var actual = Option.Split(value, v => v.Length == 8);
+            var actual = Option.Split(value, _ => split);
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Splitting a null nullable value over a func returns a None Option.")]
-        public void FuncSplit_NullableNull_None()
+        [Property(DisplayName = "Splitting a null nullable value over a func returns a None Option.")]
+        public static void FuncSplit_NullableNull_None(bool split)
         {
             // arrange
             var value = (int?)null;
 
             // act
-            var actual = Option.Split(value, (int v) => v == 8);
+            var actual = Option.Split(value, (int _) => split);
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Splitting a value over a func, failing the condition, " +
-                            "returns a None Option.")]
-        public void FuncSplit_ReturnFalse_None()
+        [Property(DisplayName = "Splitting a value over a func, failing the condition, returns a None Option.")]
+        public static void FuncSplit_ReturnFalse_None(NonNull<string> some)
         {
             // arrange
-            var value = sentinel;
+            var value = some.Get;
 
             // act
-            var actual = Option.Split(value, v => v.Length == 33);
+            var actual = Option.Split(value, _ => false);
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Splitting a nullable value over a func, failing the condition, " +
-                            "returns a None Option.")]
-        public void FuncSplit_NullableReturnFalse_None()
+        [Property(DisplayName = "Splitting a nullable value over a func, failing the condition, " +
+            "returns a None Option.")]
+        public static void FuncSplit_NullableReturnFalse_None(int some)
         {
             // arrange
-            var value = (int?)42;
+            var value = (int?)some;
 
             // act
-            var actual = Option.Split(value, (int v) => v == 33);
+            var actual = Option.Split(value, (int _) => false);
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Splitting a value over a func, passing the condition, " +
-                            "returns a Some Option.")]
-        public void FuncSplit_Some()
+        [Property(DisplayName = "Splitting a value over a func, passing the condition, returns a Some Option.")]
+        public static void FuncSplit_Some(NonNull<string> some)
         {
             // arrange
-            var value = sentinel;
+            var value = some.Get;
 
             // act
-            var actual = Option.Split(value, v => v.Length == 8);
+            var actual = Option.Split(value, _ => true);
 
             // assert
             Assert.True(actual.IsSome);
         }
 
-        [Fact(DisplayName = "Splitting a nullable value over a func, passing the condition, " +
-                            "returns a Some Option.")]
-        public void FuncSplit_Nullable_Some()
+        [Property(DisplayName = "Splitting a nullable value over a func, passing the condition, " +
+            "returns a Some Option.")]
+        public static void FuncSplit_Nullable_Some(int some)
         {
             // arrange
-            var value = (int?)42;
+            var value = (int?)some;
 
             // act
-            var actual = Option.Split(value, (int v) => v == 42);
+            var actual = Option.Split(value, (int _) => true);
 
             // assert
             Assert.True(actual.IsSome);
         }
 
-        [Fact(DisplayName = "Splitting a null value over a task returns a None Option.")]
-        public async Task TaskSplit_Null_None()
+        [Property(DisplayName = "Splitting a null value over a task returns a None Option.")]
+        public static void TaskSplit_Null_None(bool split)
         {
             // arrange
-            var value = (string)null;
+            const string value = null;
 
             // act
-            var actual = await Option.Split(value, v => FromResult(v.Length == 8));
+            var actual = Option.Split(value, _ => FromResult(split)).Result;
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Splitting a nullable null value over a task returns a None Option.")]
-        public async Task TaskSplit_NullableNull_None()
+        [Property(DisplayName = "Splitting a nullable null value over a task returns a None Option.")]
+        public static void TaskSplit_NullableNull_None(bool split)
         {
             // arrange
             var value = (int?)null;
 
             // act
-            var actual = await Option.Split(value, (int v) => FromResult(v == 8));
+            var actual = Option.Split(value, (int _) => FromResult(split)).Result;
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Splitting a value over a task, failing the condition, " +
-                            "returns a None Option.")]
-        public async Task TaskSplit_ReturnFalse_None()
+        [Property(DisplayName = "Splitting a value over a task, failing the condition, " +
+            "returns a None Option.")]
+        public static void TaskSplit_ReturnFalse_None(NonNull<string> some)
         {
             // arrange
-            var value = sentinel;
+            var value = some;
 
             // act
-            var actual = await Option.Split(value, v => FromResult(v.Length == 33));
+            var actual = Option.Split(value, _ => FromResult(false)).Result;
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Splitting a nullable value over a task, failing the condition, " +
-                            "returns a None Option.")]
-        public async Task TaskSplit_NullableReturnFalse_None()
+        [Property(DisplayName = "Splitting a nullable value over a task, failing the condition, " +
+            "returns a None Option.")]
+        public static void TaskSplit_NullableReturnFalse_None(int some)
         {
             // arrange
-            var value = (int?)42;
+            var value = (int?)some;
 
             // act
-            var actual = await Option.Split(value, (int v) => FromResult(v == 33));
+            var actual = Option.Split(value, (int _) => FromResult(false)).Result;
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Splitting a value over a func, passing the condition, " +
-                            "returns a Some Option.")]
-        public async Task TaskSplit_Some()
+        [Property(DisplayName = "Splitting a value over a func, passing the condition, " +
+            "returns a Some Option.")]
+        public static void TaskSplit_Some(NonNull<string> some)
         {
             // arrange
-            var value = sentinel;
+            var value = some;
 
             // act
-            var actual = await Option.Split(value, v => FromResult(v.Length == 8));
+            var actual = Option.Split(value, _ => FromResult(true)).Result;
 
             // assert
             Assert.True(actual.IsSome);
         }
 
-        [Fact(DisplayName = "Splitting a nullable value over a func, passing the condition, " +
-                            "returns a Some Option.")]
-        public async Task TaskSplit_Nullable_Some()
+        [Property(DisplayName = "Splitting a nullable value over a func, passing the condition, " +
+            "returns a Some Option.")]
+        public static void TaskSplit_Nullable_Some(int some)
         {
             // arrange
-            var value = (int?)42;
+            var value = (int?)some;
 
             // act
-            var actual = await Option.Split(value, (int v) => FromResult(v == 42));
+            var actual = Option.Split(value, (int _) => FromResult(true)).Result;
 
             // assert
             Assert.True(actual.IsSome);
@@ -2183,7 +2167,7 @@ namespace Tiger.Types.UnitTest
         #region Join
 
         [Fact(DisplayName = "Joining a None Option Option returns a None Option.")]
-        public void Join_None()
+        public static void Join_None()
         {
             // arrange
             var value = Option<Option<int>>.None;
@@ -2196,7 +2180,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Joining a Some Option containing a None Option returns a None Option.")]
-        public void Join_SomeNone()
+        public static void Join_SomeNone()
         {
             // arrange
             var value = Option.From(Option<int>.None);
@@ -2208,27 +2192,26 @@ namespace Tiger.Types.UnitTest
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Joining a Some Option containing a Some Option returns a Same Option.")]
-        public void Join_SomeSome()
+        [Property(DisplayName = "Joining a Some Option containing a Some Option returns a Some Option.")]
+        public static void Join_SomeSome(int some)
         {
             // arrange
-            var value = Option.From(Option.From(42));
+            var value = Option.From(Option.From(some));
 
             // act
             var actual = value.Join();
 
             // assert
             Assert.True(actual.IsSome);
-            Assert.Equal(42, actual.Value);
+            Assert.Equal(some, actual.Value);
         }
-        
+
         #endregion
 
         #region Extensions
 
         [Fact(DisplayName = "A None Option converted to a Nullable is null.")]
-        
-        public void ToNullable_None()
+        public static void ToNullable_None()
         {
             // arrange
             var value = Option<int>.None;
@@ -2240,26 +2223,24 @@ namespace Tiger.Types.UnitTest
             Assert.Null(actual);
         }
 
-        [Fact(DisplayName = "A Some Option converted to a Nullable is equal to the Some value.")]
-        
-        public void ToNullable_Some()
+        [Property(DisplayName = "A Some Option converted to a Nullable is equal to the Some value.")]
+        public static void ToNullable_Some(int some)
         {
             // arrange
-            var value = Option.From(42);
+            var value = Option.From(some);
 
             // act
             var actual = value.ToNullable();
 
             // assert
             Assert.NotNull(actual);
-            Assert.Equal(42, actual);
+            Assert.Equal(some, actual);
         }
 
         #region LINQ
 
         [Fact(DisplayName = "Asking a None Option for any returns false.")]
-        
-        public void Any_None()
+        public static void Any_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -2271,12 +2252,11 @@ namespace Tiger.Types.UnitTest
             Assert.False(actual);
         }
 
-        [Fact(DisplayName = "Asking a Some Option for any returns true.")]
-        
-        public void Any_Some()
+        [Property(DisplayName = "Asking a Some Option for any returns true.")]
+        public static void Any_Some(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
             var actual = value.Any();
@@ -2286,8 +2266,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Asking a None Option for any with a false predicate returns false.")]
-        
-        public void PredicateAny_NoneFalse()
+        public static void PredicateAny_NoneFalse()
         {
             // arrange
             var value = Option<string>.None;
@@ -2300,8 +2279,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Asking a None Option for any with a true predicate returns false.")]
-        
-        public void PredicateAny_NoneTrue()
+        public static void PredicateAny_NoneTrue()
         {
             // arrange
             var value = Option<string>.None;
@@ -2313,12 +2291,11 @@ namespace Tiger.Types.UnitTest
             Assert.False(actual);
         }
 
-        [Fact(DisplayName = "Asking a Some Option for any with a false predicate returns false.")]
-        
-        public void PredicateAny_SomeFalse()
+        [Property(DisplayName = "Asking a Some Option for any with a false predicate returns false.")]
+        public static void PredicateAny_SomeFalse(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
             var actual = value.Any(_ => false);
@@ -2327,12 +2304,11 @@ namespace Tiger.Types.UnitTest
             Assert.False(actual);
         }
 
-        [Fact(DisplayName = "Asking a Some Option for any with a true predicate returns false.")]
-        
-        public void PredicateAny_SomeTrue()
+        [Property(DisplayName = "Asking a Some Option for any with a true predicate returns true.")]
+        public static void PredicateAny_SomeTrue(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
             var actual = value.Any(_ => true);
@@ -2342,8 +2318,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Asking a None Option for all with a false predicate returns true.")]
-        
-        public void PredicateAll_NoneFalse()
+        public static void PredicateAll_NoneFalse()
         {
             // arrange
             var value = Option<string>.None;
@@ -2356,8 +2331,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Asking a None Option for all with a true predicate returns true.")]
-        
-        public void PredicateAll_NoneTrue()
+        public static void PredicateAll_NoneTrue()
         {
             // arrange
             var value = Option<string>.None;
@@ -2369,12 +2343,11 @@ namespace Tiger.Types.UnitTest
             Assert.True(actual);
         }
 
-        [Fact(DisplayName = "Asking a Some Option for all with a false predicate returns false.")]
-        
-        public void PredicateAll_SomeFalse()
+        [Property(DisplayName = "Asking a Some Option for all with a false predicate returns false.")]
+        public static void PredicateAll_SomeFalse(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
             var actual = value.All(_ => false);
@@ -2383,12 +2356,11 @@ namespace Tiger.Types.UnitTest
             Assert.False(actual);
         }
 
-        [Fact(DisplayName = "Asking a Some Option for all with a true predicate returns true.")]
-        
-        public void PredicateAll_SomeTrue()
+        [Property(DisplayName = "Asking a Some Option for all with a true predicate returns true.")]
+        public static void PredicateAll_SomeTrue(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
             var actual = value.All(_ => true);
@@ -2397,103 +2369,90 @@ namespace Tiger.Types.UnitTest
             Assert.True(actual);
         }
 
-        [Theory(DisplayName = "Asking a None option whether it contains a value returns false.")]
-        [InlineData(0)]
-        [InlineData(3)]
-        [InlineData(-1)]
-        
-        public void Contains_None(int testValue)
+        [Property(DisplayName = "Asking a None option whether it contains a value returns false.")]
+        public static void Contains_None(int contains)
         {
             // arrange
             var value = Option<int>.None;
 
             // act
-            var actual = value.Contains(testValue);
+            var actual = value.Contains(contains);
 
             // assert
             Assert.False(actual);
         }
 
-        [Fact(DisplayName = "Asking a Some option whether it contains a value that it doesn't" +
-                            "returns false.")]
-        
-        public void Contains_Some_False()
+        [Property(DisplayName = "Asking a Some option whether it contains a value that it doesn't " +
+            "returns false.", Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        public static void Contains_Some_False(UnequalNonNullPair<string> pair)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(pair.Left);
 
             // act
-            var actual = value.Contains("megatron");
+            var actual = value.Contains(pair.Right);
 
             // assert
             Assert.False(actual);
         }
 
-        [Fact(DisplayName = "Asking a Some option whether it contains a value that it does" +
-                            "returns true.")]
-        
-        public void Contains_Some_True()
+        [Property(DisplayName = "Asking a Some option whether it contains a value that it does" +
+            "returns true.")]
+        public static void Contains_Some_True(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = value.Contains(sentinel);
+            var actual = value.Contains(some.Get);
 
             // assert
             Assert.True(actual);
         }
 
-        [Theory(DisplayName = "Asking a None option whether it contains a value returns false.")]
-        [InlineData(0)]
-        [InlineData(3)]
-        [InlineData(-1)]
-        
-        public void ComparerContains_None(int testValue)
+        [Property(DisplayName = "Asking a None option whether it contains a value returns false.")]
+        public static void ComparerContains_None(int contains)
         {
             // arrange
             var value = Option<int>.None;
 
             // act
-            var actual = value.Contains(testValue, EqualityComparer<int>.Default);
+            var actual = value.Contains(contains, EqualityComparer<int>.Default);
 
             // assert
             Assert.False(actual);
         }
 
-        [Fact(DisplayName = "Asking a Some option whether it contains a value that it doesn't" +
-                            "returns false.")]
-        
-        public void ComparerContains_Some_False()
+        [Property(DisplayName = "Asking a Some option whether it contains a value that it doesn't" +
+            "returns false.", Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        public static void ComparerContains_Some_False(UnequalNonNullPair<string> pair)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(pair.Left);
 
             // act
-            var actual = value.Contains("megatron", StringComparer.OrdinalIgnoreCase);
+            var actual = value.Contains(pair.Right, StringComparer.OrdinalIgnoreCase);
 
             // assert
             Assert.False(actual);
         }
 
-        [Fact(DisplayName = "Asking a Some option whether it contains a value that it does" +
-                            "returns true.")]
-        
-        public void ComparerContains_Some_True()
+        [Property(DisplayName = "Asking a Some option whether it contains a value that it does" +
+            "returns true.")]
+        public static void ComparerContains_Some_True(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = value.Contains(sentinel.ToUpperInvariant(), StringComparer.OrdinalIgnoreCase);
+            var actual = value.Contains(some.Get.ToUpperInvariant(), StringComparer.OrdinalIgnoreCase);
 
             // assert
             Assert.True(actual);
         }
 
         [Fact(DisplayName = "Recovering a None Option returns the recovery value.")]
-        
-        public void DefaultIfEmpty_None()
+        public static void DefaultIfEmpty_None()
         {
             // arrange
             var value = Option<int>.None;
@@ -2507,12 +2466,11 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(0, innerValue);
         }
 
-        [Fact(DisplayName = "Recovering a Some Option returns the Some value.")]
-        
-        public void DefaultIfEmpty_Some()
+        [Property(DisplayName = "Recovering a Some Option returns the Some value.")]
+        public static void DefaultIfEmpty_Some(int some)
         {
             // arrange
-            var value = Option.From(42);
+            var value = Option.From(some);
 
             // act
             var actual = value.DefaultIfEmpty();
@@ -2520,110 +2478,102 @@ namespace Tiger.Types.UnitTest
             // assert
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
-            Assert.Equal(42, innerValue);
+            Assert.Equal(some, innerValue);
         }
 
-        [Fact(DisplayName = "Recovering a None Option returns the recovery value.")]
-        
-        public void ValueDefaultIfEmpty_None()
+        [Property(DisplayName = "Recovering a None Option returns the recovery value.")]
+        public static void ValueDefaultIfEmpty_None(NonNull<string> sentinel)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = value.DefaultIfEmpty(sentinel);
+            var actual = value.DefaultIfEmpty(sentinel.Get);
 
             // assert
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
-            Assert.Equal(sentinel, innerValue);
+            Assert.Equal(sentinel.Get, innerValue);
         }
 
-        [Fact(DisplayName = "Recovering a Some Option returns the Some value.")]
-        
-        public void ValueDefaultIfEmpty_Some()
+        [Property(DisplayName = "Recovering a Some Option returns the Some value.")]
+        public static void ValueDefaultIfEmpty_Some(NonNull<string> some, NonNull<string> sentinel)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = value.DefaultIfEmpty("megatron");
+            var actual = value.DefaultIfEmpty(sentinel.Get);
 
             // assert
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
-            Assert.Equal(sentinel, innerValue);
+            Assert.Equal(some.Get, innerValue);
         }
 
-        [Fact(DisplayName = "Tapping a None Option over a func returns a None Option " +
-                            "and performs no action.")]
-        
-        public void Do_None()
+        [Property(DisplayName = "Tapping a None Option over a func returns a None Option " +
+            "and performs no action.")]
+        public static void Do_None(NonNull<string> before, NonNull<string> sentinel)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var output = sentinel;
-            var actual = value.Do(v => output = string.Empty);
+            var output = before.Get;
+            var actual = value.Do(v => output = sentinel.Get);
 
             // assert
             Assert.True(actual.IsNone);
-            Assert.Equal(sentinel, output);
+            Assert.Equal(before.Get, output);
         }
 
-        [Fact(DisplayName = "Tapping a Some Option over a func returns a Some Option " +
-                            "and performs an action.")]
-        
-        public void Do_Some()
+        [Property(DisplayName = "Tapping a Some Option over a func returns a Some Option " +
+            "and performs an action.")]
+        public static void Do_Some(NonNull<string> some, NonNull<string> before, NonNull<string> sentinel)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var output = string.Empty;
-            var actual = value.Do(v => output = sentinel);
+            var output = before.Get;
+            var actual = value.Do(v => output = sentinel.Get);
 
             // assert
             Assert.Equal(value, actual);
-            Assert.Equal(sentinel, output);
+            Assert.Equal(sentinel.Get, output);
         }
 
-        [Fact(DisplayName = "Conditionally executing an action based on a None Option " +
-                            "does not execute.")]
-        
-        public void ForEach_None()
+        [Property(DisplayName = "Conditionally executing an action based on a None Option " +
+            "does not execute.")]
+        public static void ForEach_None(NonNull<string> before, NonNull<string> sentinel)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = sentinel;
-            value.ForEach(v => actual = string.Empty);
+            var actual = before.Get;
+            value.ForEach(v => actual = sentinel.Get);
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(before.Get, actual);
         }
 
-        [Fact(DisplayName = "Conditionally executing an action based on a Some Option " +
-                            "executes.")]
-        
-        public void ForEach_Some()
+        [Property(DisplayName = "Conditionally executing an action based on a Some Option executes.")]
+        public static void ForEach_Some(NonNull<string> some, NonNull<string> before)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = string.Empty;
+            var actual = before.Get;
             value.ForEach(v => actual = v);
 
             // assert
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(some.Get, actual);
         }
 
         [Fact(DisplayName = "Selecting a None Option produces a None Option.")]
-        
-        public void Select_None()
+        public static void Select_None()
         {
             // arrange
             var value = Option<int>.None;
@@ -2636,12 +2586,11 @@ namespace Tiger.Types.UnitTest
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Selecting a Some Option produces a Some Option.")]
-        
-        public void Select_Some()
+        [Property(DisplayName = "Selecting a Some Option produces a Some Option.")]
+        public static void Select_Some(short some)
         {
             // arrange
-            var value = Option.From(42);
+            var value = Option.From((int)some);
 
             // act
             var actual = from v in value
@@ -2650,62 +2599,58 @@ namespace Tiger.Types.UnitTest
             // assert
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
-            Assert.Equal(43, innerValue);
+            Assert.Equal(some + 1, innerValue);
         }
 
-        [Fact(DisplayName = "Filtering a None Option produces a None Option.")]
-        
-        public void Where_None()
+        [Property(DisplayName = "Filtering a None Option produces a None Option.")]
+        public static void Where_None(bool filter)
         {
             // arrange
             var value = Option<int>.None;
 
             // act
             var actual = from v in value
-                         where v <= 0
+                         where filter
                          select v;
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Filtering a Some Option with a false predicate produces a None Option.")]
-        
-        public void Where_SomeFalse()
+        [Property(DisplayName = "Filtering a Some Option with a false predicate produces a None Option.")]
+        public static void Where_SomeFalse(int some)
         {
             // arrange
-            var value = Option.From(42);
+            var value = Option.From(some);
 
             // act
             var actual = from v in value
-                         where v <= 0
+                         where false
                          select v;
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Filtering a Some Option with a true predicate produces a None Option.")]
-        
-        public void Where_SomeTrue()
+        [Property(DisplayName = "Filtering a Some Option with a true predicate produces a Some Option.")]
+        public static void Where_SomeTrue(int some)
         {
             // arrange
-            var value = Option.From(42);
+            var value = Option.From(some);
 
             // act
             var actual = from v in value
-                         where v > 0
+                         where true
                          select v;
 
             // assert
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
-            Assert.Equal(42, innerValue);
+            Assert.Equal(some, innerValue);
         }
 
         [Fact(DisplayName = "Selecting from two None Options produces a None Option.")]
-        
-        public void SelectManyResult_NoneNone()
+        public static void SelectManyResult_NoneNone()
         {
             // arrange
             var left = Option<int>.None;
@@ -2720,12 +2665,11 @@ namespace Tiger.Types.UnitTest
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Selecting from a Some Option and a None Option produces a None Option.")]
-        
-        public void SelectManyResult_SomeNone()
+        [Property(DisplayName = "Selecting from a Some Option and a None Option produces a None Option.")]
+        public static void SelectManyResult_SomeNone(int someLeft)
         {
             // arrange
-            var left = Option.From(1);
+            var left = Option.From(someLeft);
             var right = Option<int>.None;
 
             // act
@@ -2737,13 +2681,12 @@ namespace Tiger.Types.UnitTest
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Selecting from a None Option and a Some Option produces a None Option.")]
-        
-        public void SelectManyResult_NoneSome()
+        [Property(DisplayName = "Selecting from a None Option and a Some Option produces a None Option.")]
+        public static void SelectManyResult_NoneSome(int someRight)
         {
             // arrange
             var left = Option<int>.None;
-            var right = Option.From(2);
+            var right = Option.From(someRight);
 
             // act
             var actual = from l in left
@@ -2754,130 +2697,136 @@ namespace Tiger.Types.UnitTest
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Selecting from two Some Options produces a Some Option.")]
-        
-        public void SelectManyResult_SomeSome()
+        [Property(DisplayName = "Selecting from two Some Options produces a Some Option.",
+            Arbitrary = new[] { typeof(UnequalPair) })]
+        public static void SelectManyResult_SomeSome(UnequalPair<int> values)
         {
             // arrange
-            var left = Option.From(1);
-            var right = Option.From(2);
+            var left = Option.From(values.Left);
+            var right = Option.From(values.Right);
 
             // act
             var actual = from l in left
                          from r in right
-                         select l + r;
+                         select (long)l + r;
 
             // assert
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
-            Assert.Equal(3, innerValue);
+            Assert.Equal(values.Left + values.Right, innerValue);
         }
 
-        [Fact(DisplayName = "Binding a None Option over a func returns a None Option.")]
-        public void SelectMany_None()
+        [Fact(DisplayName = "Binding a None Option over a func returning a None Option returns a None Option.")]
+        public static void SelectMany_None()
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = value.SelectMany(v => v.Length == 0
-                ? Option<int>.None
-                : Option.From(v.Length));
+            var actual = value.SelectMany(_ => Option<int>.None);
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Binding a Some Option over a func returning a None Option " +
-                            "returns a None Option.")]
-        public void SelectMany_ReturnNone_Some()
+        [Property(DisplayName = "Binding a None Option over a func returning a Some Option returns a None Option.")]
+        public static void SelectMany_None(int some)
         {
             // arrange
-            var value = Option.From(string.Empty);
+            var value = Option<string>.None;
 
             // act
-            var actual = value.SelectMany(v => v.Length == 0
-                ? Option<int>.None
-                : Option.From(v.Length));
+            var actual = value.SelectMany(_ => Option.From(some));
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Binding a Some Option over a func returning a Some Option " +
-                            "returns a Some Option.")]
-        public void SelectManyReturnSome_Some()
+        [Property(DisplayName = "Binding a Some Option over a func returning a None Option " +
+            "returns a None Option.")]
+        public static void SelectMany_ReturnNone_Some(NonNull<string> some)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = value.SelectMany(v => v.Length == 0
-                ? Option<int>.None
-                : Option.From(v.Length));
+            var actual = value.SelectMany(_ => Option<int>.None);
+
+            // assert
+            Assert.True(actual.IsNone);
+        }
+
+        [Property(DisplayName = "Binding a Some Option over a func returning a Some Option " +
+            "returns a Some Option.")]
+        public static void SelectManyReturnSome_Some(NonNull<string> someString, int someInt)
+        {
+            // arrange
+            var value = Option.From(someString.Get);
+
+            // act
+            var actual = value.SelectMany(_ => Option.From(someInt));
 
             // assert
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
-            Assert.Equal(sentinel.Length, innerValue);
+            Assert.Equal(someInt, innerValue);
         }
 
-        [Fact(DisplayName = "Folding over a None Option returns the seed value.")]
-        
-        public void Aggregate_None()
+        [Property(DisplayName = "Folding over a None Option returns the seed value.")]
+        public static void Aggregate_None(short seed)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = value.Aggregate(34, (s, v) => s + v.Length);
+            var actual = value.Aggregate((int)seed, (s, v) => s + v.Length);
 
             // assert
-            Assert.Equal(34, actual);
+            Assert.Equal(seed, actual);
         }
 
-        [Fact(DisplayName = "Folding over a Some Option returns the result of invoking the " +
-                            "accumulator over the seed value and the Some value.")]
-        
-        public void Aggregate_Some()
+        [Property(DisplayName = "Folding over a Some Option returns the result of invoking the " +
+            "accumulator over the seed value and the Some value.")]
+        public static void Aggregate_Some(NonNull<string> some, short seed)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = value.Aggregate(34, (s, v) => s + v.Length);
+            var actual = value.Aggregate((int)seed, (s, v) => s + v.Length);
 
             // assert
-            Assert.Equal(42, actual);
+            var expected = some.Get.Length + seed;
+            Assert.Equal(expected, actual);
         }
 
-        [Fact(DisplayName = "Folding over a None Option returns the seed value.")]
-        
-        public void ResultAggregate_None()
+        [Property(DisplayName = "Folding over a None Option returns the seed value.")]
+        public static void ResultAggregate_None(short seed)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = value.Aggregate(34, (s, v) => s + v.Length, v => v * 2);
+            var actual = value.Aggregate((int)seed, (s, v) => s + v.Length, v => v * 2);
 
             // assert
-            Assert.Equal(68, actual);
+            var expected = seed * 2;
+            Assert.Equal(expected, actual);
         }
 
-        [Fact(DisplayName = "Folding over a Some Option returns the result of invoking the " +
-                            "accumulator over the seed value and the Some value.")]
-        
-        public void ResultAggregate_Some()
+        [Property(DisplayName = "Folding over a Some Option returns the result of invoking the " +
+            "accumulator over the seed value and the Some value.")]
+        public static void ResultAggregate_Some(NonNull<string> some, short seed)
         {
             // arrange
-            var value = Option.From(sentinel);
+            var value = Option.From(some.Get);
 
             // act
-            var actual = value.Aggregate(34, (s, v) => s + v.Length, v => v * 2);
+            var actual = value.Aggregate((int)seed, (s, v) => s + v.Length, v => v * 2);
 
             // assert
-            Assert.Equal(84, actual);
+            var expected = (seed + some.Get.Length) * 2;
+            Assert.Equal(expected, actual);
         }
 
         #endregion
@@ -2886,6 +2835,7 @@ namespace Tiger.Types.UnitTest
 
         #region Get Underlying Type
 
+        [Theory(DisplayName = "The underlying type of an Option is accessible.")]
         [InlineData(typeof(Option<int>), typeof(int))]
         [InlineData(typeof(Option<string>), typeof(string))]
         [InlineData(typeof(int), null)]
@@ -2893,8 +2843,7 @@ namespace Tiger.Types.UnitTest
         [InlineData(typeof(List<int>), null)]
         [InlineData(typeof(Option<>), null)]
         [InlineData(typeof(List<>), null)]
-        
-        public void GetUnderlyingType(Type optionalType, Type expected)
+        public static void GetUnderlyingType(Type optionalType, Type expected)
         {
             // arrange
 
@@ -2910,8 +2859,7 @@ namespace Tiger.Types.UnitTest
         #region Comparisons
 
         [Fact(DisplayName = "Two None Options are equal.")]
-        
-        public void StaticEquals_NoneNone()
+        public static void StaticEquals_NoneNone()
         {
             // arrange
             var left = Option<string>.None;
@@ -2924,13 +2872,12 @@ namespace Tiger.Types.UnitTest
             Assert.True(actual);
         }
 
-        [Fact(DisplayName = "A None Option and a Some Option are not equal.")]
-        
-        public void StaticEquals_NoneSome()
+        [Property(DisplayName = "A None Option and a Some Option are not equal.")]
+        public static void StaticEquals_NoneSome(NonNull<string> some)
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(sentinel);
+            var right = Option.From(some.Get);
 
             // act
             var actualLeftFirst = Option.OptionalEquals(left, right);
@@ -2941,13 +2888,13 @@ namespace Tiger.Types.UnitTest
             Assert.False(actualRightFirst);
         }
 
-        [Fact(DisplayName = "Two Some Options with different values are not equal.")]
-        
-        public void StaticEquals_SomeSome_DifferentValue()
+        [Property(DisplayName = "Two Some Options with different values are not equal.",
+            Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        public static void StaticEquals_SomeSome_DifferentValue(UnequalNonNullPair<string> pair)
         {
             // arrange
-            var left = Option.From(sentinel);
-            var right = Option.From("megatron");
+            var left = Option.From(pair.Left);
+            var right = Option.From(pair.Right);
 
             // act
             var actualLeftFirst = Option.OptionalEquals(left, right);
@@ -2958,13 +2905,12 @@ namespace Tiger.Types.UnitTest
             Assert.False(actualRightFirst);
         }
 
-        [Fact(DisplayName = "Two Some Options with the same values are equal.")]
-        
-        public void StaticEquals_SomeSome_SameValue()
+        [Property(DisplayName = "Two Some Options with the same values are equal.")]
+        public static void StaticEquals_SomeSome_SameValue(NonNull<string> some)
         {
             // arrange
-            var left = Option.From(sentinel);
-            var right = Option.From(sentinel);
+            var left = Option.From(some.Get);
+            var right = Option.From(some.Get);
 
             // act
             var actualLeftFirst = Option.OptionalEquals(left, right);
@@ -2976,8 +2922,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Two None Options are equal.")]
-        
-        public void StaticEqualsComparer_NoneNone()
+        public static void StaticEqualsComparer_NoneNone()
         {
             // arrange
             var left = Option<string>.None;
@@ -2990,13 +2935,12 @@ namespace Tiger.Types.UnitTest
             Assert.True(actual);
         }
 
-        [Fact(DisplayName = "A None Option and a Some Option are not equal.")]
-        
-        public void StaticEqualsComparer_NoneSome()
+        [Property(DisplayName = "A None Option and a Some Option are not equal.")]
+        public static void StaticEqualsComparer_NoneSome(NonNull<string> some)
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(sentinel);
+            var right = Option.From(some.Get);
 
             // act
             var actualLeftFirst = Option.OptionalEquals(left, right, StringComparer.OrdinalIgnoreCase);
@@ -3007,13 +2951,13 @@ namespace Tiger.Types.UnitTest
             Assert.False(actualRightFirst);
         }
 
-        [Fact(DisplayName = "Two Some Options with different values are not equal.")]
-        
-        public void StaticEqualsComparer_SomeSome_DifferentValue()
+        [Property(DisplayName = "Two Some Options with different values are not equal.",
+            Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        public static void StaticEqualsComparer_SomeSome_DifferentValue(UnequalNonNullPair<string> pair)
         {
             // arrange
-            var left = Option.From(sentinel);
-            var right = Option.From("megatron");
+            var left = Option.From(pair.Left);
+            var right = Option.From(pair.Right);
 
             // act
             var actualLeftFirst = Option.OptionalEquals(left, right, StringComparer.OrdinalIgnoreCase);
@@ -3024,13 +2968,12 @@ namespace Tiger.Types.UnitTest
             Assert.False(actualRightFirst);
         }
 
-        [Fact(DisplayName = "Two Some Options with the same values are equal.")]
-        
-        public void StaticEqualsComparer_SomeSome_SameValue()
+        [Property(DisplayName = "Two Some Options with the same values are equal.")]
+        public static void StaticEqualsComparer_SomeSome_SameValue(NonNull<string> some)
         {
             // arrange
-            var left = Option.From(sentinel);
-            var right = Option.From(sentinel.ToUpper());
+            var left = Option.From(some.Get);
+            var right = Option.From(some.Get.ToUpperInvariant());
 
             // act
             var actualLeftFirst = Option.OptionalEquals(left, right, StringComparer.OrdinalIgnoreCase);
@@ -3042,8 +2985,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Two None Options are equal.")]
-        
-        public void StaticCompare_NoneNone()
+        public static void StaticCompare_NoneNone()
         {
             // arrange
             var left = Option<string>.None;
@@ -3058,13 +3000,12 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(0, actualRightFirst);
         }
 
-        [Fact(DisplayName = "A None Option and a Some Option are not equal.")]
-        
-        public void StaticCompare_NoneSome()
+        [Property(DisplayName = "A None Option and a Some Option are not equal.")]
+        public static void StaticCompare_NoneSome(NonNull<string> some)
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(sentinel);
+            var right = Option.From(some.Get);
 
             // act
             var actualLeftFirst = Option.OptionalCompare(left, right);
@@ -3075,28 +3016,29 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(1, actualRightFirst);
         }
 
-        [Fact(DisplayName = "Two Some Options with different values are not equal.")]
-        
-        public void StaticCompare_SomeSome_DifferentValue()
+        [Property(DisplayName = "Two Some Options with different values are not equal.",
+            Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        public static void StaticCompare_SomeSome_DifferentValue(UnequalNonNullPair<string> pair)
         {
             // arrange
-            var left = Option.From("megatron");
-            var right = Option.From(sentinel);
+            var left = Option.From(pair.Left);
+            var right = Option.From(pair.Right);
 
             // act
             var actualLeftFirst = Option.OptionalCompare(left, right);
             var actualRightFirst = Option.OptionalCompare(right, left);
 
             // assert
-            Assert.Equal(-1, actualLeftFirst);
-            Assert.Equal(1, actualRightFirst);
+            Assert.NotEqual(0, actualLeftFirst);
+            Assert.NotEqual(0, actualRightFirst);
         }
 
-        public void StaticCompare_SomeSome_SameValue()
+        [Property(DisplayName = "Two Some Options with the same values are equal.")]
+        public static void StaticCompare_SomeSome_SameValue(NonNull<string> some)
         {
             // arrange
-            var left = Option.From(sentinel);
-            var right = Option.From(sentinel);
+            var left = Option.From(some.Get);
+            var right = Option.From(some.Get);
 
             // act
             var actualLeftFirst = Option.OptionalCompare(left, right);
@@ -3108,8 +3050,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Two None Options are equal.")]
-        
-        public void StaticCompareComparer_NoneNone()
+        public static void StaticCompareComparer_NoneNone()
         {
             // arrange
             var left = Option<string>.None;
@@ -3124,13 +3065,12 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(0, actualRightFirst);
         }
 
-        [Fact(DisplayName = "A None Option and a Some Option are not equal.")]
-        
-        public void StaticCompareComparer_NoneSome()
+        [Property(DisplayName = "A None Option and a Some Option are not equal.")]
+        public static void StaticCompareComparer_NoneSome(NonNull<string> some)
         {
             // arrange
             var left = Option<string>.None;
-            var right = Option.From(sentinel);
+            var right = Option.From(some.Get);
 
             // act
             var actualLeftFirst = Option.OptionalCompare(left, right, StringComparer.OrdinalIgnoreCase);
@@ -3141,29 +3081,29 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(1, actualRightFirst);
         }
 
-        [Fact(DisplayName = "Two Some Options with different values are not equal.")]
-        
-        public void StaticCompareComparer_SomeSome_DifferentValue()
+        [Property(DisplayName = "Two Some Options with different values are not equal.",
+            Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        public static void StaticCompareComparer_SomeSome_DifferentValue(UnequalNonNullPair<string> pair)
         {
             // arrange
-            var left = Option.From("megatron");
-            var right = Option.From(sentinel);
+            var left = Option.From(pair.Left);
+            var right = Option.From(pair.Right);
 
             // act
             var actualLeftFirst = Option.OptionalCompare(left, right, StringComparer.OrdinalIgnoreCase);
             var actualRightFirst = Option.OptionalCompare(right, left, StringComparer.OrdinalIgnoreCase);
 
             // assert
-            Assert.Equal(-1, actualLeftFirst);
-            Assert.Equal(1, actualRightFirst);
+            Assert.NotEqual(0, actualLeftFirst);
+            Assert.NotEqual(0, actualRightFirst);
         }
 
-        [Fact(DisplayName = "Two Some Options with the same values are equal.")]
-        public void StaticCompareComparer_SomeSome_SameValue()
+        [Property(DisplayName = "Two Some Options with the same values are equal.")]
+        public static void StaticCompareComparer_SomeSome_SameValue(NonNull<string> some)
         {
             // arrange
-            var left = Option.From(sentinel);
-            var right = Option.From(sentinel.ToUpper());
+            var left = Option.From(some.Get);
+            var right = Option.From(some.Get.ToUpperInvariant());
 
             // act
             var actualLeftFirst = Option.OptionalCompare(left, right, StringComparer.OrdinalIgnoreCase);
