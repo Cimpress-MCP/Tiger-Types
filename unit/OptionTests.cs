@@ -2,7 +2,6 @@
 using FsCheck.Xunit;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Xunit;
 using static System.Threading.Tasks.Task;
 // ReSharper disable All
@@ -10,6 +9,7 @@ using static System.Threading.Tasks.Task;
 namespace Tiger.Types.UnitTest
 {
     /// <summary>Tests related to <see cref="Option{TSome}"/>.</summary>
+    [Properties(Arbitrary = new[] { typeof(Generators) })]
     public static class OptionTests
     {
         #region IsNone, IsSome
@@ -94,18 +94,17 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(some.Get.Length, actual);
         }
 
-        [Theory(DisplayName = "Matching a None Option returns the None value branch, " +
+        [Property(DisplayName = "Matching a None Option returns the None value branch, " +
             "not the Some task branch.")]
-        [InlineData(500)]
-        public static async Task ValueTaskMatchReturn_None(int noneValue)
+        public static void ValueTaskMatchReturn_None(int noneValue)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
-            var actual = await value.Match(
+            var actual = value.Match(
                 none: noneValue,
-                some: v => v.Length.Pipe(FromResult));
+                some: v => v.Length.Pipe(FromResult)).Result;
 
             // assert
             Assert.Equal(noneValue, actual);
@@ -1175,8 +1174,7 @@ namespace Tiger.Types.UnitTest
             Assert.False(actualRightFirst);
         }
 
-        [Property(DisplayName = "Two Some Options of the same type with different values are not equal.",
-            Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        [Property(DisplayName = "Two Some Options of the same type with different values are not equal.")]
         public static void ObjectEquals_SomeSome_SameType_DifferentValue(UnequalNonNullPair<string> pair)
         {
             // arrange
@@ -1322,8 +1320,7 @@ namespace Tiger.Types.UnitTest
             Assert.False(actualRightFirst);
         }
 
-        [Property(DisplayName = "Two Some Options with different values are not equal.",
-            Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        [Property(DisplayName = "Two Some Options with different values are not equal.")]
         public static void OperatorEquals_SomeSome_DifferentValue(UnequalNonNullPair<string> pair)
         {
             // arrange
@@ -1385,8 +1382,7 @@ namespace Tiger.Types.UnitTest
             Assert.True(actualRightFirst);
         }
 
-        [Property(DisplayName = "Two Some Options with different values are unequal.",
-            Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        [Property(DisplayName = "Two Some Options with different values are unequal.")]
         public static void OperatorNotEquals_SomeSome_DifferentValue(UnequalNonNullPair<string> pair)
         {
             // arrange
@@ -1514,8 +1510,7 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(right, actualRightFirst);
         }
 
-        [Property(DisplayName = "The disjunction of two Some Options is the former Some Option.",
-            Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        [Property(DisplayName = "The disjunction of two Some Options is the former Some Option.")]
         public static void OperatorBitwiseOr_SomeSome(UnequalNonNullPair<string> pair)
         {
             // arrange
@@ -1531,8 +1526,7 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(right, actualRightFirst);
         }
 
-        [Property(DisplayName = "The disjunction of two Some Options is the latter Some Option.",
-            Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        [Property(DisplayName = "The disjunction of two Some Options is the latter Some Option.")]
         public static void NamedBitwiseOr_SomeSome(UnequalNonNullPair<string> pair)
         {
             // arrange
@@ -1548,8 +1542,7 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(right, actualRightFirst);
         }
 
-        [Property(DisplayName = "The disjunction of two Some Options is the former Some Option.",
-            Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        [Property(DisplayName = "The disjunction of two Some Options is the former Some Option.")]
         public static void OperatorLogicalOr_SomeSome(UnequalNonNullPair<string> pair)
         {
             // arrange
@@ -2382,8 +2375,7 @@ namespace Tiger.Types.UnitTest
             Assert.False(actual);
         }
 
-        [Property(DisplayName = "Asking a Some option whether it contains a value that it doesn't " +
-            "returns false.", Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        [Property(DisplayName = "Asking a Some option whether it contains a value that it doesn't returns false.")]
         public static void Contains_Some_False(UnequalNonNullPair<string> pair)
         {
             // arrange
@@ -2423,8 +2415,7 @@ namespace Tiger.Types.UnitTest
             Assert.False(actual);
         }
 
-        [Property(DisplayName = "Asking a Some option whether it contains a value that it doesn't" +
-            "returns false.", Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        [Property(DisplayName = "Asking a Some option whether it contains a value that it doesn't returns false.")]
         public static void ComparerContains_Some_False(UnequalNonNullPair<string> pair)
         {
             // arrange
@@ -2697,8 +2688,7 @@ namespace Tiger.Types.UnitTest
             Assert.True(actual.IsNone);
         }
 
-        [Property(DisplayName = "Selecting from two Some Options produces a Some Option.",
-            Arbitrary = new[] { typeof(UnequalPair) })]
+        [Property(DisplayName = "Selecting from two Some Options produces a Some Option.")]
         public static void SelectManyResult_SomeSome(UnequalPair<int> values)
         {
             // arrange
@@ -2888,8 +2878,7 @@ namespace Tiger.Types.UnitTest
             Assert.False(actualRightFirst);
         }
 
-        [Property(DisplayName = "Two Some Options with different values are not equal.",
-            Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        [Property(DisplayName = "Two Some Options with different values are not equal.")]
         public static void StaticEquals_SomeSome_DifferentValue(UnequalNonNullPair<string> pair)
         {
             // arrange
@@ -2951,8 +2940,7 @@ namespace Tiger.Types.UnitTest
             Assert.False(actualRightFirst);
         }
 
-        [Property(DisplayName = "Two Some Options with different values are not equal.",
-            Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        [Property(DisplayName = "Two Some Options with different values are not equal.")]
         public static void StaticEqualsComparer_SomeSome_DifferentValue(UnequalNonNullPair<string> pair)
         {
             // arrange
@@ -3016,8 +3004,7 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(1, actualRightFirst);
         }
 
-        [Property(DisplayName = "Two Some Options with different values are not equal.",
-            Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        [Property(DisplayName = "Two Some Options with different values are not equal.")]
         public static void StaticCompare_SomeSome_DifferentValue(UnequalNonNullPair<string> pair)
         {
             // arrange
@@ -3081,8 +3068,7 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(1, actualRightFirst);
         }
 
-        [Property(DisplayName = "Two Some Options with different values are not equal.",
-            Arbitrary = new[] { typeof(UnequalNonNullPair) })]
+        [Property(DisplayName = "Two Some Options with different values are not equal.")]
         public static void StaticCompareComparer_SomeSome_DifferentValue(UnequalNonNullPair<string> pair)
         {
             // arrange
