@@ -1130,252 +1130,260 @@ namespace Tiger.Types.UnitTest
 
         #region Fold
 
-        [Fact(DisplayName = "Right-Folding over a Left Either returns the seed value.")]
-        public static void FuncFoldRight_Left()
+        [Property(DisplayName = "Right-Folding over a Left Either returns the seed value.")]
+        public static void FuncFoldRight_Left(NonNull<string> left, int seed)
         {
             // arrange
-            var value = Either.Left<int, string>(42);
+            var value = Either.Left<string, int>(left.Get);
 
             // act
-            var actual = value.Fold(34, (s, v) => s + v.Length);
+            var actual = value.Fold(seed, right: (s, v) => s + v);
 
             // assert
-            Assert.Equal(34, actual);
+            Assert.Equal(seed, actual);
         }
 
-        [Fact(DisplayName = "Right-Folding over a Right Either returns result of invoking the accumulator" +
-                            "over the seed value and the Right value.")]
-        public static void FuncFoldRight_Right()
+        [Property(DisplayName = "Right-Folding over a Right Either returns result of invoking the accumulator" +
+            "over the seed value and the Right value.")]
+        public static void FuncFoldRight_Right(int right, int seed)
         {
             // arrange
-            var value = Either.Right<int, string>(sentinel);
+            var value = Either.Right<string, int>(right);
 
             // act
-            var actual = value.Fold(34, (s, v) => s + v.Length);
+            var actual = value.Fold(seed, right: (s, v) => s + v);
 
             // assert
-            Assert.Equal(42, actual);
+            Assert.Equal(seed + right, actual);
         }
 
-        [Fact(DisplayName = "Left-Folding over a Right Either returns the seed value.")]
-        public static void FuncFoldLeft_Right()
+        [Property(DisplayName = "Left-Folding over a Right Either returns the seed value.")]
+        public static void FuncFoldLeft_Right(int right, int seed)
         {
             // arrange
-            var value = Either.Right<string, int>(42);
+            var value = Either.Right<string, int>(right);
 
             // act
-            var actual = value.Fold(34, (s, v) => s + v.Length);
+            var actual = value.Fold(seed, left: (s, v) => s + v.Length);
 
             // assert
-            Assert.Equal(34, actual);
+            Assert.Equal(seed, actual);
         }
 
-        [Fact(DisplayName = "Left-Folding over a Left Either returns result of invoking the accumulator" +
-                            "over the seed value and the Left value.")]
-        public static void FuncFoldLeft_Left()
+        [Property(DisplayName = "Left-Folding over a Left Either returns result of invoking the accumulator" +
+            "over the seed value and the Left value.")]
+        public static void FuncFoldLeft_Left(NonNull<string> left, int seed)
         {
             // arrange
-            var value = Either.Left<string, int>(sentinel);
+            var value = Either.Left<string, int>(left.Get);
 
             // act
-            var actual = value.Fold(34, (s, v) => s + v.Length);
+            var actual = value.Fold(seed, left: (s, v) => s + v.Length);
 
             // assert
-            Assert.Equal(42, actual);
+            Assert.Equal(seed + left.Get.Length, actual);
         }
 
-        [Fact(DisplayName = "Right-Folding over a Left Either returns the seed value.")]
-        public static async Task TaskFoldRight_Left()
+        [Property(DisplayName = "Right-Folding over a Left Either returns the seed value.")]
+        public static void TaskFoldRight_Left(NonNull<string> left, int seed)
         {
             // arrange
-            var value = Either.Left<int, string>(42);
+            var value = Either.Left<string, int>(left.Get);
 
             // act
-            var actual = await value.Fold(34, (s, v) => FromResult(s + v.Length));
+            var actual = value.Fold(seed, right: (s, v) => FromResult(s + v)).Result;
 
             // assert
-            Assert.Equal(34, actual);
+            Assert.Equal(seed, actual);
         }
 
-        [Fact(DisplayName = "Right-Folding over a Right Either returns result of invoking the accumulator" +
-                            "over the seed value and the Right value.")]
-        public static async Task TaskFoldRight_Right()
+        [Property(DisplayName = "Right-Folding over a Right Either returns result of invoking the accumulator" +
+            "over the seed value and the Right value.")]
+        public static void TaskFoldRight_Right(int right, int seed)
         {
             // arrange
-            var value = Either.Right<int, string>(sentinel);
+            var value = Either.Right<string, int>(right);
 
             // act
-            var actual = await value.Fold(34, (s, v) => FromResult(s + v.Length));
+            var actual = value.Fold(seed, right: (s, v) => FromResult(s + v)).Result;
 
             // assert
-            Assert.Equal(42, actual);
+            Assert.Equal(seed + right, actual);
         }
 
-        [Fact(DisplayName = "Left-Folding over a Right Either returns the seed value.")]
-        public static async Task TaskFoldLeft_Right()
+        [Property(DisplayName = "Left-Folding over a Right Either returns the seed value.")]
+        public static void TaskFoldLeft_Right(int right, int seed)
         {
             // arrange
-            var value = Either.Right<string, int>(42);
+            var value = Either.Right<string, int>(right);
 
             // act
-            var actual = await value.Fold(34, (s, v) => FromResult(s + v.Length));
+            var actual = value.Fold(seed, left: (s, v) => FromResult(s + v.Length)).Result;
 
             // assert
-            Assert.Equal(34, actual);
+            Assert.Equal(seed, actual);
         }
 
-        [Fact(DisplayName = "Left-Folding over a Left Either returns result of invoking the accumulator" +
-                            "over the seed value and the Left value.")]
-        public static async Task TaskFoldLeft_Left()
+        [Property(DisplayName = "Left-Folding over a Left Either returns result of invoking the accumulator" +
+            "over the seed value and the Left value.")]
+        public static void TaskFoldLeft_Left(NonNull<string> left, int seed)
         {
             // arrange
-            var value = Either.Left<string, int>(sentinel);
+            var value = Either.Left<string, int>(left.Get);
 
             // act
-            var actual = await value.Fold(34, (s, v) => FromResult(s + v.Length));
+            var actual = value.Fold(seed, left: (s, v) => FromResult(s + v.Length)).Result;
 
             // assert
-            Assert.Equal(42, actual);
+            Assert.Equal(seed + left.Get.Length, actual);
         }
 
         #endregion
 
         #region Tap
 
-        [Fact(DisplayName = "Left-tapping a Left Either over a func returns a Left Either " +
-                            "and perform an action")]
-        public static void FuncTapLeft_Left()
+        [Property(DisplayName = "Left-tapping a Left Either over a func returns a Left Either " +
+            "and performs an action")]
+        public static void FuncTapLeft_Left(NonNull<string> left, int before, int sentinel)
         {
             // arrange
-            var value = Either.Left<int, string>(42);
+            var value = Either.Left<string, int>(left.Get);
 
             // act
-            var output = 33;
-            var actual = value.Tap(v => output = v);
+            var output = before;
+            var actual = value.Tap(left: _ => output = sentinel);
 
             // assert
             Assert.True(actual.IsLeft);
-            var innerValue = (int)actual;
-            Assert.Equal(42, innerValue);
+            var innerValue = (string)actual;
+            Assert.Equal(left.Get, innerValue);
+            Assert.Equal(sentinel, output);
         }
 
-        [Fact(DisplayName = "Left-tapping a Right Either over a func returns a Right Either " +
-                            "and perform no action.")]
-        public static void FuncTapLeft_Right()
+        [Property(DisplayName = "Left-tapping a Right Either over a func returns a Right Either " +
+            "and performs no action.")]
+        public static void FuncTapLeft_Right(int right, int before, int sentinel)
         {
             // arrange
-            var value = Either.Right<string, int>(42);
+            var value = Either.Right<string, int>(right);
 
             // act
-            var output = sentinel;
-            var actual = value.Tap(v => output = v);
+            var output = before;
+            var actual = value.Tap(left: _ => output = sentinel);
 
             // assert
             Assert.True(actual.IsRight);
             var innerValue = (int)actual;
-            Assert.Equal(42, innerValue);
+            Assert.Equal(right, innerValue);
+            Assert.Equal(before, output);
         }
 
-        [Fact(DisplayName = "Right-tapping a Left Either over a func returns a Left Either " +
-                            "and perform no action.")]
-        public static void FuncTapRight_Left()
+        [Property(DisplayName = "Right-tapping a Left Either over a func returns a Left Either " +
+            "and performs no action.")]
+        public static void FuncTapRight_Left(NonNull<string> left, int before, int sentinel)
         {
             // arrange
-            var value = Either.Left<int, string>(42);
+            var value = Either.Left<string, int>(left.Get);
 
             // act
-            var output = sentinel;
-            var actual = value.Tap(v => output = v);
+            var output = before;
+            var actual = value.Tap(right: _ => output = sentinel);
 
             // assert
             Assert.True(actual.IsLeft);
-            var innerValue = (int)actual;
-            Assert.Equal(42, innerValue);
+            var innerValue = (string)actual;
+            Assert.Equal(left.Get, innerValue);
+            Assert.Equal(before, output);
         }
 
-        [Fact(DisplayName = "Right-tapping a Right Either over a func returns a Right Either " +
-                            "and perform an action.")]
-        public static void FuncTapRight_Right()
+        [Property(DisplayName = "Right-tapping a Right Either over a func returns a Right Either " +
+            "and performs an action.")]
+        public static void FuncTapRight_Right(int right, int before, int sentinel)
         {
             // arrange
-            var value = Either.Right<string, int>(42);
+            var value = Either.Right<string, int>(right);
 
             // act
-            var output = 33;
-            var actual = value.Tap(v => output = v);
+            var output = before;
+            var actual = value.Tap(right: _ => output = sentinel);
 
             // assert
             Assert.True(actual.IsRight);
             var innerValue = (int)actual;
-            Assert.Equal(42, innerValue);
+            Assert.Equal(right, innerValue);
+            Assert.Equal(sentinel, output);
         }
 
-        [Fact(DisplayName = "Left-tapping a Left Either over a task returns a Left Either " +
-                            "and perform an action")]
-        public static async Task TaskTapLeft_Left()
+        [Property(DisplayName = "Left-tapping a Left Either over a task returns a Left Either " +
+            "and perform an action")]
+        public static void TaskTapLeft_Left(NonNull<string> left, int before, int sentinel)
         {
             // arrange
-            var value = Either.Left<int, string>(42);
+            var value = Either.Left<string, int>(left.Get);
 
             // act
-            var output = 33;
-            var actual = await value.Tap(v => Run(() => output = v));
+            var output = before;
+            var actual = value.Tap(left: _ => Run(() => output = sentinel)).Result;
 
             // assert
             Assert.True(actual.IsLeft);
-            var innerValue = (int)actual;
-            Assert.Equal(42, innerValue);
+            var innerValue = (string)actual;
+            Assert.Equal(left.Get, innerValue);
+            Assert.Equal(sentinel, output);
         }
 
-        [Fact(DisplayName = "Left-tapping a Right Either over a task returns a Right Either " +
-                            "and perform no action.")]
-        public static async Task TaskTapLeft_Right()
+        [Property(DisplayName = "Left-tapping a Right Either over a task returns a Right Either " +
+            "and perform no action.")]
+        public static void TaskTapLeft_Right(int right, int before, int sentinel)
         {
             // arrange
-            var value = Either.Right<string, int>(42);
+            var value = Either.Right<string, int>(right);
 
             // act
-            var output = sentinel;
-            var actual = await value.Tap(v => Run(() => output = v));
+            var output = before;
+            var actual = value.Tap(left: _ => Run(() => output = sentinel)).Result;
 
             // assert
             Assert.True(actual.IsRight);
             var innerValue = (int)actual;
-            Assert.Equal(42, innerValue);
+            Assert.Equal(right, innerValue);
+            Assert.Equal(before, output);
         }
 
-        [Fact(DisplayName = "Right-tapping a Left Either over a task returns a Left Either " +
-                            "and perform no action.")]
-        public static async Task TaskTapRight_Left()
+        [Property(DisplayName = "Right-tapping a Left Either over a task returns a Left Either " +
+            "and perform no action.")]
+        public static void TaskTapRight_Left(NonNull<string> left, int before, int sentinel)
         {
             // arrange
-            var value = Either.Left<int, string>(42);
+            var value = Either.Left<string, int>(left.Get);
 
             // act
-            var output = sentinel;
-            var actual = await value.Tap(v => Run(() => output = v));
+            var output = before;
+            var actual = value.Tap(right: _ => Run(() => output = sentinel)).Result;
 
             // assert
             Assert.True(actual.IsLeft);
-            var innerValue = (int)actual;
-            Assert.Equal(42, innerValue);
+            var innerValue = (string)actual;
+            Assert.Equal(left.Get, innerValue);
+            Assert.Equal(before, output);
         }
 
-        [Fact(DisplayName = "Right-tapping a Right Either over a task returns a Right Either " +
-                            "and perform an action.")]
-        public static async Task TaskTapRight_Right()
+        [Property(DisplayName = "Right-tapping a Right Either over a task returns a Right Either " +
+            "and perform an action.")]
+        public static void TaskTapRight_Right(int right, int before, int sentinel)
         {
             // arrange
-            var value = Either.Right<string, int>(42);
+            var value = Either.Right<string, int>(right);
 
             // act
-            var output = 33;
-            var actual = await value.Tap(v => Run(() => output = v));
+            var output = before;
+            var actual = value.Tap(right: _ => Run(() => output = sentinel)).Result;
 
             // assert
             Assert.True(actual.IsRight);
             var innerValue = (int)actual;
-            Assert.Equal(42, innerValue);
+            Assert.Equal(right, innerValue);
+            Assert.Equal(sentinel, output);
         }
 
         #endregion
