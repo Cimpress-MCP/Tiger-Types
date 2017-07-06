@@ -1,68 +1,57 @@
-﻿// ReSharper disable All
-
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using FsCheck;
+using FsCheck.Xunit;
 using Xunit;
 using static System.Threading.Tasks.Task;
 using static System.TimeSpan;
+// ReSharper disable All
 
 namespace Tiger.Types.UnitTest
 {
-    public sealed class TaskExtensionsTests
+    public static class TaskExtensionsTests
     {
-        const string sentinel = "sentinel";
-
-        [Fact(DisplayName = "Apply completes its task, then invokes its func.")]
-        public async Task Apply()
+        [Property(DisplayName = "Apply completes its task, then invokes its func.")]
+        public static void Apply(NonNull<string> sentinel)
         {
-            // arrange
-            var task = Delay(FromSeconds(3));
-
             // act
-            var actual = await task.Apply(() => sentinel);
+            var actual = CompletedTask.Apply(() => sentinel.Get).Result;
 
             // assert
-            Assert.True(task.IsCompleted);
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(sentinel.Get, actual);
         }
 
-        [Fact(DisplayName = "Then completes its task, then invokes its task.")]
-        public async Task Then()
+        [Property(DisplayName = "Then completes its task, then invokes its task.")]
+        public static void Then(NonNull<string> sentinel)
         {
-            // arrange
-            var task = Delay(FromSeconds(3));
-
             // act
-            var actual = await task.Then(() => FromResult(sentinel));
+            var actual = CompletedTask.Then(() => FromResult(sentinel.Get)).Result;
 
             // assert
-            Assert.True(task.IsCompleted);
-            Assert.Equal(sentinel, actual);
+            Assert.Equal(sentinel.Get, actual);
         }
 
-        [Fact(DisplayName = "Map completes its task, then invokes its func with the task's " +
-                            "return value as a parameter.")]
-        public async Task Map()
+        [Property(DisplayName = "Map completes its task, then invokes its func with the task's " +
+            "return value as a parameter.")]
+        public static void Map(NonNull<string> sentinel)
         {
-            // arrange
-            
             // act
-            var actual = await FromResult(sentinel).Map(v => v.Length);
+            var actual = FromResult(sentinel.Get).Map(v => v.Length).Result;
 
             // assert
-            Assert.Equal(sentinel.Length, actual);
+            Assert.Equal(sentinel.Get.Length, actual);
         }
 
-        [Fact(DisplayName= "Bind complete its task, then invokes its task with the previous task's " +
-                           "return value as a parameter.")]
-        public async Task Bind()
+        [Property(DisplayName= "Bind complete its task, then invokes its task with the previous task's " +
+            "return value as a parameter.")]
+        public static void Bind(NonNull<string> sentinel)
         {
             // arrange
-            
+
             // act
-            var actual = await FromResult(sentinel).Bind(v => FromResult(v.Length));
+            var actual = FromResult(sentinel.Get).Bind(v => FromResult(v.Length)).Result;
 
             // assert
-            Assert.Equal(sentinel.Length, actual);
+            Assert.Equal(sentinel.Get.Length, actual);
         }
     }
 }

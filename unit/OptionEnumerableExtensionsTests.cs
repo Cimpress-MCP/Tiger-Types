@@ -7,7 +7,7 @@ namespace Tiger.Types.UnitTest
     /// <summary>Tests related to <see cref="OptionEnumerableExtensions"/>.</summary>
     public static class OptionEnumerableExtensionsTests
     {
-        [Fact]
+        [Fact(DisplayName = "A collection of None Options cats to an empty collection.")]
         public static void Cat_AllNone()
         {
             // arrange
@@ -26,7 +26,8 @@ namespace Tiger.Types.UnitTest
             Assert.Empty(actual);
         }
 
-        [Fact]
+        [Fact(DisplayName = "A collection of Some Options cats to a collection of the Some values" +
+            "of its elements.")]
         public static void Cat_AllSome()
         {
             // arrange
@@ -42,12 +43,13 @@ namespace Tiger.Types.UnitTest
 
             //assert
             Assert.NotNull(actual);
-            Assert.NotEmpty(actual);
             var actualList = actual.ToList();
+            Assert.NotEmpty(actualList);
             Assert.Equal(somes.Length, actualList.Count);
         }
 
-        [Fact]
+        [Fact(DisplayName = "A collection of mixed Option values cats to a collection of the Some values " +
+            "of its elements in the Some state.")]
         public static void Cat_Mixed()
         {
             // arrange
@@ -63,8 +65,8 @@ namespace Tiger.Types.UnitTest
 
             //assert
             Assert.NotNull(actual);
-            Assert.NotEmpty(actual);
             var actualList = actual.ToList();
+            Assert.NotEmpty(actualList);
             Assert.Equal(mixed.Count(o => o.IsSome), actualList.Count);
         }
     }
