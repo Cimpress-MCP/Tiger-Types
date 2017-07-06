@@ -40,6 +40,72 @@ namespace Tiger.Types
         /// </typeparam>
         /// <typeparam name="TOut">The type to which to transform.</typeparam>
         /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to be matched.</param>
+        /// <param name="none">A value to return in the None case.</param>
+        /// <param name="some">
+        /// A transformation from <typeparamref name="TIn"/> to <typeparamref name="TOut"/>
+        /// to perform in the Some case.
+        /// </param>
+        /// <returns>
+        /// An instance of <typeparamref name="TOut"/> created from one of
+        /// <paramref name="none"/> or <paramref name="some"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="optionTaskValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
+        [NotNull, Pure]
+        public static Task<TOut> MatchT<TIn, TOut>(
+            [NotNull] this Task<Option<TIn>> optionTaskValue,
+            [NotNull, InstantHandle] TOut none,
+            [NotNull, InstantHandle] Func<TIn, TOut> some)
+        {
+            if (optionTaskValue == null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
+            if (none == null) { throw new ArgumentNullException(nameof(none)); }
+            if (some == null) { throw new ArgumentNullException(nameof(some)); }
+
+            return optionTaskValue.Map(v => v.Match(none: none, some: some));
+        }
+
+        /// <summary>
+        /// Transforms the result of <paramref name="optionTaskValue"/>
+        /// based on its state, asynchronously.
+        /// </summary>
+        /// <typeparam name="TIn">The Some type of the Result type of <paramref name="optionTaskValue"/>.</typeparam>
+        /// <typeparam name="TOut">The type to which to transform.</typeparam>
+        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to be matched.</param>
+        /// <param name="none">A value to return in the None case.</param>
+        /// <param name="some">
+        /// An asynchronous transformation from <typeparamref name="TIn"/> to
+        /// <typeparamref name="TOut"/> to perform in the Some case.
+        /// </param>
+        /// <returns>
+        /// An instance of <typeparamref name="TOut"/> created from one of
+        /// <paramref name="none"/> or <paramref name="some"/>, asynchronously.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="optionTaskValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
+        [NotNull, Pure]
+        public static Task<TOut> MatchT<TIn, TOut>(
+            [NotNull] this Task<Option<TIn>> optionTaskValue,
+            [NotNull, InstantHandle] TOut none,
+            [NotNull, InstantHandle] Func<TIn, Task<TOut>> some)
+        {
+            if (optionTaskValue == null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
+            if (none == null) { throw new ArgumentNullException(nameof(none)); }
+            if (some == null) { throw new ArgumentNullException(nameof(some)); }
+
+            return optionTaskValue.Bind(v => v.Match(none: none, some: some));
+        }
+
+        /// <summary>
+        /// Transforms the result of <paramref name="optionTaskValue"/>
+        /// based on its state.
+        /// </summary>
+        /// <typeparam name="TIn">
+        /// The Some type of the Result type of <paramref name="optionTaskValue"/>.
+        /// </typeparam>
+        /// <typeparam name="TOut">The type to which to transform.</typeparam>
+        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to be matched.</param>
         /// <param name="none">
         /// A transformation from nothing to <typeparamref name="TOut"/>
         /// to perform in the None case.

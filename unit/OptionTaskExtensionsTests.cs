@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using FsCheck;
+using FsCheck.Xunit;
 using Xunit;
 using static System.Threading.Tasks.Task;
 // ReSharper disable All
@@ -6,138 +7,168 @@ using static System.Threading.Tasks.Task;
 namespace Tiger.Types.UnitTest
 {
     /// <summary>Tests related to <see cref="OptionTaskExtensions"/>.</summary>
-    public sealed class OptionTaskExtensionsTests
+    public static class OptionTaskExtensionsTests
     {
-        const string sentinel = "sentinel";
-
         #region MatchT
 
-        [Fact(DisplayName = "Matching a None Option returns the None func branch, " +
-                            "not the Some func branch.")]
-        public async Task FuncFuncMatchTReturn_None()
+        [Property(DisplayName = "Matching a None Option returns the None value branch, " +
+            "not the Some func branch.")]
+        public static void ValueFuncMatchTReturn_None(int none)
         {
             // arrange
             var value = FromResult(Option<string>.None);
 
             // act
-            var actual = await value.MatchT(
-                none: () => 42,
-                some: v => v.Length);
+            var actual = value.MatchT(
+                none: none,
+                some: v => v.Length).Result;
 
             // assert
-            Assert.Equal(42, actual);
+            Assert.Equal(none, actual);
         }
 
-        [Fact(DisplayName = "Matching a Some Option returns the Some func branch, " +
-                            "not the None func branch.")]
-        public async Task FuncFuncMatchTReturn_Some()
+        [Property(DisplayName = "Matching a Some Option returns the Some func branch, " +
+            "not the None value branch.")]
+        public static void ValueFuncMatchTReturn_Some(NonNull<string> some, int none)
         {
             // arrange
-            var value = FromResult(Option.From(sentinel));
+            var value = FromResult(Option.From(some.Get));
 
             // act
-            var actual = await value.MatchT(
-                none: () => 42,
-                some: v => v.Length);
+            var actual = value.MatchT(
+                none: none,
+                some: v => v.Length).Result;
 
             // assert
-            Assert.Equal(sentinel.Length, actual);
+            Assert.Equal(some.Get.Length, actual);
         }
 
-        [Fact(DisplayName = "Matching a None Option returns the None func branch, " +
-                            "not the Some task branch.")]
-        public async Task FuncTaskMatchTReturn_None()
-        {
-            // arrange
-            var value = FromResult(Option<string>.None);
-
-            // act
-            var actual = await value.MatchT(
-                none: () => 42,
-                some: v => v.Length.Pipe(FromResult));
-
-            // assert
-            Assert.Equal(42, actual);
-        }
-
-        [Fact(DisplayName = "Matching a Some Option returns the Some task branch, " +
-                            "not the None func branch.")]
-        public async Task FuncTaskMatchTReturn_Some()
-        {
-            // arrange
-            var value = FromResult(Option.From(sentinel));
-
-            // act
-            var actual = await value.MatchT(
-                none: () => 42,
-                some: v => v.Length.Pipe(FromResult));
-
-            // assert
-            Assert.Equal(sentinel.Length, actual);
-        }
-
-        [Fact(DisplayName = "Matching a None Option returns the None task branch, " +
-                            "not the Some func branch.")]
-        public async Task TaskFuncMatchTReturn_None()
+        [Property(DisplayName = "Matching a None Option returns the None func branch, " +
+            "not the Some func branch.")]
+        public static void FuncFuncMatchTReturn_None(int none)
         {
             // arrange
             var value = FromResult(Option<string>.None);
 
             // act
-            var actual = await value.MatchT(
-                none: () => FromResult(42),
-                some: v => v.Length);
+            var actual = value.MatchT(
+                none: () => none,
+                some: v => v.Length).Result;
 
             // assert
-            Assert.Equal(42, actual);
+            Assert.Equal(none, actual);
         }
 
-        [Fact(DisplayName = "Matching a Some Option returns the Some func branch, " +
-                            "not the None task branch.")]
-        public async Task TaskFuncMatchTReturn_Some()
+        [Property(DisplayName = "Matching a Some Option returns the Some func branch, " +
+            "not the None func branch.")]
+        public static void FuncFuncMatchTReturn_Some(NonNull<string> some, int none)
         {
             // arrange
-            var value = FromResult(Option.From(sentinel));
+            var value = FromResult(Option.From(some.Get));
 
             // act
-            var actual = await value.MatchT(
-                none: () => FromResult(42),
-                some: v => v.Length);
+            var actual = value.MatchT(
+                none: () => none,
+                some: v => v.Length).Result;
 
             // assert
-            Assert.Equal(sentinel.Length, actual);
+            Assert.Equal(some.Get.Length, actual);
         }
 
-        [Fact(DisplayName = "Matching a None Option returns the None task branch, " +
-                            "not the Some task branch.")]
-        public async Task TaskTaskMatchTReturn_None()
+        [Property(DisplayName = "Matching a None Option returns the None func branch, " +
+            "not the Some task branch.")]
+        public static void FuncTaskMatchTReturn_None(int none)
         {
             // arrange
             var value = FromResult(Option<string>.None);
 
             // act
-            var actual = await value.MatchT(
-                none: () => FromResult(42),
-                some: v => v.Length.Pipe(FromResult));
+            var actual = value.MatchT(
+                none: () => none,
+                some: v => v.Length.Pipe(FromResult)).Result;
 
             // assert
-            Assert.Equal(42, actual);
+            Assert.Equal(none, actual);
         }
 
-        [Fact(DisplayName = "Matching a Some Option returns the Some task branch, " +
-                            "not the None task branch.")]
-        public async Task TaskTaskMatchTReturn_Some()
+        [Property(DisplayName = "Matching a Some Option returns the Some task branch, " +
+            "not the None func branch.")]
+        public static void FuncTaskMatchTReturn_Some(NonNull<string> some, int none)
         {
             // arrange
-            var value = FromResult(Option.From(sentinel));
+            var value = FromResult(Option.From(some.Get));
 
             // act
-            var actual = await value.MatchT(
-                none: () => FromResult(42),
-                some: v => v.Length.Pipe(FromResult));
+            var actual = value.MatchT(
+                none: () => none,
+                some: v => v.Length.Pipe(FromResult)).Result;
 
             // assert
-            Assert.Equal(sentinel.Length, actual);
+            Assert.Equal(some.Get.Length, actual);
+        }
+
+        [Property(DisplayName = "Matching a None Option returns the None task branch, " +
+            "not the Some func branch.")]
+        public static void TaskFuncMatchTReturn_None(int none)
+        {
+            // arrange
+            var value = FromResult(Option<string>.None);
+
+            // act
+            var actual = value.MatchT(
+                none: () => FromResult(none),
+                some: v => v.Length).Result;
+
+            // assert
+            Assert.Equal(none, actual);
+        }
+
+        [Property(DisplayName = "Matching a Some Option returns the Some func branch, " +
+            "not the None task branch.")]
+        public static void TaskFuncMatchTReturn_Some(NonNull<string> some, int none)
+        {
+            // arrange
+            var value = FromResult(Option.From(some.Get));
+
+            // act
+            var actual = value.MatchT(
+                none: () => FromResult(none),
+                some: v => v.Length).Result;
+
+            // assert
+            Assert.Equal(some.Get.Length, actual);
+        }
+
+        [Property(DisplayName = "Matching a None Option returns the None task branch, " +
+            "not the Some task branch.")]
+        public static void TaskTaskMatchTReturn_None(int none)
+        {
+            // arrange
+            var value = FromResult(Option<string>.None);
+
+            // act
+            var actual = value.MatchT(
+                none: () => FromResult(none),
+                some: v => v.Length.Pipe(FromResult)).Result;
+
+            // assert
+            Assert.Equal(none, actual);
+        }
+
+        [Property(DisplayName = "Matching a Some Option returns the Some task branch, " +
+            "not the None task branch.")]
+        public static void TaskTaskMatchTReturn_Some(NonNull<string> some, int none)
+        {
+            // arrange
+            var value = FromResult(Option.From(some.Get));
+
+            // act
+            var actual = value.MatchT(
+                none: () => FromResult(none),
+                some: v => v.Length.Pipe(FromResult)).Result;
+
+            // assert
+            Assert.Equal(some.Get.Length, actual);
         }
 
         #endregion
@@ -145,219 +176,222 @@ namespace Tiger.Types.UnitTest
         #region MapT
 
         [Fact(DisplayName = "Mapping a None Option over a func returns a None Option.")]
-        public async Task FuncMapT_None()
+        public static void FuncMapT_None()
         {
             // arrange
             var value = FromResult(Option<string>.None);
 
             // act
-            var actual = await value.MapT(v => v.Length);
+            var actual = value.MapT(v => v.Length).Result;
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Mapping a Some Option over a func returns a Some Option.")]
-        public async Task FuncMapT_Some()
+        [Property(DisplayName = "Mapping a Some Option over a func returns a Some Option.")]
+        public static void FuncMapT_Some(NonNull<string> some)
         {
             // arrange
-            var value = FromResult(Option.From(sentinel));
+            var value = FromResult(Option.From(some.Get));
 
             // act
-            var actual = await value.MapT(v => v.Length);
+            var actual = value.MapT(v => v.Length).Result;
 
             // assert
             Assert.True(actual.IsSome);
             var length = actual.Value;
-            Assert.Equal(sentinel.Length, length);
+            Assert.Equal(some.Get.Length, length);
         }
 
         [Fact(DisplayName = "Mapping a None Option over a task returns a None Option.")]
-        public async Task TaskMapT_None()
+        public static void TaskMapT_None()
         {
             // arrange
             var value = FromResult(Option<string>.None);
 
             // act
-            var actual = await value.MapT(v => v.Length.Pipe(FromResult));
+            var actual = value.MapT(v => v.Length.Pipe(FromResult)).Result;
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Mapping a Some Option over a task returns a Some Option.")]
-        public async Task TaskMapT_Some()
+        [Property(DisplayName = "Mapping a Some Option over a task returns a Some Option.")]
+        public static void TaskMapT_Some(NonNull<string> some)
         {
             // arrange
-            var value = FromResult(Option.From(sentinel));
+            var value = FromResult(Option.From(some.Get));
 
             // act
-            var actual = await value.MapT(v => v.Length.Pipe(FromResult));
+            var actual = value.MapT(v => v.Length.Pipe(FromResult)).Result;
 
             // assert
             Assert.True(actual.IsSome);
             var length = actual.Value;
-            Assert.Equal(sentinel.Length, length);
+            Assert.Equal(some.Get.Length, length);
         }
 
         #endregion
 
         #region BindT
 
-        [Fact(DisplayName = "Binding a None Option over a func returns a None Option.")]
-        public async Task FuncBindT_None()
+        [Fact(DisplayName = "Binding a None Option over a func that returns a None Option " +
+            "returns a None Option.")]
+        public static void FuncBindT_ReturnNone_None()
         {
             // arrange
             var value = FromResult(Option<string>.None);
 
             // act
-            var actual = await value.BindT(v => v.Length == 0
-                ? Option<int>.None
-                : Option.From(v.Length));
+            var actual = value.BindT(_ => Option<int>.None).Result;
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Binding a Some Option over a func returning a None Option " +
-                            "returns a None Option.")]
-        public async Task FuncBindT_ReturnNone_Some()
+        [Property(DisplayName = "Binding a None Option over a func that returns a None Option " +
+            "returns a None Option.")]
+        public static void FuncBindT_ReturnSome_None(int sentinel)
         {
             // arrange
-            var value = FromResult(Option.From(string.Empty));
+            var value = FromResult(Option<string>.None);
 
             // act
-            var actual = await value.BindT(v => v.Length == 0
-                ? Option<int>.None
-                : Option.From(v.Length));
+            var actual = value.BindT(_ => Option.From(sentinel)).Result;
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Binding a Some Option over a func returning a Some Option " +
-                            "returns a Some Option.")]
-        public async Task FuncBindTReturnSome_Some()
+        [Property(DisplayName = "Binding a Some Option over a func returning a None Option " +
+            "returns a None Option.")]
+        public static void FuncBindT_ReturnNone_Some(NonNull<string> some)
         {
             // arrange
-            var value = FromResult(Option.From(sentinel));
+            var value = FromResult(Option.From(some.Get));
 
             // act
-            var actual = await value.BindT(v => v.Length == 0
-                ? Option<int>.None
-                : Option.From(v.Length));
+            var actual = value.BindT(_ => Option<int>.None).Result;
+
+            // assert
+            Assert.True(actual.IsNone);
+        }
+
+        [Property(DisplayName = "Binding a Some Option over a func returning a Some Option " +
+            "returns a Some Option.")]
+        public static void FuncBindTReturnSome_Some(NonNull<string> some, int sentinel)
+        {
+            // arrange
+            var value = FromResult(Option.From(some.Get));
+
+            // act
+            var actual = value.BindT(_ => Option.From(sentinel)).Result;
 
             // assert
             Assert.True(actual.IsSome);
-            var length = actual.Value;
-            Assert.Equal(sentinel.Length, actual);
+            var innerValue = actual.Value;
+            Assert.Equal(sentinel, innerValue);
         }
 
-        [Fact(DisplayName = "Binding a Some Option over a task returning a None Option " +
-                            "returns a None Option.")]
-        public async Task TaskBindT_ReturnNone_Some()
+        [Property(DisplayName = "Binding a Some Option over a task returning a None Option " +
+            "returns a None Option.")]
+        public static void TaskBindT_ReturnNone_Some(NonNull<string> some)
         {
             // arrange
-            var value = FromResult(Option.From(string.Empty));
+            var value = FromResult(Option.From(some.Get));
 
             // act
-            var actual = await value.BindT(v =>
-                FromResult(v.Length == 0
-                    ? Option<int>.None
-                    : Option.From(v.Length)));
+            var actual = value.BindT(_ => FromResult(Option<int>.None)).Result;
 
             // assert
             Assert.True(actual.IsNone);
         }
 
-        [Fact(DisplayName = "Binding a Some Option over a task returning a Some Option " +
-                            "returns a Some Option.")]
-        public async Task TaskBindTReturnSome_Some()
+        [Property(DisplayName = "Binding a Some Option over a task returning a Some Option " +
+            "returns a Some Option.")]
+        public static void TaskBindTReturnSome_Some(NonNull<string> some, int sentinel)
         {
             // arrange
-            var value = FromResult(Option.From(sentinel));
+            var value = FromResult(Option.From(some.Get));
 
             // act
-            var actual = await value.BindT(v =>
-                FromResult(v.Length == 0
-                    ? Option<int>.None
-                    : Option.From(v.Length)));
+            var actual = value.BindT(_ => FromResult(Option.From(sentinel))).Result;
 
             // assert
             Assert.True(actual.IsSome);
-            var length = actual.Value;
-            Assert.Equal(sentinel.Length, actual);
+            var innerValue = actual.Value;
+            Assert.Equal(sentinel, innerValue);
         }
 
         #endregion
 
         #region TapT
 
-        [Fact(DisplayName = "Tapping a None Option over a func returns a None Option " +
-                            "and performs no action.")]
-        public async Task FuncTap_None()
+        [Property(DisplayName = "Tapping a None Option over a func returns a None Option " +
+            "and performs no action.")]
+        public static void FuncTap_None(int before, int sentinel)
         {
             // arrange
             var value = FromResult(Option<string>.None);
 
             // act
-            var output = sentinel;
-            var actual = await value.TapT(v => output = string.Empty);
+            var output = before;
+            var actual = value.TapT(_ => output = sentinel).Result;
 
             // assert
             Assert.True(actual.IsNone);
-            Assert.Equal(sentinel, output);
+            Assert.Equal(before, output);
         }
 
-        [Fact(DisplayName = "Tapping a Some Option over a func returns a Some Option " +
-                            "and performs an action.")]
-        public async Task FuncTap_Some()
+        [Property(DisplayName = "Tapping a Some Option over a func returns a Some Option " +
+            "and performs an action.")]
+        public static void FuncTap_Some(NonNull<string> some, int before, int sentinel)
         {
             // arrange
-            var value = FromResult(Option.From(sentinel));
+            var value = FromResult(Option.From(some.Get));
 
             // act
-            var output = string.Empty;
-            var actual = await value.TapT(v => output = sentinel);
+            var output = before;
+            var actual = value.TapT(_ => output = sentinel).Result;
 
             // assert
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
-            Assert.Equal(sentinel, innerValue);
+            Assert.Equal(some.Get, innerValue);
             Assert.Equal(sentinel, output);
         }
 
-        [Fact(DisplayName = "Tapping a None Option over a task returns a None Option " +
-                            "and performs no action.")]
-        public async Task TaskTap_None()
+        [Property(DisplayName = "Tapping a None Option over a task returns a None Option " +
+            "and performs no action.")]
+        public static void TaskTap_None(int before, int sentinel)
         {
             // arrange
             var value = FromResult(Option<string>.None);
 
             // act
-            var output = sentinel;
-            var actual = await value.TapT(v => Run(() => output = string.Empty));
+            var output = before;
+            var actual = value.TapT(_ => Run(() => output = sentinel)).Result;
 
             // assert
             Assert.True(actual.IsNone);
-            Assert.Equal(sentinel, output);
+            Assert.Equal(before, output);
         }
 
-        [Fact(DisplayName = "Tapping a Some Option over a task returns a Some Option " +
-                            "and performs an action.")]
-        public async Task TaskTap_Some()
+        [Property(DisplayName = "Tapping a Some Option over a task returns a Some Option " +
+            "and performs an action.")]
+        public static void TaskTap_Some(NonNull<string> some, int before, int sentinel)
         {
             // arrange
-            var value = FromResult(Option.From(sentinel));
+            var value = FromResult(Option.From(some.Get));
 
             // act
-            var output = string.Empty;
-            var actual = await value.TapT(v => Run(() => output = sentinel));
+            var output = before;
+            var actual = value.TapT(_ => Run(() => output = sentinel)).Result;
 
             // assert
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
-            Assert.Equal(sentinel, innerValue);
+            Assert.Equal(some.Get, innerValue);
             Assert.Equal(sentinel, output);
         }
 
