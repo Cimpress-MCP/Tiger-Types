@@ -15,12 +15,14 @@
 // </copyright>
 
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using static System.ComponentModel.EditorBrowsableState;
 
 namespace Tiger.Types
 {
     /// <content>Overrides and override-equivalents.</content>
+    [SuppressMessage("Microsoft:Guidelines", "CA1066", Justification = "Prevent boxing.")]
     public partial struct Unit
     {
         /// <inheritdoc/>

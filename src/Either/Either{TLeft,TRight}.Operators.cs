@@ -15,24 +15,26 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using static Tiger.Types.Resources;
 
 namespace Tiger.Types
 {
     /// <content>Operators and named alternatives.</content>
+    [SuppressMessage("Microsoft:Guidelines", "CA2225", Justification = "Parametric types play poorly with this analysis.")]
     public partial struct Either<TLeft, TRight>
     {
         /// <summary>Wraps a value in <see cref="Either{TLeft,TRight}"/>.</summary>
         /// <param name="leftValue">The value to be wrapped.</param>
         public static implicit operator Either<TLeft, TRight>([CanBeNull] TLeft leftValue) => leftValue == null
-            ? default(Either<TLeft, TRight>)
+            ? default
             : new Either<TLeft, TRight>(leftValue);
 
         /// <summary>Wraps a value in <see cref="Either{TLeft,TRight}"/>.</summary>
         /// <param name="rightValue">The value to be wrapped.</param>
         public static implicit operator Either<TLeft, TRight>([CanBeNull] TRight rightValue) => rightValue == null
-            ? default(Either<TLeft, TRight>)
+            ? default
             : new Either<TLeft, TRight>(rightValue);
 
         /// <summary>Wraps a value in <see cref="Either{TLeft,TRight}"/>.</summary>

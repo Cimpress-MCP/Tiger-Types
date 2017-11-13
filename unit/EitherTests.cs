@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Threading.Tasks;
 using FsCheck;
 using FsCheck.Xunit;
+using Tiger.Types.UnitTest.Utility;
 using Xunit;
+using static System.StringComparer;
 using static System.Threading.Tasks.Task;
 // ReSharper disable All
 
@@ -283,16 +286,16 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a Left Either executes the Left action branch, " +
             "not the Right task branch.")]
-        public static void ActionTaskMatchVoid_Left(NonNull<string> left, NonNull<string> before, NonNull<string> sentinel)
+        public static async Task ActionTaskMatchVoid_Left(NonNull<string> left, NonNull<string> before, NonNull<string> sentinel)
         {
             // arrange
             var value = Either.Left<string, int>(left.Get);
 
             // act
             var actual = before.Get;
-            value.Match(
+            await value.Match(
                 left: l => actual = sentinel.Get,
-                right: r => CompletedTask).Wait();
+                right: r => CompletedTask);
 
             // assert
             Assert.Equal(sentinel.Get, actual);
@@ -300,16 +303,16 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a Right Either executes the Right task branch, " +
             "not the Left action branch.")]
-        public static void ActionTaskMatchVoid_Right(int right, int before, int sentinel)
+        public static async Task ActionTaskMatchVoid_Right(int right, int before, int sentinel)
         {
             // arrange
             var value = Either.Right<string, int>(right);
 
             // act
             var actual = before;
-            value.Match(
+            await value.Match(
                 left: l => { },
-                right: r => Run(() => actual = sentinel)).Wait();
+                right: r => Run(() => actual = sentinel));
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -317,16 +320,16 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a Left Either executes the Left task branch, " +
             "not the Right action branch.")]
-        public static void TaskActionMatchVoid_Left(NonNull<string> left, NonNull<string> before, NonNull<string> sentinel)
+        public static async Task TaskActionMatchVoid_Left(NonNull<string> left, NonNull<string> before, NonNull<string> sentinel)
         {
             // arrange
             var value = Either.Left<string, int>(left.Get);
 
             // act
             var actual = before.Get;
-            value.Match(
+            await value.Match(
                 left: l => Run(() => actual = sentinel.Get),
-                right: r => { }).Wait();
+                right: r => { });
 
             // assert
             Assert.Equal(sentinel.Get, actual);
@@ -334,16 +337,16 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a Right Either executes the Right action branch, " +
             "not the Left task branch.")]
-        public static void TaskActionMatchVoid_Right(int right, int before, int sentinel)
+        public static async Task TaskActionMatchVoid_Right(int right, int before, int sentinel)
         {
             // arrange
             var value = Either.Right<string, int>(right);
 
             // act
             var actual = before;
-            value.Match(
+            await value.Match(
                 left: l => CompletedTask,
-                right: r => actual = sentinel).Wait();
+                right: r => actual = sentinel);
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -351,16 +354,16 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a Left Either executes the Left task branch, " +
             "not the Right task branch.")]
-        public static void TaskTaskMatchVoid_Left(NonNull<string> left, NonNull<string> before, NonNull<string> sentinel)
+        public static async Task TaskTaskMatchVoid_Left(NonNull<string> left, NonNull<string> before, NonNull<string> sentinel)
         {
             // arrange
             var value = Either.Left<string, int>(left.Get);
 
             // act
             var actual = before.Get;
-            value.Match(
+            await value.Match(
                 left: l => Run(() => actual = sentinel.Get),
-                right: r => CompletedTask).Wait();
+                right: r => CompletedTask);
 
             // assert
             Assert.Equal(sentinel.Get, actual);
@@ -368,16 +371,16 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a Right Either executes the Right task branch, " +
             "not the Left task branch.")]
-        public static void TaskTaskMatchVoid_Right(int right, int before, int sentinel)
+        public static async Task TaskTaskMatchVoid_Right(int right, int before, int sentinel)
         {
             // arrange
             var value = Either.Right<string, int>(right);
 
             // act
             var actual = before;
-            value.Match(
+            await value.Match(
                 left: l => CompletedTask,
-                right: r => Run(() => actual = sentinel)).Wait();
+                right: r => Run(() => actual = sentinel));
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -1445,56 +1448,56 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Left-conditionally executing a task based on a Left Either executes.")]
-        public static void TaskLetLeft_Left(NonNull<string> left, Guid before, Guid sentinel)
+        public static async Task TaskLetLeft_Left(NonNull<string> left, Guid before, Guid sentinel)
         {
             // arrange
             var value = Either.Left<string, int>(left.Get);
 
             // act
             var actual = before;
-            value.Let(left: _ => Run(() => actual = sentinel)).Wait();
+            await value.Let(left: _ => Run(() => actual = sentinel));
 
             // assert
             Assert.Equal(sentinel, actual);
         }
 
         [Property(DisplayName = "Left-conditionally executing a Task based on a Right Either does not execute.")]
-        public static void TaskLetLeft_Right(int right, Guid before, Guid sentinel)
+        public static async Task TaskLetLeft_Right(int right, Guid before, Guid sentinel)
         {
             // arrange
             var value = Either.Right<string, int>(right);
 
             // act
             var actual = before;
-            value.Let(left: _ => Run(() => actual = sentinel)).Wait();
+            await value.Let(left: _ => Run(() => actual = sentinel));
 
             // assert
             Assert.Equal(before, actual);
         }
 
         [Property(DisplayName = "Right-conditionally executing a Task based on a Left Either does not execute.")]
-        public static void TaskLetRight_Left(NonNull<string> left, Guid before, Guid sentinel)
+        public static async Task TaskLetRight_Left(NonNull<string> left, Guid before, Guid sentinel)
         {
             // arrange
             var value = Either.Left<string, int>(left.Get);
 
             // act
             var actual = before;
-            value.Let(right: _ => Run(() => actual = sentinel)).Wait();
+            await value.Let(right: _ => Run(() => actual = sentinel));
 
             // assert
             Assert.Equal(before, actual);
         }
 
         [Property(DisplayName = "Right-conditionally executing a Task based on a Right Either executes.")]
-        public static void TaskLetRight_Right(int right, Guid before, Guid sentinel)
+        public static async Task TaskLetRight_Right(int right, Guid before, Guid sentinel)
         {
             // arrange
             var value = Either.Right<string, int>(right);
 
             // act
             var actual = before;
-            value.Let(right: _ => Run(() => actual = sentinel)).Wait();
+            await value.Let(right: _ => Run(() => actual = sentinel));
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -2563,7 +2566,7 @@ namespace Tiger.Types.UnitTest
             var value = Either.Left<Guid, string>(left);
 
             // act
-            var actual = value.Contains(contains.Get, StringComparer.Ordinal);
+            var actual = value.Contains(contains.Get, Ordinal);
 
             // assert
             Assert.False(actual);
@@ -2577,7 +2580,7 @@ namespace Tiger.Types.UnitTest
             var value = Either.Right<Guid, string>(values.Right);
 
             // act
-            var actual = value.Contains(values.Left, StringComparer.Ordinal);
+            var actual = value.Contains(values.Left, Ordinal);
 
             // assert
             Assert.False(actual);
@@ -2591,7 +2594,7 @@ namespace Tiger.Types.UnitTest
             var value = Either.Right<Guid, string>(right.Get);
 
             // act
-            var actual = value.Contains(right.Get, StringComparer.Ordinal);
+            var actual = value.Contains(right.Get, Ordinal);
 
             // assert
             Assert.True(actual);

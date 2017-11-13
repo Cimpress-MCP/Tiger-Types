@@ -15,6 +15,7 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using static System.Globalization.CultureInfo;
 using static Tiger.Types.EitherState;
@@ -22,6 +23,7 @@ using static Tiger.Types.EitherState;
 namespace Tiger.Types
 {
     /// <content>Overrides and override-equivalents.</content>
+    [SuppressMessage("Microsoft:Guidelines", "CA1066", Justification = "Prevent boxing.")]
     public partial struct Either<TLeft, TRight>
     {
         /// <inheritdoc/>
@@ -43,6 +45,11 @@ namespace Tiger.Types
 
         /// <inheritdoc/>
         [Pure]
+        public override bool Equals(object obj) =>
+            obj is Either<TLeft, TRight> either && EqualsCore(either);
+
+        /// <inheritdoc/>
+        [Pure]
         public override int GetHashCode()
         {
             switch (State)
@@ -57,11 +64,6 @@ namespace Tiger.Types
                     return 0;
             }
         }
-
-        /// <inheritdoc/>
-        [Pure]
-        public override bool Equals(object obj) =>
-            obj is Either<TLeft, TRight> either && EqualsCore(either);
 
         [Pure]
         bool EqualsCore(Either<TLeft, TRight> other)

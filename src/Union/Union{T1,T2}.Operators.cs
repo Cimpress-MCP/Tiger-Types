@@ -15,26 +15,26 @@
 // </copyright>
 
 using System;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
+using static System.ComponentModel.EditorBrowsableState;
 
 namespace Tiger.Types
 {
     /// <content>Operators and named alternatives.</content>
+    [SuppressMessage("Microsoft:Guidelines", "CA2225", Justification = "Parametric types play poorly with this analysis.")]
     public partial class Union<T1, T2>
     {
         /// <summary>Wraps a value in <see cref="Union{T1,T2}"/>.</summary>
         /// <param name="value">The value to be wrapped.</param>
         [CanBeNull]
-        public static implicit operator Union<T1, T2>([CanBeNull] T1 value) => value == null
-            ? null
-            : new Union<T1, T2>(value);
+        public static implicit operator Union<T1, T2>([CanBeNull] T1 value) => ToUnion(value);
 
         /// <summary>Wraps a value in <see cref="Union{T1,T2}"/>.</summary>
         /// <param name="value">The value to be wrapped.</param>
         [CanBeNull]
-        public static implicit operator Union<T1, T2>([CanBeNull] T2 value) => value == null
-            ? null
-            : new Union<T1, T2>(value);
+        public static implicit operator Union<T1, T2>([CanBeNull] T2 value) => ToUnion(value);
 
         /// <summary>Unwraps the first value of this instance.</summary>
         /// <param name="value">The value to be unwrapped.</param>
@@ -79,5 +79,21 @@ namespace Tiger.Types
         /// </returns>
         public static bool operator !=([CanBeNull] Union<T1, T2> left, [CanBeNull] Union<T1, T2> right) =>
             !(left == right);
+
+        /// <summary>Wraps a value in <see cref="Union{T1,T2}"/>.</summary>
+        /// <param name="value">The value to be wrapped.</param>
+        /// <returns><paramref name="value"/>, wrapped in <see cref="Union{T1,T2}"/>.</returns>
+        [CanBeNull, EditorBrowsable(Never)]
+        public static Union<T1, T2> ToUnion([CanBeNull] T1 value) => value == null
+            ? null
+            : new Union<T1, T2>(value);
+
+        /// <summary>Wraps a value in <see cref="Union{T1,T2}"/>.</summary>
+        /// <param name="value">The value to be wrapped.</param>
+        /// <returns><paramref name="value"/>, wrapped in <see cref="Union{T1,T2}"/>.</returns>
+        [CanBeNull, EditorBrowsable(Never)]
+        public static Union<T1, T2> ToUnion([CanBeNull] T2 value) => value == null
+            ? null
+            : new Union<T1, T2>(value);
     }
 }

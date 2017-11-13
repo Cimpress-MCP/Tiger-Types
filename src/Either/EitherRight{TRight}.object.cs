@@ -14,6 +14,8 @@
 //   limitations under the License.
 // </copyright>
 
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using static System.Globalization.CultureInfo;
 using static Tiger.Types.EitherState;
@@ -21,7 +23,7 @@ using static Tiger.Types.EitherState;
 namespace Tiger.Types
 {
     /// <content>Overrides and override-equivalents.</content>
-    // ReSharper disable once UnusedTypeParameter because(cosborn) Analysis bug.
+    [SuppressMessage("Microsoft:Guidelines", "CA1066", Justification = "Prevent boxing.")]
     public partial struct EitherRight<TRight>
     {
         /// <inheritdoc/>
@@ -31,7 +33,15 @@ namespace Tiger.Types
 
         /// <inheritdoc/>
         [Pure]
+        public override bool Equals(object obj) => obj is EitherRight<TRight> eitherRight && EqualsCore(eitherRight);
+
+        /// <inheritdoc/>
+        [Pure]
         public override int GetHashCode() => Value.GetHashCode();
+
+        [Pure]
+        bool EqualsCore(EitherRight<TRight> other) =>
+            EqualityComparer<TRight>.Default.Equals(Value, other.Value);
 
         [NotNull, Pure, UsedImplicitly]
         object ToDump() => new

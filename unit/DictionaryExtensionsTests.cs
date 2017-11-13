@@ -19,17 +19,14 @@ namespace Tiger.Types.UnitTest
         [MemberData(nameof(TryGetValueTheoryData))]
         public static void Dictionary_TryGetValue(string key, Option<string> expected)
         {
-            // arrange
             var sut = new Dictionary<string, string>
             {
                 ["present"] = "sentinel",
                 ["null"] = null
             };
 
-            // act
             var actual = sut.TryGetValue(key);
 
-            // arrange, act
             Assert.Equal(expected, actual);
         }
 
@@ -37,17 +34,14 @@ namespace Tiger.Types.UnitTest
         [MemberData(nameof(TryGetValueTheoryData))]
         public static void IDictionary_TryGetValue(string key, Option<string> expected)
         {
-            // arrange
             var sut = new Dictionary<string, string>
             {
                 ["present"] = "sentinel",
                 ["null"] = null
             } as IDictionary<string, string>;
 
-            // act
             var actual = sut.TryGetValue(key);
 
-            // arrange, act
             Assert.Equal(expected, actual);
         }
 
@@ -55,17 +49,14 @@ namespace Tiger.Types.UnitTest
         [MemberData(nameof(TryGetValueTheoryData))]
         public static void IReadOnlyDictionary_TryGetValue(string key, Option<string> expected)
         {
-            // arrange
             var sut = new Dictionary<string, string>
             {
                 ["present"] = "sentinel",
                 ["null"] = null
             } as IReadOnlyDictionary<string, string>;
 
-            // act
             var actual = sut.TryGetValue(key);
 
-            // arrange, act
             Assert.Equal(expected, actual);
         }
     }

@@ -1,7 +1,9 @@
-﻿using FsCheck;
-using FsCheck.Xunit;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using FsCheck;
+using FsCheck.Xunit;
+using Tiger.Types.UnitTest.Utility;
 using Xunit;
 using static System.Threading.Tasks.Task;
 // ReSharper disable All
@@ -291,16 +293,16 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a None Option executes the None action branch, " +
             "not the Some task branch.")]
-        public static void ActionTaskMatchVoid_None(NonNull<string> before, NonNull<string> sentinel, int noneValue)
+        public static async Task ActionTaskMatchVoid_None(NonNull<string> before, NonNull<string> sentinel, int noneValue)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
             var actual = before.Get;
-            value.Match(
+            await value.Match(
                 none: () => actual = sentinel.Get,
-                some: v => CompletedTask).Wait();
+                some: v => CompletedTask);
 
             // assert
             Assert.Equal(sentinel.Get, actual);
@@ -308,16 +310,16 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a Some Option executes the Some task branch, " +
             "not the None action branch.")]
-        public static void ActionTaskMatchVoid_Some(NonNull<string> before, NonNull<string> some, int noneValue)
+        public static async Task ActionTaskMatchVoid_Some(NonNull<string> before, NonNull<string> some, int noneValue)
         {
             // arrange
             var value = Option.From(some.Get);
 
             // act
             var actual = before.Get;
-            value.Match(
+            await value.Match(
                 none: () => { },
-                some: v => Run(() => actual = v)).Wait();
+                some: v => Run(() => actual = v));
 
             // assert
             Assert.Equal(some.Get, actual);
@@ -325,16 +327,16 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a None Option executes the None task branch, " +
             "not the Some action branch.")]
-        public static void TaskActionMatchVoid_None(NonNull<string> before, NonNull<string> sentinel, int noneValue)
+        public static async Task TaskActionMatchVoid_None(NonNull<string> before, NonNull<string> sentinel, int noneValue)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
             var actual = before.Get;
-            value.Match(
+            await value.Match(
                 none: () => Run(() => actual = sentinel.Get),
-                some: v => { }).Wait();
+                some: v => { });
 
             // assert
             Assert.Equal(sentinel.Get, actual);
@@ -342,16 +344,16 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a Some Option executes the Some action branch, " +
             "not the None task branch.")]
-        public static void TaskActionMatchVoid_Some(NonNull<string> before, NonNull<string> some, int noneValue)
+        public static async Task TaskActionMatchVoid_Some(NonNull<string> before, NonNull<string> some, int noneValue)
         {
             // arrange
             var value = Option.From(some.Get);
 
             // act
             var actual = before.Get;
-            value.Match(
+            await value.Match(
                 none: () => CompletedTask,
-                some: v => actual = v).Wait();
+                some: v => actual = v);
 
             // assert
             Assert.Equal(some.Get, actual);
@@ -359,16 +361,16 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a None Option executes the None task branch, " +
             "not the Some task branch.")]
-        public static void TaskTaskMatchVoid_None(NonNull<string> before, NonNull<string> sentinel, int noneValue)
+        public static async Task TaskTaskMatchVoid_None(NonNull<string> before, NonNull<string> sentinel, int noneValue)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
             var actual = before.Get;
-            value.Match(
+            await value.Match(
                 none: () => Run(() => actual = sentinel.Get),
-                some: v => CompletedTask).Wait();
+                some: v => CompletedTask);
 
             // assert
             Assert.Equal(sentinel.Get, actual);
@@ -376,16 +378,16 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a Some Option executes the Some task branch, " +
             "not the None task branch.")]
-        public static void TaskTaskMatchVoid_Some(NonNull<string> before, NonNull<string> some, int noneValue)
+        public static async Task TaskTaskMatchVoid_Some(NonNull<string> before, NonNull<string> some, int noneValue)
         {
             // arrange
             var value = Option.From(some.Get);
 
             // act
             var actual = before.Get;
-            value.Match(
+            await value.Match(
                 none: () => CompletedTask,
-                some: v => Run(() => actual = v)).Wait();
+                some: v => Run(() => actual = v));
 
             // assert
             Assert.Equal(some.Get, actual);
@@ -790,28 +792,28 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Conditionally executing a task based on a None Option does not execute.")]
-        public static void TaskLet_None(NonNull<string> before, NonNull<string> sentinel)
+        public static async Task TaskLet_None(NonNull<string> before, NonNull<string> sentinel)
         {
             // arrange
             var value = Option<string>.None;
 
             // act
             var actual = before.Get;
-            value.Let(v => Run(() => actual = sentinel.Get)).Wait();
+            await value.Let(v => Run(() => actual = sentinel.Get));
 
             // assert
             Assert.Equal(before.Get, actual);
         }
 
         [Property(DisplayName = "Conditionally executing a task based on a Some Option executes.")]
-        public static void TaskLet_Some(NonNull<string> some, NonNull<string> before)
+        public static async Task TaskLet_Some(NonNull<string> some, NonNull<string> before)
         {
             // arrange
             var value = Option.From(some.Get);
 
             // act
             var actual = before.Get;
-            value.Let(v => Run(() => actual = v)).Wait();
+            await value.Let(v => Run(() => actual = v));
 
             // assert
             Assert.Equal(some.Get, actual);
@@ -2219,14 +2221,32 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "A Some Option converted to a Nullable is equal to the Some value.")]
         public static void ToNullable_Some(int some)
         {
-            // arrange
             var value = Option.From(some);
 
-            // act
             var actual = value.ToNullable();
 
-            // assert
             Assert.NotNull(actual);
+            Assert.Equal(some, actual);
+        }
+
+        [Property(DisplayName = "A None Option asserts itself with an exception.")]
+        public static void Assert_None(NonNull<string> message)
+        {
+            var value = Option<int>.None;
+
+            var actual = Record.Exception(() => value.Assert(() => new Exception(message.Get)));
+
+            Assert.NotNull(actual);
+            Assert.Equal(message.Get, actual.Message);
+        }
+
+        [Property(DisplayName = "A Some Option asserts itself to be its Some value.")]
+        public static void Assert_Some(int some, NonNull<string> message)
+        {
+            var value = Option.From(some);
+
+            var actual = value.Assert(() => new Exception(message.Get));
+
             Assert.Equal(some, actual);
         }
 
@@ -2707,7 +2727,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Binding a None Option over a func returning a None Option returns a None Option.")]
-        public static void SelectMany_None()
+        public static void SelectMany_None_None()
         {
             // arrange
             var value = Option<string>.None;
@@ -2720,7 +2740,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Binding a None Option over a func returning a Some Option returns a None Option.")]
-        public static void SelectMany_None(int some)
+        public static void SelectMany_None_Some(int some)
         {
             // arrange
             var value = Option<string>.None;

@@ -139,7 +139,7 @@ namespace Tiger.Types
         /// the <typeparamref name="TSource"/> type as the Some value
         /// if <paramref name="source"/> is in the None state; otherwise; <paramref name="source"/>.
         /// </returns>
-        [EditorBrowsable(Never)]
+        [Pure, EditorBrowsable(Never)]
         public static Option<TSource> DefaultIfEmpty<TSource>(this Option<TSource> source)
             where TSource : struct => source.Recover(default(TSource));
 
@@ -156,7 +156,7 @@ namespace Tiger.Types
         /// otherwise, <paramref name="source"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="defaultValue"/> is <see langword="null"/>.</exception>
-        [EditorBrowsable(Never)]
+        [Pure, EditorBrowsable(Never)]
         public static Option<TSource> DefaultIfEmpty<TSource>(
             this Option<TSource> source,
             [NotNull] TSource defaultValue)

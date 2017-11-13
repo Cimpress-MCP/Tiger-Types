@@ -23,6 +23,7 @@ using static System.ComponentModel.EditorBrowsableState;
 namespace Tiger.Types
 {
     /// <content>Operators and named alternatives.</content>
+    [SuppressMessage("Microsoft:Guidelines", "CA2225", Justification = "Parametric types play poorly with this analysis.")]
     public partial struct Option<TSome>
     {
         /// <summary>Gets a value indicating whether this instance is in the Some state.</summary>
@@ -35,9 +36,7 @@ namespace Tiger.Types
 
         /// <summary>Wraps a value in <see cref="Option{TSome}"/>.</summary>
         /// <param name="value">The value to be wrapped.</param>
-        public static implicit operator Option<TSome>([CanBeNull] TSome value) => value == null
-            ? None
-            : new Option<TSome>(value);
+        public static implicit operator Option<TSome>([CanBeNull] TSome value) => ToOption(value);
 
         /// <summary>Unwraps the Some value of this instance.</summary>
         /// <param name="value">The value to be unwrapped.</param>
@@ -119,6 +118,13 @@ namespace Tiger.Types
         /// otherwise <see langword="false"/>.
         /// </returns>
         public static bool operator !(Option<TSome> value) => value.LogicalNot();
+
+        /// <summary>Wraps a value in <see cref="Option{TSome}"/>.</summary>
+        /// <param name="value">The value to be wrapped.</param>
+        /// <returns><paramref name="value"/>, wrapped in <see cref="Option{TSome}"/>.</returns>
+        public static Option<TSome> ToOption([CanBeNull] TSome value) => value == null
+            ? None
+            : new Option<TSome>(value);
 
         /// <summary>
         /// Performs logical disjunction between this instance

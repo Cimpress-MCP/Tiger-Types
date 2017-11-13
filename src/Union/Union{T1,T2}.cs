@@ -145,7 +145,7 @@ namespace Tiger.Types
                 case 2:
                     return two(_value2);
                 default: // because(cosborn) Hush, ReSharper.
-                    return default(TOut);
+                    return default;
             }
         }
 
@@ -177,7 +177,7 @@ namespace Tiger.Types
                 case 2:
                     return two(_value2);
                 default: // because(cosborn) Hush, ReSharper.
-                    return default(TOut);
+                    return default;
             }
         }
 
@@ -209,7 +209,7 @@ namespace Tiger.Types
                 case 2:
                     return await two(_value2).ConfigureAwait(false);
                 default: // because(cosborn) Hush, ReSharper.
-                    return default(TOut);
+                    return default;
             }
         }
 
@@ -304,7 +304,7 @@ namespace Tiger.Types
             switch (_state)
             {
                 case 1:
-                    await one(_value1);
+                    await one(_value1).ConfigureAwait(false);
                     return;
                 case 2:
                     two(_value2);
@@ -338,7 +338,7 @@ namespace Tiger.Types
                     one(_value1);
                     return;
                 case 2:
-                    await two(_value2);
+                    await two(_value2).ConfigureAwait(false);
                     return;
             }
         }
@@ -366,10 +366,10 @@ namespace Tiger.Types
             switch (_state)
             {
                 case 1:
-                    await one(_value1);
+                    await one(_value1).ConfigureAwait(false);
                     return;
                 case 2:
-                    await two(_value2);
+                    await two(_value2).ConfigureAwait(false);
                     return;
             }
         }

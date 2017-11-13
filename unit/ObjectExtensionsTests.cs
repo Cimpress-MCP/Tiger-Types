@@ -1,5 +1,6 @@
 ﻿using FsCheck.Xunit;
 using Xunit;
+
 // ReSharper disable All
 
 namespace Tiger.Types.UnitTest

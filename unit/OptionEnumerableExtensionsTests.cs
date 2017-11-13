@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Xunit;
+
 // ReSharper disable All
 
 namespace Tiger.Types.UnitTest

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Threading.Tasks;
 using FsCheck;
 using FsCheck.Xunit;
+using Tiger.Types.UnitTest.Utility;
 using Xunit;
 using static System.Threading.Tasks.Task;
 using static Tiger.Types.Resources;
@@ -262,16 +264,16 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a first Union should execute the first action branch, " +
             "not the second task branch.")]
-        public void ActionTaskMatchVoid_First(NonNull<string> one, Guid before, Guid sentinel)
+        public async Task ActionTaskMatchVoid_First(NonNull<string> one, Guid before, Guid sentinel)
         {
             // arrange
             var value = Union.From<string, int>(one.Get);
 
             // act
             var actual = before;
-            value.Match(
+            await value.Match(
                 one: o => actual = sentinel,
-                two: t => CompletedTask).Wait();
+                two: t => CompletedTask);
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -279,16 +281,16 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a second Union should execute the second task branch, " +
             "not the first action branch.")]
-        public void ActionTaskMatchVoid_Second(int two, Version before, Version sentinel)
+        public async Task ActionTaskMatchVoid_Second(int two, Version before, Version sentinel)
         {
             // arrange
             var value = Union.From<string, int>(two);
 
             // act
             var actual = before;
-            value.Match(
+            await value.Match(
                 one: o => { },
-                two: t => Run(() => actual = sentinel)).Wait();
+                two: t => Run(() => actual = sentinel));
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -296,16 +298,16 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a first Union should execute the first task branch, " +
             "not the second action branch.")]
-        public void TaskActionMatchVoid_First(NonNull<string> one, Guid before, Guid sentinel)
+        public async Task TaskActionMatchVoid_First(NonNull<string> one, Guid before, Guid sentinel)
         {
             // arrange
             var value = Union.From<string, int>(one.Get);
 
             // act
             var actual = before;
-            value.Match(
+            await value.Match(
                 one: o => Run(() => actual = sentinel),
-                two: t => { }).Wait();
+                two: t => { });
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -313,16 +315,16 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a second Union should execute the second action branch, " +
             "not the first task branch.")]
-        public void TaskActionMatchVoid_Second(int two, Version before, Version sentinel)
+        public async Task TaskActionMatchVoid_Second(int two, Version before, Version sentinel)
         {
             // arrange
             var value = Union.From<string, int>(two);
 
             // act
             var actual = before;
-            value.Match(
+            await value.Match(
                 one: o => CompletedTask,
-                two: t => actual = sentinel).Wait();
+                two: t => actual = sentinel);
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -330,16 +332,16 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a first Union should execute the first task branch, " +
             "not the second task branch.")]
-        public void TaskTaskMatchVoid_First(NonNull<string> one, Guid before, Guid sentinel)
+        public async Task TaskTaskMatchVoid_First(NonNull<string> one, Guid before, Guid sentinel)
         {
             // arrange
             var value = Union.From<string, int>(one.Get);
 
             // act
             var actual = before;
-            value.Match(
+            await value.Match(
                 one: o => Run(() => actual = sentinel),
-                two: t => CompletedTask).Wait();
+                two: t => CompletedTask);
 
             // assert
             Assert.Equal(sentinel, actual);
@@ -347,16 +349,16 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a second Union should execute the second task branch, " +
             "not the first task branch.")]
-        public void TaskTaskMatchVoid_Second(int two, Version before, Version sentinel)
+        public async Task TaskTaskMatchVoid_Second(int two, Version before, Version sentinel)
         {
             // arrange
             var value = Union.From<string, int>(two);
 
             // act
             var actual = before;
-            value.Match(
+            await value.Match(
                 one: o => CompletedTask,
-                two: t => Run(() => actual = sentinel)).Wait();
+                two: t => Run(() => actual = sentinel));
 
             // assert
             Assert.Equal(sentinel, actual);

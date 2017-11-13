@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Threading.Tasks;
 using FsCheck;
 using FsCheck.Xunit;
+using Tiger.Types.UnitTest.Utility;
 using Xunit;
 using static System.Threading.Tasks.Task;
 // ReSharper disable All
@@ -15,129 +17,105 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a Left Either returns the Left func branch, " +
             "not the Right func branch.")]
-        public static void FuncFuncMatchTReturn_Left(NonNull<string> left)
+        public static async Task FuncFuncMatchTReturn_Left(NonNull<string> left)
         {
-            // arrange
             var value = FromResult<Either<string, int>>(left.Get);
 
-            // act
-            var actual = value.MatchT(
+            var actual = await value.MatchT(
                 left: l => l.Length,
-                right: r => r).Result;
+                right: r => r);
 
-            // assert
             Assert.Equal(left.Get.Length, actual);
         }
 
         [Property(DisplayName = "Matching a Right Either returns the Right func branch, " +
             "not the Left func branch.")]
-        public static void FuncFuncMatchTReturn_Right(Version right)
+        public static async Task FuncFuncMatchTReturn_Right(Version right)
         {
-            // arrange
             var value = FromResult<Either<int, Version>>(right);
 
-            // act
-            var actual = value.MatchT(
+            var actual = await value.MatchT(
                 left: l => l,
-                right: r => r.Major).Result;
+                right: r => r.Major);
 
-            // assert
             Assert.Equal(right.Major, actual);
         }
 
         [Property(DisplayName = "Matching a Left Either returns the Left func branch, " +
             "not the Right task branch.")]
-        public static void FuncTaskMatchTReturn_Left(NonNull<string> left)
+        public static async Task FuncTaskMatchTReturn_Left(NonNull<string> left)
         {
-            // arrange
             var value = FromResult<Either<string, int>>(left.Get);
 
-            // act
-            var actual = value.MatchT(
+            var actual = await value.MatchT(
                 left: l => l.Length,
-                right: FromResult).Result;
+                right: FromResult);
 
-            // assert
             Assert.Equal(left.Get.Length, actual);
         }
 
         [Property(DisplayName = "Matching a Right Either returns the Right task branch, " +
             "not the Left func branch.")]
-        public static void FuncTaskMatchTReturn_Right(Version right)
+        public static async Task FuncTaskMatchTReturn_Right(Version right)
         {
-            // arrange
             var value = FromResult<Either<int, Version>>(right);
 
-            // act
-            var actual = value.MatchT(
+            var actual = await value.MatchT(
                 left: l => l,
-                right: r => r.Major.Pipe(FromResult)).Result;
+                right: r => r.Major.Pipe(FromResult));
 
-            // assert
             Assert.Equal(right.Major, actual);
         }
 
         [Property(DisplayName = "Matching a Left Either returns the Left task branch, " +
             "not the Right func branch.")]
-        public static void TaskFuncMatchTReturn_Left(NonNull<string> left)
+        public static async Task TaskFuncMatchTReturn_Left(NonNull<string> left)
         {
-            // arrange
             var value = FromResult<Either<string, int>>(left.Get);
 
-            // act
-            var actual = value.MatchT(
+            var actual = await value.MatchT(
                 left: l => l.Length.Pipe(FromResult),
-                right: r => r).Result;
+                right: r => r);
 
-            // assert
             Assert.Equal(left.Get.Length, actual);
         }
 
         [Property(DisplayName = "Matching a Right Either returns the Right func branch, " +
             "not the Left task branch.")]
-        public static void TaskFuncMatchTReturn_Right(Version right)
+        public static async Task TaskFuncMatchTReturn_Right(Version right)
         {
-            // arrange
             var value = FromResult<Either<int, Version>>(right);
 
-            // act
-            var actual = value.MatchT(
+            var actual = await value.MatchT(
                 left: FromResult,
-                right: r => r.Major).Result;
+                right: r => r.Major);
 
-            // assert
             Assert.Equal(right.Major, actual);
         }
 
         [Property(DisplayName = "Matching a Left Either returns the Left task branch, " +
             "not the Right func branch.")]
-        public static void TaskTaskMatchTReturn_Left(NonNull<string> left)
+        public static async Task TaskTaskMatchTReturn_Left(NonNull<string> left)
         {
-            // arrange
             var value = FromResult<Either<string, int>>(left.Get);
 
-            // act
-            var actual = value.MatchT(
+            var actual = await value.MatchT(
                 left: l => l.Length.Pipe(FromResult),
-                right: FromResult).Result;
+                right: FromResult);
 
-            // assert
             Assert.Equal(left.Get.Length, actual);
         }
 
         [Property(DisplayName = "Matching a Right Either returns the Right func branch, " +
             "not the Left task branch.")]
-        public static void TaskTaskMatchTReturn_Right(Version right)
+        public static async Task TaskTaskMatchTReturn_Right(Version right)
         {
-            // arrange
             var value = FromResult<Either<int, Version>>(right);
 
-            // act
-            var actual = value.MatchT(
+            var actual = await value.MatchT(
                 left: FromResult,
-                right: r => r.Major.Pipe(FromResult)).Result;
+                right: r => r.Major.Pipe(FromResult));
 
-            // assert
             Assert.Equal(right.Major, actual);
         }
 
@@ -146,13 +124,11 @@ namespace Tiger.Types.UnitTest
         #region MapT
 
         [Property(DisplayName = "Left-Mapping a Left Either over a func returns a Left Either.")]
-        public static void FuncMapTLeft_Left(NonNull<string> left, NonNull<string> sentinel)
+        public static async Task FuncMapTLeft_Left(NonNull<string> left, NonNull<string> sentinel)
         {
-            // arrange
             var value = FromResult<Either<string, int>>(left.Get);
 
-            // act
-            var actual = value.MapT(left: _ => sentinel.Get).Result;
+            var actual = await value.MapT(left: _ => sentinel.Get);
 
             // assert
             Assert.True(actual.IsLeft);
@@ -161,13 +137,11 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Left-Mapping a Right Either over a func returns a Right Either.")]
-        public static void FuncMapTLeft_Right(int right, NonNull<string> sentinel)
+        public static async Task FuncMapTLeft_Right(int right, NonNull<string> sentinel)
         {
-            // arrange
             var value = FromResult<Either<string, int>>(right);
 
-            // act
-            var actual = value.MapT(left: _ => sentinel.Get).Result;
+            var actual = await value.MapT(left: _ => sentinel.Get);
 
             // assert
             Assert.True(actual.IsRight);
@@ -176,13 +150,11 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Left-Mapping a Left Either over a task returns a Left Either.")]
-        public static void TaskMapTLeft_Left(NonNull<string> left, NonNull<string> sentinel)
+        public static async Task TaskMapTLeft_Left(NonNull<string> left, NonNull<string> sentinel)
         {
-            // arrange
             var value = FromResult<Either<string, int>>(left.Get);
 
-            // act
-            var actual = value.MapT(left: _ => FromResult(sentinel.Get)).Result;
+            var actual = await value.MapT(left: _ => FromResult(sentinel.Get));
 
             // assert
             Assert.True(actual.IsLeft);
@@ -191,13 +163,11 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Left-Mapping a Right Either over a task returns a Right Either.")]
-        public static void TaskMapTLeft_Right(int right, NonNull<string> sentinel)
+        public static async Task TaskMapTLeft_Right(int right, NonNull<string> sentinel)
         {
-            // arrange
             var value = FromResult<Either<string, int>>(right);
 
-            // act
-            var actual = value.MapT(left: _ => FromResult(sentinel.Get)).Result;
+            var actual = await value.MapT(left: _ => FromResult(sentinel.Get));
 
             // assert
             Assert.True(actual.IsRight);
@@ -206,13 +176,11 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Right-Mapping a Left Either over a func returns a Left Either.")]
-        public static void FuncMapTRight_Left(NonNull<string> left, int sentinel)
+        public static async Task FuncMapTRight_Left(NonNull<string> left, int sentinel)
         {
-            // arrange
             var value = FromResult<Either<string, int>>(left.Get);
 
-            // act
-            var actual = value.MapT(right: _ => sentinel).Result;
+            var actual = await value.MapT(right: _ => sentinel);
 
             // assert
             Assert.True(actual.IsLeft);
@@ -221,13 +189,11 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Right-Mapping a Right Either over a func returns a Right Either.")]
-        public static void FuncMapTRight_Right(int right, int sentinel)
+        public static async Task FuncMapTRight_Right(int right, int sentinel)
         {
-            // arrange
             var value = FromResult<Either<string, int>>(right);
 
-            // act
-            var actual = value.MapT(right: _ => sentinel).Result;
+            var actual = await value.MapT(right: _ => sentinel);
 
             // assert
             Assert.True(actual.IsRight);
@@ -236,13 +202,11 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Right-Mapping a Left Either over a task returns a Left Either.")]
-        public static void TaskMapTRight_Left(NonNull<string> left, int sentinel)
+        public static async Task TaskMapTRight_Left(NonNull<string> left, int sentinel)
         {
-            // arrange
             var value = FromResult<Either<string, int>>(left.Get);
 
-            // act
-            var actual = value.MapT(right: _ => FromResult(sentinel)).Result;
+            var actual = await value.MapT(right: _ => FromResult(sentinel));
 
             // assert
             Assert.True(actual.IsLeft);
@@ -251,13 +215,11 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Right-Mapping a Right Either over a task returns a Right Either.")]
-        public static void TaskMapTRight_Right(int right, int sentinel)
+        public static async Task TaskMapTRight_Right(int right, int sentinel)
         {
-            // arrange
             var value = FromResult<Either<string, int>>(right);
 
-            // act
-            var actual = value.MapT(right: _ => FromResult(sentinel)).Result;
+            var actual = await value.MapT(right: _ => FromResult(sentinel));
 
             // assert
             Assert.True(actual.IsRight);
@@ -271,13 +233,11 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Right-Binding a Left Either over a func that returns a Right Either " +
             "returns a Left Either.")]
-        public static void FuncBindTRight_Left_Right(NonNull<string> left, Version sentinel)
+        public static async Task FuncBindTRight_Left_Right(NonNull<string> left, Version sentinel)
         {
-            // arrange
             var value = FromResult<Either<string, int>>(left.Get);
 
-            // act
-            var actual = value.BindT(right: _ => Either.Right<string, Version>(sentinel)).Result;
+            var actual = await value.BindT(right: _ => Either.Right<string, Version>(sentinel));
 
             // assert
             Assert.True(actual.IsLeft);
@@ -287,13 +247,11 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Right-Binding a Left Either over a func that returns a Left Either " +
             "returns a Left Either.")]
-        public static void FuncBindTRight_Left_Left(NonNull<string> left, NonNull<string> sentinel)
+        public static async Task FuncBindTRight_Left_Left(NonNull<string> left, NonNull<string> sentinel)
         {
-            // arrange
             var value = FromResult<Either<string, int>>(left.Get);
 
-            // act
-            var actual = value.BindT(right: _ => Either.Left<string, Version>(sentinel.Get)).Result;
+            var actual = await value.BindT(right: _ => Either.Left<string, Version>(sentinel.Get));
 
             // assert
             Assert.True(actual.IsLeft);
@@ -303,13 +261,11 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Right-Binding a Right Either over a func that returns a Left Either " +
             "returns a Left Either.")]
-        public static void FuncBindTRight_Right_Left(int right, NonNull<string> sentinel)
+        public static async Task FuncBindTRight_Right_Left(int right, NonNull<string> sentinel)
         {
-            // arrange
             var value = FromResult<Either<string, int>>(right);
 
-            // act
-            var actual = value.BindT(right: _ => Either.Left<string, Version>(sentinel.Get)).Result;
+            var actual = await value.BindT(right: _ => Either.Left<string, Version>(sentinel.Get));
 
             // assert
             Assert.True(actual.IsLeft);
@@ -319,13 +275,11 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Right-Binding a Right Either over a func that returns a Right Either " +
             "returns a Right Either.")]
-        public static void FuncBindTRight_Right_Right(int right, Guid sentinel)
+        public static async Task FuncBindTRight_Right_Right(int right, Guid sentinel)
         {
-            // arrange
             var value = FromResult<Either<string, int>>(right);
 
-            // act
-            var actual = value.BindT(right: _ => Either.Right<string, Guid>(sentinel)).Result;
+            var actual = await value.BindT(right: _ => Either.Right<string, Guid>(sentinel));
 
             // assert
             Assert.True(actual.IsRight);
@@ -335,13 +289,11 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Left-Binding a Right Either over a func that returns a Right Either " +
             "returns a Right Either.")]
-        public static void FuncBindTLeft_Right_Right(int right, int sentinel)
+        public static async Task FuncBindTLeft_Right_Right(int right, int sentinel)
         {
-            // arrange
             var value = FromResult<Either<string, int>>(right);
 
-            // act
-            var actual = value.BindT(left: _ => Either.Right<Guid, int>(sentinel)).Result;
+            var actual = await value.BindT(left: _ => Either.Right<Guid, int>(sentinel));
 
             // assert
             Assert.True(actual.IsRight);
@@ -351,13 +303,13 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Left-Binding a Right Either over a func that returns a Left Either " +
             "returns a Right Either.")]
-        public static void FuncBindTLeft_Right_Left(int right, Guid sentinel)
+        public static async Task FuncBindTLeft_Right_Left(int right, Guid sentinel)
         {
             // arrange
             var value = FromResult<Either<string, int>>(right);
 
             // act
-            var actual = value.BindT(left: _ => Either.Left<Guid, int>(sentinel)).Result;
+            var actual = await value.BindT(left: _ => Either.Left<Guid, int>(sentinel));
 
             // assert
             Assert.True(actual.IsRight);
@@ -367,13 +319,13 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Left-Binding a Left Either over a func that returns a Right Either " +
             "returns a Right Either.")]
-        public static void FuncBindTLeft_Left_Right(NonNull<string> left, int sentinel)
+        public static async Task FuncBindTLeft_Left_Right(NonNull<string> left, int sentinel)
         {
             // arrange
             var value = FromResult<Either<string, int>>(left.Get);
 
             // act
-            var actual = value.BindT(left: _ => Either.Right<Guid, int>(sentinel)).Result;
+            var actual = await value.BindT(left: _ => Either.Right<Guid, int>(sentinel));
 
             // assert
             Assert.True(actual.IsRight);
@@ -383,13 +335,13 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Left-Binding a Left Either over a func that returns a Left Either " +
             "returns a Left Either.")]
-        public static void FuncBindTLeft_Left_Left(NonNull<string> left, Guid sentinel)
+        public static async Task FuncBindTLeft_Left_Left(NonNull<string> left, Guid sentinel)
         {
             // arrange
             var value = FromResult<Either<string, int>>(left.Get);
 
             // act
-            var actual = value.BindT(left: _ => Either.Left<Guid, int>(sentinel)).Result;
+            var actual = await value.BindT(left: _ => Either.Left<Guid, int>(sentinel));
 
             // assert
             Assert.True(actual.IsLeft);
@@ -399,13 +351,13 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Right-Binding a Left Either over a task that returns a Right Either" +
             "returns a Left Either.")]
-        public static void TaskBindTRight_Left_Right(NonNull<string> left, Version sentinel)
+        public static async Task TaskBindTRight_Left_Right(NonNull<string> left, Version sentinel)
         {
             // arrange
             var value = FromResult<Either<string, int>>(left.Get);
 
             // act
-            var actual = value.BindT(right: _ => FromResult(Either.Right<string, Version>(sentinel))).Result;
+            var actual = await value.BindT(right: _ => FromResult(Either.Right<string, Version>(sentinel)));
 
             // assert
             Assert.True(actual.IsLeft);
@@ -415,13 +367,13 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Right-Binding a Left Either over a task that returns a Left Either" +
             "returns a Left Either.")]
-        public static void TaskBindTRight_Left_Left(NonNull<string> left, NonNull<string> sentinel)
+        public static async Task TaskBindTRight_Left_Left(NonNull<string> left, NonNull<string> sentinel)
         {
             // arrange
             var value = FromResult<Either<string, int>>(left.Get);
 
             // act
-            var actual = value.BindT(right: _ => FromResult(Either.Left<string, Version>(sentinel.Get))).Result;
+            var actual = await value.BindT(right: _ => FromResult(Either.Left<string, Version>(sentinel.Get)));
 
             // assert
             Assert.True(actual.IsLeft);
@@ -431,13 +383,13 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Right-Binding a Right Either over a task that returns a Left Either " +
             "returns a Left Either.")]
-        public static void TaskBindTRight_Right_Left(int right, NonNull<string> sentinel)
+        public static async Task TaskBindTRight_Right_Left(int right, NonNull<string> sentinel)
         {
             // arrange
             var value = FromResult<Either<string, int>>(right);
 
             // act
-            var actual = value.BindT(right: _ => FromResult(Either.Left<string, Version>(sentinel.Get))).Result;
+            var actual = await value.BindT(right: _ => FromResult(Either.Left<string, Version>(sentinel.Get)));
 
             // assert
             Assert.True(actual.IsLeft);
@@ -447,13 +399,13 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Right-Binding a Right Either over a task that returns a Right Either " +
             "returns a Right Either.")]
-        public static void TaskBindTRight_Right_Right(int right, Version sentinel)
+        public static async Task TaskBindTRight_Right_Right(int right, Version sentinel)
         {
             // arrange
             var value = FromResult<Either<string, int>>(right);
 
             // act
-            var actual = value.BindT(right: _ => FromResult(Either.Right<string, Version>(sentinel))).Result;
+            var actual = await value.BindT(right: _ => FromResult(Either.Right<string, Version>(sentinel)));
 
             // assert
             Assert.True(actual.IsRight);
@@ -463,13 +415,13 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Left-Binding a Right Either over a task that returns a Right Either " +
             "returns a Right Either.")]
-        public static void TaskBindTLeft_Right(int right, int sentinel)
+        public static async Task TaskBindTLeft_Right(int right, int sentinel)
         {
             // arrange
             var value = FromResult<Either<string, int>>(right);
 
             // act
-            var actual = value.BindT(left: _ => FromResult(Either.Right<Guid, int>(sentinel))).Result;
+            var actual = await value.BindT(left: _ => FromResult(Either.Right<Guid, int>(sentinel)));
 
             // assert
             Assert.True(actual.IsRight);
@@ -479,13 +431,13 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Left-Binding a Right Either over a task that returns a Left Either " +
             "returns a Right Either.")]
-        public static void TaskBindTLeft_Right_Left(int right, Guid sentinel)
+        public static async Task TaskBindTLeft_Right_Left(int right, Guid sentinel)
         {
             // arrange
             var value = FromResult<Either<string, int>>(right);
 
             // act
-            var actual = value.BindT(left: _ => FromResult(Either.Left<Guid, int>(sentinel))).Result;
+            var actual = await value.BindT(left: _ => FromResult(Either.Left<Guid, int>(sentinel)));
 
             // assert
             Assert.True(actual.IsRight);
@@ -495,13 +447,13 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Left-Binding a Left Either over a task that returns a Right Either " +
             "returns a Right Either.")]
-        public static void TaskBindTLeft_Left_Right(NonNull<string> left, int sentinel)
+        public static async Task TaskBindTLeft_Left_Right(NonNull<string> left, int sentinel)
         {
             // arrange
             var value = FromResult<Either<string, int>>(left.Get);
 
             // act
-            var actual = value.BindT(left: _ => FromResult(Either.Right<Guid, int>(sentinel))).Result;
+            var actual = await value.BindT(left: _ => FromResult(Either.Right<Guid, int>(sentinel)));
 
             // assert
             Assert.True(actual.IsRight);
@@ -511,13 +463,13 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Left-Binding a Left Either over a task that returns a Left Either " +
             "returns a Left Either.")]
-        public static void TaskBindTLeft_Left_Left(NonNull<string> left, Guid sentinel)
+        public static async Task TaskBindTLeft_Left_Left(NonNull<string> left, Guid sentinel)
         {
             // arrange
             var value = FromResult<Either<string, int>>(left.Get);
 
             // act
-            var actual = value.BindT(left: _ => FromResult(Either.Left<Guid, int>(sentinel))).Result;
+            var actual = await value.BindT(left: _ => FromResult(Either.Left<Guid, int>(sentinel)));
 
             // assert
             Assert.True(actual.IsLeft);
@@ -531,14 +483,14 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Left-tapping a Left Either over a func returns a Left Either " +
             "and performs an action.")]
-        public static void FuncTapTLeft_Left(NonNull<string> left, Guid before, Guid sentinel)
+        public static async Task FuncTapTLeft_Left(NonNull<string> left, Guid before, Guid sentinel)
         {
             // arrange
             var value = FromResult<Either<string, int>>(left.Get);
 
             // act
             var output = before;
-            var actual = value.TapT(left: _ => output = sentinel).Result;
+            var actual = await value.TapT(left: _ => output = sentinel);
 
             // assert
             Assert.True(actual.IsLeft);
@@ -549,14 +501,14 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Left-tapping a Right Either over a func returns a Right Either " +
             "and performs no action.")]
-        public static void FuncTapTLeft_Right(int right, Version before, Version sentinel)
+        public static async Task FuncTapTLeft_Right(int right, Version before, Version sentinel)
         {
             // arrange
             var value = FromResult<Either<string, int>>(right);
 
             // act
             var output = before;
-            var actual = value.TapT(left: _ => output = sentinel).Result;
+            var actual = await value.TapT(left: _ => output = sentinel);
 
             // assert
             Assert.True(actual.IsRight);
@@ -567,14 +519,14 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Right-tapping a Left Either over a func returns a Left Either " +
             "and performs no action.")]
-        public static void FuncTapTRight_Left(NonNull<string> left, Guid before, Guid sentinel)
+        public static async Task FuncTapTRight_Left(NonNull<string> left, Guid before, Guid sentinel)
         {
             // arrange
             var value = FromResult<Either<string, int>>(left.Get);
 
             // act
             var output = before;
-            var actual = value.TapT(right: _ => output = sentinel).Result;
+            var actual = await value.TapT(right: _ => output = sentinel);
 
             // assert
             Assert.True(actual.IsLeft);
@@ -585,14 +537,14 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Right-tapping a Right Either over a func returns a Right Either " +
             "and performs an action.")]
-        public static void FuncTapTRight_Right(int right, Version before, Version sentinel)
+        public static async Task FuncTapTRight_Right(int right, Version before, Version sentinel)
         {
             // arrange
             var value = FromResult<Either<string, int>>(right);
 
             // act
             var output = before;
-            var actual = value.TapT(right: _ => output = sentinel).Result;
+            var actual = await value.TapT(right: _ => output = sentinel);
 
             // assert
             Assert.True(actual.IsRight);
@@ -603,14 +555,14 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Left-tapping a Left Either over a task returns a Left Either " +
             "and performs an action")]
-        public static void TaskTapTLeft_Left(NonNull<string> left, Guid before, Guid sentinel)
+        public static async Task TaskTapTLeft_Left(NonNull<string> left, Guid before, Guid sentinel)
         {
             // arrange
             var value = FromResult<Either<string, int>>(left.Get);
 
             // act
             var output = before;
-            var actual = value.TapT(left: _ => Run(() => output = sentinel)).Result;
+            var actual = await value.TapT(left: _ => Run(() => output = sentinel));
 
             // assert
             Assert.True(actual.IsLeft);
@@ -621,14 +573,14 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Left-tapping a Right Either over a task returns a Right Either " +
             "and performs no action.")]
-        public static void TaskTapTLeft_Right(int right, Version before, Version sentinel)
+        public static async Task TaskTapTLeft_Right(int right, Version before, Version sentinel)
         {
             // arrange
             var value = FromResult<Either<string, int>>(right);
 
             // act
             var output = before;
-            var actual = value.TapT(left: _ => Run(() => output = sentinel)).Result;
+            var actual = await value.TapT(left: _ => Run(() => output = sentinel));
 
             // assert
             Assert.True(actual.IsRight);
@@ -639,14 +591,14 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Right-tapping a Left Either over a task returns a Left Either " +
             "and performs no action.")]
-        public static void TaskTapTRight_Left(NonNull<string> left, Guid before, Guid sentinel)
+        public static async Task TaskTapTRight_Left(NonNull<string> left, Guid before, Guid sentinel)
         {
             // arrange
             var value = FromResult<Either<string, int>>(left.Get);
 
             // act
             var output = before;
-            var actual = value.TapT(right: _ => Run(() => output = sentinel)).Result;
+            var actual = await value.TapT(right: _ => Run(() => output = sentinel));
 
             // assert
             Assert.True(actual.IsLeft);
@@ -657,14 +609,14 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Right-tapping a Right Either over a task returns a Right Either " +
             "and performs an action.")]
-        public static void TaskTapTRight_Right(int right, Version before, Version sentinel)
+        public static async Task TaskTapTRight_Right(int right, Version before, Version sentinel)
         {
             // arrange
             var value = FromResult<Either<string, int>>(right);
 
             // act
             var output = before;
-            var actual = value.TapT(right: _ => Run(() => output = sentinel)).Result;
+            var actual = await value.TapT(right: _ => Run(() => output = sentinel));
 
             // assert
             Assert.True(actual.IsRight);

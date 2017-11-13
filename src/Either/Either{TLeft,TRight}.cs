@@ -368,10 +368,10 @@ namespace Tiger.Types
 
             if (IsLeft)
             {
-                await left(_leftValue);
+                await left(_leftValue).ConfigureAwait(false);
             }
 
-            await right(_rightValue);
+            await right(_rightValue).ConfigureAwait(false);
         }
 
         #endregion

@@ -28,6 +28,6 @@ namespace Tiger.Types
         /// <summary>
         /// Gets the single value of the type <see cref="Unit"/>.
         /// </summary>
-        public static readonly Unit Value = default(Unit);
+        public static readonly Unit Value;
     }
 }

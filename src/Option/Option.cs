@@ -28,7 +28,7 @@ namespace Tiger.Types
         /// <summary>
         /// A value that can be converted to an <see cref="Option{TSome}"/> of any Some type.
         /// </summary>
-        public static readonly OptionNone None = default(OptionNone);
+        public static readonly OptionNone None;
 
         /// <summary>Creates an <see cref="Option{TSome}"/> from the provided value.</summary>
         /// <typeparam name="TSome">The type of <paramref name="value"/>.</typeparam>
@@ -156,6 +156,29 @@ namespace Tiger.Types
         /// </returns>
         public static Option<TSome> Join<TSome>(this Option<Option<TSome>> optionOptionValue) =>
             optionOptionValue.GetValueOrDefault();
+
+        /// <summary>
+        /// Asserts that the provided optional value is in the Some state,
+        /// throwing the provided exception if it is not.
+        /// </summary>
+        /// <typeparam name="TSome">The Some type of <paramref name="optionValue"/>.</typeparam>
+        /// <typeparam name="TException">The return type of <paramref name="none"/>.</typeparam>
+        /// <param name="optionValue">The value whose state to test.</param>
+        /// <param name="none">
+        /// A function producing an exception to be thrown if <paramref name="optionValue"/> is in the None state.
+        /// </param>
+        /// <returns>The Some value of <paramref name="optionValue"/>.</returns>
+        /// <exception cref="Exception"><paramref name="optionValue"/> is in the None state.</exception>
+        [NotNull]
+        public static TSome Assert<TSome, TException>(
+            this Option<TSome> optionValue,
+            [NotNull, InstantHandle] Func<TException> none)
+            where TException : Exception
+        {
+            if (optionValue.IsNone) { throw none(); }
+
+            return optionValue.Value;
+        }
 
         #endregion
 

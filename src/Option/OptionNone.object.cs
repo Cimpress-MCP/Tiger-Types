@@ -14,16 +14,22 @@
 //   limitations under the License.
 // </copyright>
 
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 
 namespace Tiger.Types
 {
     /// <content>Overrides and override-equivalents.</content>
+    [SuppressMessage("Microsoft:Guidelines", "CA1066", Justification = "Prevent boxing.")]
     public partial struct OptionNone
     {
         /// <inheritdoc/>
         [NotNull, Pure]
         public override string ToString() => "None";
+
+        /// <inheritdoc/>
+        [Pure]
+        public override bool Equals(object obj) => obj is OptionNone;
 
         /// <inheritdoc/>
         [Pure]

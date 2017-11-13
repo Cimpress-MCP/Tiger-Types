@@ -34,7 +34,7 @@ namespace Tiger.Types
     public partial struct Option<TSome>
     {
         /// <summary>Gets a value representing no value.</summary>
-        public static Option<TSome> None = default(Option<TSome>);
+        public static readonly Option<TSome> None;
 
         readonly TSome _value;
 
@@ -652,7 +652,7 @@ namespace Tiger.Types
 
             if (IsSome)
             {
-                await some(_value);
+                await some(_value).ConfigureAwait(false);
             }
         }
 
