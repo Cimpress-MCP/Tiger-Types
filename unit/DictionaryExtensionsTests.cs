@@ -25,9 +25,7 @@ namespace Tiger.Types.UnitTest
                 ["null"] = null
             };
 
-            var actual = sut.TryGetValue(key);
-
-            Assert.Equal(expected, actual);
+            Assert.Equal(expected, sut.TryGetValue(key));
         }
 
         [Theory(DisplayName = "A value can optionally be retrieved from a dictionary by interface.")]
@@ -40,9 +38,7 @@ namespace Tiger.Types.UnitTest
                 ["null"] = null
             } as IDictionary<string, string>;
 
-            var actual = sut.TryGetValue(key);
-
-            Assert.Equal(expected, actual);
+            Assert.Equal(expected, sut.TryGetValue(key));
         }
 
         [Theory(DisplayName = "A value can optionally be retrieved from a read-only dictionary by interface.")]
@@ -55,9 +51,7 @@ namespace Tiger.Types.UnitTest
                 ["null"] = null
             } as IReadOnlyDictionary<string, string>;
 
-            var actual = sut.TryGetValue(key);
-
-            Assert.Equal(expected, actual);
+            Assert.Equal(expected, sut.TryGetValue(key));
         }
     }
 }

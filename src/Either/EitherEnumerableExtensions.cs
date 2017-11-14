@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 using JetBrains.Annotations;
 
 namespace Tiger.Types
@@ -38,15 +39,13 @@ namespace Tiger.Types
         /// A collection of the Right values of the elements of <paramref name="eitherEnumerableValue"/>
         /// which are in the Right state.
         /// </returns>
-        [NotNull, ItemNotNull]
+        [NotNull, ItemNotNull, LinqTunnel]
         public static IEnumerable<TRight> CatRight<TLeft, TRight>(
             [NotNull] this IEnumerable<Either<TLeft, TRight>> eitherEnumerableValue)
         {
             if (eitherEnumerableValue == null) { throw new ArgumentNullException(nameof(eitherEnumerableValue)); }
 
-            return eitherEnumerableValue.Fold(
-                ImmutableList<TRight>.Empty, // ReSharper disable once ConvertClosureToMethodGroup
-                (acc, curr) => curr.Match(left: l => acc, right: r => acc.Add(r)));
+            return eitherEnumerableValue.Where(ev => ev.IsRight).Select(ev => ev.Value);
         }
 
         /// <summary>Maps a collection of either values to their Left values.</summary>
@@ -57,15 +56,13 @@ namespace Tiger.Types
         /// A collection of the Left values of the elements of <paramref name="eitherEnumerableValue"/>
         /// which are in the Left state.
         /// </returns>
-        [NotNull, ItemNotNull]
+        [NotNull, ItemNotNull, LinqTunnel]
         public static IEnumerable<TLeft> CatLeft<TLeft, TRight>(
             [NotNull] this IEnumerable<Either<TLeft, TRight>> eitherEnumerableValue)
         {
             if (eitherEnumerableValue == null) { throw new ArgumentNullException(nameof(eitherEnumerableValue)); }
 
-            return eitherEnumerableValue.Fold(
-                ImmutableList<TLeft>.Empty, // ReSharper disable once ConvertClosureToMethodGroup
-                (acc, curr) => curr.Match(left: l => acc.Add(l), right: r => acc));
+            return eitherEnumerableValue.Where(ev => ev.IsLeft).Select(ev => (TLeft)ev);
         }
 
         /// <summary>Partitions a collection of either values into two collections.</summary>
@@ -76,8 +73,8 @@ namespace Tiger.Types
         /// A tuple whose first component is the Left values of the elements of <paramref name="eitherEnumerableValue"/>
         /// and whose second component is the Right values of the elements of <paramref name="eitherEnumerableValue"/>.
         /// </returns>
-        public static (IEnumerable<TLeft> lefts, IEnumerable<TRight> rights) Partition<TLeft, TRight>(
-            [NotNull] this IEnumerable<Either<TLeft, TRight>> eitherEnumerableValue)
+        public static (IReadOnlyCollection<TLeft> lefts, IReadOnlyCollection<TRight> rights) Partition<TLeft, TRight>(
+            [NotNull] this IReadOnlyCollection<Either<TLeft, TRight>> eitherEnumerableValue)
         {
             if (eitherEnumerableValue == null) { throw new ArgumentNullException(nameof(eitherEnumerableValue)); }
 

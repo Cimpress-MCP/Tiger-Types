@@ -315,7 +315,7 @@ namespace Tiger.Types
         /// <paramref name="o2"/> parameter; otherwise, <see langword="false"/>.
         /// </returns>
         [Pure]
-        public static bool OptionalEquals<TSome>(this Option<TSome> o1, Option<TSome> o2)
+        public static bool Equals<TSome>(this Option<TSome> o1, Option<TSome> o2)
         {
             if (o1.IsNone && o2.IsNone) { return true; }
             if (o1.IsNone || o2.IsNone) { return false; }
@@ -337,7 +337,7 @@ namespace Tiger.Types
         /// <paramref name="o2"/> parameter; otherwise, <see langword="false"/>.
         /// </returns>
         [Pure]
-        public static bool OptionalEquals<TSome>(
+        public static bool Equals<TSome>(
             this Option<TSome> o1,
             Option<TSome> o2,
             [CanBeNull] IEqualityComparer<TSome> equalityComparer)
@@ -361,7 +361,7 @@ namespace Tiger.Types
         /// and <paramref name="o2"/> parameters.
         /// </returns>
         [Pure]
-        public static int OptionalCompare<TSome>(this Option<TSome> o1, Option<TSome> o2)
+        public static int Compare<TSome>(this Option<TSome> o1, Option<TSome> o2)
         {
             if (o1.IsNone && o2.IsNone) { return 0; }
             if (o1.IsNone || o2.IsNone)
@@ -386,7 +386,7 @@ namespace Tiger.Types
         /// and <paramref name="o2"/> parameters.
         /// </returns>
         [Pure]
-        public static int OptionalCompare<TSome>(
+        public static int Compare<TSome>(
             this Option<TSome> o1,
             Option<TSome> o2,
             [CanBeNull] IComparer<TSome> comparer)

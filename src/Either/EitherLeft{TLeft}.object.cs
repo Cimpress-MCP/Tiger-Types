@@ -33,7 +33,8 @@ namespace Tiger.Types
 
         /// <inheritdoc/>
         [Pure]
-        public override bool Equals(object obj) => obj is EitherLeft<TLeft> eitherLeft && EqualsCore(eitherLeft);
+        public override bool Equals(object obj) =>
+            obj is EitherLeft<TLeft> eitherLeft && EqualsCore(eitherLeft);
 
         /// <inheritdoc/>
         [Pure]

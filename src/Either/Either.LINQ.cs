@@ -209,7 +209,7 @@ namespace Tiger.Types
         {
             if (onNext == null) { throw new ArgumentNullException(nameof(onNext)); }
 
-            return source.Tap(onNext);
+            return source.Tap(right: onNext);
         }
 
         /// <summary>Invokes an action on the Right value of an either value.</summary>

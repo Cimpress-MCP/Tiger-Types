@@ -49,10 +49,4 @@
     <PackageReference Include="Text.Analyzers" Version="2.3.0-beta1" PrivateAssets="All" /> 
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\..\..\Users\cosborn\.nuget\packages\newtonsoft.json\9.0.1\lib\netstandard1.0\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>

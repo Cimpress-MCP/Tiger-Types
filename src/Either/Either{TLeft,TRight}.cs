@@ -1059,80 +1059,62 @@ namespace Tiger.Types
         #region Tap
 
         /// <summary>
-        /// Performs an action on the Left value of this instance,
-        /// if present, and returns the same value as this instance.
+        /// Performs an action on the Left or Right value of this instance,
+        /// whichever is present, and returns this instance.
         /// </summary>
-        /// <param name="left">An action to perform.</param>
-        /// <returns>The same value as this instance.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null" />.</exception>
+        /// <param name="left">An action to perform on the Left value of this instance.</param>
+        /// <param name="right">An action to perform on the Right value of this instance.</param>
+        /// <returns>This instance.</returns>
         [MustUseReturnValue]
-        public Either<TLeft, TRight> Tap([NotNull, InstantHandle] Action<TLeft> left)
+        public Either<TLeft, TRight> Tap(
+            [CanBeNull, InstantHandle] Action<TLeft> left = null,
+            [CanBeNull, InstantHandle] Action<TRight> right = null)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-
             if (IsLeft)
             {
-                left(_leftValue);
+                left?.Invoke(_leftValue);
+                return this;
             }
-
-            return this;
-        }
-
-        /// <summary>
-        /// Performs an action on the Right value of this instance,
-        /// if present, and returns the same value as this instance.
-        /// </summary>
-        /// <param name="right">An action to perform.</param>
-        /// <returns>The same value as this instance.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null" />.</exception>
-        [MustUseReturnValue]
-        public Either<TLeft, TRight> Tap([NotNull, InstantHandle] Action<TRight> right)
-        {
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
 
             if (IsRight)
-            { // note(cosborn) Remember, `IsLeft` and `IsRight` can both be false.
-                right(_rightValue);
+            {
+                right?.Invoke(_rightValue);
+                return this;
             }
 
             return this;
         }
 
         /// <summary>
-        /// Performs an action on the Left value of this instance,
-        /// if present, and returns the same value as this instance, asynchronously.
+        /// Performs an action on the Left or Right value of this instance,
+        /// whichever is present, and returns this instance, asynchronously.
         /// </summary>
-        /// <param name="left">An action to perform asynchronously.</param>
-        /// <returns>The same value as this instance.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null" />.</exception>
+        /// <param name="left">An action to perform on the Left value of this instance, asynchronously.</param>
+        /// <param name="right">An action to perform on the Right value of this instance, asynchronously.</param>
+        /// <returns>A task which, when resolved, produces this instance.</returns>
         [NotNull, MustUseReturnValue]
-        public async Task<Either<TLeft, TRight>> Tap([NotNull, InstantHandle] Func<TLeft, Task> left)
+        public async Task<Either<TLeft, TRight>> Tap(
+            [CanBeNull, InstantHandle] Func<TLeft, Task> left = null,
+            [CanBeNull, InstantHandle] Func<TRight, Task> right = null)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-
             if (IsLeft)
             {
-                await left(_leftValue).ConfigureAwait(false);
+                if (left != null)
+                {
+                    await left.Invoke(_leftValue).ConfigureAwait(false);
+                }
+
+                return this;
             }
 
-            return this;
-        }
-
-        /// <summary>
-        /// Performs an action on the Right value of this instance,
-        /// if present, and returns the same value as this instance, asynchronously.
-        /// </summary>
-        /// <param name="right">An action to perform asynchronously.</param>
-        /// <returns>The same value as this instance.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null" />.</exception>
-        [NotNull, MustUseReturnValue]
-        public async Task<Either<TLeft, TRight>> Tap([NotNull, InstantHandle] Func<TRight, Task> right)
-        {
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
-
             if (IsRight)
-            { // note(cosborn) Remember, `IsLeft` and `IsRight` can both be false.
-                await right(_rightValue).ConfigureAwait(false);
+            {
+                if (right != null)
+                {
+                    await right.Invoke(_rightValue).ConfigureAwait(false);
+                }
+
+                return this;
             }
 
             return this;

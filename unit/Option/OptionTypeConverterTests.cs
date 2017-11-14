@@ -1,9 +1,8 @@
-﻿// ReSharper disable All
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Xunit;
 using static System.ComponentModel.TypeDescriptor;
+// ReSharper disable All
 
 namespace Tiger.Types.UnitTest
 {
@@ -19,17 +18,8 @@ namespace Tiger.Types.UnitTest
         [InlineData(typeof(Option<int>), typeof(Option<int>), false)]
         [InlineData(typeof(Option<int>), typeof(long), false)]
         [InlineData(typeof(Option<string>), typeof(int), false)]
-        public void CanConvertFrom(Type converterType, Type conversionType, bool expected)
-        {
-            // arrange
-            var converter = GetConverter(converterType);
-
-            // act
-            var actual = converter.CanConvertFrom(conversionType);
-
-            // assert
-            Assert.Equal(expected, actual);
-        }
+        public void CanConvertFrom(Type converterType, Type conversionType, bool expected) =>
+            Assert.Equal(expected, GetConverter(converterType).CanConvertFrom(conversionType));
 
         public static readonly TheoryData<Type, object, object> ConvertFromSource =
             new TheoryData<Type, object, object>
@@ -43,28 +33,14 @@ namespace Tiger.Types.UnitTest
 
         [Theory(DisplayName = "An option type converter converts from what it advertises.")]
         [MemberData(nameof(ConvertFromSource))]
-        public void ConvertFrom(Type converterType, object value, object expected)
-        {
-            // arrange
-            var converter = GetConverter(converterType);
-
-            // act
-            var actual = converter.ConvertFrom(value);
-
-            // assert
-            Assert.Equal(expected, actual);
-        }
+        public void ConvertFrom(Type converterType, object value, object expected) =>
+            Assert.Equal(expected, GetConverter(converterType).ConvertFrom(value));
 
         [Fact(DisplayName = "An option type converter does not convert from what it does not advertise.")]
         public void ConvertFrom_Fail()
         {
-            // arrange
-            var converter = GetConverter(typeof(Option<int>));
+            var actual = Record.Exception(() => GetConverter(typeof(Option<int>)).ConvertFrom(33L));
 
-            // act
-            var actual = Record.Exception(() => converter.ConvertFrom(33L));
-
-            // assert
             var ex = Assert.IsType<NotSupportedException>(actual);
             Assert.Contains(nameof(OptionTypeConverter), ex.Message);
         }
@@ -78,17 +54,8 @@ namespace Tiger.Types.UnitTest
         [InlineData(typeof(Option<int>), typeof(long), true)]
         [InlineData(typeof(Option<long>), typeof(int), true)]
         [InlineData(typeof(Option<int>), typeof(List<int>), false)]
-        public void CanConvertTo(Type converterType, Type conversionType, bool expected)
-        {
-            // arrange
-            var converter = GetConverter(converterType);
-
-            // act
-            var actual = converter.CanConvertTo(conversionType);
-
-            // assert
-            Assert.Equal(expected, actual);
-        }
+        public void CanConvertTo(Type converterType, Type conversionType, bool expected) =>
+            Assert.Equal(expected, GetConverter(converterType).CanConvertTo(conversionType));
 
         public static readonly TheoryData<Type, Type, object, object> ConvertToSource =
             new TheoryData<Type, Type, object, object>
@@ -103,17 +70,8 @@ namespace Tiger.Types.UnitTest
 
         [Theory(DisplayName = "An option type converter converts to what it advertises.")]
         [MemberData(nameof(ConvertToSource))]
-        public void ConvertTo(Type converterType, Type conversionType, object value, object expected)
-        {
-            // arrange
-            var converter = GetConverter(converterType);
-
-            // act
-            var actual =  converter.ConvertTo(value, conversionType);
-
-            // assert
-            Assert.Equal(expected, actual);
-        }
+        public void ConvertTo(Type converterType, Type conversionType, object value, object expected) =>
+            Assert.Equal(expected, GetConverter(converterType).ConvertTo(value, conversionType));
 
         public static readonly TheoryData<Type, Type, object> ConvertTo_FailSource =
             new TheoryData<Type, Type, object>
@@ -128,13 +86,8 @@ namespace Tiger.Types.UnitTest
         [MemberData(nameof(ConvertTo_FailSource))]
         public void ConvertTo_Fail(Type converterType, Type conversionType, object value)
         {
-            // arrange
-            var converter = GetConverter(converterType);
+            var actual = Record.Exception(() => GetConverter(converterType).ConvertTo(value, conversionType));
 
-            // act
-            var actual = Record.Exception(() => converter.ConvertTo(value, conversionType));
-
-            // assert
             var ex = Assert.IsType<NotSupportedException>(actual);
             Assert.Contains(nameof(OptionTypeConverter), ex.Message);
         }

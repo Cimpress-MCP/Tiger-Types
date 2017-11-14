@@ -1,11 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <DebugType>portable</DebugType>
     <AssemblyName>Test</AssemblyName>
     <RootNamespace>Tiger.Types.UnitTest</RootNamespace>
     <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Features>IOperation</Features>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

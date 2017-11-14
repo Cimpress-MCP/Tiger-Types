@@ -1,6 +1,5 @@
 ﻿using FsCheck.Xunit;
 using Xunit;
-
 // ReSharper disable All
 
 namespace Tiger.Types.UnitTest
@@ -14,10 +13,8 @@ namespace Tiger.Types.UnitTest
             "function with that value directly.")]
         public static void Pipe(int value)
         {
-            // arrange
             int Piper(int v) => v + 1;
 
-            // act
             var actual = value.Pipe(Piper);
 
             // assert

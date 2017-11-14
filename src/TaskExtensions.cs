@@ -25,27 +25,6 @@ namespace Tiger.Types
     /// <summary>Extensions to the functionality of <see cref="Task{TResult}"/>.</summary>
     public static class TaskExtensions
     {
-        /// <summary>Applies a <see cref="Task"/> over a function.</summary>
-        /// <typeparam name="TOut">The return type of <paramref name="applier"/>.</typeparam>
-        /// <param name="task">The <see cref="Task"/> to be applied.</param>
-        /// <param name="applier">A function producing a <typeparamref name="TOut"/>.</param>
-        /// <returns>The return value of <paramref name="applier"/>, asynchronously.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="task"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="applier"/> is <see langword="null"/>.</exception>
-        [NotNull, ItemNotNull]
-        public static async Task<TOut> Apply<TOut>(
-            [NotNull] this Task task,
-            [NotNull, InstantHandle] Func<TOut> applier)
-        {
-            if (task == null) { throw new ArgumentNullException(nameof(task)); }
-            if (applier == null) { throw new ArgumentNullException(nameof(applier)); }
-
-            await task.ConfigureAwait(false);
-            var result = applier();
-            Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
-            return result;
-        }
-
         /// <summary>
         /// Maps the result of a <see cref="Task{TResult}"/> asynchronously over a transformation.
         /// </summary>
@@ -67,24 +46,6 @@ namespace Tiger.Types
             var result = mapper(await taskValue.ConfigureAwait(false));
             Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
-        }
-
-        /// <summary>Performs actions in a sequence.</summary>
-        /// <typeparam name="TOut">The return type of <paramref name="thenner"/>.</typeparam>
-        /// <param name="task">The <see cref="Task"/> to perform first.</param>
-        /// <param name="thenner">A function producing a <typeparamref name="TOut"/>, asynchronously.</param>
-        /// <returns>The return value of <paramref name="thenner"/>.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="task"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="thenner"/> is <see langword="null"/>.</exception>
-        [NotNull, ItemNotNull]
-        public static Task<TOut> Then<TOut>(
-            [NotNull] this Task task,
-            [NotNull, InstantHandle] Func<Task<TOut>> thenner)
-        {
-            if (task == null) { throw new ArgumentNullException(nameof(task)); }
-            if (thenner == null) { throw new ArgumentNullException(nameof(thenner)); }
-
-            return task.Apply(thenner).Unwrap();
         }
 
         /// <summary>

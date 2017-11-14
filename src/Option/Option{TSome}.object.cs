@@ -14,6 +14,7 @@
 //   limitations under the License.
 // </copyright>
 
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using static System.Globalization.CultureInfo;
@@ -34,7 +35,7 @@ namespace Tiger.Types
         [Pure]
         public override int GetHashCode() => IsNone
             ? 0
-            : _value.GetHashCode();
+            : EqualityComparer<TSome>.Default.GetHashCode(_value);
 
         /// <inheritdoc/>
         [Pure]

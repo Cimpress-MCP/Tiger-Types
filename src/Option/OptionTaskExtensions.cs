@@ -31,10 +31,7 @@ namespace Tiger.Types
     {
         #region MatchT
 
-        /// <summary>
-        /// Transforms the result of <paramref name="optionTaskValue"/>
-        /// based on its state.
-        /// </summary>
+        /// <summary>Transforms the result of <paramref name="optionTaskValue"/> based on its state.</summary>
         /// <typeparam name="TIn">
         /// The Some type of the Result type of <paramref name="optionTaskValue"/>.
         /// </typeparam>
@@ -360,51 +357,49 @@ namespace Tiger.Types
         #region TapT
 
         /// <summary>
-        /// Acts upon the Some value of the Result value of <paramref name="resultTaskValue"/>,
-        /// if it is present.
+        /// Acts upon the Some value of the Result value of <paramref name="optionTaskValue"/>, if it is present.
         /// </summary>
-        /// <typeparam name="T">The Some type of the Result type of <paramref name="resultTaskValue"/>.</typeparam>
-        /// <param name="resultTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
+        /// <typeparam name="T">The Some type of the Result type of <paramref name="optionTaskValue"/>.</typeparam>
+        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
         /// <param name="tapper">
-        /// An action to perform on the Some value of the Result value
-        /// of <paramref name="resultTaskValue"/>.
+        /// An action to perform on the Some value of the Result value of <paramref name="optionTaskValue"/>.
         /// </param>
-        /// <returns>The original value of <paramref name="resultTaskValue"/>.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="resultTaskValue"/> is <see langword="null"/>.</exception>
+        /// <returns>The original value of <paramref name="optionTaskValue"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="optionTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="tapper"/> is <see langword="null"/>.</exception>
         [NotNull, MustUseReturnValue]
         public static Task<Option<T>> TapT<T>(
-            [NotNull] this Task<Option<T>> resultTaskValue,
+            [NotNull] this Task<Option<T>> optionTaskValue,
             [NotNull, InstantHandle] Action<T> tapper)
         {
-            if (resultTaskValue == null) { throw new ArgumentNullException(nameof(resultTaskValue)); }
+            if (optionTaskValue == null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
             if (tapper == null) { throw new ArgumentNullException(nameof(tapper)); }
 
-            return resultTaskValue.Map(ov => ov.Tap(tapper));
+            return optionTaskValue.Map(ov => ov.Tap(tapper));
         }
 
         /// <summary>
-        /// Acts upon the Some value of the Result value of <paramref name="resultTaskValue"/>,
+        /// Acts upon the Some value of the Result value of <paramref name="optionTaskValue"/>,
         /// if it is present, asynchronously.
         /// </summary>
-        /// <typeparam name="T">The Some type of the Result type of <paramref name="resultTaskValue"/>.</typeparam>
-        /// <param name="resultTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
+        /// <typeparam name="T">The Some type of the Result type of <paramref name="optionTaskValue"/>.</typeparam>
+        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
         /// <param name="tapper">
         /// An asynchronous action to perform on the Some value of the Result value
-        /// of <paramref name="resultTaskValue"/>.
+        /// of <paramref name="optionTaskValue"/>.
         /// </param>
-        /// <returns>The original value of <paramref name="resultTaskValue"/>.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="resultTaskValue"/> is <see langword="null"/>.</exception>
+        /// <returns>The original value of <paramref name="optionTaskValue"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="optionTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="tapper"/> is <see langword="null"/>.</exception>
         [NotNull, MustUseReturnValue]
         public static Task<Option<T>> TapT<T>(
-            [NotNull] this Task<Option<T>> resultTaskValue,
+            [NotNull] this Task<Option<T>> optionTaskValue,
             [NotNull, InstantHandle] Func<T, Task> tapper)
         {
-            if (resultTaskValue == null) { throw new ArgumentNullException(nameof(resultTaskValue)); }
+            if (optionTaskValue == null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
             if (tapper == null) { throw new ArgumentNullException(nameof(tapper)); }
 
-            return resultTaskValue.Bind(ov => ov.Tap(tapper));
+            return optionTaskValue.Bind(ov => ov.Tap(tapper));
         }
 
         #endregion
