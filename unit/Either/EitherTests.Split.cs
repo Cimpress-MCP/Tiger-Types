@@ -3,15 +3,14 @@ using FsCheck;
 using FsCheck.Xunit;
 using Xunit;
 using static System.Threading.Tasks.Task;
-// ReSharper disable All
 
 namespace Tiger.Types.UnitTest
 {
-    /// <context>Tests related to acting upon <see cref="Either{TLeft,TRight}"/>.</context>
+    /// <summary>Tests related to acting upon <see cref="Either{TLeft,TRight}"/>.</summary>
     public static partial class EitherTests
     {
         [Property(DisplayName = "Splitting a value over a func, failing the condition, returns a Left Either.")]
-        static void FuncSplit_Left(NonNull<string> value)
+        public static void FuncSplit_Left(NonEmptyString value)
         {
             var actual = Either.Split(value.Get, _ => false);
 
@@ -20,7 +19,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Splitting a value over a func, passing the condition, returns a Right Either.")]
-        static void FuncSplit_Right(NonNull<string> value)
+        public static void FuncSplit_Right(NonEmptyString value)
         {
             var actual = Either.Split(value.Get, _ => true);
 
@@ -29,7 +28,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Splitting a value over a task, failing the condition, returns a Left Either.")]
-        static async Task TaskSplit_Left(NonNull<string> value)
+        public static async Task TaskSplit_Left(NonEmptyString value)
         {
             var actual = await Either.Split(value.Get, _ => FromResult(false)).ConfigureAwait(false);
 
@@ -38,7 +37,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Splitting a value over a task, passing the condition, returns a Right Either.")]
-        static async Task TaskSplit_Right(NonNull<string> value)
+        public static async Task TaskSplit_Right(NonEmptyString value)
         {
             var actual = await Either.Split(value.Get, _ => FromResult(true)).ConfigureAwait(false);
 

@@ -1,61 +1,64 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using FsCheck;
 using FsCheck.Xunit;
 using Xunit;
 using static System.Threading.Tasks.Task;
-// ReSharper disable All
 
 namespace Tiger.Types.UnitTest
 {
-    /// <context>Tests related to matching from <see cref="OptionTaskExtensions"/>.</context>
+    /// <summary>Tests related to matching from <see cref="OptionTaskExtensions"/>.</summary>
     public static partial class OptionTaskExtensionsTests
     {
         [Property(DisplayName = "Matching a None Option returns the None value branch, not the Some func branch.")]
-        static async Task ValueFuncMatchTReturn_None(int none)
+        public static async Task ValueFuncMatchTReturn_None(int noneValue, Func<string, int> someFunc)
         {
             var actual = await FromResult(Option<string>.None).MatchT(
-                none: none,
-                some: v => v.Length)
+                none: noneValue,
+                some: someFunc)
                 .ConfigureAwait(false);
 
-            Assert.Equal(none, actual);
+            Assert.Equal(noneValue, actual);
         }
 
         [Property(DisplayName = "Matching a Some Option returns the Some func branch, not the None value branch.")]
-        static async Task ValueFuncMatchTReturn_Some(NonNull<string> some, int none)
+        public static async Task ValueFuncMatchTReturn_Some(NonEmptyString some, int noneValue, Func<string, int> someFunc)
         {
             var actual = await FromResult(Option.From(some.Get)).MatchT(
-                none: none,
-                some: v => v.Length)
+                none: noneValue,
+                some: someFunc)
                 .ConfigureAwait(false);
 
-            Assert.Equal(some.Get.Length, actual);
+            Assert.Equal(someFunc(some.Get), actual);
         }
 
         [Property(DisplayName = "Matching a None Option returns the None func branch, not the Some func branch.")]
-        static async Task FuncFuncMatchTReturn_None(int none)
+        public static async Task FuncFuncMatchTReturn_None(Func<int> noneFunc, Func<string, int> someFunc)
         {
             var actual = await FromResult(Option<string>.None).MatchT(
-                none: () => none,
-                some: v => v.Length)
+                none: noneFunc,
+                some: someFunc)
                 .ConfigureAwait(false);
 
-            Assert.Equal(none, actual);
+            Assert.Equal(noneFunc(), actual);
         }
 
         [Property(DisplayName = "Matching a Some Option returns the Some func branch, not the None func branch.")]
-        static async Task FuncFuncMatchTReturn_Some(NonNull<string> some, int none)
+        public static async Task FuncFuncMatchTReturn_Some(
+            NonEmptyString some,
+            Func<int> noneFunc,
+            Func<string, int> someFunc)
         {
             var actual = await FromResult(Option.From(some.Get)).MatchT(
-                none: () => none,
-                some: v => v.Length)
+                none: noneFunc,
+                some: someFunc)
                 .ConfigureAwait(false);
 
-            Assert.Equal(some.Get.Length, actual);
+            Assert.Equal(someFunc(some.Get), actual);
         }
 
         [Property(DisplayName = "Matching a None Option returns the None func branch, not the Some task branch.")]
-        static async Task FuncTaskMatchTReturn_None(int none)
+        public static async Task FuncTaskMatchTReturn_None(int none)
         {
             var actual = await FromResult(Option<string>.None).MatchT(
                 none: () => none,
@@ -66,7 +69,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Matching a Some Option returns the Some task branch, not the None func branch.")]
-        static async Task FuncTaskMatchTReturn_Some(NonNull<string> some, int none)
+        public static async Task FuncTaskMatchTReturn_Some(NonEmptyString some, int none)
         {
             var actual = await FromResult(Option.From(some.Get)).MatchT(
                 none: () => none,
@@ -77,7 +80,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Matching a None Option returns the None task branch, not the Some func branch.")]
-        static async Task TaskFuncMatchTReturn_None(int none)
+        public static async Task TaskFuncMatchTReturn_None(int none)
         {
             var actual = await FromResult(Option<string>.None).MatchT(
                 none: () => FromResult(none),
@@ -88,7 +91,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Matching a Some Option returns the Some func branch, not the None task branch.")]
-        static async Task TaskFuncMatchTReturn_Some(NonNull<string> some, int none)
+        public static async Task TaskFuncMatchTReturn_Some(NonEmptyString some, int none)
         {
             var actual = await FromResult(Option.From(some.Get)).MatchT(
                 none: () => FromResult(none),
@@ -99,7 +102,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Matching a None Option returns the None task branch, not the Some task branch.")]
-        static async Task TaskTaskMatchTReturn_None(int none)
+        public static async Task TaskTaskMatchTReturn_None(int none)
         {
             var actual = await FromResult(Option<string>.None).MatchT(
                 none: () => FromResult(none),
@@ -110,7 +113,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Matching a Some Option returns the Some task branch, not the None task branch.")]
-        static async Task TaskTaskMatchTReturn_Some(NonNull<string> some, int none)
+        public static async Task TaskTaskMatchTReturn_Some(NonEmptyString some, int none)
         {
             var actual = await FromResult(Option.From(some.Get)).MatchT(
                 none: () => FromResult(none),

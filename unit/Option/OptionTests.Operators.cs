@@ -1,17 +1,18 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using FsCheck;
 using FsCheck.Xunit;
 using Tiger.Types.UnitTest.Utility;
 using Xunit;
-// ReSharper disable All
+using static System.StringComparison;
 
 namespace Tiger.Types.UnitTest
 {
-    /// <context>Tests related to operators of <see cref="Option{TSome}"/>.</context>
+    /// <summary>Tests related to operators of <see cref="Option{TSome}"/>.</summary>
     public static partial class OptionTests
     {
         [Fact(DisplayName = "Two None Options are equal.")]
-        static void OperatorEquals_NoneNone()
+        public static void OperatorEquals_NoneNone()
         {
             var left = Option<string>.None;
             var right = Option<string>.None;
@@ -21,7 +22,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "A None Option and a Some Option are not equal.")]
-        static void OperatorEquals_NoneSome(NonNull<string> some)
+        public static void OperatorEquals_NoneSome(NonEmptyString some)
         {
             var left = Option<string>.None;
             var right = Option.From(some.Get);
@@ -31,7 +32,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Two Some Options with different values are not equal.")]
-        static void OperatorEquals_SomeSome_DifferentValue(UnequalNonNullPair<string> pair)
+        public static void OperatorEquals_SomeSome_DifferentValue(UnequalNonNullPair<string> pair)
         {
             var left = Option.From(pair.Left);
             var right = Option.From(pair.Right);
@@ -41,7 +42,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Two Some Options with the same values are equal.")]
-        static void OperatorEquals_SomeSome_SameValue(NonNull<string> some)
+        public static void OperatorEquals_SomeSome_SameValue(NonEmptyString some)
         {
             var left = Option.From(some.Get);
             var right = Option.From(some.Get);
@@ -51,7 +52,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Two None Options are not unequal.")]
-        static void OperatorNotEquals_NoneNone()
+        public static void OperatorNotEquals_NoneNone()
         {
             var left = Option<string>.None;
             var right = Option<string>.None;
@@ -61,7 +62,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "A None Option and a Some Option are unequal.")]
-        static void OperatorNotEquals_NoneSome(NonNull<string> some)
+        public static void OperatorNotEquals_NoneSome(NonEmptyString some)
         {
             var left = Option<string>.None;
             var right = Option.From(some.Get);
@@ -71,7 +72,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Two Some Options with different values are unequal.")]
-        static void OperatorNotEquals_SomeSome_DifferentValue(UnequalNonNullPair<string> pair)
+        public static void OperatorNotEquals_SomeSome_DifferentValue(UnequalNonNullPair<string> pair)
         {
             var left = Option.From(pair.Left);
             var right = Option.From(pair.Right);
@@ -81,17 +82,17 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Two Some Options with the same values are not unequal.")]
-        static void OperatorNotEquals_SomeSome_SameValue(NonNull<string> some)
+        public static void OperatorNotEquals_SomeSome_SameValue(NonEmptyString some)
         {
             var left = Option.From(some.Get);
             var right = Option.From(some.Get);
-            
+
             Assert.False(left != right);
             Assert.False(right != left);
         }
 
         [Fact(DisplayName = "The disjunction of two None Options is a None Option.")]
-        static void OperatorBitwiseOr_NoneNone()
+        public static void OperatorBitwiseOr_NoneNone()
         {
             var left = Option<string>.None;
             var right = Option<string>.None;
@@ -104,7 +105,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "The disjunction of two None Options is a None Option.")]
-        static void NamedBitwiseOr_NoneNone()
+        public static void NamedBitwiseOr_NoneNone()
         {
             var left = Option<string>.None;
             var right = Option<string>.None;
@@ -117,7 +118,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "The disjunction of two None Options is a None Option.")]
-        static void OperatorLogicalOr_NoneNone()
+        public static void OperatorLogicalOr_NoneNone()
         {
             var left = Option<string>.None;
             var right = Option<string>.None;
@@ -130,7 +131,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "The disjunction of a None Option and a Some Option is the Some Option.")]
-        static void OperatorBitwiseOr_NoneSome(NonNull<string> some)
+        public static void OperatorBitwiseOr_NoneSome(NonEmptyString some)
         {
             var left = Option<string>.None;
             var right = Option.From(some.Get);
@@ -140,7 +141,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "The disjunction of a None Option and a Some Option is the Some Option.")]
-        static void NamedBitwiseOr_NoneSome(NonNull<string> some)
+        public static void NamedBitwiseOr_NoneSome(NonEmptyString some)
         {
             var left = Option<string>.None;
             var right = Option.From(some.Get);
@@ -150,7 +151,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "The disjunction of a None Option and a Some Option is the Some Option.")]
-        static void OperatorLogicalOr_NoneSome(NonNull<string> some)
+        public static void OperatorLogicalOr_NoneSome(NonEmptyString some)
         {
             var left = Option<string>.None;
             var right = Option.From(some.Get);
@@ -160,27 +161,27 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "The disjunction of two Some Options is the former Some Option.")]
-        static void OperatorBitwiseOr_SomeSome(UnequalNonNullPair<string> pair)
+        public static void OperatorBitwiseOr_SomeSome(UnequalNonNullPair<string> pair)
         {
             var left = Option.From(pair.Left);
             var right = Option.From(pair.Right);
-            
+
             Assert.Equal(left, left | right);
             Assert.Equal(right, right | left);
         }
 
         [Property(DisplayName = "The disjunction of two Some Options is the latter Some Option.")]
-        static void NamedBitwiseOr_SomeSome(UnequalNonNullPair<string> pair)
+        public static void NamedBitwiseOr_SomeSome(UnequalNonNullPair<string> pair)
         {
             var left = Option.From(pair.Left);
             var right = Option.From(pair.Right);
-            
+
             Assert.Equal(left, left.BitwiseOr(right));
             Assert.Equal(right, right.BitwiseOr(left));
         }
 
         [Property(DisplayName = "The disjunction of two Some Options is the former Some Option.")]
-        static void OperatorLogicalOr_SomeSome(UnequalNonNullPair<string> pair)
+        public static void OperatorLogicalOr_SomeSome(UnequalNonNullPair<string> pair)
         {
             var left = Option.From(pair.Left);
             var right = Option.From(pair.Right);
@@ -190,7 +191,8 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "A None Option does not evaluate as true.")]
-        static void OperatorIsTrue_None()
+        [SuppressMessage("Roslynator", "RCS1103", Justification = "That's the test.")]
+        public static void OperatorIsTrue_None()
         {
             bool actual;
             if (Option<string>.None)
@@ -206,13 +208,14 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "A None Option does not evaluate as true.")]
-        static void NamedIsTrue_None() => Assert.False(Option<string>.None.IsTrue);
+        public static void NamedIsTrue_None() => Assert.False(Option<string>.None.IsTrue);
 
         [Property(DisplayName = "A Some Option evaluates as true.")]
-        static void NamedIsTrue_Some(NonNull<string> some) => Assert.True(Option.From(some.Get).IsTrue);
+        public static void NamedIsTrue_Some(NonEmptyString some) => Assert.True(Option.From(some.Get).IsTrue);
 
         [Property(DisplayName = "A None Option evaluates as false.")]
-        static void OperatorIsTrue_Some(NonNull<string> some)
+        [SuppressMessage("Roslynator", "RCS1103", Justification = "That's the test.")]
+        public static void OperatorIsTrue_Some(NonEmptyString some)
         {
             bool actual;
             if (Option.From(some.Get))
@@ -228,28 +231,28 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "A None Option evaluates as false.")]
-        static void NamedIsFalse_None() => Assert.True(Option<string>.None.IsFalse);
+        public static void NamedIsFalse_None() => Assert.True(Option<string>.None.IsFalse);
 
         [Property(DisplayName = "A Some Option does not evaluate as true.")]
-        static void NamedIsFalse_Some(NonNull<string> some) => Assert.False(Option.From(some.Get).IsFalse);
+        public static void NamedIsFalse_Some(NonEmptyString some) => Assert.False(Option.From(some.Get).IsFalse);
 
         [Fact(DisplayName = "The logical inverse of a None Option is true.")]
-        static void NamedLogicalNot_None() => Assert.True(Option<string>.None.LogicalNot());
+        public static void NamedLogicalNot_None() => Assert.True(Option<string>.None.LogicalNot());
 
         [Fact(DisplayName = "The logical inverse of a None Option is true.")]
-        static void OperatorLogicalNot_None() => Assert.True(!Option<string>.None);
+        public static void OperatorLogicalNot_None() => Assert.True(!Option<string>.None);
 
         [Property(DisplayName = "The logical inverse of a Some Option is false.")]
-        static void NamedLogicalNot_Some(NonNull<string> some) => Assert.False(Option.From(some.Get).LogicalNot());
+        public static void NamedLogicalNot_Some(NonEmptyString some) => Assert.False(Option.From(some.Get).LogicalNot());
 
         [Property(DisplayName = "The logical inverse of a Some Option is false.")]
-        static void OperatorNot_None(NonNull<string> some) => Assert.False(!Option.From(some.Get));
+        public static void OperatorNot_None(NonEmptyString some) => Assert.False(!Option.From(some.Get));
 
         [Property(DisplayName = "The disjunction of a Some Option and a None Option short-circuits.")]
-        static void OperatorLogicalOr_SomeNone_ShortCircuits(
-            NonNull<string> some,
-            NonNull<string> before,
-            NonNull<string> sentinel)
+        public static void OperatorLogicalOr_SomeNone_ShortCircuits(
+            NonEmptyString some,
+            NonEmptyString before,
+            NonEmptyString sentinel)
         {
             var actual = before.Get;
             Option<string> Right()
@@ -264,10 +267,10 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "The disjunction of two Some Options short-circuits.")]
-        static void OperatorLogicalOr_SomeSome_ShortCircuits(
-            NonNull<string> some,
-            NonNull<string> before,
-            NonNull<string> sentinel)
+        public static void OperatorLogicalOr_SomeSome_ShortCircuits(
+            NonEmptyString some,
+            NonEmptyString before,
+            NonEmptyString sentinel)
         {
             var actual = before.Get;
             Option<string> Right()
@@ -282,7 +285,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "The conjunction of two None Options is a None Option.")]
-        static void OperatorBitwiseAnd_NoneNone()
+        public static void OperatorBitwiseAnd_NoneNone()
         {
             var left = Option<string>.None;
             var right = Option<string>.None;
@@ -295,7 +298,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "The conjunction of two None Options is a None Option.")]
-        static void NamedBitwiseAnd_NoneNone()
+        public static void NamedBitwiseAnd_NoneNone()
         {
             var left = Option<string>.None;
             var right = Option<string>.None;
@@ -308,7 +311,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "The conjunction of two None Options is a None Option.")]
-        static void OperatorLogicalAnd_NoneNone()
+        public static void OperatorLogicalAnd_NoneNone()
         {
             var left = Option<string>.None;
             var right = Option<string>.None;
@@ -321,7 +324,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "The conjunction of a None Option and a Some Option is a None Option.")]
-        static void OperatorBitwiseAnd_NoneSome(NonNull<string> some)
+        public static void OperatorBitwiseAnd_NoneSome(NonEmptyString some)
         {
             var left = Option<string>.None;
             var right = Option.From(some.Get);
@@ -331,7 +334,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "The conjunction of a None Option and a Some Option is a None Option.")]
-        static void NamedBitwiseAnd_NoneSome(NonNull<string> some)
+        public static void NamedBitwiseAnd_NoneSome(NonEmptyString some)
         {
             var left = Option<string>.None;
             var right = Option.From(some.Get);
@@ -341,7 +344,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "The conjunction of a None Option and a Some Option is a None Option.")]
-        static void OperatorLogicalAnd_NoneSome(NonNull<string> some)
+        public static void OperatorLogicalAnd_NoneSome(NonEmptyString some)
         {
             var left = Option<string>.None;
             var right = Option.From(some.Get);
@@ -351,7 +354,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "The conjunction of two Some Options is the latter Some Option.")]
-        static void OperatorBitwiseAnd_SomeSome(NonNull<string> someLeft, NonNull<string> someRight)
+        public static void OperatorBitwiseAnd_SomeSome(NonEmptyString someLeft, NonEmptyString someRight)
         {
             var left = Option.From(someLeft.Get);
             var right = Option.From(someRight.Get);
@@ -361,7 +364,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "The conjunction of two Some Options is the latter Some Option.")]
-        static void NamedBitwiseAnd_SomeSome(NonNull<string> someLeft, NonNull<string> someRight)
+        public static void NamedBitwiseAnd_SomeSome(NonEmptyString someLeft, NonEmptyString someRight)
         {
             var left = Option.From(someLeft.Get);
             var right = Option.From(someRight.Get);
@@ -371,7 +374,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "The conjunction of two Some Options is the latter Some Option.")]
-        static void OperatorLogicalAnd_SomeSome(NonNull<string> someLeft, NonNull<string> someRight)
+        public static void OperatorLogicalAnd_SomeSome(NonEmptyString someLeft, NonEmptyString someRight)
         {
             var left = Option.From(someLeft.Get);
             var right = Option.From(someRight.Get);
@@ -381,7 +384,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "The conjunction of two None Options short-circuits.")]
-        static void OperatorLogicalAnd_NoneNone_ShortCircuits(NonNull<string> before, NonNull<string> sentinel)
+        public static void OperatorLogicalAnd_NoneNone_ShortCircuits(NonEmptyString before, NonEmptyString sentinel)
         {
             var actual = before.Get;
             Option<string> Right()
@@ -396,7 +399,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "The conjunction of a None Option and a Some Option short-circuits.")]
-        static void OperatorLogicalAnd_NoneSome_ShortCircuits(NonNull<string> before, NonNull<string> sentinel)
+        public static void OperatorLogicalAnd_NoneSome_ShortCircuits(NonEmptyString before, NonEmptyString sentinel)
         {
             var actual = before.Get;
             Option<string> Right()
@@ -411,7 +414,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "The untyped None converts to a None Option.")]
-        static void LiteralNone_IsNone()
+        public static void LiteralNone_IsNone()
         {
             Option<string> actual = Option.None;
 
@@ -420,7 +423,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Null converts to a None Option.")]
-        static void Null_IsNone()
+        public static void Null_IsNone()
         {
             Option<string> actual = null;
 
@@ -429,7 +432,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Values convert to Some Options.")]
-        static void Value_IsSome(int some)
+        public static void Value_IsSome(int some)
         {
             Option<int> actual = some;
 
@@ -438,18 +441,16 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Unwrapping a None Option throws.")]
-        static void Cast_None_Throws()
+        public static void Cast_None_Throws()
         {
-            var value = Option<string>.None;
-
-            var actual = Record.Exception(() => (string)value);
+            var actual = Record.Exception(() => (string)Option<string>.None);
 
             var ex = Assert.IsType<InvalidOperationException>(actual);
-            Assert.Contains(Resources.OptionIsNone, ex.Message);
+            Assert.Contains(Resources.OptionIsNone, ex.Message, Ordinal);
         }
 
         [Property(DisplayName = "Unwrapping a Some Option returns its Some value.")]
-        static void Cast_Some(NonNull<string> some)
+        public static void Cast_Some(NonEmptyString some)
         {
             var actual = (string)Option.From(some.Get);
 

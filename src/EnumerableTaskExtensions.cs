@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -69,8 +70,8 @@ namespace Tiger.Types
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="enumerableTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="mapper"/> is <see langword="null"/>.</exception>
-        [NotNull, ItemNotNull, Pure]
-        public static Task<IEnumerable<TOut>> MapT<TIn, TOut>(
+        [NotNull, Pure]
+        public static Task<ImmutableArray<TOut>> MapT<TIn, TOut>(
             [NotNull, ItemNotNull] this Task<IEnumerable<TIn>> enumerableTaskValue,
             [NotNull, InstantHandle] Func<TIn, Task<TOut>> mapper)
         {
@@ -102,9 +103,12 @@ namespace Tiger.Types
         /// the result of <paramref name="enumerableTaskValue"/> if the result of
         /// <paramref name="enumerableTaskValue"/> is not empty; otherwise, the seed value.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="enumerableTaskValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="state"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="folder"/> is <see langword="null"/>.</exception>
         [NotNull, ItemNotNull]
         public static Task<TState> FoldT<T, TState>(
-            [NotNull, ItemNotNull] Task<IEnumerable<T>> enumerableTaskValue,
+            [NotNull, ItemNotNull] Task<IReadOnlyCollection<T>> enumerableTaskValue,
             [NotNull] TState state,
             [NotNull, InstantHandle] Func<TState, T, TState> folder)
         {
@@ -137,9 +141,12 @@ namespace Tiger.Types
         /// the result of <paramref name="enumerableTaskValue"/> if the result of
         /// <paramref name="enumerableTaskValue"/> is not empty; otherwise, the seed value.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="enumerableTaskValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="state"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="folder"/> is <see langword="null"/>.</exception>
         [NotNull, ItemNotNull]
         public static Task<TState> FoldT<T, TState>(
-            [NotNull, ItemNotNull] Task<IEnumerable<T>> enumerableTaskValue,
+            [NotNull, ItemNotNull] Task<IReadOnlyCollection<T>> enumerableTaskValue,
             [NotNull] TState state,
             [NotNull, InstantHandle] Func<TState, T, Task<TState>> folder)
         {

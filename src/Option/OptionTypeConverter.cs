@@ -38,15 +38,15 @@ namespace Tiger.Types
         /// <summary>Initializes a new instance of the <see cref="OptionTypeConverter"/> class.</summary>
         /// <param name="type">The type from which to convert.</param>
         /// <exception cref="ArgumentNullException"><paramref name="type"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="type"/> is not compatible.</exception>
+        /// <exception cref="ArgumentException"><paramref name="type"/> is not compatible.</exception>
         public OptionTypeConverter([NotNull] Type type)
         {
             if (type == null) { throw new ArgumentNullException(nameof(type)); }
 
-            if (!type.IsConstructedGenericType ||
-                type.GetGenericTypeDefinition() != typeof(Option<>))
+            if (!type.IsConstructedGenericType
+                || type.GetGenericTypeDefinition() != typeof(Option<>))
             {
-                throw new ArgumentOutOfRangeException(nameof(type), IncompatibleType);
+                throw new ArgumentException(IncompatibleType, nameof(type));
             }
 
             _conversionType = type; // note(cosborn) This is Option<TSome>.
@@ -65,7 +65,7 @@ namespace Tiger.Types
         public override object ConvertFrom(
             ITypeDescriptorContext context,
             CultureInfo culture,
-            [CanBeNull] object value)
+            object value)
         {
             if (value == null) { return Activator.CreateInstance(_conversionType); }
 
@@ -158,10 +158,8 @@ namespace Tiger.Types
         object ConvertToNull(
             [CanBeNull] ITypeDescriptorContext context,
             [CanBeNull] CultureInfo culture,
-            [NotNull] Type destinationType)
+            Type destinationType)
         {
-            if (destinationType == null) { throw new ArgumentNullException(nameof(destinationType)); }
-
             return Nullable.GetUnderlyingType(destinationType) == _underlyingType
                 ? null
                 : base.ConvertTo(context, culture, null, destinationType);

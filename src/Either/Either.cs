@@ -124,7 +124,7 @@ namespace Tiger.Types
         /// Right state; otherwise, an <see cref="Option{TSome}"/> in the None state.
         /// </returns>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
-        public static Option<TRight> ToOption<TLeft, TRight>(this Either<TLeft, TRight> eitherValue)
+        public static Option<TRight> ToOption<TLeft, TRight>(in this Either<TLeft, TRight> eitherValue)
         {
             if (eitherValue.State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
@@ -147,7 +147,7 @@ namespace Tiger.Types
         /// </returns>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         public static Either<TLeft, TRight> Join<TLeft, TRight>(
-            this Either<TLeft, Either<TLeft, TRight>> eitherEitherValue) =>
+            in this Either<TLeft, Either<TLeft, TRight>> eitherEitherValue) =>
             eitherEitherValue.Match(
                 left: l => new Either<TLeft, TRight>(l),
                 right: r => r);
@@ -168,7 +168,7 @@ namespace Tiger.Types
         /// </returns>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         public static Either<TLeft, TRight> Join<TLeft, TRight>(
-            this Either<Either<TLeft, TRight>, TRight> eitherEitherValue) =>
+            in this Either<Either<TLeft, TRight>, TRight> eitherEitherValue) =>
             eitherEitherValue.Match(
                 left: l => l,
                 right: r => new Either<TLeft, TRight>(r));
@@ -185,10 +185,38 @@ namespace Tiger.Types
         /// </returns>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, EditorBrowsable(Never)]
-        public static TSame Collapse<TSame>(this Either<TSame, TSame> eitherValue) =>
+        public static TSame Collapse<TSame>(in this Either<TSame, TSame> eitherValue) =>
             eitherValue.Match(
                 left: l => l,
                 right: r => r);
+
+        /// <summary>
+        /// Asserts that the provided either value is in the Right state,
+        /// throwing the provided exception if it is not.
+        /// </summary>
+        /// <typeparam name="TLeft">The Left type of <paramref name="eitherValue"/>.</typeparam>
+        /// <typeparam name="TRight">The Right type of <paramref name="eitherValue"/>.</typeparam>
+        /// <typeparam name="TException">The return type of <paramref name="left"/>.</typeparam>
+        /// <param name="eitherValue">The value whose state to test.</param>
+        /// <param name="left">
+        /// A function from <typeparamref name="TLeft"/> producing an exception to be thrown
+        /// if <paramref name="eitherValue"/> is in the Left state.
+        /// </param>
+        /// <returns>The Right value of <paramref name="eitherValue"/>.</returns>
+        /// <exception cref="Exception"><paramref name="eitherValue"/> is in the Left state.</exception>
+        [NotNull]
+        public static TRight Assert<TLeft, TRight, TException>(
+            in this Either<TLeft, TRight> eitherValue,
+            [NotNull, InstantHandle] Func<TLeft, TException> left)
+            where TException : Exception
+        {
+            if (eitherValue.IsLeft)
+            {
+                throw left((TLeft)eitherValue);
+            }
+
+            return eitherValue.Value;
+        }
 
         #endregion
 

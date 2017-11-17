@@ -25,7 +25,7 @@ using static Tiger.Types.Resources;
 
 namespace Tiger.Types
 {
-    /// <content>LINQ support.</content>
+    /// <summary>LINQ support.</summary>
     public static partial class Either
     {
         /// <summary>Determines whether the either value contains a right value.</summary>
@@ -38,7 +38,7 @@ namespace Tiger.Types
         /// </returns>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure]
-        public static bool Any<TLeftSource, TRightSource>(this Either<TLeftSource, TRightSource> source)
+        public static bool Any<TLeftSource, TRightSource>(in this Either<TLeftSource, TRightSource> source)
         {
             if (source.State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
@@ -62,7 +62,7 @@ namespace Tiger.Types
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure]
         public static bool Any<TLeftSource, TRightSource>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Func<TRightSource, bool> predicate)
         {
             if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
@@ -89,7 +89,7 @@ namespace Tiger.Types
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure]
         public static bool All<TLeftSource, TRightSource>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Func<TRightSource, bool> predicate)
         {
             if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
@@ -114,7 +114,7 @@ namespace Tiger.Types
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure]
         public static bool Contains<TLeftSource, TRightSource>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull] TRightSource value)
         {
             if (value == null) { throw new ArgumentNullException(nameof(value)); }
@@ -140,7 +140,7 @@ namespace Tiger.Types
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure]
         public static bool Contains<TLeftSource, TRightSource>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull] TRightSource value,
             [CanBeNull] IEqualityComparer<TRightSource> equalityComparer)
         {
@@ -166,7 +166,7 @@ namespace Tiger.Types
         /// </returns>
         [Pure, EditorBrowsable(Never)]
         public static Either<TLeftSource, TRightSource> DefaultIfEmpty<TLeftSource, TRightSource>(
-            this Either<TLeftSource, TRightSource> source)
+            in this Either<TLeftSource, TRightSource> source)
             where TRightSource : struct => source.Recover(default(TRightSource));
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="defaultValue"/> is <see langword="null"/>.</exception>
         [Pure, EditorBrowsable(Never)]
         public static Either<TLeftSource, TRightSource> DefaultIfEmpty<TLeftSource, TRightSource>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull] TRightSource defaultValue)
         {
             if (defaultValue == null) { throw new ArgumentNullException(nameof(defaultValue)); }
@@ -204,7 +204,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="onNext"/> is <see langword="null"/>.</exception>
         [LinqTunnel, EditorBrowsable(Never)]
         public static Either<TLeftSource, TRightSource> Do<TLeftSource, TRightSource>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Action<TRightSource> onNext)
         {
             if (onNext == null) { throw new ArgumentNullException(nameof(onNext)); }
@@ -221,7 +221,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="onNext"/> is <see langword="null"/>.</exception>
         [EditorBrowsable(Never)]
         public static Unit ForEach<TLeftSource, TRightSource>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Action<TRightSource> onNext)
         {
             if (onNext == null) { throw new ArgumentNullException(nameof(onNext)); }
@@ -243,7 +243,7 @@ namespace Tiger.Types
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure, LinqTunnel, EditorBrowsable(Never)]
         public static Either<TLeftSource, TResult> Select<TLeftSource, TRightSource, TResult>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Func<TRightSource, TResult> selector)
         {
             if (selector == null) { throw new ArgumentNullException(nameof(selector)); }
@@ -271,7 +271,7 @@ namespace Tiger.Types
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure, LinqTunnel, EditorBrowsable(Never)]
         public static Either<TLeftSource, TResult> SelectMany<TLeftSource, TRightSource, TResult>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Func<TRightSource, Either<TLeftSource, TResult>> selector)
         {
             if (selector == null) { throw new ArgumentNullException(nameof(selector)); }
@@ -334,7 +334,7 @@ namespace Tiger.Types
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure, NotNull, EditorBrowsable(Never)]
         public static TAccumulate Aggregate<TLeftSource, TRightSource, TAccumulate>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull] TAccumulate seed,
             [NotNull, InstantHandle] Func<TAccumulate, TRightSource, TAccumulate> func)
         {
@@ -368,7 +368,7 @@ namespace Tiger.Types
         /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [Pure, NotNull, EditorBrowsable(Never)]
         public static TResult Aggregate<TLeftSource, TRightSource, TAccumulate, TResult>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull] TAccumulate seed,
             [NotNull, InstantHandle] Func<TAccumulate, TRightSource, TAccumulate> func,
             [NotNull, InstantHandle] Func<TAccumulate, TResult> resultSelector)

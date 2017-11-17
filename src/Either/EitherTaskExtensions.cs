@@ -393,60 +393,14 @@ namespace Tiger.Types
         #region TapT
 
         /// <summary>
-        /// Acts upon the Right value of the Result value of <paramref name="eitherTaskValue"/>,
-        /// if it is present.
+        /// Performs an action on the Left value of this instance,
+        /// if present, and returns this instance.
         /// </summary>
         /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
         /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
         /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
-        /// <param name="right">An action to perform on the Right value of the Result value of <paramref name="eitherTaskValue"/>.</param>
-        /// <returns>The original value of <paramref name="eitherTaskValue"/>.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
-        [NotNull, MustUseReturnValue]
-        public static Task<Either<TLeft, TRight>> TapT<TLeft, TRight>(
-            [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
-            [NotNull, InstantHandle] Action<TRight> right)
-        {
-            if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
-
-            return eitherTaskValue.Map(v => v.Tap(right: right));
-        }
-
-        /// <summary>
-        /// Acts upon the Right value of the Result value of <paramref name="eitherTaskValue"/>,
-        /// if it is present, asynchronously.
-        /// </summary>
-        /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
-        /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
-        /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
-        /// <param name="right">
-        /// An asynchronous action to perform on the Right value of the Result value of <paramref name="eitherTaskValue"/>.
-        /// </param>
-        /// <returns>The original value of <paramref name="eitherTaskValue"/>.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
-        [NotNull, MustUseReturnValue]
-        public static Task<Either<TLeft, TRight>> TapT<TLeft, TRight>(
-            [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
-            [NotNull, InstantHandle] Func<TRight, Task> right)
-        {
-            if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
-
-            return eitherTaskValue.Bind(v => v.Tap(right: right));
-        }
-
-        /// <summary>
-        /// Acts upon the Left value of the Result value of <paramref name="eitherTaskValue"/>,
-        /// if it is present.
-        /// </summary>
-        /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
-        /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
-        /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
-        /// <param name="left">An action to perform on the Left value of the Result value of <paramref name="eitherTaskValue"/>.</param>
-        /// <returns>The original value of <paramref name="eitherTaskValue"/>.</returns>
+        /// <param name="left">An action to perform on the Left value of the Result value of this instance.</param>
+        /// <returns>A task which, when resolved, produces <paramref name="eitherTaskValue"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         [NotNull, MustUseReturnValue]
@@ -457,20 +411,18 @@ namespace Tiger.Types
             if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
 
-            return eitherTaskValue.Map(v => v.Tap(left: left));
+            return eitherTaskValue.Map(ev => ev.Tap(left: left));
         }
 
         /// <summary>
-        /// Acts upon the Left value of the Result value of <paramref name="eitherTaskValue"/>,
-        /// if it is present, asynchronously.
+        /// Performs an action on the Left value of this instance,
+        /// if present, and returns this instance, asynchronously.
         /// </summary>
         /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
         /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
         /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
-        /// <param name="left">
-        /// An asynchronous action to perform on the Left value of the Result value of <paramref name="eitherTaskValue"/>.
-        /// </param>
-        /// <returns>The original value of <paramref name="eitherTaskValue"/>.</returns>
+        /// <param name="left">An action to perform on the Left value of the Result value of this instance, asynchronously.</param>
+        /// <returns>A task which, when resolved, produces <paramref name="eitherTaskValue"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         [NotNull, MustUseReturnValue]
@@ -481,7 +433,155 @@ namespace Tiger.Types
             if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
 
-            return eitherTaskValue.Bind(v => v.Tap(left: left));
+            return eitherTaskValue.Bind(ev => ev.Tap(left: left));
+        }
+
+        /// <summary>
+        /// Performs an action on the Right value of this instance,
+        /// if present, and returns this instance.
+        /// </summary>
+        /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
+        /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
+        /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
+        /// <param name="right">An action to perform on the Right value of the Result value of this instance.</param>
+        /// <returns>A task which, when resolved, produces <paramref name="eitherTaskValue"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        [NotNull, MustUseReturnValue]
+        public static Task<Either<TLeft, TRight>> TapT<TLeft, TRight>(
+            [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
+            [NotNull, InstantHandle] Action<TRight> right)
+        {
+            if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+
+            return eitherTaskValue.Map(ev => ev.Tap(right: right));
+        }
+
+        /// <summary>
+        /// Performs an action on the Right value of this instance,
+        /// if present, and returns this instance, asynchronously.
+        /// </summary>
+        /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
+        /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
+        /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
+        /// <param name="right">An action to perform on the Right value of the Result value of this instance, asynchronously.</param>
+        /// <returns>A task which, when resolved, produces <paramref name="eitherTaskValue"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        [NotNull, MustUseReturnValue]
+        public static Task<Either<TLeft, TRight>> TapT<TLeft, TRight>(
+            [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
+            [NotNull, InstantHandle] Func<TRight, Task> right)
+        {
+            if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+
+            return eitherTaskValue.Bind(ev => ev.Tap(right: right));
+        }
+
+        /// <summary>
+        /// Performs an action on the Left or Right value of the Result value
+        /// of this instance, whichever is present, and returns this instance.
+        /// </summary>
+        /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
+        /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
+        /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
+        /// <param name="left">An action to perform on the Left value of the Result value of this instance.</param>
+        /// <param name="right">An action to perform on the Right value of the Result value of this instance.</param>
+        /// <returns>A task which, when resolved, produces <paramref name="eitherTaskValue"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        [NotNull, MustUseReturnValue]
+        public static Task<Either<TLeft, TRight>> TapT<TLeft, TRight>(
+            [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
+            [NotNull, InstantHandle] Action<TLeft> left,
+            [NotNull, InstantHandle] Action<TRight> right)
+        {
+            if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
+            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+
+            return eitherTaskValue.Map(ev => ev.Tap(left: left, right: right));
+        }
+
+        /// <summary>
+        /// Performs an action on the Left or Right value of the Result value
+        /// of this instance, whichever is present, and returns this instance, asynchronously.
+        /// </summary>
+        /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
+        /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
+        /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
+        /// <param name="left">An action to perform on the Left value of the Result value of this instance, asynchronously.</param>
+        /// <param name="right">An action to perform on the Right value of the Result value of this instance.</param>
+        /// <returns>A task which, when resolved, produces <paramref name="eitherTaskValue"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        [NotNull, MustUseReturnValue]
+        public static Task<Either<TLeft, TRight>> TapT<TLeft, TRight>(
+            [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
+            [NotNull, InstantHandle] Func<TLeft, Task> left,
+            [NotNull, InstantHandle] Action<TRight> right)
+        {
+            if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
+            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+
+            return eitherTaskValue.Bind(ev => ev.Tap(left: left, right: right));
+        }
+
+        /// <summary>
+        /// Performs an action on the Left or Right value of the Result value
+        /// of this instance, whichever is present, and returns this instance, asynchronously.
+        /// </summary>
+        /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
+        /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
+        /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
+        /// <param name="left">An action to perform on the Left value of the Result value of this instance.</param>
+        /// <param name="right">An action to perform on the Right value of the Result value of this instance, asynchronously.</param>
+        /// <returns>A task which, when resolved, produces <paramref name="eitherTaskValue"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        [NotNull, MustUseReturnValue]
+        public static Task<Either<TLeft, TRight>> TapT<TLeft, TRight>(
+            [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
+            [NotNull, InstantHandle] Action<TLeft> left,
+            [NotNull, InstantHandle] Func<TRight, Task> right)
+        {
+            if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
+            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+
+            return eitherTaskValue.Bind(ev => ev.Tap(left: left, right: right));
+        }
+
+        /// <summary>
+        /// Performs an action on the Left or Right value of the Result value
+        /// of this instance, whichever is present, and returns this instance, asynchronously.
+        /// </summary>
+        /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
+        /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
+        /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
+        /// <param name="left">An action to perform on the Left value of the Result value of this instance, asynchronously.</param>
+        /// <param name="right">An action to perform on the Right value of the Result value of this instance, asynchronously.</param>
+        /// <returns>A task which, when resolved, produces <paramref name="eitherTaskValue"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        [NotNull, MustUseReturnValue]
+        public static Task<Either<TLeft, TRight>> TapT<TLeft, TRight>(
+            [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
+            [NotNull, InstantHandle] Func<TLeft, Task> left,
+            [NotNull, InstantHandle] Func<TRight, Task> right)
+        {
+            if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
+            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+
+            return eitherTaskValue.Bind(ev => ev.Tap(left: left, right: right));
         }
 
         #endregion

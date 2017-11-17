@@ -2,15 +2,14 @@
 using FsCheck;
 using FsCheck.Xunit;
 using Xunit;
-// ReSharper disable All
 
 namespace Tiger.Types.UnitTest
 {
-    /// <context>Tests related to acting upon <see cref="Either{TLeft,TRight}"/>.</context>
+    /// <summary>Tests related to acting upon <see cref="Either{TLeft,TRight}"/>.</summary>
     public static partial class EitherTests
     {
         [Property(DisplayName = "A Left Either does not enumerate.")]
-        static void GetEnumerator_Left(Guid left, Version before)
+        public static void GetEnumerator_Left(Guid left, Version before)
         {
             var actual = before;
             foreach (var v in Either.Left<Guid, Version>(left))
@@ -22,7 +21,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "A Right Either enumerates.")]
-        static void GetEnumerator_Right(Version right, Version before)
+        public static void GetEnumerator_Right(Version right, Version before)
         {
             var actual = before;
             foreach (var v in Either.Right<Guid, Version>(right))
@@ -34,7 +33,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "A Bottom Either does not enumerate.")]
-        static void GetEnumerator_Bottom(Version before)
+        public static void GetEnumerator_Bottom(Version before)
         {
             var actual = before;
             foreach (var v in default(Either<Guid, Version>))

@@ -4,15 +4,14 @@ using FsCheck;
 using FsCheck.Xunit;
 using Xunit;
 using static System.StringComparer;
-// ReSharper disable All
 
 namespace Tiger.Types.UnitTest
 {
-    /// <context>Tests related to comparing <see cref="Option{TSome}"/>.</context>
+    /// <summary>Tests related to comparing <see cref="Option{TSome}"/>.</summary>
     public static partial class OptionTests
     {
         [Fact(DisplayName = "Two None Options are equal.")]
-        static void StaticEquals_NoneNone()
+        public static void StaticEquals_NoneNone()
         {
             var left = Option<string>.None;
             var right = Option<string>.None;
@@ -21,7 +20,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "A None Option and a Some Option are not equal.")]
-        static void StaticEquals_NoneSome(NonNull<string> some)
+        public static void StaticEquals_NoneSome(NonEmptyString some)
         {
             var left = Option<string>.None;
             var right = Option.From(some.Get);
@@ -31,7 +30,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Two Some Options are as equal as their Some values.")]
-        static void StaticEquals_SomeSome(NonNull<string> leftSome, NonNull<string> rightSome)
+        public static void StaticEquals_SomeSome(NonEmptyString leftSome, NonEmptyString rightSome)
         {
             var left = Option.From(leftSome.Get);
             var right = Option.From(rightSome.Get);
@@ -41,7 +40,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Two None Options are equal.")]
-        static void StaticEqualsComparer_NoneNone()
+        public static void StaticEqualsComparer_NoneNone()
         {
             var left = Option<string>.None;
             var right = Option<string>.None;
@@ -50,7 +49,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "A None Option and a Some Option are not equal.")]
-        static void StaticEqualsComparer_NoneSome(NonNull<string> some)
+        public static void StaticEqualsComparer_NoneSome(NonEmptyString some)
         {
             var left = Option<string>.None;
             var right = Option.From(some.Get);
@@ -60,7 +59,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Two Some Options are as equal as their Some values.")]
-        static void StaticEqualsComparer_SomeSome(NonNull<string> leftSome, NonNull<string> rightSome)
+        public static void StaticEqualsComparer_SomeSome(NonEmptyString leftSome, NonEmptyString rightSome)
         {
             var left = Option.From(leftSome.Get);
             var right = Option.From(rightSome.Get);
@@ -70,7 +69,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Two None Options are equal.")]
-        static void StaticCompare_NoneNone()
+        public static void StaticCompare_NoneNone()
         {
             var left = Option<string>.None;
             var right = Option<string>.None;
@@ -80,7 +79,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "A None Option and a Some Option are not equal.")]
-        static void StaticCompare_NoneSome(NonNull<string> some)
+        public static void StaticCompare_NoneSome(NonEmptyString some)
         {
             var left = Option<string>.None;
             var right = Option.From(some.Get);
@@ -90,7 +89,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Two Some Options compare the same as their Some values.")]
-        static void StaticCompare_SomeSome(NonNull<string> leftSome, NonNull<string> rightSome)
+        public static void StaticCompare_SomeSome(NonEmptyString leftSome, NonEmptyString rightSome)
         {
             var left = Option.From(leftSome.Get);
             var right = Option.From(rightSome.Get);
@@ -102,7 +101,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Two None Options are equal.")]
-        static void StaticCompareComparer_NoneNone()
+        public static void StaticCompareComparer_NoneNone()
         {
             var left = Option<string>.None;
             var right = Option<string>.None;
@@ -112,7 +111,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "A None Option and a Some Option are not equal.")]
-        static void StaticCompareComparer_NoneSome(NonNull<string> some)
+        public static void StaticCompareComparer_NoneSome(NonEmptyString some)
         {
             var left = Option<string>.None;
             var right = Option.From(some.Get);
@@ -122,7 +121,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Two Some Options compare the same as their Some values.")]
-        static void StaticCompareComparer_SomeSome(NonNull<string> leftSome, NonNull<string> rightSome)
+        public static void StaticCompareComparer_SomeSome(NonEmptyString leftSome, NonEmptyString rightSome)
         {
             var left = Option.From(leftSome.Get);
             var right = Option.From(rightSome.Get);

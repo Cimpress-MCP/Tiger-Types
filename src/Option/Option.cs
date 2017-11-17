@@ -67,7 +67,7 @@ namespace Tiger.Types
         /// otherwise, <see langword="null"/>.
         /// </returns>
         [Pure, CanBeNull]
-        public static TSome? ToNullable<TSome>(this Option<TSome> value)
+        public static TSome? ToNullable<TSome>(in this Option<TSome> value)
             where TSome : struct => value.IsNone
                 ? (TSome?)null
                 : value.Value;
@@ -88,7 +88,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="fallback"/> is <see langword="null"/>.</exception>
         [Pure]
         public static Either<TLeft, TSome> ToEither<TLeft, TSome>(
-            this Option<TSome> value,
+            in this Option<TSome> value,
             [NotNull] TLeft fallback)
         {
             if (fallback == null) { throw new ArgumentNullException(nameof(fallback)); }
@@ -112,7 +112,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="fallback"/> is <see langword="null"/>.</exception>
         [Pure]
         public static Either<TLeft, TSome> ToEither<TLeft, TSome>(
-            this Option<TSome> value,
+            in this Option<TSome> value,
             [NotNull, InstantHandle] Func<TLeft> fallback)
         {
             if (fallback == null) { throw new ArgumentNullException(nameof(fallback)); }
@@ -136,7 +136,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="fallback"/> is <see langword="null"/>.</exception>
         [NotNull, Pure]
         public static Task<Either<TLeft, TSome>> ToEither<TLeft, TSome>(
-            this Option<TSome> value,
+            in this Option<TSome> value,
             [NotNull, InstantHandle] Func<Task<TLeft>> fallback)
         {
             if (fallback == null) { throw new ArgumentNullException(nameof(fallback)); }
@@ -154,7 +154,7 @@ namespace Tiger.Types
         /// An <see cref="Option{TSome}"/> in the None state if <paramref name="optionOptionValue"/>
         /// is in the None state; otherwise, the Some value of <paramref name="optionOptionValue"/>.
         /// </returns>
-        public static Option<TSome> Join<TSome>(this Option<Option<TSome>> optionOptionValue) =>
+        public static Option<TSome> Join<TSome>(in this Option<Option<TSome>> optionOptionValue) =>
             optionOptionValue.GetValueOrDefault();
 
         /// <summary>
@@ -171,7 +171,7 @@ namespace Tiger.Types
         /// <exception cref="Exception"><paramref name="optionValue"/> is in the None state.</exception>
         [NotNull]
         public static TSome Assert<TSome, TException>(
-            this Option<TSome> optionValue,
+            in this Option<TSome> optionValue,
             [NotNull, InstantHandle] Func<TException> none)
             where TException : Exception
         {
@@ -267,7 +267,7 @@ namespace Tiger.Types
         [NotNull, Pure]
         public static Task<Option<TSome>> Split<TSome>(
             [CanBeNull] TSome? value,
-            [NotNull] [InstantHandle] Func<TSome, Task<bool>> splitter)
+            [NotNull, InstantHandle] Func<TSome, Task<bool>> splitter)
             where TSome : struct
         {
             if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
@@ -315,7 +315,7 @@ namespace Tiger.Types
         /// <paramref name="o2"/> parameter; otherwise, <see langword="false"/>.
         /// </returns>
         [Pure]
-        public static bool Equals<TSome>(this Option<TSome> o1, Option<TSome> o2)
+        public static bool Equals<TSome>(in Option<TSome> o1, in Option<TSome> o2)
         {
             if (o1.IsNone && o2.IsNone) { return true; }
             if (o1.IsNone || o2.IsNone) { return false; }
@@ -338,8 +338,8 @@ namespace Tiger.Types
         /// </returns>
         [Pure]
         public static bool Equals<TSome>(
-            this Option<TSome> o1,
-            Option<TSome> o2,
+            in Option<TSome> o1,
+            in Option<TSome> o2,
             [CanBeNull] IEqualityComparer<TSome> equalityComparer)
         {
             if (o1.IsNone && o2.IsNone) { return true; }
@@ -361,7 +361,7 @@ namespace Tiger.Types
         /// and <paramref name="o2"/> parameters.
         /// </returns>
         [Pure]
-        public static int Compare<TSome>(this Option<TSome> o1, Option<TSome> o2)
+        public static int Compare<TSome>(in Option<TSome> o1, in Option<TSome> o2)
         {
             if (o1.IsNone && o2.IsNone) { return 0; }
             if (o1.IsNone || o2.IsNone)
@@ -387,8 +387,8 @@ namespace Tiger.Types
         /// </returns>
         [Pure]
         public static int Compare<TSome>(
-            this Option<TSome> o1,
-            Option<TSome> o2,
+            in Option<TSome> o1,
+            in Option<TSome> o2,
             [CanBeNull] IComparer<TSome> comparer)
         {
             if (o1.IsNone && o2.IsNone) { return 0; }

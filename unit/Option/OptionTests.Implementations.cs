@@ -1,15 +1,14 @@
 ﻿using FsCheck;
 using FsCheck.Xunit;
 using Xunit;
-// ReSharper disable All
 
 namespace Tiger.Types.UnitTest
 {
-    /// <context>Tests related to interface implementations of <see cref="Option{TSome}"/>.</context>
+    /// <summary>Tests related to interface implementations of <see cref="Option{TSome}"/>.</summary>
     public static partial class OptionTests
     {
         [Property(DisplayName = "A None Option does not iterate.")]
-        static void GetEnumerator_None(NonNull<string> before, NonNull<string> sentinel)
+        public static void GetEnumerator_None(NonEmptyString before, NonEmptyString sentinel)
         {
             var actual = before.Get;
             foreach (var v in Option<string>.None)
@@ -21,7 +20,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "A Some Option iterates.")]
-        static void GetEnumerator_Some(NonNull<string> some, NonNull<string> before)
+        public static void GetEnumerator_Some(NonEmptyString some, NonEmptyString before)
         {
             var actual = before.Get;
             foreach (var v in Option.From(some.Get))

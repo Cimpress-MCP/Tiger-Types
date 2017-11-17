@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using Xunit;
-// ReSharper disable All
 
 namespace Tiger.Types.UnitTest
 {
-    /// <summary>Tests related to <see cref="DictionaryExtensions"/>.</summary>
+    /// <summary>Tests related to the functionality of <see cref="DictionaryExtensions"/>.</summary>
     public static class DictionaryExtensionsTests
     {
         public static readonly TheoryData<string, Option<string>> TryGetValueTheoryData =

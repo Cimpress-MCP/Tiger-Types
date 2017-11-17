@@ -1,6 +1,5 @@
 ﻿using FsCheck.Xunit;
 using Xunit;
-// ReSharper disable All
 
 namespace Tiger.Types.UnitTest
 {
@@ -15,11 +14,7 @@ namespace Tiger.Types.UnitTest
         {
             int Piper(int v) => v + 1;
 
-            var actual = value.Pipe(Piper);
-
-            // assert
-            var expected = Piper(value);
-            Assert.Equal(expected, actual);
+            Assert.Equal(Piper(value), value.Pipe(Piper));
         }
 
         #endregion

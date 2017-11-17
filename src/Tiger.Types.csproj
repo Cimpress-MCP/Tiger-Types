@@ -42,11 +42,26 @@
     <PackageReference Include="System.Diagnostics.Contracts" Version="4.3.0" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
 
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.3.0-beta1" PrivateAssets="All" /> 
-    <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="2.3.0-beta1" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.NetCore.Analyzers" Version="2.3.0-beta1" PrivateAssets="All" /> 
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta004" PrivateAssets="All" />
-    <PackageReference Include="Text.Analyzers" Version="2.3.0-beta1" PrivateAssets="All" /> 
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.0" PrivateAssets="All" /> 
+    <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="2.6.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.NetCore.Analyzers" Version="2.6.0" PrivateAssets="All" /> 
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta006" PrivateAssets="All" />
+    <PackageReference Include="Text.Analyzers" Version="2.6.0" PrivateAssets="All" /> 
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

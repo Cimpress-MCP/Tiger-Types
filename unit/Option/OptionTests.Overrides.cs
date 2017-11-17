@@ -1,22 +1,22 @@
-﻿using FsCheck;
+﻿using System.Collections.Generic;
+using FsCheck;
 using FsCheck.Xunit;
 using Tiger.Types.UnitTest.Utility;
 using Xunit;
-// ReSharper disable All
 
 namespace Tiger.Types.UnitTest
 {
-    /// <context>Tests related to overrides on <see cref="Option{TSome}"/>.</context>
+    /// <summary>Tests related to overrides on <see cref="Option{TSome}"/>.</summary>
     public static partial class OptionTests
     {
         [Fact(DisplayName = "A None Option stringifies to None.")]
-        static void ToString_None() => Assert.Equal("None", Option<string>.None.ToString());
+        public static void ToString_None() => Assert.Equal("None", Option<string>.None.ToString());
 
         [Property(DisplayName = "A Some Option stringifies to a wrapped value.")]
-        static void ToString_Some(int some) => Assert.Equal($"Some({some})", Option.From(some).ToString());
+        public static void ToString_Some(int some) => Assert.Equal($"Some({some})", Option.From(some).ToString());
 
         [Fact(DisplayName = "A None Option is not equal to null.")]
-        static void ObjectEquals_NoneNull()
+        public static void ObjectEquals_NoneNull()
         {
             var left = Option<string>.None;
             var right = default(object);
@@ -25,7 +25,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "A Some Option is not equal to null.")]
-        static void ObjectEquals_SomeNull(NonNull<string> some)
+        public static void ObjectEquals_SomeNull(NonEmptyString some)
         {
             var left = Option.From(some.Get);
             var right = default(object);
@@ -34,7 +34,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Two None Options of the same type are equal.")]
-        static void ObjectEquals_NoneNone_SameType()
+        public static void ObjectEquals_NoneNone_SameType()
         {
             var left = Option<string>.None;
             var right = Option<string>.None;
@@ -43,7 +43,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "Two None Options of different types are not equal.")]
-        static void ObjectEquals_NoneNone_DifferentType()
+        public static void ObjectEquals_NoneNone_DifferentType()
         {
             var left = Option<string>.None;
             var right = Option<int>.None;
@@ -53,7 +53,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "A None Option and a Some Option of the same type are not equal.")]
-        static void ObjectEquals_NoneSome_SameType(NonNull<string> some)
+        public static void ObjectEquals_NoneSome_SameType(NonEmptyString some)
         {
             var left = Option<string>.None;
             var right = Option.From(some.Get);
@@ -63,7 +63,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "A None Option and a Some Option of different types are not equal.")]
-        static void ObjectEquals_NoneSome_DifferentType(NonNull<string> some)
+        public static void ObjectEquals_NoneSome_DifferentType(NonEmptyString some)
         {
             var left = Option<int>.None;
             var right = Option.From(some.Get);
@@ -73,7 +73,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Two Some Options of the same type with different values are not equal.")]
-        static void ObjectEquals_SomeSome_SameType_DifferentValue(UnequalNonNullPair<string> pair)
+        public static void ObjectEquals_SomeSome_SameType_DifferentValue(UnequalNonNullPair<string> pair)
         {
             var left = Option.From(pair.Left);
             var right = Option.From(pair.Right);
@@ -83,7 +83,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Two Some Options of the same type with the same values are equal.")]
-        static void ObjectEquals_SomeSome_SameType_SameValue(NonNull<string> some)
+        public static void ObjectEquals_SomeSome_SameType_SameValue(NonEmptyString some)
         {
             var left = Option.From(some.Get);
             var right = Option.From(some.Get);
@@ -93,7 +93,7 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Two Some Options of different types are not equal.")]
-        static void ObjectEquals_SomeSome_DifferentType(NonNull<string> someLeft, int someRight)
+        public static void ObjectEquals_SomeSome_DifferentType(NonEmptyString someLeft, int someRight)
         {
             var left = Option.From(someLeft.Get);
             var right = Option.From(someRight);
@@ -103,10 +103,10 @@ namespace Tiger.Types.UnitTest
         }
 
         [Fact(DisplayName = "A None Option has a hashcode of 0.")]
-        static void GetHashCode_None() => Assert.Equal(0, Option<string>.None.GetHashCode());
+        public static void GetHashCode_None() => Assert.Equal(0, Option<string>.None.GetHashCode());
 
         [Property(DisplayName = "A Some Option has the hashcode of its Some value.")]
-        static void GetHashCode_Some(NonNull<string> some) =>
-            Assert.Equal(some.Get.GetHashCode(), Option.From(some.Get).GetHashCode());
+        public static void GetHashCode_Some(NonEmptyString some) =>
+            Assert.Equal(EqualityComparer<string>.Default.GetHashCode(some.Get), Option.From(some.Get).GetHashCode());
     }
 }

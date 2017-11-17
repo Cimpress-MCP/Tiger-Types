@@ -133,10 +133,6 @@
     <value>The provided type is not compatible with Tiger.Types.Option`1[TSome].</value>
     <comment>Explains that a provided type was not correct.</comment>
   </data>
-  <data name="IncompatibleValue" xml:space="preserve">
-    <value>The provided value is not compatible with Tiger.Types.Option`1[TSome].</value>
-    <comment>Explains that a provided value was not of the correct type.</comment>
-  </data>
   <data name="OptionIsNone" xml:space="preserve">
     <value>This instance is in an invalid state.</value>
     <comment>Explains unwrapping of a None Option.</comment>
@@ -144,9 +140,5 @@
   <data name="ResultIsNull" xml:space="preserve">
     <value>This result evaluated to null.</value>
     <comment>Explains evaluating an lambda and getting null.</comment>
-  </data>
-  <data name="UnionDoesNotMatch" xml:space="preserve">
-    <value>This instance is not in the specified state.</value>
-    <comment>Explains forcibly unwrapping a Union incorrectly.</comment>
   </data>
 </root>

@@ -4,20 +4,18 @@ using FsCheck;
 using FsCheck.Xunit;
 using Tiger.Types.UnitTest.Utility;
 using Xunit;
-using static System.StringComparer;
-
-// ReSharper disable All
+using static System.StringComparison;
 
 namespace Tiger.Types.UnitTest
 {
-    /// <context>Tests related to extensions to <see cref="Option{TSome}"/>.</context>
+    /// <summary>Tests related to extensions to <see cref="Option{TSome}"/>.</summary>
     public static partial class OptionTests
     {
         [Fact(DisplayName = "A None Option converted to a Nullable is null.")]
-        static void ToNullable_None() => Assert.Null(Option<int>.None.ToNullable());
+        public static void ToNullable_None() => Assert.Null(Option<int>.None.ToNullable());
 
         [Property(DisplayName = "A Some Option converted to a Nullable is equal to the Some value.")]
-        static void ToNullable_Some(int some)
+        public static void ToNullable_Some(int some)
         {
             var actual = Option.From(some).ToNullable();
 
@@ -26,151 +24,206 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "A None Option asserts itself with an exception.")]
-        static void Assert_None(NonNull<string> message)
+        public static void Assert_None(NonEmptyString message)
         {
             var actual = Record.Exception(() => Option<int>.None.Assert(() => new InvalidOperationException(message.Get)));
 
-            Assert.NotNull(actual);
             var ioe = Assert.IsType<InvalidOperationException>(actual);
-            Assert.Equal(message.Get, ioe.Message, Ordinal);
+            Assert.Contains(message.Get, ioe.Message, Ordinal);
         }
 
         [Property(DisplayName = "A Some Option asserts itself to be its Some value.")]
-        static void Assert_Some(int some, NonNull<string> message) =>
-            Assert.Equal(some, Option.From(some).Assert(() => new InvalidOperationException(message.Get)));
+        public static void Assert_Some(int some, Func<Exception> none) =>
+            Assert.Equal(some, Option.From(some).Assert(none));
 
         [Fact(DisplayName = "Asking a None Option for any returns false.")]
-        static void Any_None() => Assert.False(Option<string>.None.Any());
+        public static void Any_None() => Assert.False(Option<string>.None.Any());
 
         [Property(DisplayName = "Asking a Some Option for any returns true.")]
-        static void Any_Some(NonNull<string> some) => Assert.True(Option.From(some.Get).Any());
+        public static void Any_Some(NonEmptyString some) => Assert.True(Option.From(some.Get).Any());
 
-        [Fact(DisplayName = "Asking a None Option for any with a false predicate returns false.")]
-        static void PredicateAny_NoneFalse() => Assert.False(Option<string>.None.Any(_ => false));
+        [Property(DisplayName = "Asking an Option for any with a null predicate throws.")]
+        public static void PredicateAny_Null_Throws(string from)
+        {
+            var actual = Record.Exception(() => Option.From(from).Any(predicate: null));
 
-        [Fact(DisplayName = "Asking a None Option for any with a true predicate returns false.")]
-        static void PredicateAny_NoneTrue() => Assert.False(Option<string>.None.Any(_ => true));
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: predicate", ane.Message, Ordinal);
+        }
 
-        [Property(DisplayName = "Asking a Some Option for any with a false predicate returns false.")]
-        static void PredicateAny_SomeFalse(NonNull<string> some) => Assert.False(Option.From(some.Get).Any(_ => false));
+        [Property(DisplayName = "Asking a None Option for any returns false.")]
+        public static void PredicateAny_None(Func<string, bool> predicate) => Assert.False(Option<string>.None.Any(predicate));
 
-        [Property(DisplayName = "Asking a Some Option for any with a true predicate returns true.")]
-        static void PredicateAny_SomeTrue(NonNull<string> some) => Assert.True(Option.From(some.Get).Any(_ => true));
+        [Property(DisplayName = "Asking a Some Option for any returns the result of the predicate.")]
+        public static void PredicateAny_Some(NonEmptyString some, bool result) =>
+            Assert.Equal(Option.From(some.Get).Any(_ => result), result);
 
-        [Fact(DisplayName = "Asking a None Option for all with a false predicate returns true.")]
-        static void PredicateAll_NoneFalse() => Assert.True(Option<string>.None.All(_ => false));
+        [Property(DisplayName = "Asking an Option for all with a null predicate throws.")]
+        public static void All_Null_Throws(string from)
+        {
+            var actual = Record.Exception(() => Option.From(from).All(predicate: null));
 
-        [Fact(DisplayName = "Asking a None Option for all with a true predicate returns true.")]
-        static void PredicateAll_NoneTrue() => Assert.True(Option<string>.None.All(_ => true));
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: predicate", ane.Message, Ordinal);
+        }
 
-        [Property(DisplayName = "Asking a Some Option for all with a false predicate returns false.")]
-        static void PredicateAll_SomeFalse(NonNull<string> some) => Assert.False(Option.From(some.Get).All(_ => false));
+        [Property(DisplayName = "Asking a None Option for all returns true.")]
+        public static void All_None(Func<string, bool> predicate) => Assert.True(Option<string>.None.All(predicate));
 
-        [Property(DisplayName = "Asking a Some Option for all with a true predicate returns true.")]
-        static void PredicateAll_SomeTrue(NonNull<string> some) => Assert.True(Option.From(some.Get).All(_ => true));
+        [Property(DisplayName = "Asking a Some Option for all returns the result of the predicate.")]
+        public static void All_Some(NonEmptyString some, bool result) =>
+            Assert.Equal(Option.From(some.Get).All(_ => result), result);
 
-        [Property(DisplayName = "Asking a None option whether it contains a value returns false.")]
-        static void Contains_None(int contains) => Assert.False(Option<int>.None.Contains(contains));
+        [Property(DisplayName = "Asking an option whether it contains null throws.")]
+        public static void Contains_Null_Throws(string from)
+        {
+            var actual = Record.Exception(() => Option.From(from).Contains(value: null));
 
-        [Property(DisplayName = "Asking a Some option whether it contains a value that it doesn't returns false.")]
-        static void Contains_Some_False(UnequalNonNullPair<string> pair) =>
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: value", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Asking a None Option whether it contains a value returns false.")]
+        public static void Contains_None(int contains) => Assert.False(Option<int>.None.Contains(contains));
+
+        [Property(DisplayName = "Asking a Some Option whether it contains a value that it doesn't returns false.")]
+        public static void Contains_Some_False(UnequalNonNullPair<string> pair) =>
             Assert.False(Option.From(pair.Left).Contains(pair.Right));
 
-        [Property(DisplayName = "Asking a Some option whether it contains a value that it does returns true.")]
-        static void Contains_Some_True(NonNull<string> some) => Assert.True(Option.From(some.Get).Contains(some.Get));
+        [Property(DisplayName = "Asking a Some Option whether it contains a value that it does returns true.")]
+        public static void Contains_Some_True(NonEmptyString some) => Assert.True(Option.From(some.Get).Contains(some.Get));
 
-        [Property(DisplayName = "Asking a None option whether it contains a value returns false.")]
-        static void ComparerContains_None(int contains) =>
+        [Property(DisplayName = "Asking an option whether it contains null throws.")]
+        public static void ComparerContains_Null_Throws(string from)
+        {
+            var actual = Record.Exception(() => Option.From(from)
+                .Contains(value: null, equalityComparer: StringComparer.Ordinal));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: value", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Asking a None Option whether it contains a value returns false.")]
+        public static void ComparerContains_None(int contains) =>
             Assert.False(Option<int>.None.Contains(contains, EqualityComparer<int>.Default));
 
-        [Property(DisplayName = "Asking a Some option whether it contains a value that it doesn't returns false.")]
-        static void ComparerContains_Some_False(UnequalNonNullPair<string> pair) =>
-            Assert.False(Option.From(pair.Left).Contains(pair.Right, OrdinalIgnoreCase));
+        [Property(DisplayName = "Asking a Some Option whether it contains a value that it doesn't returns false.")]
+        public static void ComparerContains_Some_False(UnequalNonNullPair<string> pair) =>
+            Assert.False(Option.From(pair.Left).Contains(pair.Right, StringComparer.OrdinalIgnoreCase));
 
-        [Property(DisplayName = "Asking a Some option whether it contains a value that it does returns true.")]
-        static void ComparerContains_Some_True(NonNull<string> some) =>
-            Assert.True(Option.From(some.Get).Contains(some.Get.ToUpperInvariant(), OrdinalIgnoreCase));
+        [Property(DisplayName = "Asking a Some Option whether it contains a value that it does returns true.")]
+        public static void ComparerContains_Some_True(NonEmptyString some) =>
+            Assert.True(Option.From(some.Get).Contains(some.Get.ToUpperInvariant(), StringComparer.OrdinalIgnoreCase));
 
         [Fact(DisplayName = "Recovering a None Option returns the recovery value.")]
-        static void DefaultIfEmpty_None()
+        public static void DefaultIfEmpty_None()
         {
             var actual = Option<int>.None.DefaultIfEmpty();
 
-            // assert
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
             Assert.Equal(0, innerValue);
         }
 
         [Property(DisplayName = "Recovering a Some Option returns the Some value.")]
-        static void DefaultIfEmpty_Some(int some)
+        public static void DefaultIfEmpty_Some(int some)
         {
             var actual = Option.From(some).DefaultIfEmpty();
 
-            // assert
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
             Assert.Equal(some, innerValue);
         }
 
+        [Fact(DisplayName = "Recovering a None Option with null throws.")]
+        public static void ValueDefaultIfEmpty_None_Null_Throws()
+        {
+            var actual = Record.Exception(() => Option<string>.None.DefaultIfEmpty(null));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: defaultValue", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Recovering a Some Option with null throws.")]
+        public static void ValueDefaultIfEmpty_Some_Null_Throws(NonEmptyString some)
+        {
+            var actual = Record.Exception(() => Option.From(some.Get).DefaultIfEmpty(null));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: defaultValue", ane.Message, Ordinal);
+        }
+
         [Property(DisplayName = "Recovering a None Option returns the recovery value.")]
-        static void ValueDefaultIfEmpty_None(NonNull<string> sentinel)
+        public static void ValueDefaultIfEmpty_None(NonEmptyString sentinel)
         {
             var actual = Option<string>.None.DefaultIfEmpty(sentinel.Get);
 
-            // assert
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
             Assert.Equal(sentinel.Get, innerValue);
         }
 
         [Property(DisplayName = "Recovering a Some Option returns the Some value.")]
-        static void ValueDefaultIfEmpty_Some(NonNull<string> some, NonNull<string> sentinel)
+        public static void ValueDefaultIfEmpty_Some(NonEmptyString some, NonEmptyString sentinel)
         {
             var actual = Option.From(some.Get).DefaultIfEmpty(sentinel.Get);
 
-            // assert
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
             Assert.Equal(some.Get, innerValue);
         }
 
-        [Property(DisplayName = "Tapping a None Option over a func returns a None Option " +
-            "and performs no action.")]
-        static void Do_None(NonNull<string> before, NonNull<string> sentinel)
+        [Property(DisplayName = "Tapping an Option over a null func throws.")]
+        public static void Do_Some_Null_Throws(string from)
+        {
+            var actual = Record.Exception(() => Option.From(from).Do(null));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: onNext", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Tapping a None Option over a func returns a None Option and performs no action.")]
+        public static void Do_None(NonEmptyString before, NonEmptyString sentinel)
         {
             var output = before.Get;
-            var actual = Option<string>.None.Do(v => output = sentinel.Get);
+            var actual = Option<string>.None.Do(_ => output = sentinel.Get);
 
             Assert.True(actual.IsNone);
             Assert.Equal(before.Get, output);
         }
 
-        [Property(DisplayName = "Tapping a Some Option over a func returns a Some Option " +
-            "and performs an action.")]
-        static void Do_Some(NonNull<string> some, NonNull<string> before, NonNull<string> sentinel)
+        [Property(DisplayName = "Tapping a Some Option over a func returns a Some Option and performs an action.")]
+        public static void Do_Some(NonEmptyString some, NonEmptyString before, NonEmptyString sentinel)
         {
             var value = Option.From(some.Get);
 
             var output = before.Get;
-            var actual = value.Do(v => output = sentinel.Get);
+            var actual = value.Do(_ => output = sentinel.Get);
 
             Assert.Equal(value, actual);
             Assert.Equal(sentinel.Get, output);
         }
 
-        [Property(DisplayName = "Conditionally executing an action based on a None Option " +
-            "does not execute.")]
-        static void ForEach_None(NonNull<string> before, NonNull<string> sentinel)
+        [Property(DisplayName = "Conditionally executing a null action based on an Option throws.")]
+        public static void ForEach_Some_Null_Throws(string from)
+        {
+            var actual = Record.Exception(() => Option.From(from).ForEach(null));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: onNext", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Conditionally executing an action based on a None Option does not execute.")]
+        public static void ForEach_None(NonEmptyString before, NonEmptyString sentinel)
         {
             var actual = before.Get;
-            Option<string>.None.ForEach(v => actual = sentinel.Get);
+            Option<string>.None.ForEach(_ => actual = sentinel.Get);
 
             Assert.Equal(before.Get, actual);
         }
 
         [Property(DisplayName = "Conditionally executing an action based on a Some Option executes.")]
-        static void ForEach_Some(NonNull<string> some, NonNull<string> before)
+        public static void ForEach_Some(NonEmptyString some, NonEmptyString before)
         {
             var actual = before.Get;
             Option.From(some.Get).ForEach(v => actual = v);
@@ -178,41 +231,45 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(some.Get, actual);
         }
 
-        [Fact(DisplayName = "Selecting a None Option produces a None Option.")]
-        static void Select_None()
+        [Property(DisplayName = "Selecting an Option with null throws.")]
+        public static void Select_Null_Throws(string from)
         {
-            var actual = from v in Option<int>.None
-                         select v + 1;
+            var actual = Record.Exception(() => Option.From(from).Select<string, string>(selector: null));
 
-            Assert.True(actual.IsNone);
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: selector", ane.Message, Ordinal);
         }
 
+        [Property(DisplayName = "Selecting a None Option produces a None Option.")]
+        public static void Select_None(Func<int, int> selector) => Assert.True(Option<int>.None.Select(selector).IsNone);
+
         [Property(DisplayName = "Selecting a Some Option produces a Some Option.")]
-        static void Select_Some(short some)
+        public static void Select_Some(short some)
         {
             var value = Option.From((int)some);
 
             var actual = from v in value
                          select v + 1;
 
-            // assert
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
             Assert.Equal(some + 1, innerValue);
         }
 
-        [Property(DisplayName = "Filtering a None Option produces a None Option.")]
-        static void Where_None(bool filter)
+        [Property(DisplayName = "Filtering an Option with null throws.")]
+        public static void Where_Null_Throws(string from)
         {
-            var actual = from v in Option<int>.None
-                         where filter
-                         select v;
+            var actual = Record.Exception(() => Option.From(from).Where(predicate: null));
 
-            Assert.True(actual.IsNone);
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: predicate", ane.Message, Ordinal);
         }
 
+        [Property(DisplayName = "Filtering a None Option produces a None Option.")]
+        public static void Where_None(Func<int, bool> predicate) => Assert.True(Option<int>.None.Where(predicate).IsNone);
+
         [Property(DisplayName = "Filtering a Some Option with a false predicate produces a None Option.")]
-        static void Where_SomeFalse(int some)
+        public static void Where_SomeFalse(int some)
         {
             var actual = from v in Option.From(some)
                          where false
@@ -222,20 +279,50 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Filtering a Some Option with a true predicate produces a Some Option.")]
-        static void Where_SomeTrue(int some)
+        public static void Where_SomeTrue(int some)
         {
             var actual = from v in Option.From(some)
                          where true
                          select v;
 
-            // assert
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
             Assert.Equal(some, innerValue);
         }
 
+        [Property(DisplayName = "Selecting from an Option with null throws.")]
+        public static void SelectManyResult_Null_Throws(string from)
+        {
+            var actual = Record.Exception(() => Option.From(from).SelectMany<string, Option<string>>(selector: null));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: selector", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Selecting from an Option with a null optional selector throws.")]
+        public static void SelectManyResult_NullOptionalSelector_Throws(
+            string from,
+            Func<string, string, string> resultSelector)
+        {
+            var actual = Record.Exception(() => Option.From(from)
+                .SelectMany(optionalSelector: null, resultSelector: resultSelector));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: optionalSelector", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Selecting from an Option with a null result selector throws.")]
+        public static void SelectManyResult_NullResultSelector_Throws(string from)
+        {
+            var actual = Record.Exception(() => Option.From(from)
+                .SelectMany<string, string, string>(optionalSelector: Option.From, resultSelector: null));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: resultSelector", ane.Message, Ordinal);
+        }
+
         [Fact(DisplayName = "Selecting from two None Options produces a None Option.")]
-        static void SelectManyResult_NoneNone()
+        public static void SelectManyResult_NoneNone()
         {
             var actual = from l in Option<int>.None
                          from r in Option<int>.None
@@ -245,104 +332,142 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Selecting from a Some Option and a None Option produces a None Option.")]
-        static void SelectManyResult_SomeNone(int someLeft)
+        public static void SelectManyResult_SomeNone(int someLeft, Func<int, int, int> selector)
         {
             var actual = from l in Option.From(someLeft)
                          from r in Option<int>.None
-                         select l + r;
+                         select selector(l, r);
 
             Assert.True(actual.IsNone);
         }
 
         [Property(DisplayName = "Selecting from a None Option and a Some Option produces a None Option.")]
-        static void SelectManyResult_NoneSome(int someRight)
+        public static void SelectManyResult_NoneSome(int someRight, Func<int, int, int> selector)
         {
             var actual = from l in Option<int>.None
                          from r in Option.From(someRight)
-                         select l + r;
+                         select selector(l, r);
 
             Assert.True(actual.IsNone);
         }
 
         [Property(DisplayName = "Selecting from two Some Options produces a Some Option.")]
-        static void SelectManyResult_SomeSome(UnequalPair<int> values)
+        public static void SelectManyResult_SomeSome(UnequalPair<int> values, Func<int, int, int> selector)
         {
-            var actual = from l in Option.From(values.Left)
-                         from r in Option.From(values.Right)
-                         select (long)l + r;
+            var (left, right) = values;
+            var actual = from l in Option.From(left)
+                         from r in Option.From(right)
+                         select selector(l, r);
 
-            // assert
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
-            Assert.Equal(values.Left + values.Right, innerValue);
+            Assert.Equal(selector(left, right), innerValue);
         }
 
-        [Fact(DisplayName = "Binding a None Option over a func returning a None Option returns a None Option.")]
-        static void SelectMany_None_None()
-        {
-            var actual = Option<string>.None.SelectMany(_ => Option<int>.None);
-
-            Assert.True(actual.IsNone);
-        }
-
-        [Property(DisplayName = "Binding a None Option over a func returning a Some Option returns a None Option.")]
-        static void SelectMany_None_Some(int some)
-        {
-            var actual = Option<string>.None.SelectMany(_ => Option.From(some));
-
-            Assert.True(actual.IsNone);
-        }
+        [Property(DisplayName = "Binding a None Option over a func returns a None Option.")]
+        public static void SelectMany_None_Some(string from) =>
+            Assert.True(Option<string>.None.SelectMany(_ => Option.From(from)).IsNone);
 
         [Property(DisplayName = "Binding a Some Option over a func returning a None Option returns a None Option.")]
-        static void SelectMany_ReturnNone_Some(NonNull<string> some)
-        {
-            var actual = Option.From(some.Get).SelectMany(_ => Option<int>.None);
+        public static void SelectMany_ReturnNone_Some(NonEmptyString some) =>
+            Assert.True(Option.From(some.Get).SelectMany(_ => Option<int>.None).IsNone);
 
-            Assert.True(actual.IsNone);
-        }
-
-        [Property(DisplayName = "Binding a Some Option over a func returning a Some Option " +
-            "returns a Some Option.")]
-        static void SelectManyReturnSome_Some(NonNull<string> someString, int someInt)
+        [Property(DisplayName = "Binding a Some Option over a func returning a Some Option returns a Some Option.")]
+        public static void SelectManyReturnSome_Some(NonEmptyString someString, int someInt)
         {
             var actual = Option.From(someString.Get).SelectMany(_ => Option.From(someInt));
 
-            // assert
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
             Assert.Equal(someInt, innerValue);
         }
 
+        [Property(DisplayName = "Folding over an option with null throws.")]
+        public static void Aggregate_Null_Throws(string from)
+        {
+            var actual = Record.Exception(() => Option.From(from).Aggregate<string, int>(func: null));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: func", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Folding over a None Option returns the default.")]
+        public static void Aggregate_None(Func<int, string, int> func) =>
+            Assert.Equal(default, Option<string>.None.Aggregate(func));
+
+        [Property(DisplayName = "Folding over a Some Option returns the result of invoking the accumulator over the default.")]
+        public static void Aggregate_Some(NonEmptyString some, Func<int, string, int> func) =>
+            Assert.Equal(func(default, some.Get), Option.From(some.Get).Aggregate(func));
+
+        [Property(DisplayName = "Folding over an option with a null seed throws.")]
+        public static void SeededAggregate_Null_Throws(string from, Func<string, string, string> func)
+        {
+            var actual = Record.Exception(() => Option.From(from).Aggregate(seed: null, func: func));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: seed", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Folding over an option with a null aggregator throws.")]
+        public static void SeededAggregate_NullFunc_Throws(string from, int seed)
+        {
+            var actual = Record.Exception(() => Option.From(from).Aggregate(seed, func: null));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: func", ane.Message, Ordinal);
+        }
+
         [Property(DisplayName = "Folding over a None Option returns the seed value.")]
-        static void Aggregate_None(short seed) =>
-            Assert.Equal(seed, Option<string>.None.Aggregate((int)seed, (s, v) => s + v.Length));
+        public static void SeededAggregate_None(int seed, Func<int, string, int> func) =>
+            Assert.Equal(seed, Option<string>.None.Aggregate(seed, func));
 
         [Property(DisplayName = "Folding over a Some Option returns the result of invoking the accumulator over the seed value and the Some value.")]
-        static void Aggregate_Some(NonNull<string> some, short seed)
-        {
-            var actual = Option.From(some.Get).Aggregate((int)seed, (s, v) => s + v.Length);
+        public static void SeededAggregate_Some(NonEmptyString some, int seed, Func<int, string, int> func) =>
+            Assert.Equal(func(seed, some.Get), Option.From(some.Get).Aggregate(seed, func));
 
-            var expected = some.Get.Length + seed;
-            Assert.Equal(expected, actual);
+        [Property(DisplayName = "Folding over an option with a null seed throws.")]
+        public static void ResultAggregate_Null_Throws(
+            string from,
+            Func<string, string, string> func,
+            Func<string, string> resultSelector)
+        {
+            var actual = Record.Exception(() => Option.From(from)
+                .Aggregate(seed: null, func: func, resultSelector: resultSelector));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: seed", ane.Message, Ordinal);
         }
 
-        [Property(DisplayName = "Folding over a None Option returns the seed value.")]
-        static void ResultAggregate_None(short seed)
+        [Property(DisplayName = "Folding over an option with a null aggregator throws.")]
+        public static void ResultAggregate_NullFunc_Throws(string from, int seed, Func<int, int> resultSelector)
         {
-            var actual = Option<string>.None.Aggregate((int)seed, (s, v) => s + v.Length, v => v * 2);
+            var actual = Record.Exception(() => Option.From(from)
+                .Aggregate(seed, func: null, resultSelector: resultSelector));
 
-            var expected = seed * 2;
-            Assert.Equal(expected, actual);
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: func", ane.Message, Ordinal);
         }
 
-        [Property(DisplayName = "Folding over a Some Option returns the result of invoking the " +
-            "accumulator over the seed value and the Some value.")]
-        static void ResultAggregate_Some(NonNull<string> some, short seed)
+        [Property(DisplayName = "Folding over an option with a null result selector throws.")]
+        public static void ResultAggregate_NullResultSelector_Throws(string from, int seed, Func<int, string, int> func)
         {
-            var actual = Option.From(some.Get).Aggregate((int)seed, (s, v) => s + v.Length, v => v * 2);
+            var actual = Record.Exception(() => Option.From(from)
+                .Aggregate<string, int, int>(seed, func: func, resultSelector: null));
 
-            var expected = (seed + some.Get.Length) * 2;
-            Assert.Equal(expected, actual);
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: resultSelector", ane.Message, Ordinal);
         }
+
+        [Property(DisplayName = "Folding over a None Option returns the transformed seed value.")]
+        public static void ResultAggregate_None(int seed, Func<int, string, int> func, Func<int, int> resultSelector) =>
+            Assert.Equal(resultSelector(seed), Option<string>.None.Aggregate(seed, func, resultSelector));
+
+        [Property(DisplayName = "Folding over a Some Option returns the transformed result of invoking the accumulator over the seed value and the Some value.")]
+        public static void ResultAggregate_Some(
+            NonEmptyString some,
+            int seed,
+            Func<int, string, int> func,
+            Func<int, int> resultSelector) =>
+            Assert.Equal(resultSelector(func(seed, some.Get)), Option.From(some.Get).Aggregate(seed, func, resultSelector));
     }
 }

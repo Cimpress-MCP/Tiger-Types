@@ -39,6 +39,7 @@ namespace Tiger.Types
         /// A collection of the Right values of the elements of <paramref name="eitherEnumerableValue"/>
         /// which are in the Right state.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="eitherEnumerableValue"/> is <see langword="null"/>.</exception>
         [NotNull, ItemNotNull, LinqTunnel]
         public static IEnumerable<TRight> CatRight<TLeft, TRight>(
             [NotNull] this IEnumerable<Either<TLeft, TRight>> eitherEnumerableValue)
@@ -56,6 +57,7 @@ namespace Tiger.Types
         /// A collection of the Left values of the elements of <paramref name="eitherEnumerableValue"/>
         /// which are in the Left state.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="eitherEnumerableValue"/> is <see langword="null"/>.</exception>
         [NotNull, ItemNotNull, LinqTunnel]
         public static IEnumerable<TLeft> CatLeft<TLeft, TRight>(
             [NotNull] this IEnumerable<Either<TLeft, TRight>> eitherEnumerableValue)
@@ -73,13 +75,14 @@ namespace Tiger.Types
         /// A tuple whose first component is the Left values of the elements of <paramref name="eitherEnumerableValue"/>
         /// and whose second component is the Right values of the elements of <paramref name="eitherEnumerableValue"/>.
         /// </returns>
-        public static (IReadOnlyCollection<TLeft> lefts, IReadOnlyCollection<TRight> rights) Partition<TLeft, TRight>(
+        /// <exception cref="ArgumentNullException"><paramref name="eitherEnumerableValue"/> is <see langword="null"/>.</exception>
+        public static (ImmutableArray<TLeft> lefts, ImmutableArray<TRight> rights) Partition<TLeft, TRight>(
             [NotNull] this IReadOnlyCollection<Either<TLeft, TRight>> eitherEnumerableValue)
         {
             if (eitherEnumerableValue == null) { throw new ArgumentNullException(nameof(eitherEnumerableValue)); }
 
             return eitherEnumerableValue.Fold(
-                (lefts: ImmutableList<TLeft>.Empty, rights: ImmutableList<TRight>.Empty),
+                (lefts: ImmutableArray<TLeft>.Empty, rights: ImmutableArray<TRight>.Empty),
                 (acc, curr) => curr.Match(
                     left: l => (acc.lefts.Add(l), acc.rights),
                     right: r => (acc.lefts, acc.rights.Add(r))));

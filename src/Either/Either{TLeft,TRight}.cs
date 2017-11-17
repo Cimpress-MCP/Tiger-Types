@@ -15,11 +15,15 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using static JetBrains.Annotations.ImplicitUseTargetFlags;
+using static System.ComponentModel.EditorBrowsableState;
 using static System.Diagnostics.Contracts.Contract;
 using static System.Runtime.InteropServices.LayoutKind;
 using static Tiger.Types.EitherState;
@@ -32,7 +36,8 @@ namespace Tiger.Types
     /// <typeparam name="TRight">The Right type of the value that may be represented.</typeparam>
     [DebuggerTypeProxy(typeof(Either<,>.DebuggerTypeProxy))]
     [StructLayout(Auto)]
-    public partial struct Either<TLeft, TRight>
+    [SuppressMessage("Microsoft:Guidelines", "CA1066", Justification = "Prevent boxing.")]
+    public readonly struct Either<TLeft, TRight>
     {
         readonly TLeft _leftValue;
         readonly TRight _rightValue;
@@ -94,6 +99,74 @@ namespace Tiger.Types
         /// <summary>Gets the current state of this instance.</summary>
         internal EitherState State { get; }
 
+        #region Operators
+
+        /// <summary>Wraps a value in <see cref="Either{TLeft,TRight}"/>.</summary>
+        /// <param name="leftValue">The value to be wrapped.</param>
+        public static implicit operator Either<TLeft, TRight>([CanBeNull] TLeft leftValue) => leftValue == null
+            ? default
+            : new Either<TLeft, TRight>(leftValue);
+
+        /// <summary>Wraps a value in <see cref="Either{TLeft,TRight}"/>.</summary>
+        /// <param name="rightValue">The value to be wrapped.</param>
+        public static implicit operator Either<TLeft, TRight>([CanBeNull] TRight rightValue) => rightValue == null
+            ? default
+            : new Either<TLeft, TRight>(rightValue);
+
+        /// <summary>Wraps a value in <see cref="Either{TLeft,TRight}"/>.</summary>
+        /// <param name="leftValue">The value to be wrapped.</param>
+        public static implicit operator Either<TLeft, TRight>(EitherLeft<TLeft> leftValue) =>
+            new Either<TLeft, TRight>(leftValue.Value);
+
+        /// <summary>Wraps a value in <see cref="Either{TLeft,TRight}"/>.</summary>
+        /// <param name="rightValue">The value to be wrapped.</param>
+        public static implicit operator Either<TLeft, TRight>(EitherRight<TRight> rightValue) =>
+            new Either<TLeft, TRight>(rightValue.Value);
+
+        /// <summary>Unwraps the Right value of this instance.</summary>
+        /// <param name="value">The value to be unwrapped.</param>
+        /// <exception cref="InvalidOperationException">This instance is in an invalid state.</exception>
+        [NotNull]
+        [SuppressMessage("Microsoft:Guidelines", "CA2225", Justification = "Type parameters play poorly with this analysis.")]
+        public static explicit operator TRight(Either<TLeft, TRight> value)
+        {
+            if (!value.IsRight) { throw new InvalidOperationException(EitherIsNotRight); }
+
+            return value._rightValue;
+        }
+
+        /// <summary>Unwraps the Left value of this instance.</summary>
+        /// <param name="value">The value to be unwrapped.</param>
+        /// <exception cref="InvalidOperationException">This instance is in an invalid state.</exception>
+        [NotNull]
+        [SuppressMessage("Microsoft:Guidelines", "CA2225", Justification = "Type parameters play poorly with this analysis.")]
+        public static explicit operator TLeft(Either<TLeft, TRight> value)
+        {
+            if (!value.IsLeft) { throw new InvalidOperationException(EitherIsNotLeft); }
+
+            return value._leftValue;
+        }
+
+        /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
+        /// <param name="left">An object to compare with <paramref name="right"/>.</param>
+        /// <param name="right">An object to compare with <paramref name="left"/>.</param>
+        /// <returns>
+        /// <see langword="true"/> if <paramref name="left"/> is equal to the <paramref name="right"/>;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public static bool operator ==(Either<TLeft, TRight> left, Either<TLeft, TRight> right) =>
+            left.EqualsCore(right);
+
+        /// <summary>Indicates whether the current object is not equal to another object of the same type.</summary>
+        /// <param name="left">An object to compare with <paramref name="right"/>.</param>
+        /// <param name="right">An object to compare with <paramref name="left"/>.</param>
+        /// <returns>
+        /// <see langword="true"/> if <paramref name="left"/> is not equal to the <paramref name="right"/>;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public static bool operator !=(Either<TLeft, TRight> left, Either<TLeft, TRight> right) =>
+            !(left == right);
+
         /// <summary>
         /// Creates an <see cref="Either{TLeft,TRight}"/> in the Left state from the provided value.
         /// </summary>
@@ -101,7 +174,29 @@ namespace Tiger.Types
         /// <returns>An <see cref="Either{TLeft,TRight}"/> in the Left state.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         [Pure]
-        public static Either<TLeft, TRight> FromLeft([NotNull] TLeft value)
+        [EditorBrowsable(Never)]
+        public static Either<TLeft, TRight> ToEither([NotNull] TLeft value) => From(value);
+
+        /// <summary>
+        /// Creates an <see cref="Either{TLeft,TRight}"/> in the Right state from the provided value.
+        /// </summary>
+        /// <param name="value">The value to wrap.</param>
+        /// <returns>An <see cref="Either{TLeft,TRight}"/> in the Right state.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
+        [Pure]
+        [EditorBrowsable(Never)]
+        public static Either<TLeft, TRight> ToEither([NotNull] TRight value) => From(value);
+
+        #endregion
+
+        /// <summary>
+        /// Creates an <see cref="Either{TLeft,TRight}"/> in the Left state from the provided value.
+        /// </summary>
+        /// <param name="value">The value to wrap.</param>
+        /// <returns>An <see cref="Either{TLeft,TRight}"/> in the Left state.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
+        [Pure]
+        public static Either<TLeft, TRight> From([NotNull] TLeft value)
         {
             if (value == null) { throw new ArgumentNullException(nameof(value)); }
 
@@ -115,7 +210,7 @@ namespace Tiger.Types
         /// <returns>An <see cref="Either{TLeft,TRight}"/> in the Right state.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         [Pure]
-        public static Either<TLeft, TRight> FromRight([NotNull] TRight value)
+        public static Either<TLeft, TRight> From([NotNull] TRight value)
         {
             if (value == null) { throw new ArgumentNullException(nameof(value)); }
 
@@ -1059,26 +1154,174 @@ namespace Tiger.Types
         #region Tap
 
         /// <summary>
+        /// Performs an action on the Left value of this instance,
+        /// if present, and returns this instance.
+        /// </summary>
+        /// <param name="left">An action to perform on the Left value of this instance.</param>
+        /// <returns>This instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        [MustUseReturnValue]
+        public Either<TLeft, TRight> Tap([NotNull, InstantHandle] Action<TLeft> left)
+        {
+            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+
+            if (IsLeft)
+            {
+                left(_leftValue);
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Performs an action on the Left value of this instance,
+        /// if present, and returns this instance, asynchronously.
+        /// </summary>
+        /// <param name="left">An action to perform on the Left value of this instance, asynchronously.</param>
+        /// <returns>A task which, when resolved, produces this instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        [NotNull, MustUseReturnValue]
+        public async Task<Either<TLeft, TRight>> Tap([NotNull, InstantHandle] Func<TLeft, Task> left)
+        {
+            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+
+            if (IsLeft)
+            {
+                await left(_leftValue).ConfigureAwait(false);
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Performs an action on the Right value of this instance,
+        /// if present, and returns this instance.
+        /// </summary>
+        /// <param name="right">An action to perform on the Right value of this instance.</param>
+        /// <returns>This instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        [MustUseReturnValue]
+        public Either<TLeft, TRight> Tap([NotNull, InstantHandle] Action<TRight> right)
+        {
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+
+            if (IsRight)
+            {
+                right(_rightValue);
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Performs an action on the Right value of this instance,
+        /// if present, and returns this instance, asynchronously.
+        /// </summary>
+        /// <param name="right">An action to perform on the Right value of this instance, asynchronously.</param>
+        /// <returns>A task which, when resolved, produces this instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        [MustUseReturnValue]
+        public async Task<Either<TLeft, TRight>> Tap([NotNull, InstantHandle] Func<TRight, Task> right)
+        {
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+
+            if (IsRight)
+            {
+                await right(_rightValue).ConfigureAwait(false);
+            }
+
+            return this;
+        }
+
+        /// <summary>
         /// Performs an action on the Left or Right value of this instance,
         /// whichever is present, and returns this instance.
         /// </summary>
         /// <param name="left">An action to perform on the Left value of this instance.</param>
         /// <param name="right">An action to perform on the Right value of this instance.</param>
         /// <returns>This instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         [MustUseReturnValue]
         public Either<TLeft, TRight> Tap(
-            [CanBeNull, InstantHandle] Action<TLeft> left = null,
-            [CanBeNull, InstantHandle] Action<TRight> right = null)
+            [NotNull, InstantHandle] Action<TLeft> left,
+            [NotNull, InstantHandle] Action<TRight> right)
         {
+            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+
             if (IsLeft)
             {
-                left?.Invoke(_leftValue);
+                left(_leftValue);
                 return this;
             }
 
             if (IsRight)
             {
-                right?.Invoke(_rightValue);
+                right(_rightValue);
+                return this;
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Performs an action on the Left or Right value of this instance,
+        /// whichever is present, and returns this instance, asynchronously.
+        /// </summary>
+        /// <param name="left">An action to perform on the Left value of this instance, asynchronously.</param>
+        /// <param name="right">An action to perform on the Right value of this instance.</param>
+        /// <returns>A task which, when resolved, produces this instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        public async Task<Either<TLeft, TRight>> Tap(
+            [NotNull, InstantHandle] Func<TLeft, Task> left,
+            [NotNull, InstantHandle] Action<TRight> right)
+        {
+            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+
+            if (IsLeft)
+            {
+                await left(_leftValue).ConfigureAwait(false);
+                return this;
+            }
+
+            if (IsRight)
+            {
+                right(_rightValue);
+                return this;
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Performs an action on the Left or Right value of this instance,
+        /// whichever is present, and returns this instance, asynchronously.
+        /// </summary>
+        /// <param name="left">An action to perform on the Left value of this instance.</param>
+        /// <param name="right">An action to perform on the Right value of this instance, asynchronously.</param>
+        /// <returns>A task which, when resolved, produces this instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        [NotNull, MustUseReturnValue]
+        public async Task<Either<TLeft, TRight>> Tap(
+            [NotNull, InstantHandle] Action<TLeft> left,
+            [NotNull, InstantHandle] Func<TRight, Task> right)
+        {
+            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+
+            if (IsLeft)
+            {
+                left(_leftValue);
+                return this;
+            }
+
+            if (IsRight)
+            {
+                await right(_rightValue).ConfigureAwait(false);
                 return this;
             }
 
@@ -1092,28 +1335,25 @@ namespace Tiger.Types
         /// <param name="left">An action to perform on the Left value of this instance, asynchronously.</param>
         /// <param name="right">An action to perform on the Right value of this instance, asynchronously.</param>
         /// <returns>A task which, when resolved, produces this instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         [NotNull, MustUseReturnValue]
         public async Task<Either<TLeft, TRight>> Tap(
-            [CanBeNull, InstantHandle] Func<TLeft, Task> left = null,
-            [CanBeNull, InstantHandle] Func<TRight, Task> right = null)
+            [NotNull, InstantHandle] Func<TLeft, Task> left,
+            [NotNull, InstantHandle] Func<TRight, Task> right)
         {
+            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+
             if (IsLeft)
             {
-                if (left != null)
-                {
-                    await left.Invoke(_leftValue).ConfigureAwait(false);
-                }
-
+                await left(_leftValue).ConfigureAwait(false);
                 return this;
             }
 
             if (IsRight)
             {
-                if (right != null)
-                {
-                    await right.Invoke(_rightValue).ConfigureAwait(false);
-                }
-
+                await right(_rightValue).ConfigureAwait(false);
                 return this;
             }
 
@@ -1332,5 +1572,112 @@ namespace Tiger.Types
         }
 
         #endregion
+
+        /// <summary>
+        /// Returns an enumerator that iterates through the <see cref="Either{TLeft,TRight}"/>.
+        /// </summary>
+        /// <returns>An <see cref="IEnumerator{T}"/> for the <see cref="Either{TLeft,TRight}"/>.</returns>
+        [Pure, EditorBrowsable(Never)]
+        public IEnumerator<TRight> GetEnumerator()
+        { // note(cosborn) OK, it's kind of an implementation.
+            if (IsRight)
+            {
+                yield return _rightValue;
+            }
+        }
+
+        #region object
+
+        /// <inheritdoc/>
+        [NotNull, Pure]
+        public override string ToString()
+        {
+            switch (State)
+            {
+                case Left:
+                    return $"Left({_leftValue})";
+                case Right:
+                    return $"Right({_rightValue})";
+                case Bottom:
+                    return "Bottom";
+                default: // note(cosborn) Why would you change this enum???
+                    return string.Empty;
+            }
+        }
+
+        /// <inheritdoc/>
+        [Pure]
+        public override bool Equals(object obj) =>
+            obj is Either<TLeft, TRight> either && EqualsCore(either);
+
+        /// <inheritdoc/>
+        [Pure]
+        public override int GetHashCode()
+        {
+            switch (State)
+            {
+                case Left:
+                    return _leftValue.GetHashCode();
+                case Right:
+                    return _rightValue.GetHashCode();
+                default: // note(cosborn) Why would you change this enum???
+                    return 0;
+            }
+        }
+
+        [Pure]
+        bool EqualsCore(Either<TLeft, TRight> other)
+        { // note(cosborn) Eh, this gets gnarly using other implementations.
+            if (State == Bottom && other.State == Bottom)
+            {
+                return true;
+            }
+
+            if (IsLeft && other.IsLeft)
+            {
+                return EqualityComparer<TLeft>.Default.Equals(_leftValue, other._leftValue);
+            }
+
+            if (IsRight && other.IsRight)
+            {
+                return EqualityComparer<TRight>.Default.Equals(_rightValue, other._rightValue);
+            }
+
+            // note(cosborn) Implicitly `_state != other._state`.
+            return false;
+        }
+
+        [NotNull, Pure, UsedImplicitly]
+        object ToDump() => Match<object>(
+            left: l => new { State = Left, Value = l },
+            right: r => new { State = Right, Value = r });
+
+        #endregion
+
+        [UsedImplicitly(WithMembers)]
+        sealed class DebuggerTypeProxy
+        {
+            readonly Either<TLeft, TRight> _value;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="DebuggerTypeProxy"/> class.
+            /// </summary>
+            /// <param name="value">The either value to be proxied.</param>
+            public DebuggerTypeProxy(in Either<TLeft, TRight> value)
+            {
+                _value = value;
+            }
+
+            /// <summary>Gets an internal value of the <see cref="Either{TLeft,TRight}"/>.</summary>
+            [CanBeNull]
+            public TLeft LeftValue => _value._leftValue;
+
+            /// <summary>Gets an internal value of the <see cref="Either{TLeft,TRight}"/>.</summary>
+            [CanBeNull]
+            public TRight RightValue => _value._rightValue;
+
+            /// <summary>Gets the internal state of the <see cref="Either{TLeft,TRight}"/>.</summary>
+            public string State => _value.State.ToString();
+        }
     }
 }

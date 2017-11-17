@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using FsCheck;
 using JetBrains.Annotations;
 using static JetBrains.Annotations.ImplicitUseTargetFlags;
@@ -10,6 +11,23 @@ namespace Tiger.Types.UnitTest.Utility
     [UsedImplicitly(Members)]
     public static class Generators
     {
+        /// <summary>
+        /// Generates an arbitrary instance of <typeparamref name="T"/>, wrapped in <see cref="Task{TResult}"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of value to generate.</typeparam>
+        /// <returns>An arbitrary value.</returns>
+        public static Arbitrary<Task<T>> TaskValue<T>() => Arb.Generate<T>()
+            .Select(Task.FromResult)
+            .ToArbitrary();
+
+        /// <summary>Generates an arbitrary instance of <see cref="Option{TSome}"/>.</summary>
+        /// <typeparam name="T">The type of value to generate.</typeparam>
+        /// <returns>An arbitrary value.</returns>
+        public static Arbitrary<Option<T>> OptionValue<T>() => Arb.From(
+            Gen.Frequency(
+                Tuple.Create(24, Arb.Generate<T>().Where(t => t != null).Select(Option.From)),
+                Tuple.Create(1, Gen.Constant(Option<T>.None))));
+
         /// <summary>Generates an arbitrary instance of <see cref="UnequalNonNullPair{T}"/>.</summary>
         /// <typeparam name="T">The type of value to generate.</typeparam>
         /// <returns>An arbitrary value.</returns>

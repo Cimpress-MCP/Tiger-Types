@@ -1,18 +1,41 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using FsCheck;
 using FsCheck.Xunit;
 using Xunit;
+using static System.StringComparison;
 using static System.Threading.Tasks.Task;
-// ReSharper disable All
 
 namespace Tiger.Types.UnitTest
 {
-    /// <context>Tests related to matching <see cref="Option{TSome}"/>.</context>
+    /// <summary>Tests related to matching <see cref="Option{TSome}"/>.</summary>
     public static partial class OptionTests
     {
+        [Property(DisplayName = "Matching an Option with a null None value throws.")]
+        public static void ValueFuncMatchReturn_NullNone_Throw(Option<int> option, Func<int, string> some)
+        {
+            var actual = Record.Exception(() => option.Match(
+                none: (string)null,
+                some: some));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Matching an Option with a null some func throws.")]
+        public static void ValueFuncMatchReturn_NullSome_Throw(Option<int> option, NonEmptyString none)
+        {
+            var actual = Record.Exception(() => option.Match(
+                none: none.Get,
+                some: (Func<int, string>)null));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+        }
+
         [Property(DisplayName = "Matching a None Option returns the None value branch, " +
                                 "not the Some func branch.")]
-        static void ValueFuncMatchReturn_None(int noneValue)
+        public static void ValueFuncMatchReturn_None(int noneValue)
         {
             var actual = Option<string>.None.Match(
                 none: noneValue,
@@ -23,7 +46,7 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a Some Option returns the Some func branch, " +
                                 "not the None value branch.")]
-        static void ValueFuncMatchReturn_Some(NonNull<string> some, int noneValue)
+        public static void ValueFuncMatchReturn_Some(NonEmptyString some, int noneValue)
         {
             var actual = Option.From(some.Get).Match(
                 none: noneValue,
@@ -32,9 +55,31 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(some.Get.Length, actual);
         }
 
+        [Property(DisplayName = "Matching an Option with a null None value throws.")]
+        public static async Task ValueTaskMatchReturn_NullNone_Throw(Option<int> option, Func<int, Task<string>> some)
+        {
+            var actual = await Record.ExceptionAsync(() => option.Match(
+                none: (string)null,
+                some: some)).ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Matching an Option with a null Some task throws.")]
+        public static async Task ValueTaskMatchReturn_NullSome_Throw(Option<int> option, NonEmptyString none)
+        {
+            var actual = await Record.ExceptionAsync(() => option.Match(
+                none: none.Get,
+                some: (Func<int, Task<string>>)null)).ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+        }
+
         [Property(DisplayName = "Matching a None Option returns the None value branch, " +
                                 "not the Some task branch.")]
-        static async Task ValueTaskMatchReturn_None(int noneValue)
+        public static async Task ValueTaskMatchReturn_None(int noneValue)
         {
             var actual = await Option<string>.None.Match(
                 none: noneValue,
@@ -46,7 +91,7 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a Some Option returns the Some task branch, " +
                                 "not the None value branch.")]
-        static async Task ValueTaskMatchReturn_Some(NonNull<string> some, int noneValue)
+        public static async Task ValueTaskMatchReturn_Some(NonEmptyString some, int noneValue)
         {
             var actual = await Option.From(some.Get).Match(
                 none: noneValue,
@@ -56,9 +101,31 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(some.Get.Length, actual);
         }
 
+        [Property(DisplayName = "Matching an Option with a null None func throws.")]
+        public static void FuncFuncMatchReturn_NullNone_Throw(Option<int> option, Func<int, string> some)
+        {
+            var actual = Record.Exception(() => option.Match(
+                none: (Func<string>)null,
+                some: some));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Matching an Option with a null Some func throws.")]
+        public static void FuncFuncMatchReturn_NullSome_Throw(Option<int> option, Func<string> none)
+        {
+            var actual = Record.Exception(() => option.Match(
+                none: none,
+                some: (Func<int, string>)null));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+        }
+
         [Property(DisplayName = "Matching a None Option returns the None func branch, " +
                                 "not the Some func branch.")]
-        static void FuncFuncMatchReturn_None(int noneValue)
+        public static void FuncFuncMatchReturn_None(int noneValue)
         {
             var actual = Option<string>.None.Match(
                 none: () => noneValue,
@@ -69,7 +136,7 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a Some Option returns the Some func branch, " +
                                 "not the None func branch.")]
-        static void FuncFuncMatchReturn_Some(NonNull<string> some, int noneValue)
+        public static void FuncFuncMatchReturn_Some(NonEmptyString some, int noneValue)
         {
             var actual = Option.From(some.Get).Match(
                 none: () => noneValue,
@@ -78,9 +145,31 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(some.Get.Length, actual);
         }
 
+        [Property(DisplayName = "Matching an Option with a null None func throws.")]
+        public static async Task FuncTaskMatchReturn_NullNone_Throw(Option<int> option, Func<int, Task<string>> some)
+        {
+            var actual = await Record.ExceptionAsync(() => option.Match(
+                none: (Func<string>)null,
+                some: some)).ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Matching an Option with a null Some task throws.")]
+        public static async Task FuncTaskMatchReturn_NullSome_Throw(Option<int> option, Func<string> none)
+        {
+            var actual = await Record.ExceptionAsync(() => option.Match(
+                none: none,
+                some: (Func<int, Task<string>>)null)).ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+        }
+
         [Property(DisplayName = "Matching a None Option returns the None func branch, " +
                                 "not the Some task branch.")]
-        static async Task FuncTaskMatchReturn_None(int noneValue)
+        public static async Task FuncTaskMatchReturn_None(int noneValue)
         {
             var actual = await Option<string>.None.Match(
                 none: () => noneValue,
@@ -92,7 +181,7 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a Some Option returns the Some task branch, " +
                                 "not the None func branch.")]
-        static async Task FuncTaskMatchReturn_Some(NonNull<string> some, int noneValue)
+        public static async Task FuncTaskMatchReturn_Some(NonEmptyString some, int noneValue)
         {
             var actual = await Option.From(some.Get).Match(
                 none: () => noneValue,
@@ -100,11 +189,33 @@ namespace Tiger.Types.UnitTest
                 .ConfigureAwait(false);
 
             Assert.Equal(some.Get.Length, actual);
+        }
+
+        [Property(DisplayName = "Matching an Option with a null None task throws.")]
+        public static async Task TaskFuncMatchReturn_NullNone_Throw(Option<int> option, Func<int, string> some)
+        {
+            var actual = await Record.ExceptionAsync(() => option.Match(
+                none: (Func<Task<string>>)null,
+                some: some)).ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Matching an Option with a null Some func throws.")]
+        public static async Task TaskFuncMatchReturn_NullSome_Throw(Option<int> option, Func<Task<string>> none)
+        {
+            var actual = await Record.ExceptionAsync(() => option.Match(
+                none: none,
+                some: (Func<int, string>)null)).ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching a None Option returns the None task branch, " +
                                 "not the Some func branch.")]
-        static async Task TaskFuncMatchReturn_None(int noneValue)
+        public static async Task TaskFuncMatchReturn_None(int noneValue)
         {
             var actual = await Option<string>.None.Match(
                 none: () => FromResult(noneValue),
@@ -116,7 +227,7 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a Some Option returns the Some func branch, " +
                                 "not the None task branch.")]
-        static async Task TaskFuncMatchReturn_Some(NonNull<string> some, int noneValue)
+        public static async Task TaskFuncMatchReturn_Some(NonEmptyString some, int noneValue)
         {
             var actual = await Option.From(some.Get).Match(
                 none: () => FromResult(noneValue),
@@ -126,9 +237,31 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(some.Get.Length, actual);
         }
 
+        [Property(DisplayName = "Matching an Option with a null None task throws.")]
+        public static async Task TaskTaskMatchReturn_NullNone_Throw(Option<int> option, Func<int, Task<string>> some)
+        {
+            var actual = await Record.ExceptionAsync(() => option.Match(
+                none: (Func<Task<string>>)null,
+                some: some)).ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Matching an Option with a null Some task throws.")]
+        public static async Task TaskTaskMatchReturn_NullSome_Throw(Option<int> option, Func<Task<string>> none)
+        {
+            var actual = await Record.ExceptionAsync(() => option.Match(
+                none: none,
+                some: (Func<int, Task<string>>)null)).ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+        }
+
         [Property(DisplayName = "Matching a None Option returns the None task branch, " +
                                 "not the Some task branch.")]
-        static async Task TaskTaskMatchReturn_None(int noneValue)
+        public static async Task TaskTaskMatchReturn_None(int noneValue)
         {
             var actual = await Option<string>.None.Match(
                 none: () => FromResult(noneValue),
@@ -140,7 +273,7 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a Some Option returns the Some task branch, " +
                                 "not the None task branch.")]
-        static async Task TaskTaskMatchReturn_Some(NonNull<string> some, int noneValue)
+        public static async Task TaskTaskMatchReturn_Some(NonEmptyString some, int noneValue)
         {
             var actual = await Option.From(some.Get).Match(
                 none: () => FromResult(noneValue),
@@ -148,23 +281,45 @@ namespace Tiger.Types.UnitTest
                 .ConfigureAwait(false);
 
             Assert.Equal(some.Get.Length, actual);
+        }
+
+        [Property(DisplayName = "Matching an Option with a null None action throws.")]
+        public static void ActionActionMatchVoid_NullNone_Throw(Option<int> option, Action<int> some)
+        {
+            var actual = Record.Exception(() => option.Match(
+                none: (Action)null,
+                some: some));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Matching an Option with a null Some func throws.")]
+        public static void ActionActionMatchVoid_NullSome_Throw(Option<int> option)
+        {
+            var actual = Record.Exception(() => option.Match(
+                none: () => { },
+                some: (Action<int>)null));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching a None Option executes the None action branch, " +
                                 "not the Some action branch.")]
-        static void ActionActionMatchVoid_None(NonNull<string> before, NonNull<string> sentinel, int noneValue)
+        public static void ActionActionMatchVoid_None(NonEmptyString before, NonEmptyString sentinel)
         {
             var actual = before.Get;
             var unit = Option<string>.None.Match(
                 none: () => actual = sentinel.Get,
-                some: v => { });
+                some: _ => { });
 
             Assert.Equal(Unit.Value, unit);
             Assert.Equal(sentinel.Get, actual);
         }
 
         [Property(DisplayName = "Matching a Some Option executes the Some action branch, not the None action branch.")]
-        static void ActionActionMatchVoid_Some(NonNull<string> before, NonNull<string> some, int noneValue)
+        public static void ActionActionMatchVoid_Some(NonEmptyString before, NonEmptyString some)
         {
             var actual = before.Get;
             var unit = Option.From(some.Get).Match(
@@ -175,14 +330,36 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(some.Get, actual);
         }
 
+        [Property(DisplayName = "Matching an Option with a null None action throws.")]
+        public static async Task ActionTaskMatchVoid_NullNone_Throw(Option<int> option, Func<int, Task> some)
+        {
+            var actual = await Record.ExceptionAsync(() => option.Match(
+                none: (Action)null,
+                some: some)).ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Matching an Option with a null Some task throws.")]
+        public static async Task ActionTaskMatchVoid_NullSome_Throw(Option<int> option)
+        {
+            var actual = await Record.ExceptionAsync(() => option.Match(
+                none: () => { },
+                some: (Func<int, Task>)null)).ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+        }
+
         [Property(DisplayName = "Matching a None Option executes the None action branch, " +
                                 "not the Some task branch.")]
-        static async Task ActionTaskMatchVoid_None(NonNull<string> before, NonNull<string> sentinel, int noneValue)
+        public static async Task ActionTaskMatchVoid_None(NonEmptyString before, NonEmptyString sentinel)
         {
             var actual = before.Get;
             await Option<string>.None.Match(
                 none: () => actual = sentinel.Get,
-                some: v => CompletedTask)
+                some: _ => CompletedTask)
                 .ConfigureAwait(false);
 
             Assert.Equal(sentinel.Get, actual);
@@ -190,7 +367,7 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a Some Option executes the Some task branch, " +
                                 "not the None action branch.")]
-        static async Task ActionTaskMatchVoid_Some(NonNull<string> before, NonNull<string> some, int noneValue)
+        public static async Task ActionTaskMatchVoid_Some(NonEmptyString before, NonEmptyString some)
         {
             var actual = before.Get;
             await Option.From(some.Get).Match(
@@ -201,14 +378,36 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(some.Get, actual);
         }
 
+        [Property(DisplayName = "Matching an Option with a null None task throws.")]
+        public static async Task TaskActionMatchVoid_NullNone_Throw(Option<int> option, Action<int> some)
+        {
+            var actual = await Record.ExceptionAsync(() => option.Match(
+                none: null,
+                some: some)).ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Matching an Option with a null Some action throws.")]
+        public static async Task TaskActionMatchVoid_NullSome_Throw(Option<int> option)
+        {
+            var actual = await Record.ExceptionAsync(() => option.Match(
+                none: () => CompletedTask,
+                some: (Action<int>)null)).ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+        }
+
         [Property(DisplayName = "Matching a None Option executes the None task branch, " +
                                 "not the Some action branch.")]
-        static async Task TaskActionMatchVoid_None(NonNull<string> before, NonNull<string> sentinel, int noneValue)
+        public static async Task TaskActionMatchVoid_None(NonEmptyString before, NonEmptyString sentinel)
         {
             var actual = before.Get;
             await Option<string>.None.Match(
                 none: () => Run(() => actual = sentinel.Get),
-                some: v => { })
+                some: _ => { })
                 .ConfigureAwait(false);
 
             Assert.Equal(sentinel.Get, actual);
@@ -216,7 +415,7 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a Some Option executes the Some action branch, " +
                                 "not the None task branch.")]
-        static async Task TaskActionMatchVoid_Some(NonNull<string> before, NonNull<string> some, int noneValue)
+        public static async Task TaskActionMatchVoid_Some(NonEmptyString before, NonEmptyString some)
         {
             var actual = before.Get;
             await Option.From(some.Get).Match(
@@ -227,14 +426,36 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(some.Get, actual);
         }
 
+        [Property(DisplayName = "Matching an Option with a null None task throws.")]
+        public static async Task TaskTaskMatchVoid_NullNone_Throw(Option<int> option, Func<int, Task> some)
+        {
+            var actual = await Record.ExceptionAsync(() => option.Match(
+                none: (Func<Task>)null,
+                some: some)).ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Matching an Option with a null Some task throws.")]
+        public static async Task TaskTaskMatchVoid_NullSome_Throw(Option<int> option)
+        {
+            var actual = await Record.ExceptionAsync(() => option.Match(
+                none: () => CompletedTask,
+                some: (Func<int, Task>)null)).ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+        }
+
         [Property(DisplayName = "Matching a None Option executes the None task branch, " +
                                 "not the Some task branch.")]
-        static async Task TaskTaskMatchVoid_None(NonNull<string> before, NonNull<string> sentinel, int noneValue)
+        public static async Task TaskTaskMatchVoid_None(NonEmptyString before, NonEmptyString sentinel)
         {
             var actual = before.Get;
             await Option<string>.None.Match(
                 none: () => Run(() => actual = sentinel.Get),
-                some: v => CompletedTask)
+                some: _ => CompletedTask)
                 .ConfigureAwait(false);
 
             Assert.Equal(sentinel.Get, actual);
@@ -242,7 +463,7 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Matching a Some Option executes the Some task branch, " +
                                 "not the None task branch.")]
-        static async Task TaskTaskMatchVoid_Some(NonNull<string> before, NonNull<string> some, int noneValue)
+        public static async Task TaskTaskMatchVoid_Some(NonEmptyString before, NonEmptyString some)
         {
             var actual = before.Get;
             await Option.From(some.Get).Match(

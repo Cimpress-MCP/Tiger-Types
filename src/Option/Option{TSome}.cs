@@ -15,11 +15,15 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using static JetBrains.Annotations.ImplicitUseTargetFlags;
+using static System.ComponentModel.EditorBrowsableState;
 using static System.Diagnostics.Contracts.Contract;
 using static System.Runtime.InteropServices.LayoutKind;
 using static Tiger.Types.Resources;
@@ -31,19 +35,20 @@ namespace Tiger.Types
     [TypeConverter(typeof(OptionTypeConverter))]
     [DebuggerTypeProxy(typeof(Option<>.DebuggerTypeProxy))]
     [StructLayout(Auto)]
-    public partial struct Option<TSome>
+    [SuppressMessage("Microsoft:Guidelines", "CA1066", Justification = "Prevent boxing.")]
+    public readonly struct Option<TSome>
     {
         /// <summary>Gets a value representing no value.</summary>
         public static readonly Option<TSome> None;
 
         readonly TSome _value;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Option{TSome}"/> struct.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="Option{TSome}"/> struct.</summary>
         /// <param name="value">The value to be wrapped.</param>
         internal Option([NotNull] TSome value)
         {
+            Assume(value != null, "Attempted to initialize Option with null value.");
+
             _value = value;
             IsSome = true;
         }
@@ -73,6 +78,143 @@ namespace Tiger.Types
                 return _value;
             }
         }
+
+        #region Operators
+
+        /// <summary>Gets a value indicating whether this instance is in the Some state.</summary>
+        [EditorBrowsable(Never)]
+        public bool IsTrue => IsSome;
+
+        /// <summary>Gets a value indicating whether this instance is in the None state.</summary>
+        [EditorBrowsable(Never)]
+        public bool IsFalse => !IsSome;
+
+        /// <summary>Wraps a value in <see cref="Option{TSome}"/>.</summary>
+        /// <param name="value">The value to be wrapped.</param>
+        public static implicit operator Option<TSome>([CanBeNull] TSome value) => ToOption(value);
+
+        /// <summary>Unwraps the Some value of this instance.</summary>
+        /// <param name="value">The value to be unwrapped.</param>
+        /// <exception cref="InvalidOperationException">This instance is in an invalid state.</exception>
+        [NotNull]
+        [SuppressMessage("Microsoft:Guidelines", "CA2225", Justification = "Type parameters play poorly with this analysis.")]
+        public static explicit operator TSome(Option<TSome> value) => value.Value;
+
+        /// <summary>
+        /// Implicitly converts a <see cref="OptionNone"/> to an
+        /// <see cref="Option{TSome}"/> in the None state.
+        /// </summary>
+        /// <param name="none">The default value of <see cref="OptionNone"/>.</param>
+        [SuppressMessage("Roslynator", "RCS1163", Justification = "Used only for the type inference.")]
+        public static implicit operator Option<TSome>(OptionNone none) => None;
+
+        /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
+        /// <param name="left">An object to compare with <paramref name="right"/>.</param>
+        /// <param name="right">An object to compare with <paramref name="left"/>.</param>
+        /// <returns>
+        /// <see langword="true"/> if <paramref name="left"/> is equal to the <paramref name="right"/>;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public static bool operator ==(Option<TSome> left, Option<TSome> right) => left.EqualsCore(right);
+
+        /// <summary>Indicates whether the current object is not equal to another object of the same type.</summary>
+        /// <param name="left">An object to compare with <paramref name="right"/>.</param>
+        /// <param name="right">An object to compare with <paramref name="left"/>.</param>
+        /// <returns>
+        /// <see langword="true"/> if <paramref name="left"/> is not equal to the <paramref name="right"/>;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public static bool operator !=(Option<TSome> left, Option<TSome> right) => !(left == right);
+
+        /// <summary>Performs logical disjunction between two objects of the same type.</summary>
+        /// <param name="left">An object to disjoin with <paramref name="right"/>.</param>
+        /// <param name="right">An object to disjoin with <paramref name="left"/>.</param>
+        /// <returns>
+        /// The first value of <paramref name="left"/> and <paramref name="right"/>
+        /// that is in the Some state; otherwise, <see cref="None"/>.
+        /// </returns>
+        public static Option<TSome> operator |(Option<TSome> left, Option<TSome> right) =>
+            left.BitwiseOr(right); // note(cosborn) Also implements || (LogicalOr) operator, see below.
+
+        /// <summary>Performs logical conjunction between two objects of the same type.</summary>
+        /// <param name="left">An object to conjoin with <paramref name="right"/>.</param>
+        /// <param name="right">An object to conjoin with <paramref name="left"/>.</param>
+        /// <returns>
+        /// The last value of <paramref name="left"/> and <paramref name="right"/>
+        /// if they are both in the Some state; otherwise, <see cref="None"/>.
+        /// </returns>
+        public static Option<TSome> operator &(Option<TSome> left, Option<TSome> right) =>
+            left.BitwiseAnd(right); // note(cosborn) Also implements && (LogicalAnd) operator, see below.
+
+        // note(cosborn) Implementing true and false operators allows || and && operators to short-circuit.
+
+        /// <summary>Tests whether <paramref name="value"/> is in the Some state.</summary>
+        /// <param name="value">The value to be tested.</param>
+        /// <returns>
+        /// <see langword="true"/> if <paramref name="value"/> is in the Some state;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        public static bool operator true(Option<TSome> value) => value.IsTrue;
+
+        /// <summary>Tests whether <paramref name="value"/> is in the None state.</summary>
+        /// <param name="value">The value to be tested.</param>
+        /// <returns>
+        /// <see langword="true"/> if <paramref name="value"/> is in the None state;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        public static bool operator false(Option<TSome> value) => value.IsFalse;
+
+        /// <summary>
+        /// Tests the logical inverse of whether <paramref name="value"/>
+        /// is in the Some state.
+        /// </summary>
+        /// <param name="value">The value to be tested.</param>
+        /// <returns>
+        /// <see langword="true"/> if <paramref name="value"/> is in the None state;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        public static bool operator !(Option<TSome> value) => value.LogicalNot();
+
+        /// <summary>Wraps a value in <see cref="Option{TSome}"/>.</summary>
+        /// <param name="value">The value to be wrapped.</param>
+        /// <returns><paramref name="value"/>, wrapped in <see cref="Option{TSome}"/>.</returns>
+        public static Option<TSome> ToOption([CanBeNull] TSome value) => Option.From(value);
+
+        /// <summary>
+        /// Performs logical disjunction between this instance
+        /// and another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to disjoin with this instance.</param>
+        /// <returns>
+        /// The first value of this instance and <paramref name="other"/>
+        /// that is in the Some state; otherwise, <see cref="None"/>.
+        /// </returns>
+        [Pure, EditorBrowsable(Never)]
+        public Option<TSome> BitwiseOr(Option<TSome> other) =>
+            IsSome ? this : other; // note(cosborn) Yes, BitwiseOr is the alternate name for the operator.
+
+        /// <summary>
+        /// Performs logical conjunction between this instance
+        /// and another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to conjoin with this instance.</param>
+        /// <returns>
+        /// The last value of this instance and <paramref name="other"/>
+        /// if they are both in the Some state; otherwise, <see cref="None"/>.
+        /// </returns>
+        [Pure, EditorBrowsable(Never)]
+        public Option<TSome> BitwiseAnd(Option<TSome> other) =>
+            IsSome ? other : None; // note(cosborn) Yes, BitwiseAnd is the alternate name for the operator.
+
+        /// <summary>Tests the logical inverse of whether this instance is in the Some state.</summary>
+        /// <returns>
+        /// <see langword="true"/> if this instance is in the None state;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        [Pure, EditorBrowsable(Never)]
+        public bool LogicalNot() => !IsSome;
+
+        #endregion
 
         #region Match
 
@@ -581,9 +723,25 @@ namespace Tiger.Types
 
         #region Tap
 
+        /// <summary>Performs an action if this instance is in the None state and returns this instance.</summary>
+        /// <param name="none">An action to perform.</param>
+        /// <returns>The same value as this instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
+        [MustUseReturnValue]
+        public Option<TSome> Tap([NotNull, InstantHandle] Action none)
+        {
+            if (none == null) { throw new ArgumentNullException(nameof(none)); }
+
+            if (!IsSome)
+            {
+                none();
+            }
+
+            return this;
+        }
+
         /// <summary>
-        /// Performs an action on the Some value of this instance,
-        /// if present, and returns the same value as this instance.
+        /// Performs an action on the Some value of this instance, if present, and returns this instance.
         /// </summary>
         /// <param name="some">An action to perform.</param>
         /// <returns>The same value as this instance.</returns>
@@ -602,10 +760,29 @@ namespace Tiger.Types
         }
 
         /// <summary>
-        /// Performs an action on the Some value of this instance asynchronously,
-        /// if present, and returns the same value as this instance.
+        /// Performs an action if this instance is in the None state and returns this instance, asynchronously.
         /// </summary>
-        /// <param name="some">An action to perform asynchronously.</param>
+        /// <param name="none">An action to perform.</param>
+        /// <returns>The same value as this instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
+        [NotNull, MustUseReturnValue]
+        public async Task<Option<TSome>> Tap([NotNull, InstantHandle] Func<Task> none)
+        {
+            if (none == null) { throw new ArgumentNullException(nameof(none)); }
+
+            if (!IsSome)
+            {
+                await none().ConfigureAwait(false);
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Performs an action on the Some value of this instance,
+        /// if present, and returns the same value as this instance, asynchronously.
+        /// </summary>
+        /// <param name="some">An action to perform, asynchronously.</param>
         /// <returns>The same value as this instance.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
         [NotNull, MustUseReturnValue]
@@ -616,6 +793,106 @@ namespace Tiger.Types
             if (IsSome)
             {
                 await some(_value).ConfigureAwait(false);
+            }
+
+            return this;
+        }
+
+        /// <summary>Performs an action based on the state of this instance.</summary>
+        /// <param name="none">An action to perform if this instance is in the None state.</param>
+        /// <param name="some">An action to perform if this instance is in the Some state.</param>
+        /// <returns>This instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
+        public Option<TSome> Tap(
+            [NotNull, InstantHandle] Action none,
+            [NotNull, InstantHandle] Action<TSome> some)
+        {
+            if (none == null) { throw new ArgumentNullException(nameof(none)); }
+            if (some == null) { throw new ArgumentNullException(nameof(some)); }
+
+            if (IsSome)
+            {
+                some(_value);
+            }
+            else
+            {
+                none();
+            }
+
+            return this;
+        }
+
+        /// <summary>Performs an action based on the state of this instance, asynchronously.</summary>
+        /// <param name="none">An action to perform if this instance is in the None state, asynchonously.</param>
+        /// <param name="some">An action to perform if this instance is in the Some state.</param>
+        /// <returns>A task which, when resolved, produces this instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
+        public async Task<Option<TSome>> Tap(
+            [NotNull, InstantHandle] Func<Task> none,
+            [NotNull, InstantHandle] Action<TSome> some)
+        {
+            if (none == null) { throw new ArgumentNullException(nameof(none)); }
+            if (some == null) { throw new ArgumentNullException(nameof(some)); }
+
+            if (IsSome)
+            {
+                some(_value);
+            }
+            else
+            {
+                await none().ConfigureAwait(false);
+            }
+
+            return this;
+        }
+
+        /// <summary>Performs an action based on the state of this instance, asynchronously.</summary>
+        /// <param name="none">An action to perform if this instance is in the None state.</param>
+        /// <param name="some">An action to perform if this instance is in the Some state, asynchronously.</param>
+        /// <returns>A task which, when resolved, produces this instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
+        public async Task<Option<TSome>> Tap(
+            [NotNull, InstantHandle] Action none,
+            [NotNull, InstantHandle] Func<TSome, Task> some)
+        {
+            if (none == null) { throw new ArgumentNullException(nameof(none)); }
+            if (some == null) { throw new ArgumentNullException(nameof(some)); }
+
+            if (IsSome)
+            {
+                await some(_value).ConfigureAwait(false);
+            }
+            else
+            {
+                none();
+            }
+
+            return this;
+        }
+
+        /// <summary>Performs an action based on the state of this instance, asynchronously.</summary>
+        /// <param name="none">An action to perform if this instance is in the None state, asynchronously.</param>
+        /// <param name="some">An action to perform if this instance is in the Some state, asynchronously.</param>
+        /// <returns>A task which, when resolved, produces this instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
+        public async Task<Option<TSome>> Tap(
+            [NotNull, InstantHandle] Func<Task> none,
+            [NotNull, InstantHandle] Func<TSome, Task> some)
+        {
+            if (none == null) { throw new ArgumentNullException(nameof(none)); }
+            if (some == null) { throw new ArgumentNullException(nameof(some)); }
+
+            if (IsSome)
+            {
+                await some(_value).ConfigureAwait(false);
+            }
+            else
+            {
+                await none().ConfigureAwait(false);
             }
 
             return this;
@@ -802,5 +1079,73 @@ namespace Tiger.Types
         }
 
         #endregion
+
+        /// <summary>Returns an enumerator that iterates through the <see cref="Option{TSome}"/>.</summary>
+        /// <returns>An <see cref="IEnumerator{T}"/> for the <see cref="Option{TSome}"/>.</returns>
+        [Pure, EditorBrowsable(Never)]
+        public IEnumerator<TSome> GetEnumerator()
+        { // note(cosborn) OK, it's kind of an implementation.
+            if (IsSome)
+            {
+                yield return _value;
+            }
+        }
+
+        #region object
+
+        /// <inheritdoc/>
+        [NotNull, Pure]
+        public override string ToString() => IsNone
+            ? "None"
+            : $"Some({_value})";
+
+        /// <inheritdoc/>
+        [Pure]
+        public override int GetHashCode() => IsNone
+            ? 0
+            : EqualityComparer<TSome>.Default.GetHashCode(_value);
+
+        /// <inheritdoc/>
+        [Pure]
+        public override bool Equals(object obj) =>
+            obj is Option<TSome> option && EqualsCore(option);
+
+        [Pure]
+        bool EqualsCore(Option<TSome> other)
+        {
+            if (IsNone && other.IsNone) { return true; }
+            if (IsNone || other.IsNone) { return false; }
+
+            // note(cosborn) Implicitly `IsSome && other.IsSome`.
+            return _value.Equals(other._value);
+        }
+
+        [NotNull, Pure, UsedImplicitly]
+        object ToDump() => Match<object>(
+            none: new { State = "None" },
+            some: v => new { State = "Some", Value = v });
+
+        #endregion
+
+        [UsedImplicitly(WithMembers)]
+        sealed class DebuggerTypeProxy
+        {
+            readonly Option<TSome> _value;
+
+            /// <summary>Initializes a new instance of the <see cref="DebuggerTypeProxy"/> class.</summary>
+            /// <param name="value">The optional value to be proxied.</param>
+            public DebuggerTypeProxy(in Option<TSome> value)
+            {
+                _value = value;
+            }
+
+            /// <summary>Gets the internal value of the <see cref="Option{TSome}"/>.</summary>
+            [NotNull]
+            public TSome Value => _value._value;
+
+            /// <summary>Gets the internal state of the <see cref="Option{TSome}"/>.</summary>
+            [NotNull]
+            public string State => _value.IsSome ? "Some" : "None";
+        }
     }
 }

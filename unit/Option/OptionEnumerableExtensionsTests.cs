@@ -1,26 +1,31 @@
 ﻿using System.Linq;
 using FsCheck.Xunit;
 using Xunit;
-// ReSharper disable All
 
 namespace Tiger.Types.UnitTest
 {
     /// <summary>Tests related to <see cref="OptionEnumerableExtensions"/>.</summary>
     public static class OptionEnumerableExtensionsTests
     {
-        [Property(DisplayName = "A collection of None Options cats to an empty collection.")]
-        static void Cat_AllNone(byte count)
+        [Fact(DisplayName = "A null collection of options throws.")]
+        public static void Cat_Null_Throws()
         {
-            var nones = Enumerable.Repeat(Option<int>.None, count);
+            var actual = Record.Exception(() => OptionEnumerableExtensions.Cat<int>(null));
 
-            var actual = nones.Cat();
+            Assert.NotNull(actual);
+        }
+
+        [Property(DisplayName = "A collection of None Options cats to an empty collection.")]
+        public static void Cat_AllNone(byte count)
+        {
+            var actual = Enumerable.Repeat(Option<int>.None, count).Cat();
 
             Assert.NotNull(actual);
             Assert.Empty(actual);
         }
 
         [Property(DisplayName = "A collection of Some Options cats to a collection of the Some value of its elements.")]
-        static void Cat_AllSome(int[] values)
+        public static void Cat_AllSome(int[] values)
         {
             var actual = values.Select(Option.From).Cat().ToList();
 
@@ -28,14 +33,14 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(values.Length, actual.Count);
         }
 
-        [Fact(DisplayName = "A collection of mixed Option values cats to a collection of the Some values of its elements in the Some state.")]
-        static void Cat_Mixed()
+        [Property(DisplayName = "A collection of mixed Option values cats to a collection of the Some values of its elements in the Some state.")]
+        public static void Cat_Mixed(int a, int b)
         {
             var mixed = new[]
             {
-                Option.From(33),
+                Option.From(a),
                 Option<int>.None,
-                Option.From(55)
+                Option.From(b)
             };
 
             var actual = mixed.Cat().ToList();
@@ -45,8 +50,8 @@ namespace Tiger.Types.UnitTest
             Assert.NotEmpty(actual);
             Assert.Equal(mixed.Count(o => o.IsSome), actual.Count);
             Assert.Collection(actual,
-                i => Assert.Equal(33, i),
-                i => Assert.Equal(55, i));
+                i => Assert.Equal(a, i),
+                i => Assert.Equal(b, i));
         }
     }
 }

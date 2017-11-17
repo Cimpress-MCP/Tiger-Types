@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -44,12 +45,15 @@ namespace Tiger.Types
         {
             if (source == null) { throw new ArgumentNullException(nameof(source)); }
 
-            // note(cosborn) Logic cribbed from FirstOrDefault.
-            if (source is IList<TSource> list && list.Count > 0)
+            switch (source)
             {
-                return list[0];
+                case null:
+                    throw new ArgumentNullException(nameof(source));
+                case IList<TSource> list when list.Count > 0:
+                    return list[0];
             }
 
+            // note(cosborn) Logic cribbed from FirstOrDefault
             using (var e = source.GetEnumerator())
             {
                 if (e.MoveNext()) { return e.Current; }
@@ -101,6 +105,8 @@ namespace Tiger.Types
         /// <returns>
         /// An <see cref="IEnumerable{T}"/> that is the result of applying <paramref name="mapper"/>
         /// to each element of <paramref name="enumerableValue"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="enumerableValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="mapper"/> is <see langword="null"/>.</exception>
         [NotNull, ItemNotNull, Pure, LinqTunnel]
         public static IEnumerable<TOut> Map<TIn, TOut>(
             [NotNull, ItemNotNull] this IEnumerable<TIn> enumerableValue,
@@ -126,6 +132,8 @@ namespace Tiger.Types
         /// An <see cref="IEnumerable{T}"/> that is the result of applying <paramref name="mapper"/>
         /// to each element of <paramref name="enumerableValue"/>, then extracting the Some values thereof.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="enumerableValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="mapper"/> is <see langword="null"/>.</exception>
         [NotNull, ItemNotNull, Pure, LinqTunnel]
         public static IEnumerable<TOut> MapCat<TIn, TOut>(
             [NotNull, ItemNotNull] this IEnumerable<TIn> enumerableValue,
@@ -148,17 +156,19 @@ namespace Tiger.Types
         /// to <typeparamref name="TOut"/>.
         /// </param>
         /// <returns>
-        /// An <see cref="IEnumerable{T}"/> that is the result of applying <paramref name="mapper"/>
+        /// A collection that is the result of applying <paramref name="mapper"/>
         /// to each element of <paramref name="enumerableValue"/>.</returns>
-        [NotNull, ItemNotNull, Pure, LinqTunnel]
-        public static Task<IEnumerable<TOut>> Map<TIn, TOut>(
+        /// <exception cref="ArgumentNullException"><paramref name="enumerableValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="mapper"/> is <see langword="null"/>.</exception>
+        [NotNull, Pure, LinqTunnel]
+        public static Task<ImmutableArray<TOut>> Map<TIn, TOut>(
             [NotNull, ItemNotNull] this IEnumerable<TIn> enumerableValue,
             [NotNull, InstantHandle] Func<TIn, Task<TOut>> mapper)
         {
             if (enumerableValue == null) { throw new ArgumentNullException(nameof(enumerableValue)); }
             if (mapper == null) { throw new ArgumentNullException(nameof(mapper)); }
 
-            return enumerableValue.Select(mapper).Pipe(Task.WhenAll).Map(Enumerable.AsEnumerable);
+            return enumerableValue.Select(mapper).Pipe(Task.WhenAll).Map(ImmutableArray.Create);
         }
 
         /// <summary>Combines the provided seed state with each element of this instance.</summary>
@@ -178,7 +188,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="folder"/> is <see langword="null"/>.</exception>
         [NotNull, Pure]
         public static TState Fold<T, TState>(
-            [NotNull, ItemNotNull] this IEnumerable<T> collection,
+            [NotNull, ItemNotNull] this IReadOnlyCollection<T> collection,
             [NotNull] TState state,
             [NotNull, InstantHandle] Func<TState, T, TState> folder)
         {
@@ -216,7 +226,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="folder"/> is <see langword="null"/>.</exception>
         [NotNull, ItemNotNull]
         public static async Task<TState> Fold<T, TState>(
-            [NotNull, ItemNotNull] this IEnumerable<T> collection,
+            [NotNull, ItemNotNull] this IReadOnlyCollection<T> collection,
             [NotNull] TState state,
             [NotNull, InstantHandle] Func<TState, T, Task<TState>> folder)
         {
