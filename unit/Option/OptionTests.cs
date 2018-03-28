@@ -16,6 +16,10 @@ namespace Tiger.Types.UnitTest
     [Properties(Arbitrary = new[] { typeof(Generators) }, QuietOnSuccess = true)]
     public static partial class OptionTests
     {
+        [Property(DisplayName = "The copy constructor copies.")]
+        public static void CopyConstructor(Option<int> expected) =>
+            Assert.Equal(expected, new Option<int>(expected));
+
         [Property(DisplayName = "Non-null values create Some Options using the untyped static From method.")]
         public static void UntypedFrom_Value_IsSome(NonEmptyString some)
         {
@@ -108,7 +112,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Coalescing an Option with a null task throws.")]
         public static async Task TaskGetOrDefault_Null_Throws(Option<string> option)
         {
-            var actual = await Record.ExceptionAsync(() => option.GetValueOrDefault((Func<Task<string>>)null)).ConfigureAwait(false);
+            var actual = await Record.ExceptionAsync(() => option.GetValueOrDefaultAsync((Func<Task<string>>)null)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
             Assert.Contains("Parameter name: other", ane.Message, Ordinal);
@@ -118,7 +122,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskGetValueOrDefault_None(NonEmptyString coalescey)
         {
             var actual = await Option<string>.None
-                .GetValueOrDefault(() => FromResult(coalescey.Get))
+                .GetValueOrDefaultAsync(() => FromResult(coalescey.Get))
                 .ConfigureAwait(false);
 
             Assert.Equal(coalescey.Get, actual);
@@ -128,7 +132,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskGetValueOrDefault_Some(NonEmptyString some, NonEmptyString coalescey)
         {
             var actual = await Option.From(some.Get)
-                .GetValueOrDefault(() => FromResult(coalescey.Get))
+                .GetValueOrDefaultAsync(() => FromResult(coalescey.Get))
                 .ConfigureAwait(false);
 
             Assert.Equal(some.Get, actual);

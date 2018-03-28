@@ -38,7 +38,7 @@ namespace Tiger.Types.UnitTest
         {
             var value = Either.Left<string, int>(left.Get);
 
-            var actual = await value.Match(
+            var actual = await value.MatchAsync(
                 left: l => l.Length,
                 right: FromResult)
                 .ConfigureAwait(false);
@@ -51,7 +51,7 @@ namespace Tiger.Types.UnitTest
         {
             var value = Either.Right<string, int>(right);
 
-            var actual = await value.Match(
+            var actual = await value.MatchAsync(
                 left: l => l.Length,
                 right: FromResult)
                 .ConfigureAwait(false);
@@ -64,7 +64,7 @@ namespace Tiger.Types.UnitTest
         {
             var value = Either.Left<string, int>(left.Get);
 
-            var actual = await value.Match(
+            var actual = await value.MatchAsync(
                 left: l => l.Length.Pipe(FromResult),
                 right: r => r)
                 .ConfigureAwait(false);
@@ -77,7 +77,7 @@ namespace Tiger.Types.UnitTest
         {
             var value = Either.Right<string, int>(right);
 
-            var actual = await value.Match(
+            var actual = await value.MatchAsync(
                 left: l => l.Length.Pipe(FromResult),
                 right: r => r)
                 .ConfigureAwait(false);
@@ -90,7 +90,7 @@ namespace Tiger.Types.UnitTest
         {
             var value = Either.Left<string, int>(left.Get);
 
-            var actual = await value.Match(
+            var actual = await value.MatchAsync(
                 left: l => l.Length.Pipe(FromResult),
                 right: FromResult)
                 .ConfigureAwait(false);
@@ -103,7 +103,7 @@ namespace Tiger.Types.UnitTest
         {
             var value = Either.Right<string, int>(right);
 
-            var actual = await value.Match(
+            var actual = await value.MatchAsync(
                 left: l => l.Length.Pipe(FromResult),
                 right: FromResult)
                 .ConfigureAwait(false);
@@ -151,7 +151,7 @@ namespace Tiger.Types.UnitTest
             var value = Either.Left<string, int>(left.Get);
 
             var actual = before.Get;
-            await value.Match(
+            await value.MatchAsync(
                 left: _ => actual = sentinel.Get,
                 right: _ => CompletedTask).ConfigureAwait(false);
 
@@ -164,7 +164,7 @@ namespace Tiger.Types.UnitTest
             var value = Either.Right<string, int>(right);
 
             var actual = before;
-            await value.Match(
+            await value.MatchAsync(
                 left: _ => { },
                 right: _ => Run(() => actual = sentinel)).ConfigureAwait(false);
 
@@ -178,7 +178,7 @@ namespace Tiger.Types.UnitTest
 
             // act
             var actual = before.Get;
-            await value.Match(
+            await value.MatchAsync(
                 left: _ => Run(() => actual = sentinel.Get),
                 right: _ => { }).ConfigureAwait(false);
 
@@ -192,7 +192,7 @@ namespace Tiger.Types.UnitTest
 
             // act
             var actual = before;
-            await value.Match(
+            await value.MatchAsync(
                 left: _ => CompletedTask,
                 right: _ => actual = sentinel).ConfigureAwait(false);
 
@@ -206,7 +206,7 @@ namespace Tiger.Types.UnitTest
 
             // act
             var actual = before.Get;
-            await value.Match(
+            await value.MatchAsync(
                 left: _ => Run(() => actual = sentinel.Get),
                 right: _ => CompletedTask).ConfigureAwait(false);
 
@@ -220,7 +220,7 @@ namespace Tiger.Types.UnitTest
 
             // act
             var actual = before;
-            await value.Match(
+            await value.MatchAsync(
                 left: _ => CompletedTask,
                 right: _ => Run(() => actual = sentinel)).ConfigureAwait(false);
 

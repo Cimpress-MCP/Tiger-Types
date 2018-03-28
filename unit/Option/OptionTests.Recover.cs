@@ -91,7 +91,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskRecover_None_Null_Throws()
         {
             var actual = await Record.ExceptionAsync(() => Option<string>.None
-                .Recover(recoverer: (Func<Task<string>>)null))
+                .RecoverAsync(recoverer: (Func<Task<string>>)null))
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
@@ -102,7 +102,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskRecover_None(NonEmptyString recovery)
         {
             var actual = await Option<string>.None
-                .Recover(() => FromResult(recovery.Get))
+                .RecoverAsync(() => FromResult(recovery.Get))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsSome);
@@ -114,7 +114,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskRecover_Some_Null_Throws(NonEmptyString some)
         {
             var actual = await Record.ExceptionAsync(() => Option.From(some.Get)
-                .Recover(recoverer: (Func<Task<string>>)null))
+                .RecoverAsync(recoverer: (Func<Task<string>>)null))
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
@@ -125,7 +125,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskRecover_Some(NonEmptyString some, NonEmptyString recovery)
         {
             var actual = await Option.From(some.Get)
-                .Recover(() => FromResult(recovery.Get))
+                .RecoverAsync(() => FromResult(recovery.Get))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsSome);

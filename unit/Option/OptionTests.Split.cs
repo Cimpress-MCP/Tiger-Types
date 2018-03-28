@@ -68,7 +68,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskSplit_NullSplitter_Throws(string from)
         {
             var actual = await Record.ExceptionAsync(() => Option
-                .Split(from, splitter: (Func<string, Task<bool>>)null))
+                .SplitAsync(from, splitter: (Func<string, Task<bool>>)null))
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
@@ -78,7 +78,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Splitting a null value over a task returns a None Option.")]
         public static async Task TaskSplit_Null_None(Func<string, Task<bool>> splitter)
         {
-            var actual = await Option.Split(null, splitter).ConfigureAwait(false);
+            var actual = await Option.SplitAsync(null, splitter).ConfigureAwait(false);
 
             Assert.True(actual.IsNone);
         }
@@ -87,7 +87,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskSplit_Nullable_NullSplitter_Throws(int? from)
         {
             var actual = await Record.ExceptionAsync(() => Option
-                .Split(from, splitter: (Func<int, Task<bool>>)null))
+                .SplitAsync(from, splitter: (Func<int, Task<bool>>)null))
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
@@ -97,7 +97,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Splitting a nullable null value over a task returns a None Option.")]
         public static async Task TaskSplit_NullableNull_None(Func<int, Task<bool>> splitter)
         {
-            var actual = await Option.Split(null, splitter).ConfigureAwait(false);
+            var actual = await Option.SplitAsync(null, splitter).ConfigureAwait(false);
 
             Assert.True(actual.IsNone);
         }
@@ -105,7 +105,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Splitting a value over a task, failing the condition, returns a None Option.")]
         public static async Task TaskSplit_ReturnFalse_None(NonEmptyString some)
         {
-            var actual = await Option.Split(some.Get, _ => FromResult(false)).ConfigureAwait(false);
+            var actual = await Option.SplitAsync(some.Get, _ => FromResult(false)).ConfigureAwait(false);
 
             Assert.True(actual.IsNone);
         }
@@ -113,7 +113,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Splitting a nullable value over a task, failing the condition, returns a None Option.")]
         public static async Task TaskSplit_NullableReturnFalse_None(int some)
         {
-            var actual = await Option.Split((int?)some, (int _) => FromResult(false)).ConfigureAwait(false);
+            var actual = await Option.SplitAsync((int?)some, (int _) => FromResult(false)).ConfigureAwait(false);
 
             Assert.True(actual.IsNone);
         }
@@ -121,7 +121,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Splitting a value over a func, passing the condition, returns a Some Option.")]
         public static async Task TaskSplit_Some(NonEmptyString some)
         {
-            var actual = await Option.Split(some.Get, _ => FromResult(true)).ConfigureAwait(false);
+            var actual = await Option.SplitAsync(some.Get, _ => FromResult(true)).ConfigureAwait(false);
 
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
@@ -131,7 +131,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Splitting a nullable value over a func, passing the condition, returns a Some Option.")]
         public static async Task TaskSplit_Nullable_Some(int some)
         {
-            var actual = await Option.Split((int?)some, (int _) => FromResult(true)).ConfigureAwait(false);
+            var actual = await Option.SplitAsync((int?)some, (int _) => FromResult(true)).ConfigureAwait(false);
 
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;

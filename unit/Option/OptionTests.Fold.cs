@@ -39,7 +39,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Folding over an option with a null seed throws.")]
         public static async Task TaskFold_NullSeed_Throws(Option<int> option, Func<string, int, Task<string>> folder)
         {
-            var actual = await Record.ExceptionAsync(() => option.Fold(null, folder)).ConfigureAwait(false);
+            var actual = await Record.ExceptionAsync(() => option.FoldAsync(null, folder)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
             Assert.Contains("Parameter name: state", ane.Message, Ordinal);
@@ -48,7 +48,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Folding over an option with a null seed throws.")]
         public static async Task TaskFold_NullFolder_Throws(Option<int> option, NonEmptyString state)
         {
-            var actual = await Record.ExceptionAsync(() => option.Fold(state.Get, (Func<string, int, Task<string>>)null))
+            var actual = await Record.ExceptionAsync(() => option.FoldAsync(state.Get, (Func<string, int, Task<string>>)null))
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
@@ -59,7 +59,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskFold_None(int seed)
         {
             var actual = await Option<string>.None
-                .Fold(seed, (s, v) => FromResult(s + v.Length))
+                .FoldAsync(seed, (s, v) => FromResult(s + v.Length))
                 .ConfigureAwait(false);
 
             Assert.Equal(seed, actual);
@@ -70,7 +70,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskFold_Some(NonEmptyString some, int seed)
         {
             var actual = await Option.From(some.Get)
-                .Fold(seed, (s, v) => FromResult(s + v.Length))
+                .FoldAsync(seed, (s, v) => FromResult(s + v.Length))
                 .ConfigureAwait(false);
 
             Assert.Equal(seed + some.Get.Length, actual);

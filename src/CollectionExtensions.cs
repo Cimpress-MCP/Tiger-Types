@@ -1,4 +1,4 @@
-﻿// <copyright file="EnumerableExtensions.cs" company="Cimpress, Inc.">
+﻿// <copyright file="CollectionExtensions.cs" company="Cimpress, Inc.">
 //   Copyright 2017 Cimpress, Inc.
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,9 +25,9 @@ using static Tiger.Types.Resources;
 
 namespace Tiger.Types
 {
-    /// <summary>Extensions to the functionality of <see cref="IEnumerable{T}"/>.</summary>
+    /// <summary>Extensions to the functionality of collections.</summary>
     [PublicAPI]
-    public static class EnumerableExtensions
+    public static class CollectionExtensions
     {
         /// <summary>
         /// Returns the first element of a sequence, or a default value
@@ -44,13 +44,9 @@ namespace Tiger.Types
             [NotNull, ItemNotNull] this IEnumerable<TSource> source)
         {
             if (source == null) { throw new ArgumentNullException(nameof(source)); }
-
-            switch (source)
+            if (source is IList<TSource> list && list.Count > 0)
             {
-                case null:
-                    throw new ArgumentNullException(nameof(source));
-                case IList<TSource> list when list.Count > 0:
-                    return list[0];
+                return list[0];
             }
 
             // note(cosborn) Logic cribbed from FirstOrDefault
@@ -119,8 +115,34 @@ namespace Tiger.Types
         }
 
         /// <summary>
+        /// Maps a transformation over each element of an <see cref="IEnumerable{T}"/>, asynchronously.
+        /// </summary>
+        /// <typeparam name="TIn">The element type of <paramref name="enumerableValue"/>.</typeparam>
+        /// <typeparam name="TOut">The return type of <paramref name="mapper"/>.</typeparam>
+        /// <param name="enumerableValue">The value to map.</param>
+        /// <param name="mapper">
+        /// An asynchronous transformation from <typeparamref name="TIn"/>
+        /// to <typeparamref name="TOut"/>.
+        /// </param>
+        /// <returns>
+        /// A collection that is the result of applying <paramref name="mapper"/>
+        /// to each element of <paramref name="enumerableValue"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="enumerableValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="mapper"/> is <see langword="null"/>.</exception>
+        [NotNull, Pure, LinqTunnel]
+        public static Task<ImmutableArray<TOut>> MapAsync<TIn, TOut>(
+            [NotNull, ItemNotNull] this IEnumerable<TIn> enumerableValue,
+            [NotNull, InstantHandle] Func<TIn, Task<TOut>> mapper)
+        {
+            if (enumerableValue == null) { throw new ArgumentNullException(nameof(enumerableValue)); }
+            if (mapper == null) { throw new ArgumentNullException(nameof(mapper)); }
+
+            return enumerableValue.Select(mapper).Pipe(Task.WhenAll).Map(ImmutableArray.Create);
+        }
+
+        /// <summary>
         /// Maps a transformation over each element of an <see cref="IEnumerable{T}"/>,
-        /// then maps the collection of optional values to their Some values..
+        /// then maps the collection of optional values to their Some values.
         /// </summary>
         /// <typeparam name="TIn">The element type of <paramref name="enumerableValue"/>.</typeparam>
         /// <typeparam name="TOut">The Some type of the return type of <paramref name="mapper"/>.</typeparam>
@@ -146,29 +168,36 @@ namespace Tiger.Types
         }
 
         /// <summary>
-        /// Maps a transformation over each element of an <see cref="IEnumerable{T}"/>, asynchronously.
+        /// Combines the default value of <typeparamref name="TState"/> with each element of this instance.
         /// </summary>
-        /// <typeparam name="TIn">The element type of <paramref name="enumerableValue"/>.</typeparam>
-        /// <typeparam name="TOut">The return type of <paramref name="mapper"/>.</typeparam>
-        /// <param name="enumerableValue">The value to map.</param>
-        /// <param name="mapper">
-        /// An asynchronous transformation from <typeparamref name="TIn"/>
-        /// to <typeparamref name="TOut"/>.
+        /// <typeparam name="T">The element type of <paramref name="collection"/>.</typeparam>
+        /// <typeparam name="TState">The type of the seed value.</typeparam>
+        /// <param name="collection">The collection to be folded.</param>
+        /// <param name="folder">
+        /// A function to invoke with the seed value and each element of this instance as the arguments.
         /// </param>
         /// <returns>
-        /// A collection that is the result of applying <paramref name="mapper"/>
-        /// to each element of <paramref name="enumerableValue"/>.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="enumerableValue"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="mapper"/> is <see langword="null"/>.</exception>
-        [NotNull, Pure, LinqTunnel]
-        public static Task<ImmutableArray<TOut>> Map<TIn, TOut>(
-            [NotNull, ItemNotNull] this IEnumerable<TIn> enumerableValue,
-            [NotNull, InstantHandle] Func<TIn, Task<TOut>> mapper)
+        /// The result of combining the provided seed value with each element of this instance
+        /// if this instance is not empty; otherwise, the seed value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="collection"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="folder"/> is <see langword="null"/>.</exception>
+        [Pure]
+        public static TState Fold<T, TState>(
+            [NotNull, ItemNotNull] this IReadOnlyCollection<T> collection,
+            [NotNull, InstantHandle] Func<TState, T, TState> folder)
+            where TState : struct
         {
-            if (enumerableValue == null) { throw new ArgumentNullException(nameof(enumerableValue)); }
-            if (mapper == null) { throw new ArgumentNullException(nameof(mapper)); }
+            if (collection == null) { throw new ArgumentNullException(nameof(collection)); }
+            if (folder == null) { throw new ArgumentNullException(nameof(folder)); }
 
-            return enumerableValue.Select(mapper).Pipe(Task.WhenAll).Map(ImmutableArray.Create);
+            var result = default(TState);
+            foreach (var item in collection)
+            {
+                result = folder(result, item);
+            }
+
+            return result;
         }
 
         /// <summary>Combines the provided seed state with each element of this instance.</summary>
@@ -207,6 +236,40 @@ namespace Tiger.Types
         }
 
         /// <summary>
+        /// Combines the default value of <typeparamref name="TState"/> with each value of this instance, asynchronously.
+        /// </summary>
+        /// <typeparam name="T">The type of the items contained in <paramref name="collection"/>.</typeparam>
+        /// <typeparam name="TState">The type of the seed value.</typeparam>
+        /// <param name="collection">The collection to be folded.</param>
+        /// <param name="folder">
+        /// An asynchronous function to invoke with the seed value
+        /// and each value of this instance as the arguments.
+        /// </param>
+        /// <returns>
+        /// The result of combining the provided seed value with each value of this instance
+        /// if this instance is not empty; otherwise, the seed value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="collection"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="folder"/> is <see langword="null"/>.</exception>
+        [NotNull]
+        public static async Task<TState> FoldAsync<T, TState>(
+            [NotNull, ItemNotNull] this IReadOnlyCollection<T> collection,
+            [NotNull, InstantHandle] Func<TState, T, Task<TState>> folder)
+            where TState : struct
+        {
+            if (collection == null) { throw new ArgumentNullException(nameof(collection)); }
+            if (folder == null) { throw new ArgumentNullException(nameof(folder)); }
+
+            var result = default(TState);
+            foreach (var item in collection)
+            {
+                result = await folder(result, item).ConfigureAwait(false);
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Combines the provided seed state with each value of this instance, asynchronously.
         /// </summary>
         /// <typeparam name="T">The type of the items contained in <paramref name="collection"/>.</typeparam>
@@ -225,7 +288,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="state"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="folder"/> is <see langword="null"/>.</exception>
         [NotNull, ItemNotNull]
-        public static async Task<TState> Fold<T, TState>(
+        public static async Task<TState> FoldAsync<T, TState>(
             [NotNull, ItemNotNull] this IReadOnlyCollection<T> collection,
             [NotNull] TState state,
             [NotNull, InstantHandle] Func<TState, T, Task<TState>> folder)

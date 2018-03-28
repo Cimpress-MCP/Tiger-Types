@@ -81,7 +81,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException"><paramref name="eitherTaskValue"/> produced a result that has not been initialized.</exception>
         [NotNull, Pure]
-        public static Task<TOut> MatchT<TLeft, TRight, TOut>(
+        public static Task<TOut> MatchTAsync<TLeft, TRight, TOut>(
             [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
             [NotNull, InstantHandle] Func<TLeft, TOut> left,
             [NotNull, InstantHandle] Func<TRight, Task<TOut>> right)
@@ -90,7 +90,7 @@ namespace Tiger.Types
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
 
-            return eitherTaskValue.Bind(ev => ev.Match(left: left, right: right));
+            return eitherTaskValue.Bind(ev => ev.MatchAsync(left: left, right: right));
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException"><paramref name="eitherTaskValue"/> produced a result that has not been initialized.</exception>
         [NotNull, Pure]
-        public static Task<TOut> MatchT<TLeft, TRight, TOut>(
+        public static Task<TOut> MatchTAsync<TLeft, TRight, TOut>(
             [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
             [NotNull, InstantHandle] Func<TLeft, Task<TOut>> left,
             [NotNull, InstantHandle] Func<TRight, TOut> right)
@@ -123,7 +123,7 @@ namespace Tiger.Types
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
 
-            return eitherTaskValue.Bind(ev => ev.Match(left: left, right: right));
+            return eitherTaskValue.Bind(ev => ev.MatchAsync(left: left, right: right));
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException"><paramref name="eitherTaskValue"/> produced a result that has not been initialized.</exception>
         [NotNull, Pure]
-        public static Task<TOut> MatchT<TLeft, TRight, TOut>(
+        public static Task<TOut> MatchTAsync<TLeft, TRight, TOut>(
             [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
             [NotNull, InstantHandle] Func<TLeft, Task<TOut>> left,
             [NotNull, InstantHandle] Func<TRight, Task<TOut>> right)
@@ -156,7 +156,7 @@ namespace Tiger.Types
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
 
-            return eitherTaskValue.Bind(ev => ev.Match(left: left, right: right));
+            return eitherTaskValue.Bind(ev => ev.MatchAsync(left: left, right: right));
         }
 
         #endregion
@@ -209,14 +209,14 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException"><paramref name="eitherTaskValue"/> produced a result that has not been initialized.</exception>
         [NotNull, Pure]
-        public static Task<Either<TLeft, TOut>> MapT<TLeft, TIn, TOut>(
+        public static Task<Either<TLeft, TOut>> MapTAsync<TLeft, TIn, TOut>(
             [NotNull] this Task<Either<TLeft, TIn>> eitherTaskValue,
             [NotNull, InstantHandle] Func<TIn, Task<TOut>> right)
         {
             if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
 
-            return eitherTaskValue.Bind(ev => ev.Map(right: right));
+            return eitherTaskValue.Bind(ev => ev.MapAsync(right: right));
         }
 
         /// <summary>
@@ -264,14 +264,14 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException"><paramref name="eitherTaskValue"/> produced a result that has not been initialized.</exception>
         [NotNull, Pure]
-        public static Task<Either<TOut, TRight>> MapT<TRight, TIn, TOut>(
+        public static Task<Either<TOut, TRight>> MapTAsync<TRight, TIn, TOut>(
             [NotNull] this Task<Either<TIn, TRight>> eitherTaskValue,
             [NotNull, InstantHandle] Func<TIn, Task<TOut>> left)
         {
             if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
 
-            return eitherTaskValue.Bind(ev => ev.Map(left: left));
+            return eitherTaskValue.Bind(ev => ev.MapAsync(left: left));
         }
 
         #endregion
@@ -324,14 +324,14 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException"><paramref name="eitherTaskValue"/> produced a result that has not been initialized.</exception>
         [NotNull, Pure]
-        public static Task<Either<TLeft, TOut>> BindT<TLeft, TIn, TOut>(
+        public static Task<Either<TLeft, TOut>> BindTAsync<TLeft, TIn, TOut>(
             [NotNull] this Task<Either<TLeft, TIn>> eitherTaskValue,
             [NotNull, InstantHandle] Func<TIn, Task<Either<TLeft, TOut>>> right)
         {
             if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
 
-            return eitherTaskValue.Bind(ev => ev.Bind(right: right));
+            return eitherTaskValue.Bind(ev => ev.BindAsync(right: right));
         }
 
         /// <summary>
@@ -378,14 +378,14 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException"><paramref name="eitherTaskValue"/> produced a result that has not been initialized.</exception>
         [NotNull, Pure]
-        public static Task<Either<TOut, TRight>> BindT<TRight, TIn, TOut>(
+        public static Task<Either<TOut, TRight>> BindTAsync<TRight, TIn, TOut>(
             [NotNull] this Task<Either<TIn, TRight>> eitherTaskValue,
             [NotNull, InstantHandle] Func<TIn, Task<Either<TOut, TRight>>> left)
         {
             if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
 
-            return eitherTaskValue.Bind(ev => ev.Bind(left: left));
+            return eitherTaskValue.Bind(ev => ev.BindAsync(left: left));
         }
 
         #endregion
@@ -426,14 +426,14 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         [NotNull, MustUseReturnValue]
-        public static Task<Either<TLeft, TRight>> TapT<TLeft, TRight>(
+        public static Task<Either<TLeft, TRight>> TapTAsync<TLeft, TRight>(
             [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
             [NotNull, InstantHandle] Func<TLeft, Task> left)
         {
             if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
 
-            return eitherTaskValue.Bind(ev => ev.Tap(left: left));
+            return eitherTaskValue.Bind(ev => ev.TapAsync(left: left));
         }
 
         /// <summary>
@@ -470,14 +470,14 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         [NotNull, MustUseReturnValue]
-        public static Task<Either<TLeft, TRight>> TapT<TLeft, TRight>(
+        public static Task<Either<TLeft, TRight>> TapTAsync<TLeft, TRight>(
             [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
             [NotNull, InstantHandle] Func<TRight, Task> right)
         {
             if (eitherTaskValue == null) { throw new ArgumentNullException(nameof(eitherTaskValue)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
 
-            return eitherTaskValue.Bind(ev => ev.Tap(right: right));
+            return eitherTaskValue.Bind(ev => ev.TapAsync(right: right));
         }
 
         /// <summary>
@@ -520,7 +520,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         [NotNull, MustUseReturnValue]
-        public static Task<Either<TLeft, TRight>> TapT<TLeft, TRight>(
+        public static Task<Either<TLeft, TRight>> TapTAsync<TLeft, TRight>(
             [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
             [NotNull, InstantHandle] Func<TLeft, Task> left,
             [NotNull, InstantHandle] Action<TRight> right)
@@ -529,7 +529,7 @@ namespace Tiger.Types
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
 
-            return eitherTaskValue.Bind(ev => ev.Tap(left: left, right: right));
+            return eitherTaskValue.Bind(ev => ev.TapAsync(left: left, right: right));
         }
 
         /// <summary>
@@ -546,7 +546,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         [NotNull, MustUseReturnValue]
-        public static Task<Either<TLeft, TRight>> TapT<TLeft, TRight>(
+        public static Task<Either<TLeft, TRight>> TapTAsync<TLeft, TRight>(
             [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
             [NotNull, InstantHandle] Action<TLeft> left,
             [NotNull, InstantHandle] Func<TRight, Task> right)
@@ -555,7 +555,7 @@ namespace Tiger.Types
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
 
-            return eitherTaskValue.Bind(ev => ev.Tap(left: left, right: right));
+            return eitherTaskValue.Bind(ev => ev.TapAsync(left: left, right: right));
         }
 
         /// <summary>
@@ -572,7 +572,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         [NotNull, MustUseReturnValue]
-        public static Task<Either<TLeft, TRight>> TapT<TLeft, TRight>(
+        public static Task<Either<TLeft, TRight>> TapTAsync<TLeft, TRight>(
             [NotNull] this Task<Either<TLeft, TRight>> eitherTaskValue,
             [NotNull, InstantHandle] Func<TLeft, Task> left,
             [NotNull, InstantHandle] Func<TRight, Task> right)
@@ -581,7 +581,7 @@ namespace Tiger.Types
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
 
-            return eitherTaskValue.Bind(ev => ev.Tap(left: left, right: right));
+            return eitherTaskValue.Bind(ev => ev.TapAsync(left: left, right: right));
         }
 
         #endregion

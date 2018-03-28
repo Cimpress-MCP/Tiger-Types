@@ -41,7 +41,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Binding an option over a null task throws.")]
         public static async Task TaskBind_Null_Throws(Option<string> option)
         {
-            var actual = await Record.ExceptionAsync(() => option.Bind((Func<string, Task<Option<int>>>)null))
+            var actual = await Record.ExceptionAsync(() => option.BindAsync((Func<string, Task<Option<int>>>)null))
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
@@ -51,7 +51,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Binding a None Option over a task returns a None Option.")]
         public static async Task TaskBind_None(Func<string, Task<Option<int>>> some)
         {
-            var actual = await Option<string>.None.Bind(some).ConfigureAwait(false);
+            var actual = await Option<string>.None.BindAsync(some).ConfigureAwait(false);
 
             Assert.True(actual.IsNone);
         }
@@ -60,7 +60,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskBind_ReturnNone_Some(NonEmptyString some)
         {
             var actual = await Option.From(some.Get)
-                .Bind(_ => FromResult(Option<int>.None))
+                .BindAsync(_ => FromResult(Option<int>.None))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsNone);
@@ -70,7 +70,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskBindReturnSome_Some(NonEmptyString some)
         {
             var actual = await Option.From(some.Get)
-                .Bind(v => FromResult(Option.From(v.Length)))
+                .BindAsync(v => FromResult(Option.From(v.Length)))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsSome);

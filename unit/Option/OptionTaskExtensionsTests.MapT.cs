@@ -31,7 +31,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Mapping a None Option over a task returns a None Option.")]
         public static async Task TaskMapT_None(Func<string, Task<int>> mapper)
         {
-            var actual = await FromResult(Option<string>.None).MapT(mapper).ConfigureAwait(false);
+            var actual = await FromResult(Option<string>.None).MapTAsync(mapper).ConfigureAwait(false);
 
             Assert.True(actual.IsNone);
         }
@@ -40,7 +40,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskMapT_Some(NonEmptyString some, int result)
         {
             var actual = await FromResult(Option.From(some.Get))
-                .MapT(_ => FromResult(result))
+                .MapTAsync(_ => FromResult(result))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsSome);

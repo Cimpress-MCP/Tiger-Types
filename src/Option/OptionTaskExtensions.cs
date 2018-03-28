@@ -82,7 +82,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
         [NotNull, Pure]
-        public static Task<TOut> MatchT<TIn, TOut>(
+        public static Task<TOut> MatchTAsync<TIn, TOut>(
             [NotNull] this Task<Option<TIn>> optionTaskValue,
             [NotNull, InstantHandle] TOut none,
             [NotNull, InstantHandle] Func<TIn, Task<TOut>> some)
@@ -91,7 +91,7 @@ namespace Tiger.Types
             if (none == null) { throw new ArgumentNullException(nameof(none)); }
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            return optionTaskValue.Bind(v => v.Match(none: none, some: some));
+            return optionTaskValue.Bind(v => v.MatchAsync(none: none, some: some));
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
         [NotNull, Pure]
-        public static Task<TOut> MatchT<TIn, TOut>(
+        public static Task<TOut> MatchTAsync<TIn, TOut>(
             [NotNull] this Task<Option<TIn>> optionTaskValue,
             [NotNull, InstantHandle] Func<TOut> none,
             [NotNull, InstantHandle] Func<TIn, Task<TOut>> some)
@@ -163,7 +163,7 @@ namespace Tiger.Types
             if (none == null) { throw new ArgumentNullException(nameof(none)); }
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            return optionTaskValue.Bind(v => v.Match(none: none, some: some));
+            return optionTaskValue.Bind(v => v.MatchAsync(none: none, some: some));
         }
 
         /// <summary>
@@ -191,7 +191,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
         [NotNull, Pure]
-        public static Task<TOut> MatchT<TIn, TOut>(
+        public static Task<TOut> MatchTAsync<TIn, TOut>(
             [NotNull] this Task<Option<TIn>> optionTaskValue,
             [NotNull, InstantHandle] Func<Task<TOut>> none,
             [NotNull, InstantHandle] Func<TIn, TOut> some)
@@ -200,7 +200,7 @@ namespace Tiger.Types
             if (none == null) { throw new ArgumentNullException(nameof(none)); }
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            return optionTaskValue.Bind(v => v.Match(none: none, some: some));
+            return optionTaskValue.Bind(v => v.MatchAsync(none: none, some: some));
         }
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
         [NotNull, Pure]
-        public static Task<TOut> MatchT<TIn, TOut>(
+        public static Task<TOut> MatchTAsync<TIn, TOut>(
             [NotNull] this Task<Option<TIn>> optionTaskValue,
             [NotNull, InstantHandle] Func<Task<TOut>> none,
             [NotNull, InstantHandle] Func<TIn, Task<TOut>> some)
@@ -237,7 +237,7 @@ namespace Tiger.Types
             if (none == null) { throw new ArgumentNullException(nameof(none)); }
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            return optionTaskValue.Bind(v => v.Match(none: none, some: some));
+            return optionTaskValue.Bind(v => v.MatchAsync(none: none, some: some));
         }
 
         #endregion
@@ -286,14 +286,14 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="optionTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
         [NotNull, Pure]
-        public static Task<Option<TOut>> MapT<TIn, TOut>(
+        public static Task<Option<TOut>> MapTAsync<TIn, TOut>(
             [NotNull] this Task<Option<TIn>> optionTaskValue,
             [NotNull, InstantHandle] Func<TIn, Task<TOut>> some)
         {
             if (optionTaskValue == null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            return optionTaskValue.Bind(ov => ov.Map(some));
+            return optionTaskValue.Bind(ov => ov.MapAsync(some));
         }
 
         #endregion
@@ -342,14 +342,14 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="optionTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="some"/> is <see langword="null"/>.</exception>
         [NotNull, Pure]
-        public static Task<Option<TOut>> BindT<TIn, TOut>(
+        public static Task<Option<TOut>> BindTAsync<TIn, TOut>(
             [NotNull] this Task<Option<TIn>> optionTaskValue,
             [NotNull, InstantHandle] Func<TIn, Task<Option<TOut>>> some)
         {
             if (optionTaskValue == null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
             if (some == null) { throw new ArgumentNullException(nameof(some)); }
 
-            return optionTaskValue.Bind(ov => ov.Bind(some));
+            return optionTaskValue.Bind(ov => ov.BindAsync(some));
         }
 
         #endregion
@@ -392,14 +392,14 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="optionTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="tapper"/> is <see langword="null"/>.</exception>
         [NotNull, MustUseReturnValue]
-        public static Task<Option<T>> TapT<T>(
+        public static Task<Option<T>> TapTAsync<T>(
             [NotNull] this Task<Option<T>> optionTaskValue,
             [NotNull, InstantHandle] Func<T, Task> tapper)
         {
             if (optionTaskValue == null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
             if (tapper == null) { throw new ArgumentNullException(nameof(tapper)); }
 
-            return optionTaskValue.Bind(ov => ov.Tap(tapper));
+            return optionTaskValue.Bind(ov => ov.TapAsync(tapper));
         }
 
         #endregion

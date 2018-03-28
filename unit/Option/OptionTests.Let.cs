@@ -50,7 +50,7 @@ namespace Tiger.Types.UnitTest
         [Fact(DisplayName = "Conditionally executing an action based on a None Option with a null asynchronous action throws.")]
         public static async Task TaskLet_None_Null_Throws()
         {
-            var actual = await Record.ExceptionAsync(() => Option<string>.None.Let(null)).ConfigureAwait(false);
+            var actual = await Record.ExceptionAsync(() => Option<string>.None.LetAsync(null)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
             Assert.Contains("Parameter name: some", ane.Message, Ordinal);
@@ -61,7 +61,7 @@ namespace Tiger.Types.UnitTest
         {
             var actual = before.Get;
             await Option<string>.None
-                .Let(_ => Run(() => actual = sentinel.Get))
+                .LetAsync(_ => Run(() => actual = sentinel.Get))
                 .ConfigureAwait(false);
 
             Assert.Equal(before.Get, actual);
@@ -70,7 +70,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Conditionally executing an action based on a Some Option with a null asynchronous action throws.")]
         public static async Task TaskLet_Some_Null_Throws(NonEmptyString some)
         {
-            var actual = await Record.ExceptionAsync(() => Option.From(some.Get).Let(null)).ConfigureAwait(false);
+            var actual = await Record.ExceptionAsync(() => Option.From(some.Get).LetAsync(null)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
             Assert.Contains("Parameter name: some", ane.Message, Ordinal);
@@ -81,7 +81,7 @@ namespace Tiger.Types.UnitTest
         {
             var actual = before.Get;
             await Option.From(some.Get)
-                .Let(v => Run(() => actual = v))
+                .LetAsync(v => Run(() => actual = v))
                 .ConfigureAwait(false);
 
             Assert.Equal(some.Get, actual);

@@ -58,7 +58,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching an Option with a null None value throws.")]
         public static async Task ValueTaskMatchReturn_NullNone_Throw(Option<int> option, Func<int, Task<string>> some)
         {
-            var actual = await Record.ExceptionAsync(() => option.Match(
+            var actual = await Record.ExceptionAsync(() => option.MatchAsync(
                 none: (string)null,
                 some: some)).ConfigureAwait(false);
 
@@ -69,7 +69,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching an Option with a null Some task throws.")]
         public static async Task ValueTaskMatchReturn_NullSome_Throw(Option<int> option, NonEmptyString none)
         {
-            var actual = await Record.ExceptionAsync(() => option.Match(
+            var actual = await Record.ExceptionAsync(() => option.MatchAsync(
                 none: none.Get,
                 some: (Func<int, Task<string>>)null)).ConfigureAwait(false);
 
@@ -81,7 +81,7 @@ namespace Tiger.Types.UnitTest
                                 "not the Some task branch.")]
         public static async Task ValueTaskMatchReturn_None(int noneValue)
         {
-            var actual = await Option<string>.None.Match(
+            var actual = await Option<string>.None.MatchAsync(
                 none: noneValue,
                 some: v => v.Length.Pipe(FromResult))
                 .ConfigureAwait(false);
@@ -93,7 +93,7 @@ namespace Tiger.Types.UnitTest
                                 "not the None value branch.")]
         public static async Task ValueTaskMatchReturn_Some(NonEmptyString some, int noneValue)
         {
-            var actual = await Option.From(some.Get).Match(
+            var actual = await Option.From(some.Get).MatchAsync(
                 none: noneValue,
                 some: v => v.Length.Pipe(FromResult))
                 .ConfigureAwait(false);
@@ -148,7 +148,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching an Option with a null None func throws.")]
         public static async Task FuncTaskMatchReturn_NullNone_Throw(Option<int> option, Func<int, Task<string>> some)
         {
-            var actual = await Record.ExceptionAsync(() => option.Match(
+            var actual = await Record.ExceptionAsync(() => option.MatchAsync(
                 none: (Func<string>)null,
                 some: some)).ConfigureAwait(false);
 
@@ -159,7 +159,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching an Option with a null Some task throws.")]
         public static async Task FuncTaskMatchReturn_NullSome_Throw(Option<int> option, Func<string> none)
         {
-            var actual = await Record.ExceptionAsync(() => option.Match(
+            var actual = await Record.ExceptionAsync(() => option.MatchAsync(
                 none: none,
                 some: (Func<int, Task<string>>)null)).ConfigureAwait(false);
 
@@ -171,7 +171,7 @@ namespace Tiger.Types.UnitTest
                                 "not the Some task branch.")]
         public static async Task FuncTaskMatchReturn_None(int noneValue)
         {
-            var actual = await Option<string>.None.Match(
+            var actual = await Option<string>.None.MatchAsync(
                 none: () => noneValue,
                 some: v => v.Length.Pipe(FromResult))
                 .ConfigureAwait(false);
@@ -183,7 +183,7 @@ namespace Tiger.Types.UnitTest
                                 "not the None func branch.")]
         public static async Task FuncTaskMatchReturn_Some(NonEmptyString some, int noneValue)
         {
-            var actual = await Option.From(some.Get).Match(
+            var actual = await Option.From(some.Get).MatchAsync(
                 none: () => noneValue,
                 some: v => v.Length.Pipe(FromResult))
                 .ConfigureAwait(false);
@@ -194,7 +194,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching an Option with a null None task throws.")]
         public static async Task TaskFuncMatchReturn_NullNone_Throw(Option<int> option, Func<int, string> some)
         {
-            var actual = await Record.ExceptionAsync(() => option.Match(
+            var actual = await Record.ExceptionAsync(() => option.MatchAsync(
                 none: (Func<Task<string>>)null,
                 some: some)).ConfigureAwait(false);
 
@@ -205,7 +205,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching an Option with a null Some func throws.")]
         public static async Task TaskFuncMatchReturn_NullSome_Throw(Option<int> option, Func<Task<string>> none)
         {
-            var actual = await Record.ExceptionAsync(() => option.Match(
+            var actual = await Record.ExceptionAsync(() => option.MatchAsync(
                 none: none,
                 some: (Func<int, string>)null)).ConfigureAwait(false);
 
@@ -217,7 +217,7 @@ namespace Tiger.Types.UnitTest
                                 "not the Some func branch.")]
         public static async Task TaskFuncMatchReturn_None(int noneValue)
         {
-            var actual = await Option<string>.None.Match(
+            var actual = await Option<string>.None.MatchAsync(
                 none: () => FromResult(noneValue),
                 some: v => v.Length)
                 .ConfigureAwait(false);
@@ -229,7 +229,7 @@ namespace Tiger.Types.UnitTest
                                 "not the None task branch.")]
         public static async Task TaskFuncMatchReturn_Some(NonEmptyString some, int noneValue)
         {
-            var actual = await Option.From(some.Get).Match(
+            var actual = await Option.From(some.Get).MatchAsync(
                 none: () => FromResult(noneValue),
                 some: v => v.Length)
                 .ConfigureAwait(false);
@@ -240,7 +240,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching an Option with a null None task throws.")]
         public static async Task TaskTaskMatchReturn_NullNone_Throw(Option<int> option, Func<int, Task<string>> some)
         {
-            var actual = await Record.ExceptionAsync(() => option.Match(
+            var actual = await Record.ExceptionAsync(() => option.MatchAsync(
                 none: (Func<Task<string>>)null,
                 some: some)).ConfigureAwait(false);
 
@@ -251,7 +251,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching an Option with a null Some task throws.")]
         public static async Task TaskTaskMatchReturn_NullSome_Throw(Option<int> option, Func<Task<string>> none)
         {
-            var actual = await Record.ExceptionAsync(() => option.Match(
+            var actual = await Record.ExceptionAsync(() => option.MatchAsync(
                 none: none,
                 some: (Func<int, Task<string>>)null)).ConfigureAwait(false);
 
@@ -263,7 +263,7 @@ namespace Tiger.Types.UnitTest
                                 "not the Some task branch.")]
         public static async Task TaskTaskMatchReturn_None(int noneValue)
         {
-            var actual = await Option<string>.None.Match(
+            var actual = await Option<string>.None.MatchAsync(
                 none: () => FromResult(noneValue),
                 some: v => v.Length.Pipe(FromResult))
                 .ConfigureAwait(false);
@@ -275,7 +275,7 @@ namespace Tiger.Types.UnitTest
                                 "not the None task branch.")]
         public static async Task TaskTaskMatchReturn_Some(NonEmptyString some, int noneValue)
         {
-            var actual = await Option.From(some.Get).Match(
+            var actual = await Option.From(some.Get).MatchAsync(
                 none: () => FromResult(noneValue),
                 some: v => v.Length.Pipe(FromResult))
                 .ConfigureAwait(false);
@@ -333,7 +333,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching an Option with a null None action throws.")]
         public static async Task ActionTaskMatchVoid_NullNone_Throw(Option<int> option, Func<int, Task> some)
         {
-            var actual = await Record.ExceptionAsync(() => option.Match(
+            var actual = await Record.ExceptionAsync(() => option.MatchAsync(
                 none: (Action)null,
                 some: some)).ConfigureAwait(false);
 
@@ -344,7 +344,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching an Option with a null Some task throws.")]
         public static async Task ActionTaskMatchVoid_NullSome_Throw(Option<int> option)
         {
-            var actual = await Record.ExceptionAsync(() => option.Match(
+            var actual = await Record.ExceptionAsync(() => option.MatchAsync(
                 none: () => { },
                 some: (Func<int, Task>)null)).ConfigureAwait(false);
 
@@ -357,7 +357,7 @@ namespace Tiger.Types.UnitTest
         public static async Task ActionTaskMatchVoid_None(NonEmptyString before, NonEmptyString sentinel)
         {
             var actual = before.Get;
-            await Option<string>.None.Match(
+            await Option<string>.None.MatchAsync(
                 none: () => actual = sentinel.Get,
                 some: _ => CompletedTask)
                 .ConfigureAwait(false);
@@ -370,7 +370,7 @@ namespace Tiger.Types.UnitTest
         public static async Task ActionTaskMatchVoid_Some(NonEmptyString before, NonEmptyString some)
         {
             var actual = before.Get;
-            await Option.From(some.Get).Match(
+            await Option.From(some.Get).MatchAsync(
                 none: () => { },
                 some: v => Run(() => actual = v))
                 .ConfigureAwait(false);
@@ -381,7 +381,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching an Option with a null None task throws.")]
         public static async Task TaskActionMatchVoid_NullNone_Throw(Option<int> option, Action<int> some)
         {
-            var actual = await Record.ExceptionAsync(() => option.Match(
+            var actual = await Record.ExceptionAsync(() => option.MatchAsync(
                 none: null,
                 some: some)).ConfigureAwait(false);
 
@@ -392,7 +392,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching an Option with a null Some action throws.")]
         public static async Task TaskActionMatchVoid_NullSome_Throw(Option<int> option)
         {
-            var actual = await Record.ExceptionAsync(() => option.Match(
+            var actual = await Record.ExceptionAsync(() => option.MatchAsync(
                 none: () => CompletedTask,
                 some: (Action<int>)null)).ConfigureAwait(false);
 
@@ -405,7 +405,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskActionMatchVoid_None(NonEmptyString before, NonEmptyString sentinel)
         {
             var actual = before.Get;
-            await Option<string>.None.Match(
+            await Option<string>.None.MatchAsync(
                 none: () => Run(() => actual = sentinel.Get),
                 some: _ => { })
                 .ConfigureAwait(false);
@@ -418,7 +418,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskActionMatchVoid_Some(NonEmptyString before, NonEmptyString some)
         {
             var actual = before.Get;
-            await Option.From(some.Get).Match(
+            await Option.From(some.Get).MatchAsync(
                 none: () => CompletedTask,
                 some: v => actual = v)
                 .ConfigureAwait(false);
@@ -429,7 +429,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching an Option with a null None task throws.")]
         public static async Task TaskTaskMatchVoid_NullNone_Throw(Option<int> option, Func<int, Task> some)
         {
-            var actual = await Record.ExceptionAsync(() => option.Match(
+            var actual = await Record.ExceptionAsync(() => option.MatchAsync(
                 none: (Func<Task>)null,
                 some: some)).ConfigureAwait(false);
 
@@ -440,7 +440,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching an Option with a null Some task throws.")]
         public static async Task TaskTaskMatchVoid_NullSome_Throw(Option<int> option)
         {
-            var actual = await Record.ExceptionAsync(() => option.Match(
+            var actual = await Record.ExceptionAsync(() => option.MatchAsync(
                 none: () => CompletedTask,
                 some: (Func<int, Task>)null)).ConfigureAwait(false);
 
@@ -453,7 +453,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskTaskMatchVoid_None(NonEmptyString before, NonEmptyString sentinel)
         {
             var actual = before.Get;
-            await Option<string>.None.Match(
+            await Option<string>.None.MatchAsync(
                 none: () => Run(() => actual = sentinel.Get),
                 some: _ => CompletedTask)
                 .ConfigureAwait(false);
@@ -466,7 +466,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskTaskMatchVoid_Some(NonEmptyString before, NonEmptyString some)
         {
             var actual = before.Get;
-            await Option.From(some.Get).Match(
+            await Option.From(some.Get).MatchAsync(
                 none: () => CompletedTask,
                 some: v => Run(() => actual = v))
                 .ConfigureAwait(false);

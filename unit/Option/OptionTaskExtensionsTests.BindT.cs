@@ -55,7 +55,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskBindT_ReturnNone_Some(NonEmptyString some)
         {
             var actual = await FromResult(Option.From(some.Get))
-                .BindT(_ => FromResult(Option<int>.None))
+                .BindTAsync(_ => FromResult(Option<int>.None))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsNone);
@@ -65,7 +65,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskBindTReturnSome_Some(NonEmptyString some, int sentinel)
         {
             var actual = await FromResult(Option.From(some.Get))
-                .BindT(_ => FromResult(Option.From(sentinel)))
+                .BindTAsync(_ => FromResult(Option.From(sentinel)))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsSome);

@@ -1,4 +1,4 @@
-﻿// <copyright file="EnumerableTaskExtensions.cs" company="Cimpress, Inc.">
+﻿// <copyright file="CollectionTaskExtensions.cs" company="Cimpress, Inc.">
 //   Copyright 2017 Cimpress, Inc.
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,11 +25,11 @@ namespace Tiger.Types
 {
     /// <summary>
     /// Extensions to the functionality of <see cref="Task{TResult}"/>,
-    /// specialized for <see cref="IEnumerable{T}"/>.
+    /// specialized for collections.
     /// </summary>
     [PublicAPI]
     [DebuggerStepThrough]
-    public static class EnumerableTaskExtensions
+    public static class CollectionTaskExtensions
     {
         /// <summary>
         /// Maps the result of a <see cref="Task{TResult}"/> over a transformation.
@@ -71,14 +71,46 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="enumerableTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="mapper"/> is <see langword="null"/>.</exception>
         [NotNull, Pure]
-        public static Task<ImmutableArray<TOut>> MapT<TIn, TOut>(
+        public static Task<ImmutableArray<TOut>> MapTAsync<TIn, TOut>(
             [NotNull, ItemNotNull] this Task<IEnumerable<TIn>> enumerableTaskValue,
             [NotNull, InstantHandle] Func<TIn, Task<TOut>> mapper)
         {
             if (enumerableTaskValue == null) { throw new ArgumentNullException(nameof(enumerableTaskValue)); }
             if (mapper == null) { throw new ArgumentNullException(nameof(mapper)); }
 
-            return enumerableTaskValue.Bind(ev => ev.Map(mapper));
+            return enumerableTaskValue.Bind(ev => ev.MapAsync(mapper));
+        }
+
+        /// <summary>
+        /// Combines the default value of <typeparamref name="TState"/> with each value of
+        /// the result of a <see cref="Task{TResult}"/>.
+        /// </summary>
+        /// <typeparam name="T">
+        /// The element type of the Result type of <paramref name="enumerableTaskValue"/>.
+        /// </typeparam>
+        /// <typeparam name="TState">The type of the seed value.</typeparam>
+        /// <param name="enumerableTaskValue">The <see cref="Task{TResult}"/> to be folded.</param>
+        /// <param name="folder">
+        /// A function to invoke with the seed value and each element of
+        /// the result of <paramref name="enumerableTaskValue"/> as the arguments.
+        /// </param>
+        /// <returns>
+        /// The result of combining the provided seed value with each element of
+        /// the result of <paramref name="enumerableTaskValue"/> if the result of
+        /// <paramref name="enumerableTaskValue"/> is not empty; otherwise, the seed value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="enumerableTaskValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="folder"/> is <see langword="null"/>.</exception>
+        [NotNull]
+        public static Task<TState> FoldT<T, TState>(
+            [NotNull, ItemNotNull] this Task<IReadOnlyCollection<T>> enumerableTaskValue,
+            [NotNull, InstantHandle] Func<TState, T, TState> folder)
+            where TState : struct
+        {
+            if (enumerableTaskValue == null) { throw new ArgumentNullException(nameof(enumerableTaskValue)); }
+            if (folder == null) { throw new ArgumentNullException(nameof(folder)); }
+
+            return enumerableTaskValue.Map(ev => ev.Fold(folder));
         }
 
         /// <summary>
@@ -108,7 +140,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="folder"/> is <see langword="null"/>.</exception>
         [NotNull, ItemNotNull]
         public static Task<TState> FoldT<T, TState>(
-            [NotNull, ItemNotNull] Task<IReadOnlyCollection<T>> enumerableTaskValue,
+            [NotNull, ItemNotNull] this Task<IReadOnlyCollection<T>> enumerableTaskValue,
             [NotNull] TState state,
             [NotNull, InstantHandle] Func<TState, T, TState> folder)
         {
@@ -117,6 +149,38 @@ namespace Tiger.Types
             if (folder == null) { throw new ArgumentNullException(nameof(folder)); }
 
             return enumerableTaskValue.Map(ev => ev.Fold(state, folder));
+        }
+
+        /// <summary>
+        /// Combines the default value of <typeparamref name="TState"/> with each value of
+        /// the result of a <see cref="Task{TResult}"/>, asynchronously.
+        /// </summary>
+        /// <typeparam name="T">
+        /// The element type of the Result type of <paramref name="enumerableTaskValue"/>.
+        /// </typeparam>
+        /// <typeparam name="TState">The type of the seed value.</typeparam>
+        /// <param name="enumerableTaskValue">The <see cref="Task{TResult}"/> to be folded.</param>
+        /// <param name="folder">
+        /// An asynchronous function to invoke with the seed value and each element of
+        /// the result of <paramref name="enumerableTaskValue"/> as the arguments.
+        /// </param>
+        /// <returns>
+        /// The result of combining the provided seed value with each element of
+        /// the result of <paramref name="enumerableTaskValue"/> if the result of
+        /// <paramref name="enumerableTaskValue"/> is not empty; otherwise, the seed value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="enumerableTaskValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="folder"/> is <see langword="null"/>.</exception>
+        [NotNull]
+        public static Task<TState> FoldTAsync<T, TState>(
+            [NotNull, ItemNotNull] this Task<IReadOnlyCollection<T>> enumerableTaskValue,
+            [NotNull, InstantHandle] Func<TState, T, Task<TState>> folder)
+            where TState : struct
+        {
+            if (enumerableTaskValue == null) { throw new ArgumentNullException(nameof(enumerableTaskValue)); }
+            if (folder == null) { throw new ArgumentNullException(nameof(folder)); }
+
+            return enumerableTaskValue.Bind(ev => ev.FoldAsync(folder));
         }
 
         /// <summary>
@@ -145,8 +209,8 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="state"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="folder"/> is <see langword="null"/>.</exception>
         [NotNull, ItemNotNull]
-        public static Task<TState> FoldT<T, TState>(
-            [NotNull, ItemNotNull] Task<IReadOnlyCollection<T>> enumerableTaskValue,
+        public static Task<TState> FoldTAsync<T, TState>(
+            [NotNull, ItemNotNull] this Task<IReadOnlyCollection<T>> enumerableTaskValue,
             [NotNull] TState state,
             [NotNull, InstantHandle] Func<TState, T, Task<TState>> folder)
         {
@@ -154,7 +218,7 @@ namespace Tiger.Types
             if (state == null) { throw new ArgumentNullException(nameof(state)); }
             if (folder == null) { throw new ArgumentNullException(nameof(folder)); }
 
-            return enumerableTaskValue.Bind(ev => ev.Fold(state, folder));
+            return enumerableTaskValue.Bind(ev => ev.FoldAsync(state, folder));
         }
     }
 }

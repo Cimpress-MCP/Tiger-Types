@@ -52,6 +52,8 @@ namespace Tiger.Types
 
         #endregion
 
+        #region Overrides
+
         #region object
 
         /// <inheritdoc/>
@@ -68,6 +70,8 @@ namespace Tiger.Types
 
         [NotNull, Pure, UsedImplicitly]
         object ToDump() => new { State = "None" };
+
+        #endregion
 
         #endregion
     }

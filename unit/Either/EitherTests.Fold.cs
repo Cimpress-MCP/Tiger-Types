@@ -30,7 +30,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskFoldRight_Left(NonEmptyString left, int seed)
         {
             var actual = await Either.Left<string, int>(left.Get)
-                .Fold(seed, right: (s, v) => FromResult(s + v))
+                .FoldAsync(seed, right: (s, v) => FromResult(s + v))
                 .ConfigureAwait(false);
 
             Assert.Equal(seed, actual);
@@ -41,7 +41,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskFoldRight_Right(int right, int seed)
         {
             var actual = await Either.Right<string, int>(right)
-                .Fold(seed, right: (s, v) => FromResult(s + v))
+                .FoldAsync(seed, right: (s, v) => FromResult(s + v))
                 .ConfigureAwait(false);
 
             Assert.Equal(seed + right, actual);
@@ -51,7 +51,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskFoldLeft_Right(int right, int seed)
         {
             var actual = await Either.Right<string, int>(right)
-                .Fold(seed, left: (s, v) => FromResult(s + v.Length))
+                .FoldAsync(seed, left: (s, v) => FromResult(s + v.Length))
                 .ConfigureAwait(false);
 
             Assert.Equal(seed, actual);
@@ -62,7 +62,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskFoldLeft_Left(NonEmptyString left, int seed)
         {
             var actual = await Either.Left<string, int>(left.Get)
-                .Fold(seed, left: (s, v) => FromResult(s + v.Length))
+                .FoldAsync(seed, left: (s, v) => FromResult(s + v.Length))
                 .ConfigureAwait(false);
 
             Assert.Equal(seed + left.Get.Length, actual);

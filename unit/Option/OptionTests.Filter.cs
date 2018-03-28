@@ -48,7 +48,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Filtering an option over a null task throws.")]
         public static async Task TaskFilter_Null_Throws(Option<int> option)
         {
-            var actual = await Record.ExceptionAsync(() => option.Filter((Func<int, Task<bool>>)null))
+            var actual = await Record.ExceptionAsync(() => option.FilterAsync((Func<int, Task<bool>>)null))
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
@@ -59,7 +59,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskFilter_None(bool filter)
         {
             var actual = await Option<int>.None
-                .Filter(_ => FromResult(filter))
+                .FilterAsync(_ => FromResult(filter))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsNone);
@@ -69,7 +69,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskFilter_SomeFalse(int some)
         {
             var actual = await Option.From(some)
-                .Filter(_ => FromResult(false))
+                .FilterAsync(_ => FromResult(false))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsNone);
@@ -79,7 +79,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskFilter_SomeTrue(int some)
         {
             var actual = await Option.From(some)
-                .Filter(_ => FromResult(true))
+                .FilterAsync(_ => FromResult(true))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsSome);

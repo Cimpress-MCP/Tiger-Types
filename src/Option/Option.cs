@@ -135,14 +135,14 @@ namespace Tiger.Types
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="fallback"/> is <see langword="null"/>.</exception>
         [NotNull, Pure]
-        public static Task<Either<TLeft, TSome>> ToEither<TLeft, TSome>(
+        public static Task<Either<TLeft, TSome>> ToEitherAsync<TLeft, TSome>(
             in this Option<TSome> value,
             [NotNull, InstantHandle] Func<Task<TLeft>> fallback)
         {
             if (fallback == null) { throw new ArgumentNullException(nameof(fallback)); }
 
             return value.Map(v => new Either<TLeft, TSome>(v))
-                .GetValueOrDefault(async () => await fallback().ConfigureAwait(false));
+                .GetValueOrDefaultAsync(async () => await fallback().ConfigureAwait(false));
         }
 
         /// <summary>
@@ -242,13 +242,13 @@ namespace Tiger.Types
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="splitter"/> is <see langword="null"/>.</exception>
         [NotNull, PublicAPI]
-        public static Task<Option<TSome>> Split<TSome>(
+        public static Task<Option<TSome>> SplitAsync<TSome>(
             [CanBeNull] TSome value,
             [NotNull, InstantHandle] Func<TSome, Task<bool>> splitter)
         {
             if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
 
-            return From(value).Filter(splitter);
+            return From(value).FilterAsync(splitter);
         }
 
         /// <summary>Splits a value into an optional value based on a provided condition, asynchronously.</summary>
@@ -265,14 +265,14 @@ namespace Tiger.Types
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="splitter"/> is <see langword="null"/>.</exception>
         [NotNull, Pure]
-        public static Task<Option<TSome>> Split<TSome>(
+        public static Task<Option<TSome>> SplitAsync<TSome>(
             [CanBeNull] TSome? value,
             [NotNull, InstantHandle] Func<TSome, Task<bool>> splitter)
             where TSome : struct
         {
             if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
 
-            return From(value).Filter(splitter);
+            return From(value).FilterAsync(splitter);
         }
 
         #endregion

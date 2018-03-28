@@ -15,6 +15,10 @@
 // </copyright>
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Reflection;
 using JetBrains.Annotations;
 
 namespace Tiger.Types
@@ -38,6 +42,52 @@ namespace Tiger.Types
             if (piper == null) { throw new ArgumentNullException(nameof(piper)); }
 
             return piper(value);
+        }
+
+        /// <summary>
+        /// Transforms an arbitrary object into a dictionary of public property names to property values,
+        /// with special handling for dictionaries.
+        /// </summary>
+        /// <param name="value">The object to be converted.</param>
+        /// <param name="comparer">A comparer for the keys of the returned dictionary.</param>
+        /// <returns>A dictionary.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
+        [NotNull, Pure]
+        internal static ImmutableDictionary<string, object> ToDictionary(
+            [NotNull] this object value,
+            [CanBeNull] IEqualityComparer<string> comparer = null)
+        {
+            if (value == null) { throw new ArgumentNullException(nameof(value)); }
+
+            comparer = comparer ?? EqualityComparer<string>.Default;
+
+            return value is IDictionary dictValue
+                ? ToDictionaryCore(dictValue, comparer)
+                : ToDictionaryCore(value, comparer);
+        }
+
+        [NotNull, Pure]
+        static ImmutableDictionary<string, object> ToDictionaryCore(
+            [NotNull] object value,
+            [CanBeNull] IEqualityComparer<string> comparer) =>
+            value.GetType()
+                 .GetRuntimeProperties()
+                 .ToImmutableDictionary(d => d.Name, d => d.GetValue(value), comparer);
+
+        [NotNull, Pure]
+        static ImmutableDictionary<string, object> ToDictionaryCore(
+            [NotNull] IDictionary value,
+            [CanBeNull] IEqualityComparer<string> comparer)
+        {
+            var kvpCollection = new List<KeyValuePair<string, object>>();
+
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (DictionaryEntry de in value)
+            {
+                kvpCollection.Add(new KeyValuePair<string, object>(de.Key.ToString(), de.Value));
+            }
+
+            return kvpCollection.ToImmutableDictionary(comparer);
         }
     }
 }

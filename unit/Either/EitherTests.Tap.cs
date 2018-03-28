@@ -63,7 +63,7 @@ namespace Tiger.Types.UnitTest
         {
             var output = before;
             var actual = await Either.Left<string, int>(left.Get)
-                .Tap(left: _ => Run(() => output = sentinel))
+                .TapAsync(left: _ => Run(() => output = sentinel))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsLeft);
@@ -77,7 +77,7 @@ namespace Tiger.Types.UnitTest
         {
             var output = before;
             var actual = await Either.Right<string, int>(right)
-                .Tap(left: _ => Run(() => output = sentinel))
+                .TapAsync(left: _ => Run(() => output = sentinel))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsRight);
@@ -91,7 +91,7 @@ namespace Tiger.Types.UnitTest
         {
             var output = before;
             var actual = await Either.Left<string, int>(left.Get)
-                .Tap(right: _ => Run(() => output = sentinel))
+                .TapAsync(right: _ => Run(() => output = sentinel))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsLeft);
@@ -105,7 +105,7 @@ namespace Tiger.Types.UnitTest
         {
             var output = before;
             var actual = await Either.Right<string, int>(right)
-                .Tap(right: _ => Run(() => output = sentinel))
+                .TapAsync(right: _ => Run(() => output = sentinel))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsRight);

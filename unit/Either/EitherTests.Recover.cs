@@ -53,7 +53,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskRecover_Left(NonEmptyString left, int recoverer)
         {
             var actual = await Either.Left<string, int>(left.Get)
-                .Recover(() => FromResult(recoverer))
+                .RecoverAsync(() => FromResult(recoverer))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsRight);
@@ -65,7 +65,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskRecover_Right(int right, int recoverer)
         {
             var actual = await Either.Right<string, int>(right)
-                .Recover(() => FromResult(recoverer))
+                .RecoverAsync(() => FromResult(recoverer))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsRight);

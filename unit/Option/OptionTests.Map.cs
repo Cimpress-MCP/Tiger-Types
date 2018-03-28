@@ -51,7 +51,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskMap_None_Null_Throws()
         {
             var actual = await Record.ExceptionAsync(() => Option<string>.None
-                .Map((Func<string, Task<int>>)null))
+                .MapAsync((Func<string, Task<int>>)null))
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
@@ -62,7 +62,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskMap_None()
         {
             var actual = await Option<string>.None
-                .Map(v => v.Length.Pipe(FromResult))
+                .MapAsync(v => v.Length.Pipe(FromResult))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsNone);
@@ -72,7 +72,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskMap_Some_Null_Throws(NonEmptyString some)
         {
             var actual = await Record.ExceptionAsync(() => Option.From(some.Get)
-                .Map((Func<string, Task<int>>)null))
+                .MapAsync((Func<string, Task<int>>)null))
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
@@ -83,7 +83,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskMap_Some(NonEmptyString some)
         {
             var actual = await Option.From(some.Get)
-                .Map(v => v.Length.Pipe(FromResult))
+                .MapAsync(v => v.Length.Pipe(FromResult))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsSome);

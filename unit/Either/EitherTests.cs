@@ -88,7 +88,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskGetValueOrDefault_Left(NonEmptyString left, int alternative)
         {
             var actual = await Either.Left<string, int>(left.Get)
-                .GetValueOrDefault(() => FromResult(alternative))
+                .GetValueOrDefaultAsync(() => FromResult(alternative))
                 .ConfigureAwait(false);
 
             Assert.Equal(alternative, actual);
@@ -98,7 +98,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskGetValueOrDefault_Right(int right, int alternative)
         {
             var actual = await Either.Right<string, int>(right)
-                .GetValueOrDefault(() => FromResult(alternative))
+                .GetValueOrDefaultAsync(() => FromResult(alternative))
                 .ConfigureAwait(false);
 
             Assert.Equal(right, actual);

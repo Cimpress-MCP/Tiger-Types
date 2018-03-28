@@ -30,7 +30,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Splitting a value over a task, failing the condition, returns a Left Either.")]
         public static async Task TaskSplit_Left(NonEmptyString value)
         {
-            var actual = await Either.Split(value.Get, _ => FromResult(false)).ConfigureAwait(false);
+            var actual = await Either.SplitAsync(value.Get, _ => FromResult(false)).ConfigureAwait(false);
 
             Assert.True(actual.IsLeft);
             Assert.False(actual.IsRight);
@@ -39,7 +39,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Splitting a value over a task, passing the condition, returns a Right Either.")]
         public static async Task TaskSplit_Right(NonEmptyString value)
         {
-            var actual = await Either.Split(value.Get, _ => FromResult(true)).ConfigureAwait(false);
+            var actual = await Either.SplitAsync(value.Get, _ => FromResult(true)).ConfigureAwait(false);
 
             Assert.False(actual.IsLeft);
             Assert.True(actual.IsRight);

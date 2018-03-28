@@ -25,9 +25,27 @@ namespace Tiger.Types
     /// <summary>Extensions to the functionality of <see cref="Task{TResult}"/>.</summary>
     public static class TaskExtensions
     {
-        /// <summary>
-        /// Maps the result of a <see cref="Task{TResult}"/> asynchronously over a transformation.
-        /// </summary>
+        /// <summary>Replaces the Result value of this instance with the provided value.</summary>
+        /// <typeparam name="TIn">The Result type of <paramref name="taskValue"/>.</typeparam>
+        /// <typeparam name="TOut">The type of the replacement value.</typeparam>
+        /// <param name="taskValue">The <see cref="Task{TResult}"/> whose result is to be replaced.</param>
+        /// <param name="replacement">The value to use as a replacement.</param>
+        /// <returns><paramref name="replacement"/>, asynchronously.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="taskValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="replacement"/> is <see langword="null"/>.</exception>
+        [NotNull, ItemNotNull]
+        public static async Task<TOut> Replace<TIn, TOut>(
+            [NotNull, ItemNotNull] this Task<TIn> taskValue,
+            [NotNull] TOut replacement)
+        {
+            if (taskValue == null) { throw new ArgumentNullException(nameof(taskValue)); }
+            if (replacement == null) { throw new ArgumentNullException(nameof(replacement)); }
+
+            await taskValue.ConfigureAwait(false);
+            return replacement;
+        }
+
+        /// <summary>Maps the result of a <see cref="Task{TResult}"/> over a transformation.</summary>
         /// <typeparam name="TIn">The Result type of <paramref name="taskValue"/>.</typeparam>
         /// <typeparam name="TOut">The return type of <paramref name="mapper"/>.</typeparam>
         /// <param name="taskValue">The <see cref="Task{TResult}"/> to be mapped.</param>
@@ -48,9 +66,7 @@ namespace Tiger.Types
             return result;
         }
 
-        /// <summary>
-        /// Binds the result of a <see cref="Task{TResult}"/> asynchronously over a transformation.
-        /// </summary>
+        /// <summary>Binds the result of a <see cref="Task{TResult}"/> over a transformation.</summary>
         /// <typeparam name="TIn">The Result type of <paramref name="taskValue"/>.</typeparam>
         /// <typeparam name="TOut">The Result type of the return type of <paramref name="binder"/>.</typeparam>
         /// <param name="taskValue">The <see cref="Task{TResult}"/> to be bound.</param>

@@ -60,7 +60,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching a None Option returns the None func branch, not the Some task branch.")]
         public static async Task FuncTaskMatchTReturn_None(int none)
         {
-            var actual = await FromResult(Option<string>.None).MatchT(
+            var actual = await FromResult(Option<string>.None).MatchTAsync(
                 none: () => none,
                 some: v => v.Length.Pipe(FromResult))
                 .ConfigureAwait(false);
@@ -71,7 +71,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching a Some Option returns the Some task branch, not the None func branch.")]
         public static async Task FuncTaskMatchTReturn_Some(NonEmptyString some, int none)
         {
-            var actual = await FromResult(Option.From(some.Get)).MatchT(
+            var actual = await FromResult(Option.From(some.Get)).MatchTAsync(
                 none: () => none,
                 some: v => v.Length.Pipe(FromResult))
                 .ConfigureAwait(false);
@@ -82,7 +82,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching a None Option returns the None task branch, not the Some func branch.")]
         public static async Task TaskFuncMatchTReturn_None(int none)
         {
-            var actual = await FromResult(Option<string>.None).MatchT(
+            var actual = await FromResult(Option<string>.None).MatchTAsync(
                 none: () => FromResult(none),
                 some: v => v.Length)
                 .ConfigureAwait(false);
@@ -93,7 +93,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching a Some Option returns the Some func branch, not the None task branch.")]
         public static async Task TaskFuncMatchTReturn_Some(NonEmptyString some, int none)
         {
-            var actual = await FromResult(Option.From(some.Get)).MatchT(
+            var actual = await FromResult(Option.From(some.Get)).MatchTAsync(
                 none: () => FromResult(none),
                 some: v => v.Length)
                 .ConfigureAwait(false);
@@ -104,7 +104,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching a None Option returns the None task branch, not the Some task branch.")]
         public static async Task TaskTaskMatchTReturn_None(int none)
         {
-            var actual = await FromResult(Option<string>.None).MatchT(
+            var actual = await FromResult(Option<string>.None).MatchTAsync(
                 none: () => FromResult(none),
                 some: v => v.Length.Pipe(FromResult))
                 .ConfigureAwait(false);
@@ -115,7 +115,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching a Some Option returns the Some task branch, not the None task branch.")]
         public static async Task TaskTaskMatchTReturn_Some(NonEmptyString some, int none)
         {
-            var actual = await FromResult(Option.From(some.Get)).MatchT(
+            var actual = await FromResult(Option.From(some.Get)).MatchTAsync(
                 none: () => FromResult(none),
                 some: v => v.Length.Pipe(FromResult))
                 .ConfigureAwait(false);

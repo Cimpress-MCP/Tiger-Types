@@ -75,7 +75,12 @@ namespace Tiger.Types
             }
 
             var typeInfo = _conversionType.GetTypeInfo();
-            var ctor = typeInfo.DeclaredConstructors.Single(c => c.GetParameters().Length == 1);
+            var ctor = typeInfo.DeclaredConstructors.Single(c =>
+            {
+                var parameters = c.GetParameters();
+                return parameters.Length == 1
+                    && parameters[0].ParameterType == _underlyingType;
+            });
 
             if (value.GetType() == _underlyingType)
             { // note(cosborn) Since there's no other conversion to be done, wrap it up!

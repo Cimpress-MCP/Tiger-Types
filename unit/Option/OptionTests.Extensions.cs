@@ -29,7 +29,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option<int>.None.Assert(() => new InvalidOperationException(message.Get)));
 
             var ioe = Assert.IsType<InvalidOperationException>(actual);
-            Assert.Contains(message.Get, ioe.Message, Ordinal);
+            Assert.Equal(message.Get, ioe.Message, StringComparer.Ordinal);
         }
 
         [Property(DisplayName = "A Some Option asserts itself to be its Some value.")]

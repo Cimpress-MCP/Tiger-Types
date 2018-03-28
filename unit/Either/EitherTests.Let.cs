@@ -51,7 +51,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskLetLeft_Left(NonEmptyString left, Guid before, Guid sentinel)
         {
             var actual = before;
-            await Either.Left<string, int>(left.Get).Let(left: _ => Run(() => actual = sentinel)).ConfigureAwait(false);
+            await Either.Left<string, int>(left.Get).LetAsync(left: _ => Run(() => actual = sentinel)).ConfigureAwait(false);
 
             Assert.Equal(sentinel, actual);
         }
@@ -60,7 +60,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskLetLeft_Right(int right, Guid before, Guid sentinel)
         {
             var actual = before;
-            await Either.Right<string, int>(right).Let(left: _ => Run(() => actual = sentinel)).ConfigureAwait(false);
+            await Either.Right<string, int>(right).LetAsync(left: _ => Run(() => actual = sentinel)).ConfigureAwait(false);
 
             Assert.Equal(before, actual);
         }
@@ -69,7 +69,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskLetRight_Left(NonEmptyString left, Guid before, Guid sentinel)
         {
             var actual = before;
-            await Either.Left<string, int>(left.Get).Let(right: _ => Run(() => actual = sentinel)).ConfigureAwait(false);
+            await Either.Left<string, int>(left.Get).LetAsync(right: _ => Run(() => actual = sentinel)).ConfigureAwait(false);
 
             Assert.Equal(before, actual);
         }
@@ -78,7 +78,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskLetRight_Right(int right, Guid before, Guid sentinel)
         {
             var actual = before;
-            await Either.Right<string, int>(right).Let(right: _ => Run(() => actual = sentinel)).ConfigureAwait(false);
+            await Either.Right<string, int>(right).LetAsync(right: _ => Run(() => actual = sentinel)).ConfigureAwait(false);
 
             Assert.Equal(sentinel, actual);
         }

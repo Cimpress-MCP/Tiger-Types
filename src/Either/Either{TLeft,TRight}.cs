@@ -266,7 +266,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, ItemNotNull, Pure]
-        public async Task<TOut> Match<TOut>(
+        public async Task<TOut> MatchAsync<TOut>(
             [NotNull, InstantHandle] Func<TLeft, TOut> left,
             [NotNull, InstantHandle] Func<TRight, Task<TOut>> right)
         {
@@ -296,7 +296,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, ItemNotNull, Pure]
-        public async Task<TOut> Match<TOut>(
+        public async Task<TOut> MatchAsync<TOut>(
             [NotNull, InstantHandle] Func<TLeft, Task<TOut>> left,
             [NotNull, InstantHandle] Func<TRight, TOut> right)
         {
@@ -326,7 +326,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, ItemNotNull, Pure]
-        public async Task<TOut> Match<TOut>(
+        public async Task<TOut> MatchAsync<TOut>(
             [NotNull, InstantHandle] Func<TLeft, Task<TOut>> left,
             [NotNull, InstantHandle] Func<TRight, Task<TOut>> right)
         {
@@ -391,7 +391,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
-        public async Task Match(
+        public async Task<Unit> MatchAsync(
             [NotNull, InstantHandle] Action<TLeft> left,
             [NotNull, InstantHandle] Func<TRight, Task> right)
         {
@@ -407,6 +407,8 @@ namespace Tiger.Types
             {
                 await right(_rightValue).ConfigureAwait(false);
             }
+
+            return Unit.Value;
         }
 
         /// <summary>Performs an action with this instance by matching on its state, asynchronously.</summary>
@@ -422,7 +424,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
-        public async Task Match(
+        public async Task<Unit> MatchAsync(
             [NotNull, InstantHandle] Func<TLeft, Task> left,
             [NotNull, InstantHandle] Action<TRight> right)
         {
@@ -438,6 +440,8 @@ namespace Tiger.Types
             {
                 right(_rightValue);
             }
+
+            return Unit.Value;
         }
 
         /// <summary>Performs an action with this instance by matching on its state, asynchronously.</summary>
@@ -453,7 +457,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
-        public async Task Match(
+        public async Task<Unit> MatchAsync(
             [NotNull, InstantHandle] Func<TLeft, Task> left,
             [NotNull, InstantHandle] Func<TRight, Task> right)
         {
@@ -465,8 +469,12 @@ namespace Tiger.Types
             {
                 await left(_leftValue).ConfigureAwait(false);
             }
+            else
+            {
+                await right(_rightValue).ConfigureAwait(false);
+            }
 
-            await right(_rightValue).ConfigureAwait(false);
+            return Unit.Value;
         }
 
         #endregion
@@ -518,7 +526,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, Pure]
-        public async Task<Either<TOut, TRight>> Map<TOut>([NotNull, InstantHandle] Func<TLeft, Task<TOut>> left)
+        public async Task<Either<TOut, TRight>> MapAsync<TOut>([NotNull, InstantHandle] Func<TLeft, Task<TOut>> left)
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
@@ -573,7 +581,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, Pure]
-        public async Task<Either<TLeft, TOut>> Map<TOut>([NotNull, InstantHandle] Func<TRight, Task<TOut>> right)
+        public async Task<Either<TLeft, TOut>> MapAsync<TOut>([NotNull, InstantHandle] Func<TRight, Task<TOut>> right)
         {
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
@@ -654,7 +662,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, Pure]
-        public async Task<Either<TLeftOut, TRightOut>> Map<TLeftOut, TRightOut>(
+        public async Task<Either<TLeftOut, TRightOut>> MapAsync<TLeftOut, TRightOut>(
             [NotNull, InstantHandle] Func<TLeft, TLeftOut> left,
             [NotNull, InstantHandle] Func<TRight, Task<TRightOut>> right)
         {
@@ -699,7 +707,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, Pure]
-        public async Task<Either<TLeftOut, TRightOut>> Map<TLeftOut, TRightOut>(
+        public async Task<Either<TLeftOut, TRightOut>> MapAsync<TLeftOut, TRightOut>(
             [NotNull, InstantHandle] Func<TLeft, Task<TLeftOut>> left,
             [NotNull, InstantHandle] Func<TRight, TRightOut> right)
         {
@@ -744,7 +752,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, Pure]
-        public async Task<Either<TLeftOut, TRightOut>> Map<TLeftOut, TRightOut>(
+        public async Task<Either<TLeftOut, TRightOut>> MapAsync<TLeftOut, TRightOut>(
             [NotNull, InstantHandle] Func<TLeft, Task<TLeftOut>> left,
             [NotNull, InstantHandle] Func<TRight, Task<TRightOut>> right)
         {
@@ -810,13 +818,13 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, Pure]
-        public Task<Either<TOut, TRight>> Bind<TOut>(
+        public Task<Either<TOut, TRight>> BindAsync<TOut>(
             [NotNull, InstantHandle] Func<TLeft, Task<Either<TOut, TRight>>> left)
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return Map(left).Map(Either.Join);
+            return MapAsync(left).Map(Either.Join);
         }
 
         /// <summary>Binds a function over the Right value of this instance, if present.</summary>
@@ -861,13 +869,13 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, Pure]
-        public Task<Either<TLeft, TOut>> Bind<TOut>(
+        public Task<Either<TLeft, TOut>> BindAsync<TOut>(
             [NotNull, InstantHandle] Func<TRight, Task<Either<TLeft, TOut>>> right)
         {
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return Map(right).Map(Either.Join);
+            return MapAsync(right).Map(Either.Join);
         }
 
         /// <summary>
@@ -936,7 +944,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure, NotNull]
-        public Task<Either<TOutLeft, TOutRight>> Bind<TOutLeft, TOutRight>(
+        public Task<Either<TOutLeft, TOutRight>> BindAsync<TOutLeft, TOutRight>(
             [NotNull, InstantHandle] Func<TLeft, Task<Either<TOutLeft, TOutRight>>> left,
             [NotNull, InstantHandle] Func<TRight, Either<TOutLeft, TOutRight>> right)
         {
@@ -944,7 +952,7 @@ namespace Tiger.Types
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return Map(left, right).Map(Either.Collapse);
+            return MapAsync(left, right).Map(Either.Collapse);
         }
 
         /// <summary>
@@ -975,7 +983,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure, NotNull]
-        public Task<Either<TOutLeft, TOutRight>> Bind<TOutLeft, TOutRight>(
+        public Task<Either<TOutLeft, TOutRight>> BindAsync<TOutLeft, TOutRight>(
             [NotNull, InstantHandle] Func<TLeft, Either<TOutLeft, TOutRight>> left,
             [NotNull, InstantHandle] Func<TRight, Task<Either<TOutLeft, TOutRight>>> right)
         {
@@ -983,7 +991,7 @@ namespace Tiger.Types
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return Map(left, right).Map(Either.Collapse);
+            return MapAsync(left, right).Map(Either.Collapse);
         }
 
         /// <summary>
@@ -1014,7 +1022,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure, NotNull]
-        public Task<Either<TOutLeft, TOutRight>> Bind<TOutLeft, TOutRight>(
+        public Task<Either<TOutLeft, TOutRight>> BindAsync<TOutLeft, TOutRight>(
             [NotNull, InstantHandle] Func<TLeft, Task<Either<TOutLeft, TOutRight>>> left,
             [NotNull, InstantHandle] Func<TRight, Task<Either<TOutLeft, TOutRight>>> right)
         {
@@ -1022,12 +1030,38 @@ namespace Tiger.Types
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return Map(left, right).Map(Either.Collapse);
+            return MapAsync(left, right).Map(Either.Collapse);
         }
 
         #endregion
 
         #region Fold
+
+        /// <summary>
+        /// Combines the default value of <typeparamref name="TState"/> with the Left value of this instance.
+        /// </summary>
+        /// <typeparam name="TState">The type of the seed value.</typeparam>
+        /// <param name="left">
+        /// A function to invoke with the seed value and the Left value of this instance as the arguments
+        /// if this instance is in the Left state.
+        /// </param>
+        /// <returns>
+        /// The result of combining the seed value with the Left value of this instance
+        /// if this instance is in the Left state; otherwise, the seed value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
+        [NotNull, Pure]
+        public TState Fold<TState>([NotNull, InstantHandle] Func<TState, TLeft, TState> left)
+            where TState : struct
+        {
+            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
+
+            return IsLeft
+                ? left(default, _leftValue)
+                : default;
+        }
 
         /// <summary>Combines the provided seed state with the Left value of this instance.</summary>
         /// <typeparam name="TState">The type of the seed value.</typeparam>
@@ -1057,6 +1091,32 @@ namespace Tiger.Types
                 : state;
             Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
+        }
+
+        /// <summary>
+        /// Combines the default value of <typeparamref name="TState"/> with the Right value of this instance.
+        /// </summary>
+        /// <typeparam name="TState">The type of the seed value.</typeparam>
+        /// <param name="right">
+        /// A function to invoke with the seed value and the Right value of this instance as the arguments
+        /// if this instance is in the Right state.
+        /// </param>
+        /// <returns>
+        /// The result of combining the seed value with the Right value of this instance
+        /// if this instance is in the Right state; otherwise, the seed value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
+        [NotNull, Pure]
+        public TState Fold<TState>([NotNull, InstantHandle] Func<TState, TRight, TState> right)
+            where TState : struct
+        {
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
+
+            return IsRight
+                ? right(default, _rightValue)
+                : default;
         }
 
         /// <summary>Combines the provided seed state with the Right value of this instance.</summary>
@@ -1089,6 +1149,33 @@ namespace Tiger.Types
             return result;
         }
 
+        /// <summary>
+        /// Combines the default value of <typeparamref name="TState"/>
+        /// with the Left value of this instance, asynchronously.
+        /// </summary>
+        /// <typeparam name="TState">The type of the seed value.</typeparam>
+        /// <param name="left">
+        /// A function to invoke asynchronously with the seed value and the Left value of this instance
+        /// as the arguments if this instance is in the Left state.
+        /// </param>
+        /// <returns>
+        /// The result of combining the provided seed value with the Left value of this instance
+        /// if this instance is in the Left state; otherwise, the seed value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
+        [NotNull, Pure]
+        public async Task<TState> FoldAsync<TState>([NotNull, InstantHandle] Func<TState, TLeft, Task<TState>> left)
+            where TState : struct
+        {
+            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
+
+            return IsLeft
+                ? await left(default, _leftValue).ConfigureAwait(false)
+                : default;
+        }
+
         /// <summary>Combines the provided seed state with the Left value of this instance, asynchronously.</summary>
         /// <typeparam name="TState">The type of the seed value.</typeparam>
         /// <param name="state">The seed value to be combined with the Left value of this instance.</param>
@@ -1104,7 +1191,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, Pure]
-        public async Task<TState> Fold<TState>(
+        public async Task<TState> FoldAsync<TState>(
             [NotNull] TState state,
             [NotNull, InstantHandle] Func<TState, TLeft, Task<TState>> left)
         {
@@ -1117,6 +1204,33 @@ namespace Tiger.Types
                 : state;
             Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
+        }
+
+        /// <summary>
+        /// Combines the default value of <typeparamref name="TState"/>
+        /// with the Right value of this instance, asynchronously.
+        /// </summary>
+        /// <typeparam name="TState">The type of the seed value.</typeparam>
+        /// <param name="right">
+        /// A function to invoke asynchronously with the seed value and the Right value of this instance
+        /// as the arguments if this instance is in the Right state.
+        /// </param>
+        /// <returns>
+        /// The result of combining the provided seed value with the Right value of this instance
+        /// if this instance is in the Right state; otherwise, the seed value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
+        [NotNull, Pure]
+        public async Task<TState> FoldAsync<TState>([NotNull, InstantHandle] Func<TState, TRight, Task<TState>> right)
+            where TState : struct
+        {
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
+
+            return IsRight
+                ? await right(default, _rightValue).ConfigureAwait(false)
+                : default;
         }
 
         /// <summary>Combines the provided seed state with the Right value of this instance, asynchronously.</summary>
@@ -1134,7 +1248,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, Pure]
-        public async Task<TState> Fold<TState>(
+        public async Task<TState> FoldAsync<TState>(
             [NotNull] TState state,
             [NotNull, InstantHandle] Func<TState, TRight, Task<TState>> right)
         {
@@ -1181,7 +1295,7 @@ namespace Tiger.Types
         /// <returns>A task which, when resolved, produces this instance.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         [NotNull, MustUseReturnValue]
-        public async Task<Either<TLeft, TRight>> Tap([NotNull, InstantHandle] Func<TLeft, Task> left)
+        public async Task<Either<TLeft, TRight>> TapAsync([NotNull, InstantHandle] Func<TLeft, Task> left)
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
 
@@ -1221,7 +1335,7 @@ namespace Tiger.Types
         /// <returns>A task which, when resolved, produces this instance.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         [MustUseReturnValue]
-        public async Task<Either<TLeft, TRight>> Tap([NotNull, InstantHandle] Func<TRight, Task> right)
+        public async Task<Either<TLeft, TRight>> TapAsync([NotNull, InstantHandle] Func<TRight, Task> right)
         {
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
 
@@ -1274,7 +1388,7 @@ namespace Tiger.Types
         /// <returns>A task which, when resolved, produces this instance.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
-        public async Task<Either<TLeft, TRight>> Tap(
+        public async Task<Either<TLeft, TRight>> TapAsync(
             [NotNull, InstantHandle] Func<TLeft, Task> left,
             [NotNull, InstantHandle] Action<TRight> right)
         {
@@ -1306,7 +1420,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         [NotNull, MustUseReturnValue]
-        public async Task<Either<TLeft, TRight>> Tap(
+        public async Task<Either<TLeft, TRight>> TapAsync(
             [NotNull, InstantHandle] Action<TLeft> left,
             [NotNull, InstantHandle] Func<TRight, Task> right)
         {
@@ -1338,7 +1452,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         [NotNull, MustUseReturnValue]
-        public async Task<Either<TLeft, TRight>> Tap(
+        public async Task<Either<TLeft, TRight>> TapAsync(
             [NotNull, InstantHandle] Func<TLeft, Task> left,
             [NotNull, InstantHandle] Func<TRight, Task> right)
         {
@@ -1401,7 +1515,7 @@ namespace Tiger.Types
         /// <returns>The task object representing the asynchronous operation.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         [NotNull]
-        public async Task Let([NotNull, InstantHandle] Func<TLeft, Task> left)
+        public async Task LetAsync([NotNull, InstantHandle] Func<TLeft, Task> left)
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
 
@@ -1416,7 +1530,7 @@ namespace Tiger.Types
         /// <returns>The task object representing the asynchronous operation.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         [NotNull]
-        public async Task Let([NotNull, InstantHandle] Func<TRight, Task> right)
+        public async Task LetAsync([NotNull, InstantHandle] Func<TRight, Task> right)
         {
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
 
@@ -1477,7 +1591,7 @@ namespace Tiger.Types
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="recoverer"/> is <see langword="null"/>.</exception>
         [Pure, NotNull]
-        public async Task<Either<TLeft, TRight>> Recover([NotNull, InstantHandle] Func<Task<TRight>> recoverer)
+        public async Task<Either<TLeft, TRight>> RecoverAsync([NotNull, InstantHandle] Func<Task<TRight>> recoverer)
         {
             if (recoverer == null) { throw new ArgumentNullException(nameof(recoverer)); }
 
@@ -1486,6 +1600,29 @@ namespace Tiger.Types
             var result = await recoverer().ConfigureAwait(false);
             Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
             return result;
+        }
+
+        #endregion
+
+        #region Replace
+
+        /// <summary>Replaces the Right value of this instance with the provided value.</summary>
+        /// <typeparam name="TOut">The type of the replacement value.</typeparam>
+        /// <param name="replacement">The value to use as a replacement.</param>
+        /// <returns>
+        /// An <see cref="Either{TLeft, TRight}"/> in the Right state whose Right value is the value
+        /// of <paramref name="replacement"/> if this instance is in the Right state; otherwise,
+        /// an <see cref="Either{TLeft, TRight}"/> in the Left state whose Left value is the
+        /// Left value of this instance.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="replacement"/> is <see langword="null"/>.</exception>
+        public Either<TLeft, TOut> Replace<TOut>([NotNull] TOut replacement)
+        {
+            if (replacement == null) { throw new ArgumentNullException(nameof(replacement)); }
+
+            return IsLeft
+                ? new Either<TLeft, TOut>(_leftValue)
+                : new Either<TLeft, TOut>(replacement);
         }
 
         #endregion
@@ -1560,7 +1697,7 @@ namespace Tiger.Types
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <see langword="null"/>.</exception>
         [NotNull, ItemNotNull, Pure]
-        public async Task<TRight> GetValueOrDefault([NotNull, InstantHandle] Func<Task<TRight>> other)
+        public async Task<TRight> GetValueOrDefaultAsync([NotNull, InstantHandle] Func<Task<TRight>> other)
         {
             if (other == null) { throw new ArgumentNullException(nameof(other)); }
 
@@ -1586,6 +1723,8 @@ namespace Tiger.Types
             }
         }
 
+        #region Overrides
+
         #region object
 
         /// <inheritdoc/>
@@ -1598,10 +1737,8 @@ namespace Tiger.Types
                     return $"Left({_leftValue})";
                 case Right:
                     return $"Right({_rightValue})";
-                case Bottom:
-                    return "Bottom";
                 default: // note(cosborn) Why would you change this enum???
-                    return string.Empty;
+                    return "Bottom";
             }
         }
 
@@ -1625,8 +1762,14 @@ namespace Tiger.Types
             }
         }
 
+        /// <summary>Compares this instance with another instance for equality.</summary>
+        /// <param name="other">Another instance.</param>
+        /// <returns>
+        /// <see langword="true"/> if this instance and <paramref name="other"/> are equal;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
         [Pure]
-        bool EqualsCore(Either<TLeft, TRight> other)
+        internal bool EqualsCore(Either<TLeft, TRight> other)
         { // note(cosborn) Eh, this gets gnarly using other implementations.
             if (State == Bottom && other.State == Bottom)
             {
@@ -1651,6 +1794,8 @@ namespace Tiger.Types
         object ToDump() => Match<object>(
             left: l => new { State = Left, Value = l },
             right: r => new { State = Right, Value = r });
+
+        #endregion
 
         #endregion
 

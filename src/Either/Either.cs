@@ -227,10 +227,10 @@ namespace Tiger.Types
         /// <param name="value">A value to test for a condition.</param>
         /// <param name="splitter">A condition by which <paramref name="value"/> can be split.</param>
         /// <returns>
-        /// An <see cref="Either{TLeft,TRight}"/> in the Left state with its Left value
+        /// An <see cref="Either{TLeft,TRight}"/> in the Right state with its Right value
         /// set to <paramref name="value"/> if the condition <paramref name="splitter"/> is
         /// satisfied by <paramref name="value"/>; otherwise, an <see cref="Either{TLeft,TRight}"/>
-        /// in the Right state with its Right value set to <paramref name="value"/>.
+        /// in the Left state with its Left value set to <paramref name="value"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="splitter"/> is <see langword="null"/>.</exception>
@@ -255,14 +255,14 @@ namespace Tiger.Types
         /// An asynchronous condition by which <paramref name="value"/> can be split.
         /// </param>
         /// <returns>
-        /// An <see cref="Either{TLeft,TRight}"/> in the Left state with its Left value
+        /// An <see cref="Either{TLeft,TRight}"/> in the Right state with its Right value
         /// set to <paramref name="value"/> if the condition <paramref name="splitter"/> is
         /// satisfied by <paramref name="value"/>; otherwise, an <see cref="Either{TLeft,TRight}"/>
-        /// in the Right state with its Right value set to <paramref name="value"/>.
+        /// in the Left state with its Left value set to <paramref name="value"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="splitter"/> is <see langword="null"/>.</exception>
-        public static async Task<Either<TValue, TValue>> Split<TValue>(
+        public static async Task<Either<TValue, TValue>> SplitAsync<TValue>(
             [NotNull] TValue value,
             [NotNull, InstantHandle] Func<TValue, Task<bool>> splitter)
         {
@@ -286,10 +286,10 @@ namespace Tiger.Types
         /// A transformation from <typeparamref name="TValue"/> to <typeparamref name="TOut"/>.
         /// </param>
         /// <returns>
-        /// An <see cref="Either{TLeft,TRight}"/> in the Left state with its Left value
+        /// An <see cref="Either{TLeft,TRight}"/> in the Right state with its Right value
         /// set to the result of transforming <paramref name="value"/> with <paramref name="mapper"/>
         /// if the condition <paramref name="splitter"/> is satisfied by <paramref name="value"/>;
-        /// otherwise, an <see cref="Either{TLeft,TRight}"/> in the Right state with its Right value
+        /// otherwise, an <see cref="Either{TLeft,TRight}"/> in the Left state with its Left value
         /// set to the result of transforming <paramref name="value"/> with <paramref name="mapper"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
@@ -320,16 +320,16 @@ namespace Tiger.Types
         /// to <typeparamref name="TOut"/>.
         /// </param>
         /// <returns>
-        /// An <see cref="Either{TLeft,TRight}"/> in the Left state with its Left value
+        /// An <see cref="Either{TLeft,TRight}"/> in the Right state with its Right value
         /// set to the result of transforming <paramref name="value"/> with <paramref name="mapper"/>
         /// if the condition <paramref name="splitter"/> is satisfied by <paramref name="value"/>;
-        /// otherwise, an <see cref="Either{TLeft,TRight}"/> in the Right state with its Right value
+        /// otherwise, an <see cref="Either{TLeft,TRight}"/> in the Left state with its Left value
         /// set to the result of transforming <paramref name="value"/> with <paramref name="mapper"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="splitter"/> is <see langword="null"/>.</exception>
         [NotNull]
-        public static Task<Either<TOut, TOut>> Split<TValue, TOut>(
+        public static Task<Either<TOut, TOut>> SplitAsync<TValue, TOut>(
             [NotNull] TValue value,
             [NotNull, InstantHandle] Func<TValue, bool> splitter,
             [NotNull, InstantHandle] Func<TValue, Task<TOut>> mapper)
@@ -337,7 +337,7 @@ namespace Tiger.Types
             if (value == null) { throw new ArgumentNullException(nameof(value)); }
             if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
 
-            return Split(value, splitter).Map(
+            return Split(value, splitter).MapAsync(
                 left: mapper,
                 right: mapper);
         }
@@ -356,16 +356,16 @@ namespace Tiger.Types
         /// A transformation from <typeparamref name="TValue"/> to <typeparamref name="TOut"/>.
         /// </param>
         /// <returns>
-        /// An <see cref="Either{TLeft,TRight}"/> in the Left state with its Left value
+        /// An <see cref="Either{TLeft,TRight}"/> in the Right state with its Right value
         /// set to the result of transforming <paramref name="value"/> with <paramref name="mapper"/>
         /// if the condition <paramref name="splitter"/> is satisfied by <paramref name="value"/>;
-        /// otherwise, an <see cref="Either{TLeft,TRight}"/> in the Right state with its Right value
+        /// otherwise, an <see cref="Either{TLeft,TRight}"/> in the Left state with its Left value
         /// set to the result of transforming <paramref name="value"/> with <paramref name="mapper"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="splitter"/> is <see langword="null"/>.</exception>
         [NotNull]
-        public static Task<Either<TOut, TOut>> Split<TValue, TOut>(
+        public static Task<Either<TOut, TOut>> SplitAsync<TValue, TOut>(
             [NotNull] TValue value,
             [NotNull, InstantHandle] Func<TValue, Task<bool>> splitter,
             [NotNull, InstantHandle] Func<TValue, TOut> mapper)
@@ -374,7 +374,7 @@ namespace Tiger.Types
             if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
 
             // todo(cosborn) I'm starting to regret skipping bi-mappable T-versions.
-            return Split(value, splitter).Map(ev => ev.Map(
+            return SplitAsync(value, splitter).Map(ev => ev.Map(
                 left: mapper,
                 right: mapper));
         }
@@ -394,16 +394,16 @@ namespace Tiger.Types
         /// to <typeparamref name="TOut"/>.
         /// </param>
         /// <returns>
-        /// An <see cref="Either{TLeft,TRight}"/> in the Left state with its Left value
+        /// An <see cref="Either{TLeft,TRight}"/> in the Right state with its Right value
         /// set to the result of transforming <paramref name="value"/> with <paramref name="mapper"/>
         /// if the condition <paramref name="splitter"/> is satisfied by <paramref name="value"/>;
-        /// otherwise, an <see cref="Either{TLeft,TRight}"/> in the Right state with its Right value
+        /// otherwise, an <see cref="Either{TLeft,TRight}"/> in the Left state with its Left value
         /// set to the result of transforming <paramref name="value"/> with <paramref name="mapper"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="splitter"/> is <see langword="null"/>.</exception>
         [NotNull]
-        public static Task<Either<TOut, TOut>> Split<TValue, TOut>(
+        public static Task<Either<TOut, TOut>> SplitAsync<TValue, TOut>(
             [NotNull] TValue value,
             [NotNull, InstantHandle] Func<TValue, Task<bool>> splitter,
             [NotNull, InstantHandle] Func<TValue, Task<TOut>> mapper)
@@ -412,7 +412,7 @@ namespace Tiger.Types
             if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
 
             // todo(cosborn) I'm starting to regret skipping bi-mappable T-versions.
-            return Split(value, splitter).Bind(ev => ev.Map(
+            return SplitAsync(value, splitter).Bind(ev => ev.MapAsync(
                 left: mapper,
                 right: mapper));
         }

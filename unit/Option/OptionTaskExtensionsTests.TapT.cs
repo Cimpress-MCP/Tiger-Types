@@ -40,7 +40,7 @@ namespace Tiger.Types.UnitTest
         {
             var output = before;
             var actual = await FromResult(Option<string>.None)
-                .TapT(_ => Run(() => output = sentinel))
+                .TapTAsync(_ => Run(() => output = sentinel))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsNone);
@@ -52,7 +52,7 @@ namespace Tiger.Types.UnitTest
         {
             var output = before;
             var actual = await FromResult(Option.From(some.Get))
-                .TapT(_ => Run(() => output = sentinel))
+                .TapTAsync(_ => Run(() => output = sentinel))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsSome);

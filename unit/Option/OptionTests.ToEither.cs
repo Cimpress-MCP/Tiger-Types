@@ -73,7 +73,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskToEither_Null_Throws(string from)
         {
             var actual = await Record.ExceptionAsync(() => Option.From(from)
-                .ToEither(fallback: (Func<Task<Version>>)null))
+                .ToEitherAsync(fallback: (Func<Task<Version>>)null))
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
@@ -84,7 +84,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskToEither_None(Guid fallback)
         {
             var actual = await Option<string>.None
-                .ToEither(() => FromResult(fallback))
+                .ToEitherAsync(() => FromResult(fallback))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsLeft);
@@ -96,7 +96,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskToEither_Some(NonEmptyString some, Guid fallback)
         {
             var actual = await Option.From(some.Get)
-                .ToEither(() => FromResult(fallback))
+                .ToEitherAsync(() => FromResult(fallback))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsRight);

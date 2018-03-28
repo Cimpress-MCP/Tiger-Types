@@ -128,7 +128,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
         [Pure]
         public static Option<TValue> TryGetValue<TKey, TValue>(
-            [NotNull] this ImmutableDictionary<TKey, TValue> dictionary,
+            [NotNull] this IImmutableDictionary<TKey, TValue> dictionary,
             [NotNull] TKey key)
         {
             if (dictionary == null) { throw new ArgumentNullException(nameof(dictionary)); }

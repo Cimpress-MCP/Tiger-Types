@@ -39,7 +39,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching a Left Either returns the Left func branch, not the Right task branch.")]
         public static async Task FuncTaskMatchTReturn_Left(NonEmptyString left)
         {
-            var actual = await FromResult<Either<string, int>>(left.Get).MatchT(
+            var actual = await FromResult<Either<string, int>>(left.Get).MatchTAsync(
                 left: l => l.Length,
                 right: FromResult)
                 .ConfigureAwait(false);
@@ -50,7 +50,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching a Right Either returns the Right task branch, not the Left func branch.")]
         public static async Task FuncTaskMatchTReturn_Right(Version right)
         {
-            var actual = await FromResult<Either<int, Version>>(right).MatchT(
+            var actual = await FromResult<Either<int, Version>>(right).MatchTAsync(
                 left: l => l,
                 right: r => r.Major.Pipe(FromResult))
                 .ConfigureAwait(false);
@@ -61,7 +61,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching a Left Either returns the Left task branch, not the Right func branch.")]
         public static async Task TaskFuncMatchTReturn_Left(NonEmptyString left)
         {
-            var actual = await FromResult<Either<string, int>>(left.Get).MatchT(
+            var actual = await FromResult<Either<string, int>>(left.Get).MatchTAsync(
                 left: l => l.Length.Pipe(FromResult),
                 right: r => r)
                 .ConfigureAwait(false);
@@ -72,7 +72,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching a Right Either returns the Right func branch, not the Left task branch.")]
         public static async Task TaskFuncMatchTReturn_Right(Version right)
         {
-            var actual = await FromResult<Either<int, Version>>(right).MatchT(
+            var actual = await FromResult<Either<int, Version>>(right).MatchTAsync(
                 left: FromResult,
                 right: r => r.Major)
                 .ConfigureAwait(false);
@@ -83,7 +83,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching a Left Either returns the Left task branch, not the Right func branch.")]
         public static async Task TaskTaskMatchTReturn_Left(NonEmptyString left)
         {
-            var actual = await FromResult<Either<string, int>>(left.Get).MatchT(
+            var actual = await FromResult<Either<string, int>>(left.Get).MatchTAsync(
                 left: l => l.Length.Pipe(FromResult),
                 right: FromResult)
                 .ConfigureAwait(false);
@@ -94,7 +94,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Matching a Right Either returns the Right func branch, not the Left task branch.")]
         public static async Task TaskTaskMatchTReturn_Right(Version right)
         {
-            var actual = await FromResult<Either<int, Version>>(right).MatchT(
+            var actual = await FromResult<Either<int, Version>>(right).MatchTAsync(
                 left: FromResult,
                 right: r => r.Major.Pipe(FromResult))
                 .ConfigureAwait(false);
@@ -134,7 +134,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskMapTLeft_Left(NonEmptyString left, NonEmptyString sentinel)
         {
             var actual = await FromResult<Either<string, int>>(left.Get)
-                .MapT(left: _ => FromResult(sentinel.Get))
+                .MapTAsync(left: _ => FromResult(sentinel.Get))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsLeft);
@@ -146,7 +146,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskMapTLeft_Right(int right, NonEmptyString sentinel)
         {
             var actual = await FromResult<Either<string, int>>(right)
-                .MapT(left: _ => FromResult(sentinel.Get))
+                .MapTAsync(left: _ => FromResult(sentinel.Get))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsRight);
@@ -182,7 +182,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskMapTRight_Left(NonEmptyString left, int sentinel)
         {
             var actual = await FromResult<Either<string, int>>(left.Get)
-                .MapT(right: _ => FromResult(sentinel))
+                .MapTAsync(right: _ => FromResult(sentinel))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsLeft);
@@ -194,7 +194,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskMapTRight_Right(int right, int sentinel)
         {
             var actual = await FromResult<Either<string, int>>(right)
-                .MapT(right: _ => FromResult(sentinel))
+                .MapTAsync(right: _ => FromResult(sentinel))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsRight);
@@ -306,7 +306,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskBindTRight_Left_Right(NonEmptyString left, Version sentinel)
         {
             var actual = await FromResult<Either<string, int>>(left.Get)
-                .BindT(right: _ => FromResult(Either.Right<string, Version>(sentinel)))
+                .BindTAsync(right: _ => FromResult(Either.Right<string, Version>(sentinel)))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsLeft);
@@ -318,7 +318,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskBindTRight_Left_Left(NonEmptyString left, NonEmptyString sentinel)
         {
             var actual = await FromResult<Either<string, int>>(left.Get)
-                .BindT(right: _ => FromResult(Either.Left<string, Version>(sentinel.Get)))
+                .BindTAsync(right: _ => FromResult(Either.Left<string, Version>(sentinel.Get)))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsLeft);
@@ -330,7 +330,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskBindTRight_Right_Left(int right, NonEmptyString sentinel)
         {
             var actual = await FromResult<Either<string, int>>(right)
-                .BindT(right: _ => FromResult(Either.Left<string, Version>(sentinel.Get)))
+                .BindTAsync(right: _ => FromResult(Either.Left<string, Version>(sentinel.Get)))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsLeft);
@@ -342,7 +342,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskBindTRight_Right_Right(int right, Version sentinel)
         {
             var actual = await FromResult<Either<string, int>>(right)
-                .BindT(right: _ => FromResult(Either.Right<string, Version>(sentinel)))
+                .BindTAsync(right: _ => FromResult(Either.Right<string, Version>(sentinel)))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsRight);
@@ -354,7 +354,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskBindTLeft_Right(int right, int sentinel)
         {
             var actual = await FromResult<Either<string, int>>(right)
-                .BindT(left: _ => FromResult(Either.Right<Guid, int>(sentinel)))
+                .BindTAsync(left: _ => FromResult(Either.Right<Guid, int>(sentinel)))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsRight);
@@ -366,7 +366,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskBindTLeft_Right_Left(int right, Guid sentinel)
         {
             var actual = await FromResult<Either<string, int>>(right)
-                .BindT(left: _ => FromResult(Either.Left<Guid, int>(sentinel)))
+                .BindTAsync(left: _ => FromResult(Either.Left<Guid, int>(sentinel)))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsRight);
@@ -378,7 +378,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskBindTLeft_Left_Right(NonEmptyString left, int sentinel)
         {
             var actual = await FromResult<Either<string, int>>(left.Get)
-                .BindT(left: _ => FromResult(Either.Right<Guid, int>(sentinel)))
+                .BindTAsync(left: _ => FromResult(Either.Right<Guid, int>(sentinel)))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsRight);
@@ -390,7 +390,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskBindTLeft_Left_Left(NonEmptyString left, Guid sentinel)
         {
             var actual = await FromResult<Either<string, int>>(left.Get)
-                .BindT(left: _ => FromResult(Either.Left<Guid, int>(sentinel)))
+                .BindTAsync(left: _ => FromResult(Either.Left<Guid, int>(sentinel)))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsLeft);
@@ -463,7 +463,7 @@ namespace Tiger.Types.UnitTest
         {
             var output = before;
             var actual = await FromResult<Either<string, int>>(left.Get)
-                .TapT(left: _ => Run(() => output = sentinel))
+                .TapTAsync(left: _ => Run(() => output = sentinel))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsLeft);
@@ -477,7 +477,7 @@ namespace Tiger.Types.UnitTest
         {
             var output = before;
             var actual = await FromResult<Either<string, int>>(right)
-                .TapT(left: _ => Run(() => output = sentinel))
+                .TapTAsync(left: _ => Run(() => output = sentinel))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsRight);
@@ -491,7 +491,7 @@ namespace Tiger.Types.UnitTest
         {
             var output = before;
             var actual = await FromResult<Either<string, int>>(left.Get)
-                .TapT(right: _ => Run(() => output = sentinel))
+                .TapTAsync(right: _ => Run(() => output = sentinel))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsLeft);
@@ -505,7 +505,7 @@ namespace Tiger.Types.UnitTest
         {
             var output = before;
             var actual = await FromResult<Either<string, int>>(right)
-                .TapT(right: _ => Run(() => output = sentinel))
+                .TapTAsync(right: _ => Run(() => output = sentinel))
                 .ConfigureAwait(false);
 
             Assert.True(actual.IsRight);

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using FsCheck;
 using FsCheck.Xunit;
@@ -77,7 +76,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Tapping an option with a null task throws.")]
         public static async Task TaskTap_OneWayNone_Null_Throws(Option<string> option)
         {
-            var actual = await Record.ExceptionAsync(() => option.Tap(none: null)).ConfigureAwait(false);
+            var actual = await Record.ExceptionAsync(() => option.TapAsync(none: null)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
             Assert.Contains("Parameter name: none", ane.Message, Ordinal);
@@ -87,7 +86,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskTap_OneWayNone_None(NonEmptyString before, NonEmptyString sentinel)
         {
             var output = before.Get;
-            var actual = await Option<string>.None.Tap(() => Run(() => output = sentinel.Get)).ConfigureAwait(false);
+            var actual = await Option<string>.None.TapAsync(() => Run(() => output = sentinel.Get)).ConfigureAwait(false);
 
             Assert.True(actual.IsNone);
             Assert.Equal(sentinel.Get, output);
@@ -97,7 +96,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskTap_OneWayNone_Some(NonEmptyString some, NonEmptyString before, NonEmptyString sentinel)
         {
             var output = before.Get;
-            var actual = await Option.From(some.Get).Tap(() => Run(() => output = sentinel.Get)).ConfigureAwait(false);
+            var actual = await Option.From(some.Get).TapAsync(() => Run(() => output = sentinel.Get)).ConfigureAwait(false);
 
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
@@ -108,7 +107,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Tapping an option with a null task throws.")]
         public static async Task TaskTap_OneWaySome_Null_Throws(Option<string> option)
         {
-            var actual = await Record.ExceptionAsync(() => option.Tap(some: null)).ConfigureAwait(false);
+            var actual = await Record.ExceptionAsync(() => option.TapAsync(some: null)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
             Assert.Contains("Parameter name: some", ane.Message, Ordinal);
@@ -118,7 +117,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskTap_OneWaySome_None(NonEmptyString before, NonEmptyString sentinel)
         {
             var output = before.Get;
-            var actual = await Option<string>.None.Tap(_ => Run(() => output = sentinel.Get)).ConfigureAwait(false);
+            var actual = await Option<string>.None.TapAsync(_ => Run(() => output = sentinel.Get)).ConfigureAwait(false);
 
             Assert.True(actual.IsNone);
             Assert.Equal(before.Get, output);
@@ -128,7 +127,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskTap_OneWaySome_Some(NonEmptyString some, NonEmptyString before, NonEmptyString sentinel)
         {
             var output = before.Get;
-            var actual = await Option.From(some.Get).Tap(_ => Run(() => output = sentinel.Get)).ConfigureAwait(false);
+            var actual = await Option.From(some.Get).TapAsync(_ => Run(() => output = sentinel.Get)).ConfigureAwait(false);
 
             Assert.True(actual.IsSome);
             var innerValue = actual.Value;
@@ -189,7 +188,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Tapping an option with a null None task throws.")]
         public static async Task TaskFuncTap_TwoWay_NoneNull_Throws(Option<string> option)
         {
-            var actual = await Record.ExceptionAsync(() => option.Tap(
+            var actual = await Record.ExceptionAsync(() => option.TapAsync(
                 none: null,
                 some: _ => { })).ConfigureAwait(false);
 
@@ -200,7 +199,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Tapping an option with a null Some task throws.")]
         public static async Task TaskFuncTap_TwoWay_SomeNull_Throws(Option<string> option)
         {
-            var actual = await Record.ExceptionAsync(() => option.Tap(
+            var actual = await Record.ExceptionAsync(() => option.TapAsync(
                 none: () => CompletedTask,
                 some: (Action<string>)null)).ConfigureAwait(false);
 
@@ -213,7 +212,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskFuncTap_TwoWayNone_None(NonEmptyString before, NonEmptyString sentinel)
         {
             var output = before.Get;
-            var actual = await Option<string>.None.Tap(
+            var actual = await Option<string>.None.TapAsync(
                 none: () => Run(() => output = sentinel.Get),
                 some: _ => { }).ConfigureAwait(false);
 
@@ -226,7 +225,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskFuncMap_TwoWaySome_Some(NonEmptyString some, NonEmptyString before, NonEmptyString sentinel)
         {
             var output = before.Get;
-            var actual = await Option.From(some.Get).Tap(
+            var actual = await Option.From(some.Get).TapAsync(
                 none: () => CompletedTask,
                 some: _ => output = sentinel.Get).ConfigureAwait(false);
 
@@ -239,7 +238,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Tapping an option with a null None func throws.")]
         public static async Task FuncTaskTap_TwoWay_NoneNull_Throws(Option<string> option)
         {
-            var actual = await Record.ExceptionAsync(() => option.Tap(
+            var actual = await Record.ExceptionAsync(() => option.TapAsync(
                 none: (Action)null,
                 some: _ => CompletedTask)).ConfigureAwait(false);
 
@@ -250,7 +249,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Tapping an option with a null Some task throws.")]
         public static async Task FuncTaskTap_TwoWay_SomeNull_Throws(Option<string> option)
         {
-            var actual = await Record.ExceptionAsync(() => option.Tap(
+            var actual = await Record.ExceptionAsync(() => option.TapAsync(
                 none: () => { },
                 some: null)).ConfigureAwait(false);
 
@@ -263,7 +262,7 @@ namespace Tiger.Types.UnitTest
         public static async Task FuncTaskTap_TwoWayNone_None(NonEmptyString before, NonEmptyString sentinel)
         {
             var output = before.Get;
-            var actual = await Option<string>.None.Tap(
+            var actual = await Option<string>.None.TapAsync(
                 none: () => output = sentinel.Get,
                 some: _ => CompletedTask).ConfigureAwait(false);
 
@@ -276,7 +275,7 @@ namespace Tiger.Types.UnitTest
         public static async Task FuncTaskMap_TwoWaySome_Some(NonEmptyString some, NonEmptyString before, NonEmptyString sentinel)
         {
             var output = before.Get;
-            var actual = await Option.From(some.Get).Tap(
+            var actual = await Option.From(some.Get).TapAsync(
                 none: () => { },
                 some: _ => Run(() => output = sentinel.Get)).ConfigureAwait(false);
 
@@ -289,7 +288,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Tapping an option with a null None task throws.")]
         public static async Task TaskTaskTap_TwoWay_NoneNull_Throws(Option<string> option)
         {
-            var actual = await Record.ExceptionAsync(() => option.Tap(
+            var actual = await Record.ExceptionAsync(() => option.TapAsync(
                 none: null,
                 some: _ => CompletedTask)).ConfigureAwait(false);
 
@@ -300,7 +299,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Tapping an option with a null Some task throws.")]
         public static async Task TaskTaskTap_TwoWay_SomeNull_Throws(Option<string> option)
         {
-            var actual = await Record.ExceptionAsync(() => option.Tap(
+            var actual = await Record.ExceptionAsync(() => option.TapAsync(
                 none: () => CompletedTask,
                 some: null)).ConfigureAwait(false);
 
@@ -313,7 +312,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskTaskTap_TwoWayNone_None(NonEmptyString before, NonEmptyString sentinel)
         {
             var output = before.Get;
-            var actual = await Option<string>.None.Tap(
+            var actual = await Option<string>.None.TapAsync(
                 none: () => Run(() => output = sentinel.Get),
                 some: _ => CompletedTask).ConfigureAwait(false);
 
@@ -326,7 +325,7 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskTaskMap_TwoWaySome_Some(NonEmptyString some, NonEmptyString before, NonEmptyString sentinel)
         {
             var output = before.Get;
-            var actual = await Option.From(some.Get).Tap(
+            var actual = await Option.From(some.Get).TapAsync(
                 none: () => CompletedTask,
                 some: _ => Run(() => output = sentinel.Get)).ConfigureAwait(false);
 
