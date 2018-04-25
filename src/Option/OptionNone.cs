@@ -26,7 +26,7 @@ namespace Tiger.Types
     /// <summary>A None state that can be cast to an <see cref="Option{TSome}"/> of any type.</summary>
     [EditorBrowsable(Never)]
     [StructLayout(Auto)]
-    [SuppressMessage("Microsoft:Guidelines", "CA1066", Justification = "Prevent boxing.")]
+    [SuppressMessage("Microsoft:Guidelines", "CA1066", Justification = "Type system isn't rich enough to prove this.")]
     public readonly struct OptionNone
     {
         #region Operators

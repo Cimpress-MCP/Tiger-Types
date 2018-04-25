@@ -29,7 +29,7 @@ namespace Tiger.Types
         /// <summary>Invokes <paramref name="piper"/> with <paramref name="value"/> as its argument.</summary>
         /// <typeparam name="TIn">The type of <paramref name="value"/>.</typeparam>
         /// <typeparam name="TOut">The type to produce.</typeparam>
-        /// <param name="value">The value to be piped.</param>
+        /// <param name="value">The value to pipe.</param>
         /// <param name="piper">A function to invoke with <paramref name="value"/> as its argument.</param>
         /// <returns>The value of invoking <paramref name="value"/> to <paramref name="piper"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
@@ -39,7 +39,7 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TIn, TOut> piper)
         {
             if (value == null) { throw new ArgumentNullException(nameof(value)); }
-            if (piper == null) { throw new ArgumentNullException(nameof(piper)); }
+            if (piper is null) { throw new ArgumentNullException(nameof(piper)); }
 
             return piper(value);
         }
@@ -48,7 +48,7 @@ namespace Tiger.Types
         /// Transforms an arbitrary object into a dictionary of public property names to property values,
         /// with special handling for dictionaries.
         /// </summary>
-        /// <param name="value">The object to be converted.</param>
+        /// <param name="value">The object to convert.</param>
         /// <param name="comparer">A comparer for the keys of the returned dictionary.</param>
         /// <returns>A dictionary.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
@@ -57,7 +57,7 @@ namespace Tiger.Types
             [NotNull] this object value,
             [CanBeNull] IEqualityComparer<string> comparer = null)
         {
-            if (value == null) { throw new ArgumentNullException(nameof(value)); }
+            if (value is null) { throw new ArgumentNullException(nameof(value)); }
 
             comparer = comparer ?? EqualityComparer<string>.Default;
 

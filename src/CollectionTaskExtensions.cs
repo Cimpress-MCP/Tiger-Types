@@ -36,7 +36,7 @@ namespace Tiger.Types
         /// </summary>
         /// <typeparam name="TIn">The Some type of the member type of <paramref name="enumerableTaskValue"/>.</typeparam>
         /// <typeparam name="TOut">The return type of <paramref name="mapper"/>.</typeparam>
-        /// <param name="enumerableTaskValue">The <see cref="Task{TResult}"/> to be mapped.</param>
+        /// <param name="enumerableTaskValue">The <see cref="Task{TResult}"/> to map.</param>
         /// <param name="mapper">
         /// A transformation from <typeparamref name="TIn"/> to <typeparamref name="TOut"/>.
         /// </param>
@@ -50,8 +50,8 @@ namespace Tiger.Types
             [NotNull, ItemNotNull] this Task<IEnumerable<TIn>> enumerableTaskValue,
             [NotNull, InstantHandle] Func<TIn, TOut> mapper)
         {
-            if (enumerableTaskValue == null) { throw new ArgumentNullException(nameof(enumerableTaskValue)); }
-            if (mapper == null) { throw new ArgumentNullException(nameof(mapper)); }
+            if (enumerableTaskValue is null) { throw new ArgumentNullException(nameof(enumerableTaskValue)); }
+            if (mapper is null) { throw new ArgumentNullException(nameof(mapper)); }
 
             return enumerableTaskValue.Map(ev => ev.Map(mapper));
         }
@@ -61,7 +61,7 @@ namespace Tiger.Types
         /// </summary>
         /// <typeparam name="TIn">The Some type of the member type of <paramref name="enumerableTaskValue"/>.</typeparam>
         /// <typeparam name="TOut">The return type of <paramref name="mapper"/>.</typeparam>
-        /// <param name="enumerableTaskValue">The <see cref="Task{TResult}"/> to be mapped.</param>
+        /// <param name="enumerableTaskValue">The <see cref="Task{TResult}"/> to map.</param>
         /// <param name="mapper">
         /// A transformation from <typeparamref name="TIn"/> to <typeparamref name="TOut"/>.
         /// </param>
@@ -75,8 +75,8 @@ namespace Tiger.Types
             [NotNull, ItemNotNull] this Task<IEnumerable<TIn>> enumerableTaskValue,
             [NotNull, InstantHandle] Func<TIn, Task<TOut>> mapper)
         {
-            if (enumerableTaskValue == null) { throw new ArgumentNullException(nameof(enumerableTaskValue)); }
-            if (mapper == null) { throw new ArgumentNullException(nameof(mapper)); }
+            if (enumerableTaskValue is null) { throw new ArgumentNullException(nameof(enumerableTaskValue)); }
+            if (mapper is null) { throw new ArgumentNullException(nameof(mapper)); }
 
             return enumerableTaskValue.Bind(ev => ev.MapAsync(mapper));
         }
@@ -89,7 +89,7 @@ namespace Tiger.Types
         /// The element type of the Result type of <paramref name="enumerableTaskValue"/>.
         /// </typeparam>
         /// <typeparam name="TState">The type of the seed value.</typeparam>
-        /// <param name="enumerableTaskValue">The <see cref="Task{TResult}"/> to be folded.</param>
+        /// <param name="enumerableTaskValue">The <see cref="Task{TResult}"/> to fold.</param>
         /// <param name="folder">
         /// A function to invoke with the seed value and each element of
         /// the result of <paramref name="enumerableTaskValue"/> as the arguments.
@@ -107,8 +107,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TState, T, TState> folder)
             where TState : struct
         {
-            if (enumerableTaskValue == null) { throw new ArgumentNullException(nameof(enumerableTaskValue)); }
-            if (folder == null) { throw new ArgumentNullException(nameof(folder)); }
+            if (enumerableTaskValue is null) { throw new ArgumentNullException(nameof(enumerableTaskValue)); }
+            if (folder is null) { throw new ArgumentNullException(nameof(folder)); }
 
             return enumerableTaskValue.Map(ev => ev.Fold(folder));
         }
@@ -121,9 +121,9 @@ namespace Tiger.Types
         /// The element type of the Result type of <paramref name="enumerableTaskValue"/>.
         /// </typeparam>
         /// <typeparam name="TState">The type of the seed value.</typeparam>
-        /// <param name="enumerableTaskValue">The <see cref="Task{TResult}"/> to be folded.</param>
+        /// <param name="enumerableTaskValue">The <see cref="Task{TResult}"/> to fold.</param>
         /// <param name="state">
-        /// The seed value to be combined with each element of
+        /// The seed value to combine with each element of
         /// the result of <paramref name="enumerableTaskValue"/>.
         /// </param>
         /// <param name="folder">
@@ -144,9 +144,9 @@ namespace Tiger.Types
             [NotNull] TState state,
             [NotNull, InstantHandle] Func<TState, T, TState> folder)
         {
-            if (enumerableTaskValue == null) { throw new ArgumentNullException(nameof(enumerableTaskValue)); }
+            if (enumerableTaskValue is null) { throw new ArgumentNullException(nameof(enumerableTaskValue)); }
             if (state == null) { throw new ArgumentNullException(nameof(state)); }
-            if (folder == null) { throw new ArgumentNullException(nameof(folder)); }
+            if (folder is null) { throw new ArgumentNullException(nameof(folder)); }
 
             return enumerableTaskValue.Map(ev => ev.Fold(state, folder));
         }
@@ -159,7 +159,7 @@ namespace Tiger.Types
         /// The element type of the Result type of <paramref name="enumerableTaskValue"/>.
         /// </typeparam>
         /// <typeparam name="TState">The type of the seed value.</typeparam>
-        /// <param name="enumerableTaskValue">The <see cref="Task{TResult}"/> to be folded.</param>
+        /// <param name="enumerableTaskValue">The <see cref="Task{TResult}"/> to fold.</param>
         /// <param name="folder">
         /// An asynchronous function to invoke with the seed value and each element of
         /// the result of <paramref name="enumerableTaskValue"/> as the arguments.
@@ -177,8 +177,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TState, T, Task<TState>> folder)
             where TState : struct
         {
-            if (enumerableTaskValue == null) { throw new ArgumentNullException(nameof(enumerableTaskValue)); }
-            if (folder == null) { throw new ArgumentNullException(nameof(folder)); }
+            if (enumerableTaskValue is null) { throw new ArgumentNullException(nameof(enumerableTaskValue)); }
+            if (folder is null) { throw new ArgumentNullException(nameof(folder)); }
 
             return enumerableTaskValue.Bind(ev => ev.FoldAsync(folder));
         }
@@ -191,9 +191,9 @@ namespace Tiger.Types
         /// The element type of the Result type of <paramref name="enumerableTaskValue"/>.
         /// </typeparam>
         /// <typeparam name="TState">The type of the seed value.</typeparam>
-        /// <param name="enumerableTaskValue">The <see cref="Task{TResult}"/> to be folded.</param>
+        /// <param name="enumerableTaskValue">The <see cref="Task{TResult}"/> to fold.</param>
         /// <param name="state">
-        /// The seed value to be combined with each element of
+        /// The seed value to combine with each element of
         /// the result of <paramref name="enumerableTaskValue"/>.
         /// </param>
         /// <param name="folder">
@@ -214,9 +214,9 @@ namespace Tiger.Types
             [NotNull] TState state,
             [NotNull, InstantHandle] Func<TState, T, Task<TState>> folder)
         {
-            if (enumerableTaskValue == null) { throw new ArgumentNullException(nameof(enumerableTaskValue)); }
+            if (enumerableTaskValue is null) { throw new ArgumentNullException(nameof(enumerableTaskValue)); }
             if (state == null) { throw new ArgumentNullException(nameof(state)); }
-            if (folder == null) { throw new ArgumentNullException(nameof(folder)); }
+            if (folder is null) { throw new ArgumentNullException(nameof(folder)); }
 
             return enumerableTaskValue.Bind(ev => ev.FoldAsync(state, folder));
         }

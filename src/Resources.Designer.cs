@@ -114,5 +114,23 @@ namespace Tiger.Types {
                 return ResourceManager.GetString("ResultIsNull", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This instance is in an invalid state..
+        /// </summary>
+        public static string TryIsNotErr {
+            get {
+                return ResourceManager.GetString("TryIsNotErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This instance is in an invalid state..
+        /// </summary>
+        public static string TryIsNotOk {
+            get {
+                return ResourceManager.GetString("TryIsNotOk", resourceCulture);
+            }
+        }
     }
 }

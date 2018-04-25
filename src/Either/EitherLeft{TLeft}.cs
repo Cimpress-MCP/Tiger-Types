@@ -30,11 +30,11 @@ namespace Tiger.Types
     /// <typeparam name="TLeft">The applied Left type.</typeparam>
     [EditorBrowsable(Never)]
     [StructLayout(Auto)]
-    [SuppressMessage("Microsoft:Guidelines", "CA1066", Justification = "Prevent boxing.")]
+    [SuppressMessage("Microsoft:Guidelines", "CA1066", Justification = "Type system isn't rich enough to prove this.")]
     public readonly struct EitherLeft<TLeft>
     {
         /// <summary>Initializes a new instance of the <see cref="EitherLeft{TLeft}"/> struct.</summary>
-        /// <param name="value">The value to be wrapped.</param>
+        /// <param name="value">The value to wrap.</param>
         [SuppressMessage("Style", "IDE0016:Use 'throw' expression", Justification = "Analyzer bug.")]
         internal EitherLeft([NotNull] TLeft value)
         {
@@ -78,7 +78,7 @@ namespace Tiger.Types
         public override int GetHashCode() => EqualityComparer<TLeft>.Default.GetHashCode(Value);
 
         [Pure]
-        bool EqualsCore(EitherLeft<TLeft> other) =>
+        bool EqualsCore(in EitherLeft<TLeft> other) =>
             EqualityComparer<TLeft>.Default.Equals(Value, other.Value);
 
         [NotNull, Pure, UsedImplicitly]

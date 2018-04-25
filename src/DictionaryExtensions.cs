@@ -50,7 +50,7 @@ namespace Tiger.Types
             [NotNull] this Dictionary<TKey, TValue> dictionary,
             [NotNull] TKey key)
         {
-            if (dictionary == null) { throw new ArgumentNullException(nameof(dictionary)); }
+            if (dictionary is null) { throw new ArgumentNullException(nameof(dictionary)); }
             if (key == null) { throw new ArgumentNullException(nameof(key)); }
 
             return !dictionary.TryGetValue(key, out var value)
@@ -77,7 +77,7 @@ namespace Tiger.Types
             [NotNull] this IDictionary<TKey, TValue> dictionary,
             [NotNull] TKey key)
         {
-            if (dictionary == null) { throw new ArgumentNullException(nameof(dictionary)); }
+            if (dictionary is null) { throw new ArgumentNullException(nameof(dictionary)); }
             if (key == null) { throw new ArgumentNullException(nameof(key)); }
 
             return !dictionary.TryGetValue(key, out var value)
@@ -104,7 +104,7 @@ namespace Tiger.Types
             [NotNull] this IReadOnlyDictionary<TKey, TValue> dictionary,
             [NotNull] TKey key)
         {
-            if (dictionary == null) { throw new ArgumentNullException(nameof(dictionary)); }
+            if (dictionary is null) { throw new ArgumentNullException(nameof(dictionary)); }
             if (key == null) { throw new ArgumentNullException(nameof(key)); }
 
             return !dictionary.TryGetValue(key, out var value)
@@ -131,7 +131,7 @@ namespace Tiger.Types
             [NotNull] this IImmutableDictionary<TKey, TValue> dictionary,
             [NotNull] TKey key)
         {
-            if (dictionary == null) { throw new ArgumentNullException(nameof(dictionary)); }
+            if (dictionary is null) { throw new ArgumentNullException(nameof(dictionary)); }
             if (key == null) { throw new ArgumentNullException(nameof(key)); }
 
             return !dictionary.TryGetValue(key, out var value)

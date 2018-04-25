@@ -96,7 +96,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "An EitherLeft converts implicitly to a Left Either.")]
         public static void EitherLeft_ToEither(NonEmptyString left)
         {
-            Either<string, int> actual = Either.Left(left.Get);
+            Either<string, int> actual = Either.Left(left: left.Get);
 
             Assert.True(actual.IsLeft);
             var innerValue = (string)actual;
@@ -106,7 +106,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "An EitherRight converts implicitly to a Right Either.")]
         public static void EitherRight_ToEither(int right)
         {
-            Either<string, int> actual = Either.Right(right);
+            Either<string, int> actual = Either.Right(right: right);
 
             Assert.True(actual.IsRight);
             var innerValue = (int)actual;
@@ -120,9 +120,9 @@ namespace Tiger.Types.UnitTest
             {
                 if (i <= 0)
                 {
-                    return Either.Right(right);
+                    return Either.Right(right: right);
                 }
-                return Either.Left(left);
+                return Either.Left(left: left);
             }
 
             var actual = Func(value.Get);

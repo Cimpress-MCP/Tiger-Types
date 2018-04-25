@@ -26,7 +26,7 @@ namespace Tiger.Types
     /// <summary>Represents a type with one possible value.</summary>
     [PublicAPI]
     [StructLayout(Auto)]
-    [SuppressMessage("Microsoft:Guidelines", "CA1066", Justification = "Prevent boxing.")]
+    [SuppressMessage("Microsoft:Guidelines", "CA1066", Justification = "Type system isn't rich enough to prove this.")]
     public readonly struct Unit
     {
         /// <summary>

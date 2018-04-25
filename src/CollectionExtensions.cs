@@ -43,7 +43,7 @@ namespace Tiger.Types
         public static Option<TSource> FirstOrNone<TSource>(
             [NotNull, ItemNotNull] this IEnumerable<TSource> source)
         {
-            if (source == null) { throw new ArgumentNullException(nameof(source)); }
+            if (source is null) { throw new ArgumentNullException(nameof(source)); }
             if (source is IList<TSource> list && list.Count > 0)
             {
                 return list[0];
@@ -77,8 +77,8 @@ namespace Tiger.Types
             [NotNull, ItemNotNull] this IEnumerable<TSource> source,
             [NotNull] Func<TSource, bool> predicate)
         {
-            if (source == null) { throw new ArgumentNullException(nameof(source)); }
-            if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
+            if (source is null) { throw new ArgumentNullException(nameof(source)); }
+            if (predicate is null) { throw new ArgumentNullException(nameof(predicate)); }
 
             // note(cosborn) Logic cribbed from FirstOrDefault.
             foreach (var element in source)
@@ -108,8 +108,8 @@ namespace Tiger.Types
             [NotNull, ItemNotNull] this IEnumerable<TIn> enumerableValue,
             [NotNull, InstantHandle] Func<TIn, TOut> mapper)
         {
-            if (enumerableValue == null) { throw new ArgumentNullException(nameof(enumerableValue)); }
-            if (mapper == null) { throw new ArgumentNullException(nameof(mapper)); }
+            if (enumerableValue is null) { throw new ArgumentNullException(nameof(enumerableValue)); }
+            if (mapper is null) { throw new ArgumentNullException(nameof(mapper)); }
 
             return enumerableValue.Select(mapper);
         }
@@ -134,8 +134,8 @@ namespace Tiger.Types
             [NotNull, ItemNotNull] this IEnumerable<TIn> enumerableValue,
             [NotNull, InstantHandle] Func<TIn, Task<TOut>> mapper)
         {
-            if (enumerableValue == null) { throw new ArgumentNullException(nameof(enumerableValue)); }
-            if (mapper == null) { throw new ArgumentNullException(nameof(mapper)); }
+            if (enumerableValue is null) { throw new ArgumentNullException(nameof(enumerableValue)); }
+            if (mapper is null) { throw new ArgumentNullException(nameof(mapper)); }
 
             return enumerableValue.Select(mapper).Pipe(Task.WhenAll).Map(ImmutableArray.Create);
         }
@@ -161,8 +161,8 @@ namespace Tiger.Types
             [NotNull, ItemNotNull] this IEnumerable<TIn> enumerableValue,
             [NotNull, InstantHandle] Func<TIn, Option<TOut>> mapper)
         {
-            if (enumerableValue == null) { throw new ArgumentNullException(nameof(enumerableValue)); }
-            if (mapper == null) { throw new ArgumentNullException(nameof(mapper)); }
+            if (enumerableValue is null) { throw new ArgumentNullException(nameof(enumerableValue)); }
+            if (mapper is null) { throw new ArgumentNullException(nameof(mapper)); }
 
             return enumerableValue.Select(mapper).Cat();
         }
@@ -172,7 +172,7 @@ namespace Tiger.Types
         /// </summary>
         /// <typeparam name="T">The element type of <paramref name="collection"/>.</typeparam>
         /// <typeparam name="TState">The type of the seed value.</typeparam>
-        /// <param name="collection">The collection to be folded.</param>
+        /// <param name="collection">The collection to fold.</param>
         /// <param name="folder">
         /// A function to invoke with the seed value and each element of this instance as the arguments.
         /// </param>
@@ -188,8 +188,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TState, T, TState> folder)
             where TState : struct
         {
-            if (collection == null) { throw new ArgumentNullException(nameof(collection)); }
-            if (folder == null) { throw new ArgumentNullException(nameof(folder)); }
+            if (collection is null) { throw new ArgumentNullException(nameof(collection)); }
+            if (folder is null) { throw new ArgumentNullException(nameof(folder)); }
 
             var result = default(TState);
             foreach (var item in collection)
@@ -203,8 +203,8 @@ namespace Tiger.Types
         /// <summary>Combines the provided seed state with each element of this instance.</summary>
         /// <typeparam name="T">The element type of <paramref name="collection"/>.</typeparam>
         /// <typeparam name="TState">The type of the seed value.</typeparam>
-        /// <param name="collection">The collection to be folded.</param>
-        /// <param name="state">The seed value to be combined with each element of this instance.</param>
+        /// <param name="collection">The collection to fold.</param>
+        /// <param name="state">The seed value to combine with each element of this instance.</param>
         /// <param name="folder">
         /// A function to invoke with the seed value and each element of this instance as the arguments.
         /// </param>
@@ -221,9 +221,9 @@ namespace Tiger.Types
             [NotNull] TState state,
             [NotNull, InstantHandle] Func<TState, T, TState> folder)
         {
-            if (collection == null) { throw new ArgumentNullException(nameof(collection)); }
+            if (collection is null) { throw new ArgumentNullException(nameof(collection)); }
             if (state == null) { throw new ArgumentNullException(nameof(state)); }
-            if (folder == null) { throw new ArgumentNullException(nameof(folder)); }
+            if (folder is null) { throw new ArgumentNullException(nameof(folder)); }
 
             var result = state;
             foreach (var item in collection)
@@ -240,7 +240,7 @@ namespace Tiger.Types
         /// </summary>
         /// <typeparam name="T">The type of the items contained in <paramref name="collection"/>.</typeparam>
         /// <typeparam name="TState">The type of the seed value.</typeparam>
-        /// <param name="collection">The collection to be folded.</param>
+        /// <param name="collection">The collection to fold.</param>
         /// <param name="folder">
         /// An asynchronous function to invoke with the seed value
         /// and each value of this instance as the arguments.
@@ -257,8 +257,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TState, T, Task<TState>> folder)
             where TState : struct
         {
-            if (collection == null) { throw new ArgumentNullException(nameof(collection)); }
-            if (folder == null) { throw new ArgumentNullException(nameof(folder)); }
+            if (collection is null) { throw new ArgumentNullException(nameof(collection)); }
+            if (folder is null) { throw new ArgumentNullException(nameof(folder)); }
 
             var result = default(TState);
             foreach (var item in collection)
@@ -274,8 +274,8 @@ namespace Tiger.Types
         /// </summary>
         /// <typeparam name="T">The type of the items contained in <paramref name="collection"/>.</typeparam>
         /// <typeparam name="TState">The type of the seed value.</typeparam>
-        /// <param name="collection">The collection to be folded.</param>
-        /// <param name="state">The seed value to be combined with each value of this instance.</param>
+        /// <param name="collection">The collection to fold.</param>
+        /// <param name="state">The seed value to combine with each value of this instance.</param>
         /// <param name="folder">
         /// An asynchronous function to invoke with the seed value
         /// and each value of this instance as the arguments.
@@ -293,9 +293,9 @@ namespace Tiger.Types
             [NotNull] TState state,
             [NotNull, InstantHandle] Func<TState, T, Task<TState>> folder)
         {
-            if (collection == null) { throw new ArgumentNullException(nameof(collection)); }
+            if (collection is null) { throw new ArgumentNullException(nameof(collection)); }
             if (state == null) { throw new ArgumentNullException(nameof(state)); }
-            if (folder == null) { throw new ArgumentNullException(nameof(folder)); }
+            if (folder is null) { throw new ArgumentNullException(nameof(folder)); }
 
             var result = state;
             foreach (var item in collection)

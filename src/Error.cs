@@ -61,7 +61,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="message"/> is <see langword="null"/>.</exception>
         public Error([NotNull] string message, [CanBeNull] IEnumerable<KeyValuePair<string, object>> context)
         {
-            if (message == null) { throw new ArgumentNullException(nameof(message)); }
+            if (message is null) { throw new ArgumentNullException(nameof(message)); }
 
             var calculatedContext = context?.ToImmutableDictionary() ?? s_emptyContext;
             _context = calculatedContext.SetItem(MessageKey, message);
@@ -73,7 +73,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="message"/> is <see langword="null"/>.</exception>
         public Error([NotNull] string message, [CanBeNull] IEnumerable<KeyValuePair<string, string>> context)
         {
-            if (message == null) { throw new ArgumentNullException(nameof(message)); }
+            if (message is null) { throw new ArgumentNullException(nameof(message)); }
 
             var calculatedContext = context?.ToImmutableDictionary(kvp => kvp.Key, kvp => (object)kvp.Value) ?? s_emptyContext;
             _context = calculatedContext.SetItem(MessageKey, message);
@@ -138,7 +138,7 @@ namespace Tiger.Types
             obj is Error error && EqualsCore(error);
 
         [Pure]
-        bool EqualsCore(Error other)
+        bool EqualsCore(in Error other)
         {
             if (ReferenceEquals(_context, other._context)) { return true; }
             if (_context is null || other._context is null)

@@ -40,7 +40,7 @@ namespace Tiger.Types
         [NotNull, ItemNotNull, LinqTunnel]
         public static IEnumerable<TSome> Cat<TSome>([NotNull] this IEnumerable<Option<TSome>> optionEnumerableValue)
         {
-            if (optionEnumerableValue == null) { throw new ArgumentNullException(nameof(optionEnumerableValue)); }
+            if (optionEnumerableValue is null) { throw new ArgumentNullException(nameof(optionEnumerableValue)); }
 
             return optionEnumerableValue.Where(ov => ov.IsSome).Select(ov => ov.Value);
         }

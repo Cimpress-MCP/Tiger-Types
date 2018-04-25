@@ -60,24 +60,24 @@ namespace Tiger.Types
         #region Extensions
 
         /// <summary>Converts an <see cref="Option{TSome}"/> into a <see cref="Nullable{T}"/>.</summary>
-        /// <typeparam name="TSome">The Some type of <paramref name="value"/>.</typeparam>
-        /// <param name="value">The value to be converted.</param>
+        /// <typeparam name="TSome">The Some type of <paramref name="optionValue"/>.</typeparam>
+        /// <param name="optionValue">The value to convert.</param>
         /// <returns>
-        /// The Some value of <paramref name="value"/> if it is in the Some state;
+        /// The Some value of <paramref name="optionValue"/> if it is in the Some state;
         /// otherwise, <see langword="null"/>.
         /// </returns>
         [Pure, CanBeNull]
-        public static TSome? ToNullable<TSome>(in this Option<TSome> value)
-            where TSome : struct => value.IsNone
+        public static TSome? ToNullable<TSome>(in this Option<TSome> optionValue)
+            where TSome : struct => optionValue.IsNone
                 ? (TSome?)null
-                : value.Value;
+                : optionValue.Value;
 
         /// <summary>
         /// Converts an <see cref="Option{TSome}"/> into an <see cref="Either{TLeft,TRight}"/>.
         /// </summary>
         /// <typeparam name="TLeft">The type of <paramref name="fallback"/>.</typeparam>
         /// <typeparam name="TSome">The Some type of <paramref name="value"/></typeparam>
-        /// <param name="value">The value to be converted.</param>
+        /// <param name="value">The value to convert.</param>
         /// <param name="fallback">The value to use as a fallback.</param>
         /// <returns>
         /// An <see cref="Either{TLeft,TRight}"/> in the Right state with its Right value
@@ -100,56 +100,70 @@ namespace Tiger.Types
         /// Converts an <see cref="Option{TSome}"/> into an <see cref="Either{TLeft,TRight}"/>.
         /// </summary>
         /// <typeparam name="TLeft">The type of <paramref name="fallback"/>.</typeparam>
-        /// <typeparam name="TSome">The Some type of <paramref name="value"/></typeparam>
-        /// <param name="value">The value to be converted.</param>
+        /// <typeparam name="TSome">The Some type of <paramref name="optionValue"/></typeparam>
+        /// <param name="optionValue">The value to convert.</param>
         /// <param name="fallback">A function producing the value to use as a fallback.</param>
         /// <returns>
         /// An <see cref="Either{TLeft,TRight}"/> in the Right state with its Right value
-        /// set to the Some value of <paramref name="value"/> if <paramref name="value"/>
+        /// set to the Some value of <paramref name="optionValue"/> if <paramref name="optionValue"/>
         /// is in the Some state; otherwise, an <see cref="Either{TLeft,TRight}"/> in the
         /// Left state with its Left value set to <paramref name="fallback"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="fallback"/> is <see langword="null"/>.</exception>
         [Pure]
         public static Either<TLeft, TSome> ToEither<TLeft, TSome>(
-            in this Option<TSome> value,
+            in this Option<TSome> optionValue,
             [NotNull, InstantHandle] Func<TLeft> fallback)
         {
-            if (fallback == null) { throw new ArgumentNullException(nameof(fallback)); }
+            if (fallback is null) { throw new ArgumentNullException(nameof(fallback)); }
 
-            return value.Map(v => new Either<TLeft, TSome>(v)).GetValueOrDefault(() => fallback());
+            return optionValue.Map(v => new Either<TLeft, TSome>(v)).GetValueOrDefault(() => fallback());
         }
 
         /// <summary>
         /// Converts an <see cref="Option{TSome}"/> into an <see cref="Either{TLeft,TRight}"/>.
         /// </summary>
         /// <typeparam name="TLeft">The type of <paramref name="fallback"/>.</typeparam>
-        /// <typeparam name="TSome">The Some type of <paramref name="value"/></typeparam>
-        /// <param name="value">The value to be converted.</param>
+        /// <typeparam name="TSome">The Some type of <paramref name="optionValue"/></typeparam>
+        /// <param name="optionValue">The value to convert.</param>
         /// <param name="fallback">A function producing the value to use as a fallback.</param>
         /// <returns>
         /// An <see cref="Either{TLeft,TRight}"/> in the Right state with its Right value
-        /// set to the Some value of <paramref name="value"/> if <paramref name="value"/>
+        /// set to the Some value of <paramref name="optionValue"/> if <paramref name="optionValue"/>
         /// is in the Some state; otherwise, an <see cref="Either{TLeft,TRight}"/> in the
         /// Left state with its Left value set to <paramref name="fallback"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="fallback"/> is <see langword="null"/>.</exception>
         [NotNull, Pure]
         public static Task<Either<TLeft, TSome>> ToEitherAsync<TLeft, TSome>(
-            in this Option<TSome> value,
+            in this Option<TSome> optionValue,
             [NotNull, InstantHandle] Func<Task<TLeft>> fallback)
         {
-            if (fallback == null) { throw new ArgumentNullException(nameof(fallback)); }
+            if (fallback is null) { throw new ArgumentNullException(nameof(fallback)); }
 
-            return value.Map(v => new Either<TLeft, TSome>(v))
+            return optionValue.Map(v => new Either<TLeft, TSome>(v))
                 .GetValueOrDefaultAsync(async () => await fallback().ConfigureAwait(false));
         }
+
+        /// <summary>
+        /// Converts an <see cref="Option"/> into a <see cref="Try{TErr, TOk}"/>.
+        /// </summary>
+        /// <typeparam name="TErr">The Err type of the <see cref="Try{TErr, TOk}"/> to create.</typeparam>
+        /// <typeparam name="TSome">The Some type of <paramref name="optionValue"/>.</typeparam>
+        /// <param name="optionValue">The value to convert.</param>
+        /// <returns>
+        /// A <see cref="Try{TErr, TOk}"/> in the None state if <paramref name="optionValue"/> is in the None state;
+        /// otherwise, a <see cref="Try{TErr, TOk}"/> in the Ok state whose Ok value
+        /// is the Some value of <paramref name="optionValue"/>.
+        /// </returns>
+        public static Try<TErr, TSome> ToTry<TErr, TSome>(in this Option<TSome> optionValue) =>
+            new Try<TErr, TSome>(optionValue.Map(v => new Either<TErr, TSome>(v)));
 
         /// <summary>
         /// Joins an optional <see cref="Option{TSome}"/> into an <see cref="Option{TSome}"/>.
         /// </summary>
         /// <typeparam name="TSome">The Some type of <paramref name="optionOptionValue"/>.</typeparam>
-        /// <param name="optionOptionValue">The value to be joined.</param>
+        /// <param name="optionOptionValue">The value to join.</param>
         /// <returns>
         /// An <see cref="Option{TSome}"/> in the None state if <paramref name="optionOptionValue"/>
         /// is in the None state; otherwise, the Some value of <paramref name="optionOptionValue"/>.
@@ -165,7 +179,7 @@ namespace Tiger.Types
         /// <typeparam name="TException">The return type of <paramref name="none"/>.</typeparam>
         /// <param name="optionValue">The value whose state to test.</param>
         /// <param name="none">
-        /// A function producing an exception to be thrown if <paramref name="optionValue"/> is in the None state.
+        /// A function producing an exception to throw if <paramref name="optionValue"/> is in the None state.
         /// </param>
         /// <returns>The Some value of <paramref name="optionValue"/>.</returns>
         /// <exception cref="Exception"><paramref name="optionValue"/> is in the None state.</exception>
@@ -200,7 +214,7 @@ namespace Tiger.Types
             [CanBeNull] TSome value,
             [NotNull, InstantHandle] Func<TSome, bool> splitter)
         {
-            if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
+            if (splitter is null) { throw new ArgumentNullException(nameof(splitter)); }
 
             return From(value).Filter(splitter);
         }
@@ -223,7 +237,7 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TSome, bool> splitter)
             where TSome : struct
         {
-            if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
+            if (splitter is null) { throw new ArgumentNullException(nameof(splitter)); }
 
             return From(nullableValue).Filter(splitter);
         }
@@ -246,7 +260,7 @@ namespace Tiger.Types
             [CanBeNull] TSome value,
             [NotNull, InstantHandle] Func<TSome, Task<bool>> splitter)
         {
-            if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
+            if (splitter is null) { throw new ArgumentNullException(nameof(splitter)); }
 
             return From(value).FilterAsync(splitter);
         }
@@ -270,7 +284,7 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TSome, Task<bool>> splitter)
             where TSome : struct
         {
-            if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
+            if (splitter is null) { throw new ArgumentNullException(nameof(splitter)); }
 
             return From(value).FilterAsync(splitter);
         }
@@ -291,7 +305,7 @@ namespace Tiger.Types
         [Pure, CanBeNull]
         public static Type GetUnderlyingType([NotNull] Type optionalType)
         {
-            if (optionalType == null) { throw new ArgumentNullException(nameof(optionalType)); }
+            if (optionalType is null) { throw new ArgumentNullException(nameof(optionalType)); }
 
             if (!optionalType.IsConstructedGenericType)
             { // note(cosborn) Constructed generics only, please.
@@ -307,7 +321,7 @@ namespace Tiger.Types
         /// Indicates whether two specified <see cref="Option{TSome}"/> objects are equal
         /// by using the default equality comparer.
         /// </summary>
-        /// <typeparam name="TSome">The Some type of the objects to be compared for equality.</typeparam>
+        /// <typeparam name="TSome">The Some type of the objects to compare for equality.</typeparam>
         /// <param name="o1">The left <see cref="Option{TSome}"/> object.</param>
         /// <param name="o2">The right <see cref="Option{TSome}"/> object.</param>
         /// <returns>
@@ -328,7 +342,7 @@ namespace Tiger.Types
         /// Indicates whether two specified <see cref="Option{TSome}"/> objects are equal
         /// by using the specified equality comparer.
         /// </summary>
-        /// <typeparam name="TSome">The Some type of the objects to be compared for equality.</typeparam>
+        /// <typeparam name="TSome">The Some type of the objects to compare for equality.</typeparam>
         /// <param name="o1">The left <see cref="Option{TSome}"/> object.</param>
         /// <param name="o2">The right <see cref="Option{TSome}"/> object.</param>
         /// <param name="equalityComparer">An equality comparer to compare values.</param>
@@ -353,7 +367,7 @@ namespace Tiger.Types
         /// Compares the relative values of two <see cref="Option{TSome}"/> objects
         /// using the default comparer.
         /// </summary>
-        /// <typeparam name="TSome">The Some type of the objects to be compared.</typeparam>
+        /// <typeparam name="TSome">The Some type of the objects to compare.</typeparam>
         /// <param name="o1">The left <see cref="Option{TSome}"/> object.</param>
         /// <param name="o2">The right <see cref="Option{TSome}"/> object.</param>
         /// <returns>
@@ -377,7 +391,7 @@ namespace Tiger.Types
         /// Compares the relative values of two <see cref="Option{TSome}"/> objects
         /// using the specified comparer.
         /// </summary>
-        /// <typeparam name="TSome">The Some type of the objects to be compared.</typeparam>
+        /// <typeparam name="TSome">The Some type of the objects to compare.</typeparam>
         /// <param name="o1">The left <see cref="Option{TSome}"/> object.</param>
         /// <param name="o2">The right <see cref="Option{TSome}"/> object.</param>
         /// <param name="comparer">A comparer to compare values.</param>

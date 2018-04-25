@@ -41,7 +41,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentException"><paramref name="type"/> is not compatible.</exception>
         public OptionTypeConverter([NotNull] Type type)
         {
-            if (type == null) { throw new ArgumentNullException(nameof(type)); }
+            if (type is null) { throw new ArgumentNullException(nameof(type)); }
 
             if (!type.IsConstructedGenericType
                 || type.GetGenericTypeDefinition() != typeof(Option<>))
@@ -67,7 +67,7 @@ namespace Tiger.Types
             CultureInfo culture,
             object value)
         {
-            if (value == null) { return Activator.CreateInstance(_conversionType); }
+            if (value is null) { return Activator.CreateInstance(_conversionType); }
 
             if (Option.From(value as string).Any(s => s.Length == 0))
             { // note(cosborn) For TypeConverter purposes, an empty string is "no value."
@@ -83,7 +83,7 @@ namespace Tiger.Types
             });
 
             if (value.GetType() == _underlyingType)
-            { // note(cosborn) Since there's no other conversion to be done, wrap it up!
+            { // note(cosborn) Since there's no other conversion to do, wrap it up!
                 return ctor.Invoke(new[] { value });
             }
 
@@ -112,7 +112,7 @@ namespace Tiger.Types
             [CanBeNull] object value,
             Type destinationType)
         { // todo(cosborn) There is a strong possibility that this can be more efficient.
-            if (value == null)
+            if (value is null)
             {
                 return ConvertToNull(context, culture, destinationType);
             }

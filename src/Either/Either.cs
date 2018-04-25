@@ -32,82 +32,82 @@ namespace Tiger.Types
         /// Creates an <see cref="Either{TLeft,TRight}"/> in the Left state from the provided value.
         /// </summary>
         /// <typeparam name="TLeft">
-        /// The Left type of the <see cref="Either{TLeft,TRight}"/> to be created.
+        /// The Left type of the <see cref="Either{TLeft,TRight}"/> to create.
         /// </typeparam>
         /// <typeparam name="TRight">
-        /// The Right type of the <see cref="Either{TLeft,TRight}"/> to be created.
+        /// The Right type of the <see cref="Either{TLeft,TRight}"/> to create.
         /// </typeparam>
-        /// <param name="leftValue">
+        /// <param name="left">
         /// The value from which to create the <see cref="Either{TLeft,TRight}"/>.
         /// </param>
         /// <returns>An <see cref="Either{TLeft,TRight}"/> in the Left state.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="leftValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         [Pure]
-        public static Either<TLeft, TRight> Left<TLeft, TRight>([NotNull] TLeft leftValue)
+        public static Either<TLeft, TRight> Left<TLeft, TRight>([NotNull] TLeft left)
         {
-            if (leftValue == null) { throw new ArgumentNullException(nameof(leftValue)); }
+            if (left == null) { throw new ArgumentNullException(nameof(left)); }
 
-            return new Either<TLeft, TRight>(leftValue);
+            return new Either<TLeft, TRight>(left);
         }
 
         /// <summary>Creates an <see cref="EitherLeft{TLeft}"/> from the provided value.</summary>
         /// <typeparam name="TLeft">
-        /// The Left type of the <see cref="Either{TLeft,TRight}"/> to be created.
+        /// The Left type of the <see cref="Either{TLeft,TRight}"/> to create.
         /// </typeparam>
-        /// <param name="leftValue">
+        /// <param name="left">
         /// The value from which to create the <see cref="Either{TLeft,TRight}"/>.
         /// </param>
         /// <returns>
         /// An <see cref="EitherLeft{TLeft}"/> that can be converted to an <see cref="Either{TLeft,TRight}"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="leftValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         [Pure]
-        public static EitherLeft<TLeft> Left<TLeft>([NotNull] TLeft leftValue)
+        public static EitherLeft<TLeft> Left<TLeft>([NotNull] TLeft left)
         {
-            if (leftValue == null) { throw new ArgumentNullException(nameof(leftValue)); }
+            if (left == null) { throw new ArgumentNullException(nameof(left)); }
 
-            return new EitherLeft<TLeft>(leftValue);
+            return new EitherLeft<TLeft>(left);
         }
 
         /// <summary>
         /// Creates an <see cref="Either{TLeft,TRight}"/> in the Right state from the provided value.
         /// </summary>
         /// <typeparam name="TLeft">
-        /// The Left type of the <see cref="Either{TLeft,TRight}"/> to be created.
+        /// The Left type of the <see cref="Either{TLeft,TRight}"/> to create.
         /// </typeparam>
         /// <typeparam name="TRight">
-        /// The Right type of the <see cref="Either{TLeft,TRight}"/> to be created.
+        /// The Right type of the <see cref="Either{TLeft,TRight}"/> to create.
         /// </typeparam>
-        /// <param name="rightValue">
+        /// <param name="right">
         /// The value from which to create the <see cref="Either{TLeft,TRight}"/>.
         /// </param>
         /// <returns>An <see cref="Either{TLeft,TRight}"/> in the Right state.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="rightValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         [Pure]
-        public static Either<TLeft, TRight> Right<TLeft, TRight>([NotNull] TRight rightValue)
+        public static Either<TLeft, TRight> Right<TLeft, TRight>([NotNull] TRight right)
         {
-            if (rightValue == null) { throw new ArgumentNullException(nameof(rightValue)); }
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
 
-            return new Either<TLeft, TRight>(rightValue);
+            return new Either<TLeft, TRight>(right);
         }
 
         /// <summary>Creates an <see cref="EitherRight{TRight}"/> from the provided value.</summary>
         /// <typeparam name="TRight">
-        /// The Right type of the <see cref="Either{TLeft,TRight}"/> to be created.
+        /// The Right type of the <see cref="Either{TLeft,TRight}"/> to create.
         /// </typeparam>
-        /// <param name="rightValue">
+        /// <param name="right">
         /// The value from which to create the <see cref="Either{TLeft,TRight}"/>.
         /// </param>
         /// <returns>
         /// An <see cref="EitherRight{TRight}"/> that can be converted to an <see cref="Either{TLeft,TRight}"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="rightValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         [Pure]
-        public static EitherRight<TRight> Right<TRight>([NotNull] TRight rightValue)
+        public static EitherRight<TRight> Right<TRight>([NotNull] TRight right)
         {
-            if (rightValue == null) { throw new ArgumentNullException(nameof(rightValue)); }
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
 
-            return new EitherRight<TRight>(rightValue);
+            return new EitherRight<TRight>(right);
         }
 
         #region Extensions
@@ -117,9 +117,9 @@ namespace Tiger.Types
         /// </summary>
         /// <typeparam name="TLeft">The Left type of <paramref name="eitherValue"/>.</typeparam>
         /// <typeparam name="TRight">The Right type of <paramref name="eitherValue"/>.</typeparam>
-        /// <param name="eitherValue">The value to be converted.</param>
+        /// <param name="eitherValue">The value to convert.</param>
         /// <returns>
-        /// An <see cref="Option{TSome}"/> in the Some state with its Some value set to the
+        /// An <see cref="Option{TSome}"/> in the Some state whose Some value is the
         /// Right value of <paramref name="eitherValue"/> if <paramref name="eitherValue"/> is in the
         /// Right state; otherwise, an <see cref="Option{TSome}"/> in the None state.
         /// </returns>
@@ -131,6 +131,26 @@ namespace Tiger.Types
             return eitherValue.Map(v => new Option<TRight>(v)).GetValueOrDefault();
         }
 
+        /// <summary>Converts an <see cref="Either{TLeft, TRight}"/> into a <see cref="Try{TErr, TOk}"/>.</summary>
+        /// <typeparam name="TLeft">The Left type of <paramref name="eitherValue"/>.</typeparam>
+        /// <typeparam name="TRight">The Right type of <paramref name="eitherValue"/>.</typeparam>
+        /// <param name="eitherValue">The value to convert.</param>
+        /// <returns>
+        /// A <see cref="Try{TErr, TOk}"/> in the Err state whose Err value
+        /// is the Left value of <paramref name="eitherValue"/> if <paramref name="eitherValue"/>
+        /// is in the Left state;
+        /// otherwise, a <see cref="Try{TErr, TOk}"/> in the Ok state whose Ok value
+        /// is the Right value of <paramref name="eitherValue"/> if <paramref name="eitherValue"/>
+        /// is in the Right state.
+        /// </returns>
+        /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
+        public static Try<TLeft, TRight> ToTry<TLeft, TRight>(in this Either<TLeft, TRight> eitherValue)
+        {
+            if (eitherValue.State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
+
+            return new Try<TLeft, TRight>(eitherValue);
+        }
+
         /// <summary>Joins one layer of <see cref="Either{TLeft,TRight}"/> from a value.</summary>
         /// <typeparam name="TLeft">
         /// The Left type of <paramref name="eitherEitherValue"/> and
@@ -139,7 +159,7 @@ namespace Tiger.Types
         /// <typeparam name="TRight">
         /// The Right type of the Right type of <paramref name="eitherEitherValue"/>.
         /// </typeparam>
-        /// <param name="eitherEitherValue">The value to be joined.</param>
+        /// <param name="eitherEitherValue">The value to join.</param>
         /// <returns>
         /// An <see cref="Either{TLeft,TRight}"/> in the Left state whose Left value
         /// is the Left value of this instance if this instance is in the Left state,
@@ -160,7 +180,7 @@ namespace Tiger.Types
         /// The Right type of <paramref name="eitherEitherValue"/> and
         /// the Right type of the Right type of <paramref name="eitherEitherValue"/>.
         /// </typeparam>
-        /// <param name="eitherEitherValue">The value to be joined.</param>
+        /// <param name="eitherEitherValue">The value to join.</param>
         /// <returns>
         /// An <see cref="Either{TLeft,TRight}"/> in the Right state whose Right value
         /// is the Right value of this instance if this instance is in the Right state,
@@ -174,14 +194,16 @@ namespace Tiger.Types
                 right: r => new Either<TLeft, TRight>(r));
 
         /// <summary>
-        /// Collapses an <see cref="Either{TLeft,TRight}"/> whose Left and Right types
-        /// match into a value, based on its state.
+        /// Collapses an <see cref="Either{TLeft,TRight}"/> whose Left and Right types match
+        /// into a value, based on its state.
         /// </summary>
         /// <typeparam name="TSame">The Left and Right type of <paramref name="eitherValue"/>.</typeparam>
-        /// <param name="eitherValue">The value to be collapsed.</param>
+        /// <param name="eitherValue">The value to collapse.</param>
         /// <returns>
-        /// The Left value of this instance if this instance is in the Left state, or
-        /// the Right value of this instance if this instance is in the Right state.
+        /// The Left value of <paramref name="eitherValue"/>
+        /// if <paramref name="eitherValue"/> is in the Left state,
+        /// or the Right value of <paramref name="eitherValue"/>
+        /// if <paramref name="eitherValue"/> is in the Right state.
         /// </returns>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [NotNull, EditorBrowsable(Never)]
@@ -199,7 +221,7 @@ namespace Tiger.Types
         /// <typeparam name="TException">The return type of <paramref name="left"/>.</typeparam>
         /// <param name="eitherValue">The value whose state to test.</param>
         /// <param name="left">
-        /// A function from <typeparamref name="TLeft"/> producing an exception to be thrown
+        /// A function from <typeparamref name="TLeft"/> producing an exception to throw
         /// if <paramref name="eitherValue"/> is in the Left state.
         /// </param>
         /// <returns>The Right value of <paramref name="eitherValue"/>.</returns>
@@ -213,6 +235,27 @@ namespace Tiger.Types
             if (eitherValue.IsLeft)
             {
                 throw left((TLeft)eitherValue);
+            }
+
+            return eitherValue.Value;
+        }
+
+        /// <summary>
+        /// Asserts that the provided either value is in the Right state,
+        /// throwing Left value if it is not.
+        /// </summary>
+        /// <typeparam name="TLeft">The Left type of <paramref name="eitherValue"/>.</typeparam>
+        /// <typeparam name="TRight">The Right type of <paramref name="eitherValue"/>.</typeparam>
+        /// <param name="eitherValue">The value whose state to test.</param>
+        /// <returns>The Right value of <paramref name="eitherValue"/>.</returns>
+        /// <exception cref="Exception"><paramref name="eitherValue"/> is in the Left state.</exception>
+        [NotNull]
+        public static TRight Assert<TLeft, TRight>(in this Either<TLeft, TRight> eitherValue)
+            where TLeft : Exception
+        {
+            if (eitherValue.IsLeft)
+            {
+                throw (TLeft)eitherValue;
             }
 
             return eitherValue.Value;
@@ -239,11 +282,11 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TValue, bool> splitter)
         {
             if (value == null) { throw new ArgumentNullException(nameof(value)); }
-            if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
+            if (splitter is null) { throw new ArgumentNullException(nameof(splitter)); }
 
             return splitter(value)
-                ? Right<TValue, TValue>(value)
-                : Left<TValue, TValue>(value);
+                ? Right<TValue, TValue>(right: value)
+                : Left<TValue, TValue>(left: value);
         }
 
         /// <summary>
@@ -267,11 +310,11 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TValue, Task<bool>> splitter)
         {
             if (value == null) { throw new ArgumentNullException(nameof(value)); }
-            if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
+            if (splitter is null) { throw new ArgumentNullException(nameof(splitter)); }
 
             return await splitter(value).ConfigureAwait(false)
-                ? Right<TValue, TValue>(value)
-                : Left<TValue, TValue>(value);
+                ? Right<TValue, TValue>(right: value)
+                : Left<TValue, TValue>(left: value);
         }
 
         /// <summary>
@@ -300,7 +343,7 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TValue, TOut> mapper)
         {
             if (value == null) { throw new ArgumentNullException(nameof(value)); }
-            if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
+            if (splitter is null) { throw new ArgumentNullException(nameof(splitter)); }
 
             return Split(value, splitter).Map(
                 left: mapper,
@@ -335,7 +378,7 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TValue, Task<TOut>> mapper)
         {
             if (value == null) { throw new ArgumentNullException(nameof(value)); }
-            if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
+            if (splitter is null) { throw new ArgumentNullException(nameof(splitter)); }
 
             return Split(value, splitter).MapAsync(
                 left: mapper,
@@ -371,7 +414,7 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TValue, TOut> mapper)
         {
             if (value == null) { throw new ArgumentNullException(nameof(value)); }
-            if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
+            if (splitter is null) { throw new ArgumentNullException(nameof(splitter)); }
 
             // todo(cosborn) I'm starting to regret skipping bi-mappable T-versions.
             return SplitAsync(value, splitter).Map(ev => ev.Map(
@@ -409,7 +452,7 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TValue, Task<TOut>> mapper)
         {
             if (value == null) { throw new ArgumentNullException(nameof(value)); }
-            if (splitter == null) { throw new ArgumentNullException(nameof(splitter)); }
+            if (splitter is null) { throw new ArgumentNullException(nameof(splitter)); }
 
             // todo(cosborn) I'm starting to regret skipping bi-mappable T-versions.
             return SplitAsync(value, splitter).Bind(ev => ev.MapAsync(

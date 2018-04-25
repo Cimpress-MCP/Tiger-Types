@@ -30,11 +30,11 @@ namespace Tiger.Types
     /// <typeparam name="TRight">The applied Right type.</typeparam>
     [EditorBrowsable(Never)]
     [StructLayout(Auto)]
-    [SuppressMessage("Microsoft:Guidelines", "CA1066", Justification = "Prevent boxing.")]
+    [SuppressMessage("Microsoft:Guidelines", "CA1066", Justification = "Type system isn't rich enough to prove this.")]
     public readonly struct EitherRight<TRight>
     {
         /// <summary>Initializes a new instance of the <see cref="EitherRight{TRight}"/> struct.</summary>
-        /// <param name="value">The value to be wrapped.</param>
+        /// <param name="value">The value to wrap.</param>
         [SuppressMessage("Style", "IDE0016:Use 'throw' expression", Justification = "Analyzer bug.")]
         internal EitherRight([NotNull] TRight value)
         {
@@ -77,7 +77,7 @@ namespace Tiger.Types
         public override int GetHashCode() => Value.GetHashCode();
 
         [Pure]
-        bool EqualsCore(EitherRight<TRight> other) => EqualityComparer<TRight>.Default.Equals(Value, other.Value);
+        bool EqualsCore(in EitherRight<TRight> other) => EqualityComparer<TRight>.Default.Equals(Value, other.Value);
 
         [NotNull, Pure, UsedImplicitly]
         object ToDump() => new

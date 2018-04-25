@@ -28,7 +28,7 @@ namespace Tiger.Types
         /// <summary>Replaces the Result value of this instance with the provided value.</summary>
         /// <typeparam name="TIn">The Result type of <paramref name="taskValue"/>.</typeparam>
         /// <typeparam name="TOut">The type of the replacement value.</typeparam>
-        /// <param name="taskValue">The <see cref="Task{TResult}"/> whose result is to be replaced.</param>
+        /// <param name="taskValue">The <see cref="Task{TResult}"/> whose result to replace.</param>
         /// <param name="replacement">The value to use as a replacement.</param>
         /// <returns><paramref name="replacement"/>, asynchronously.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="taskValue"/> is <see langword="null"/>.</exception>
@@ -38,7 +38,7 @@ namespace Tiger.Types
             [NotNull, ItemNotNull] this Task<TIn> taskValue,
             [NotNull] TOut replacement)
         {
-            if (taskValue == null) { throw new ArgumentNullException(nameof(taskValue)); }
+            if (taskValue is null) { throw new ArgumentNullException(nameof(taskValue)); }
             if (replacement == null) { throw new ArgumentNullException(nameof(replacement)); }
 
             await taskValue.ConfigureAwait(false);
@@ -48,7 +48,7 @@ namespace Tiger.Types
         /// <summary>Maps the result of a <see cref="Task{TResult}"/> over a transformation.</summary>
         /// <typeparam name="TIn">The Result type of <paramref name="taskValue"/>.</typeparam>
         /// <typeparam name="TOut">The return type of <paramref name="mapper"/>.</typeparam>
-        /// <param name="taskValue">The <see cref="Task{TResult}"/> to be mapped.</param>
+        /// <param name="taskValue">The <see cref="Task{TResult}"/> to map.</param>
         /// <param name="mapper">A transformation from <typeparamref name="TIn"/> to <typeparamref name="TOut"/>.</param>
         /// <returns>The result of <paramref name="mapper"/>, asynchronously.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="taskValue"/> is <see langword="null"/>.</exception>
@@ -58,8 +58,8 @@ namespace Tiger.Types
             [NotNull, ItemNotNull] this Task<TIn> taskValue,
             [NotNull, InstantHandle] Func<TIn, TOut> mapper)
         {
-            if (taskValue == null) { throw new ArgumentNullException(nameof(taskValue)); }
-            if (mapper == null) { throw new ArgumentNullException(nameof(mapper)); }
+            if (taskValue is null) { throw new ArgumentNullException(nameof(taskValue)); }
+            if (mapper is null) { throw new ArgumentNullException(nameof(mapper)); }
 
             var result = mapper(await taskValue.ConfigureAwait(false));
             Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute
@@ -69,7 +69,7 @@ namespace Tiger.Types
         /// <summary>Binds the result of a <see cref="Task{TResult}"/> over a transformation.</summary>
         /// <typeparam name="TIn">The Result type of <paramref name="taskValue"/>.</typeparam>
         /// <typeparam name="TOut">The Result type of the return type of <paramref name="binder"/>.</typeparam>
-        /// <param name="taskValue">The <see cref="Task{TResult}"/> to be bound.</param>
+        /// <param name="taskValue">The <see cref="Task{TResult}"/> to bind.</param>
         /// <param name="binder">An asynchronous transformation from <typeparamref name="TIn"/> to <typeparamref name="TOut"/>.</param>
         /// <returns>The result of <paramref name="binder"/>, asynchronously.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="taskValue"/> is <see langword="null"/>.</exception>
@@ -79,8 +79,8 @@ namespace Tiger.Types
             [NotNull, ItemNotNull] this Task<TIn> taskValue,
             [NotNull, InstantHandle] Func<TIn, Task<TOut>> binder)
         {
-            if (taskValue == null) { throw new ArgumentNullException(nameof(taskValue)); }
-            if (binder == null) { throw new ArgumentNullException(nameof(binder)); }
+            if (taskValue is null) { throw new ArgumentNullException(nameof(taskValue)); }
+            if (binder is null) { throw new ArgumentNullException(nameof(binder)); }
 
             return taskValue.Map(binder).Unwrap();
         }

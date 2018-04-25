@@ -36,11 +36,18 @@ namespace Tiger.Types
     /// <typeparam name="TRight">The Right type of the value that may be represented.</typeparam>
     [DebuggerTypeProxy(typeof(Either<,>.DebuggerTypeProxy))]
     [StructLayout(Auto)]
-    [SuppressMessage("Microsoft:Guidelines", "CA1066", Justification = "Prevent boxing.")]
+    [SuppressMessage("Microsoft:Guidelines", "CA1066", Justification = "Type system isn't rich enough to prove this.")]
     public readonly struct Either<TLeft, TRight>
     {
         readonly TLeft _leftValue;
         readonly TRight _rightValue;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Either{TLeft, TRight}"/> struct
+        /// from the provided <see cref="Either{TLeft, TRight}"/> struct.
+        /// </summary>
+        /// <param name="eitherValue">The value to copy.</param>
+        public Either(in Either<TLeft, TRight> eitherValue) => this = eitherValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Either{TLeft,TRight}"/> struct.
@@ -102,49 +109,49 @@ namespace Tiger.Types
         #region Operators
 
         /// <summary>Wraps a value in <see cref="Either{TLeft,TRight}"/>.</summary>
-        /// <param name="leftValue">The value to be wrapped.</param>
+        /// <param name="leftValue">The value to wrap.</param>
         public static implicit operator Either<TLeft, TRight>([CanBeNull] TLeft leftValue) => leftValue == null
             ? default
             : new Either<TLeft, TRight>(leftValue);
 
         /// <summary>Wraps a value in <see cref="Either{TLeft,TRight}"/>.</summary>
-        /// <param name="rightValue">The value to be wrapped.</param>
+        /// <param name="rightValue">The value to wrap.</param>
         public static implicit operator Either<TLeft, TRight>([CanBeNull] TRight rightValue) => rightValue == null
             ? default
             : new Either<TLeft, TRight>(rightValue);
 
         /// <summary>Wraps a value in <see cref="Either{TLeft,TRight}"/>.</summary>
-        /// <param name="leftValue">The value to be wrapped.</param>
+        /// <param name="leftValue">The value to wrap.</param>
         public static implicit operator Either<TLeft, TRight>(EitherLeft<TLeft> leftValue) =>
             new Either<TLeft, TRight>(leftValue.Value);
 
         /// <summary>Wraps a value in <see cref="Either{TLeft,TRight}"/>.</summary>
-        /// <param name="rightValue">The value to be wrapped.</param>
+        /// <param name="rightValue">The value to wrap.</param>
         public static implicit operator Either<TLeft, TRight>(EitherRight<TRight> rightValue) =>
             new Either<TLeft, TRight>(rightValue.Value);
 
-        /// <summary>Unwraps the Right value of this instance.</summary>
-        /// <param name="value">The value to be unwrapped.</param>
+        /// <summary>Unwraps the Right value of <paramref name="eitherValue"/>.</summary>
+        /// <param name="eitherValue">The value to unwrap.</param>
         /// <exception cref="InvalidOperationException">This instance is in an invalid state.</exception>
         [NotNull]
         [SuppressMessage("Microsoft:Guidelines", "CA2225", Justification = "Type parameters play poorly with this analysis.")]
-        public static explicit operator TRight(Either<TLeft, TRight> value)
+        public static explicit operator TRight(Either<TLeft, TRight> eitherValue)
         {
-            if (!value.IsRight) { throw new InvalidOperationException(EitherIsNotRight); }
+            if (!eitherValue.IsRight) { throw new InvalidOperationException(EitherIsNotRight); }
 
-            return value._rightValue;
+            return eitherValue._rightValue;
         }
 
-        /// <summary>Unwraps the Left value of this instance.</summary>
-        /// <param name="value">The value to be unwrapped.</param>
+        /// <summary>Unwraps the Left value of <paramref name="eitherValue"/>.</summary>
+        /// <param name="eitherValue">The value to unwrap.</param>
         /// <exception cref="InvalidOperationException">This instance is in an invalid state.</exception>
         [NotNull]
         [SuppressMessage("Microsoft:Guidelines", "CA2225", Justification = "Type parameters play poorly with this analysis.")]
-        public static explicit operator TLeft(Either<TLeft, TRight> value)
+        public static explicit operator TLeft(Either<TLeft, TRight> eitherValue)
         {
-            if (!value.IsLeft) { throw new InvalidOperationException(EitherIsNotLeft); }
+            if (!eitherValue.IsLeft) { throw new InvalidOperationException(EitherIsNotLeft); }
 
-            return value._leftValue;
+            return eitherValue._leftValue;
         }
 
         /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
@@ -154,8 +161,7 @@ namespace Tiger.Types
         /// <see langword="true"/> if <paramref name="left"/> is equal to the <paramref name="right"/>;
         /// otherwise, <see langword="false"/>.
         /// </returns>
-        public static bool operator ==(Either<TLeft, TRight> left, Either<TLeft, TRight> right) =>
-            left.EqualsCore(right);
+        public static bool operator ==(Either<TLeft, TRight> left, Either<TLeft, TRight> right) => left.EqualsCore(right);
 
         /// <summary>Indicates whether the current object is not equal to another object of the same type.</summary>
         /// <param name="left">An object to compare with <paramref name="right"/>.</param>
@@ -164,8 +170,7 @@ namespace Tiger.Types
         /// <see langword="true"/> if <paramref name="left"/> is not equal to the <paramref name="right"/>;
         /// otherwise, <see langword="false"/>.
         /// </returns>
-        public static bool operator !=(Either<TLeft, TRight> left, Either<TLeft, TRight> right) =>
-            !(left == right);
+        public static bool operator !=(Either<TLeft, TRight> left, Either<TLeft, TRight> right) => !(left == right);
 
         /// <summary>
         /// Creates an <see cref="Either{TLeft,TRight}"/> in the Left state from the provided value.
@@ -222,13 +227,13 @@ namespace Tiger.Types
         #region Value
 
         /// <summary>Produces a value from this instance by matching on its state.</summary>
-        /// <typeparam name="TOut">The type of the value to be produced.</typeparam>
+        /// <typeparam name="TOut">The type of the value to produce.</typeparam>
         /// <param name="left">
-        /// A function to be invoked with the Left value of this instance as
+        /// A function to invoke with the Left value of this instance as
         /// the argument if this instance is in the Left state.
         /// </param>
         /// <param name="right">
-        /// A function to be invoked with the Right value of this instance as
+        /// A function to invoke with the Right value of this instance as
         /// the argument if this instance is in the Right state.
         /// </param>
         /// <returns>A value produced by <paramref name="left"/> or <paramref name="right"/>.</returns>
@@ -240,8 +245,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TLeft, TOut> left,
             [NotNull, InstantHandle] Func<TRight, TOut> right)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             var result = IsLeft
@@ -252,13 +257,13 @@ namespace Tiger.Types
         }
 
         /// <summary>Produces a value from this instance by matching on its state, asynchronously.</summary>
-        /// <typeparam name="TOut">The type of the value to be produced.</typeparam>
+        /// <typeparam name="TOut">The type of the value to produce.</typeparam>
         /// <param name="left">
-        /// A function to be invoked with the Left value of this instance as
+        /// A function to invoke with the Left value of this instance as
         /// the argument if this instance is in the Left state.
         /// </param>
         /// <param name="right">
-        /// A function to be invoked asynchronously with the Right value of this instance as
+        /// A function to invoke asynchronously with the Right value of this instance as
         /// the argument if this instance is in the Right state.
         /// </param>
         /// <returns>A value produced by <paramref name="left"/> or <paramref name="right"/>.</returns>
@@ -270,8 +275,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TLeft, TOut> left,
             [NotNull, InstantHandle] Func<TRight, Task<TOut>> right)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             var result = IsLeft
@@ -282,13 +287,13 @@ namespace Tiger.Types
         }
 
         /// <summary>Produces a value from this instance by matching on its state, asynchronously.</summary>
-        /// <typeparam name="TOut">The type of the value to be produced.</typeparam>
+        /// <typeparam name="TOut">The type of the value to produce.</typeparam>
         /// <param name="left">
-        /// A function to be invoked asynchronously with the Left value of this instance as
+        /// A function to invoke asynchronously with the Left value of this instance as
         /// the argument if this instance is in the Left state.
         /// </param>
         /// <param name="right">
-        /// A function to be invoked with the Right value of this instance as
+        /// A function to invoke with the Right value of this instance as
         /// the argument if this instance is in the Right state.
         /// </param>
         /// <returns>A value produced by <paramref name="left"/> or <paramref name="right"/>.</returns>
@@ -300,8 +305,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TLeft, Task<TOut>> left,
             [NotNull, InstantHandle] Func<TRight, TOut> right)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             var result = IsLeft
@@ -312,13 +317,13 @@ namespace Tiger.Types
         }
 
         /// <summary>Produces a value from this instance by matching on its state, asynchronously.</summary>
-        /// <typeparam name="TOut">The type of the value to be produced.</typeparam>
+        /// <typeparam name="TOut">The type of the value to produce.</typeparam>
         /// <param name="left">
-        /// A function to be invoked asynchronously with the Left value of this instance as
+        /// A function to invoke asynchronously with the Left value of this instance as
         /// the argument if this instance is in the Left state.
         /// </param>
         /// <param name="right">
-        /// A function to be invoked asynchronously with the Right value of this instance as
+        /// A function to invoke asynchronously with the Right value of this instance as
         /// the argument if this instance is in the Right state.
         /// </param>
         /// <returns>A value produced by <paramref name="left"/> or <paramref name="right"/>.</returns>
@@ -330,8 +335,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TLeft, Task<TOut>> left,
             [NotNull, InstantHandle] Func<TRight, Task<TOut>> right)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             var result = IsLeft
@@ -347,11 +352,11 @@ namespace Tiger.Types
 
         /// <summary>Performs an action with this instance by matching on its state.</summary>
         /// <param name="left">
-        /// An action to be invoked with the Left value of this instance
+        /// An action to invoke with the Left value of this instance
         /// as the argument if this instance is in the Left state.
         /// </param>
         /// <param name="right">
-        /// An action to be invoked with the Right value of this instance
+        /// An action to invoke with the Right value of this instance
         /// as the argument if this instance is in the Right state.
         /// </param>
         /// <returns>A unit.</returns>
@@ -362,8 +367,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Action<TLeft> left,
             [NotNull, InstantHandle] Action<TRight> right)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft)
@@ -380,11 +385,11 @@ namespace Tiger.Types
 
         /// <summary>Performs an action with this instance by matching on its state, asynchronously.</summary>
         /// <param name="left">
-        /// An action to be invoked with the Left value of this instance
+        /// An action to invoke with the Left value of this instance
         /// as the argument if this instance is in the Left state.
         /// </param>
         /// <param name="right">
-        /// An action to be invoked asynchronously with the Right value of this instance
+        /// An action to invoke asynchronously with the Right value of this instance
         /// as the argument if this instance is in the Right state.
         /// </param>
         /// <returns>The task object representing the asynchronous operation.</returns>
@@ -395,8 +400,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Action<TLeft> left,
             [NotNull, InstantHandle] Func<TRight, Task> right)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft)
@@ -413,11 +418,11 @@ namespace Tiger.Types
 
         /// <summary>Performs an action with this instance by matching on its state, asynchronously.</summary>
         /// <param name="left">
-        /// An action to be invoked asynchronously with the Left value of this instance
+        /// An action to invoke asynchronously with the Left value of this instance
         /// as the argument if this instance is in the Left state.
         /// </param>
         /// <param name="right">
-        /// An action to be invoked with the Right value of this instance
+        /// An action to invoke with the Right value of this instance
         /// as the argument if this instance is in the Right state.
         /// </param>
         /// <returns>The task object representing the asynchronous operation.</returns>
@@ -428,8 +433,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TLeft, Task> left,
             [NotNull, InstantHandle] Action<TRight> right)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft)
@@ -446,11 +451,11 @@ namespace Tiger.Types
 
         /// <summary>Performs an action with this instance by matching on its state, asynchronously.</summary>
         /// <param name="left">
-        /// An action to be invoked asynchronously with the Left value of this instance
+        /// An action to invoke asynchronously with the Left value of this instance
         /// as the argument if this instance is in the Left state.
         /// </param>
         /// <param name="right">
-        /// An action to be invoked asynchronously with the Right value of this instance
+        /// An action to invoke asynchronously with the Right value of this instance
         /// as the argument if this instance is in the Right state.
         /// </param>
         /// <returns>The task object representing the asynchronous operation.</returns>
@@ -461,8 +466,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TLeft, Task> left,
             [NotNull, InstantHandle] Func<TRight, Task> right)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft)
@@ -499,7 +504,7 @@ namespace Tiger.Types
         [Pure]
         public Either<TOut, TRight> Map<TOut>([NotNull, InstantHandle] Func<TLeft, TOut> left)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft)
@@ -528,7 +533,7 @@ namespace Tiger.Types
         [NotNull, Pure]
         public async Task<Either<TOut, TRight>> MapAsync<TOut>([NotNull, InstantHandle] Func<TLeft, Task<TOut>> left)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft)
@@ -557,7 +562,7 @@ namespace Tiger.Types
         [Pure]
         public Either<TLeft, TOut> Map<TOut>([NotNull, InstantHandle] Func<TRight, TOut> right)
         {
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft) { return new Either<TLeft, TOut>(_leftValue); }
@@ -583,7 +588,7 @@ namespace Tiger.Types
         [NotNull, Pure]
         public async Task<Either<TLeft, TOut>> MapAsync<TOut>([NotNull, InstantHandle] Func<TRight, Task<TOut>> right)
         {
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft) { return new Either<TLeft, TOut>(_leftValue); }
@@ -621,8 +626,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TLeft, TLeftOut> left,
             [NotNull, InstantHandle] Func<TRight, TRightOut> right)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft)
@@ -666,8 +671,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TLeft, TLeftOut> left,
             [NotNull, InstantHandle] Func<TRight, Task<TRightOut>> right)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft)
@@ -711,8 +716,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TLeft, Task<TLeftOut>> left,
             [NotNull, InstantHandle] Func<TRight, TRightOut> right)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft)
@@ -756,8 +761,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TLeft, Task<TLeftOut>> left,
             [NotNull, InstantHandle] Func<TRight, Task<TRightOut>> right)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             if (IsLeft)
@@ -794,10 +799,10 @@ namespace Tiger.Types
         [Pure]
         public Either<TOut, TRight> Bind<TOut>([NotNull, InstantHandle] Func<TLeft, Either<TOut, TRight>> left)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return Map(left).Pipe(Either.Join);
+            return Map(left: left).Pipe(v => v.Join());
         }
 
         /// <summary>
@@ -821,10 +826,10 @@ namespace Tiger.Types
         public Task<Either<TOut, TRight>> BindAsync<TOut>(
             [NotNull, InstantHandle] Func<TLeft, Task<Either<TOut, TRight>>> left)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return MapAsync(left).Map(Either.Join);
+            return MapAsync(left: left).Map(v => v.Join());
         }
 
         /// <summary>Binds a function over the Right value of this instance, if present.</summary>
@@ -845,10 +850,10 @@ namespace Tiger.Types
         [Pure]
         public Either<TLeft, TOut> Bind<TOut>([NotNull, InstantHandle] Func<TRight, Either<TLeft, TOut>> right)
         {
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return Map(right).Pipe(Either.Join);
+            return Map(right: right).Join();
         }
 
         /// <summary>
@@ -872,10 +877,10 @@ namespace Tiger.Types
         public Task<Either<TLeft, TOut>> BindAsync<TOut>(
             [NotNull, InstantHandle] Func<TRight, Task<Either<TLeft, TOut>>> right)
         {
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return MapAsync(right).Map(Either.Join);
+            return MapAsync(right: right).Map(v => v.Join());
         }
 
         /// <summary>
@@ -895,8 +900,8 @@ namespace Tiger.Types
         /// An <see cref="Either{TLeft,TRight}"/> in the Left state if this instance is in the Left state
         /// and the result of invoking <paramref name="left"/> over the Left value of this instance
         /// is in the Left state or if this instance is in the Right state and the result of invoking
-        /// <paramref name="right"/> over the Right value of this instance is in the Left state;
-        /// an <see cref="Either{TLeft,TRight}"/> in the Right state if this instance is in the Right state
+        /// <paramref name="right"/> over the Right value of this instance is in the Left state,
+        /// or an <see cref="Either{TLeft,TRight}"/> in the Right state if this instance is in the Right state
         /// and the result of invoking <paramref name="right"/> over the Right value of this instance
         /// is in the Right state or if this instance is in the Left state and the result of invoking
         /// <paramref name="left"/> over the Left value of this instance is in the Right state.
@@ -909,11 +914,11 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TLeft, Either<TOutLeft, TOutRight>> left,
             [NotNull, InstantHandle] Func<TRight, Either<TOutLeft, TOutRight>> right)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return Map(left, right).Pipe(Either.Collapse);
+            return Map(left: left, right: right).Collapse();
         }
 
         /// <summary>
@@ -934,8 +939,8 @@ namespace Tiger.Types
         /// An <see cref="Either{TLeft,TRight}"/> in the Left state if this instance is in the Left state
         /// and the result of invoking <paramref name="left"/> over the Left value of this instance
         /// is in the Left state or if this instance is in the Right state and the result of invoking
-        /// <paramref name="right"/> over the Right value of this instance is in the Left state;
-        /// an <see cref="Either{TLeft,TRight}"/> in the Right state if this instance is in the Right state
+        /// <paramref name="right"/> over the Right value of this instance is in the Left state,
+        /// or an <see cref="Either{TLeft,TRight}"/> in the Right state if this instance is in the Right state
         /// and the result of invoking <paramref name="right"/> over the Right value of this instance
         /// is in the Right state or if this instance is in the Left state and the result of invoking
         /// <paramref name="left"/> over the Left value of this instance is in the Right state.
@@ -948,11 +953,11 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TLeft, Task<Either<TOutLeft, TOutRight>>> left,
             [NotNull, InstantHandle] Func<TRight, Either<TOutLeft, TOutRight>> right)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return MapAsync(left, right).Map(Either.Collapse);
+            return MapAsync(left: left, right: right).Map(v => v.Collapse());
         }
 
         /// <summary>
@@ -973,8 +978,8 @@ namespace Tiger.Types
         /// An <see cref="Either{TLeft,TRight}"/> in the Left state if this instance is in the Left state
         /// and the result of invoking <paramref name="left"/> over the Left value of this instance
         /// is in the Left state or if this instance is in the Right state and the result of invoking
-        /// <paramref name="right"/> over the Right value of this instance is in the Left state;
-        /// an <see cref="Either{TLeft,TRight}"/> in the Right state if this instance is in the Right state
+        /// <paramref name="right"/> over the Right value of this instance is in the Left state,
+        /// or an <see cref="Either{TLeft,TRight}"/> in the Right state if this instance is in the Right state
         /// and the result of invoking <paramref name="right"/> over the Right value of this instance
         /// is in the Right state or if this instance is in the Left state and the result of invoking
         /// <paramref name="left"/> over the Left value of this instance is in the Right state.
@@ -987,11 +992,11 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TLeft, Either<TOutLeft, TOutRight>> left,
             [NotNull, InstantHandle] Func<TRight, Task<Either<TOutLeft, TOutRight>>> right)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return MapAsync(left, right).Map(Either.Collapse);
+            return MapAsync(left: left, right: right).Map(v => v.Collapse());
         }
 
         /// <summary>
@@ -1012,8 +1017,8 @@ namespace Tiger.Types
         /// An <see cref="Either{TLeft,TRight}"/> in the Left state if this instance is in the Left state
         /// and the result of invoking <paramref name="left"/> over the Left value of this instance
         /// is in the Left state or if this instance is in the Right state and the result of invoking
-        /// <paramref name="right"/> over the Right value of this instance is in the Left state;
-        /// an <see cref="Either{TLeft,TRight}"/> in the Right state if this instance is in the Right state
+        /// <paramref name="right"/> over the Right value of this instance is in the Left state,
+        /// or an <see cref="Either{TLeft,TRight}"/> in the Right state if this instance is in the Right state
         /// and the result of invoking <paramref name="right"/> over the Right value of this instance
         /// is in the Right state or if this instance is in the Left state and the result of invoking
         /// <paramref name="left"/> over the Left value of this instance is in the Right state.
@@ -1026,11 +1031,11 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TLeft, Task<Either<TOutLeft, TOutRight>>> left,
             [NotNull, InstantHandle] Func<TRight, Task<Either<TOutLeft, TOutRight>>> right)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return MapAsync(left, right).Map(Either.Collapse);
+            return MapAsync(left: left, right: right).Map(v => v.Collapse());
         }
 
         #endregion
@@ -1051,11 +1056,11 @@ namespace Tiger.Types
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
-        [NotNull, Pure]
+        [Pure]
         public TState Fold<TState>([NotNull, InstantHandle] Func<TState, TLeft, TState> left)
             where TState : struct
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             return IsLeft
@@ -1065,7 +1070,7 @@ namespace Tiger.Types
 
         /// <summary>Combines the provided seed state with the Left value of this instance.</summary>
         /// <typeparam name="TState">The type of the seed value.</typeparam>
-        /// <param name="state">The seed value to be combined with the Left value of this instance.</param>
+        /// <param name="state">The seed value to combine with the Left value of this instance.</param>
         /// <param name="left">
         /// A function to invoke with the seed value and the Left value of this instance as the arguments
         /// if this instance is in the Left state.
@@ -1083,7 +1088,7 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TState, TLeft, TState> left)
         {
             if (state == null) { throw new ArgumentNullException(nameof(state)); }
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             var result = IsLeft
@@ -1107,11 +1112,11 @@ namespace Tiger.Types
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
-        [NotNull, Pure]
+        [Pure]
         public TState Fold<TState>([NotNull, InstantHandle] Func<TState, TRight, TState> right)
             where TState : struct
         {
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             return IsRight
@@ -1121,7 +1126,7 @@ namespace Tiger.Types
 
         /// <summary>Combines the provided seed state with the Right value of this instance.</summary>
         /// <typeparam name="TState">The type of the seed value.</typeparam>
-        /// <param name="state">The seed value to be combined with the Right value of this instance.</param>
+        /// <param name="state">The seed value to combine with the Right value of this instance.</param>
         /// <param name="right">
         /// A function to invoke with the seed value and the Right value of this instance as the arguments
         /// if this instance is in the Right state.
@@ -1139,7 +1144,7 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TState, TRight, TState> right)
         {
             if (state == null) { throw new ArgumentNullException(nameof(state)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             var result = IsRight
@@ -1168,7 +1173,7 @@ namespace Tiger.Types
         public async Task<TState> FoldAsync<TState>([NotNull, InstantHandle] Func<TState, TLeft, Task<TState>> left)
             where TState : struct
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             return IsLeft
@@ -1178,7 +1183,7 @@ namespace Tiger.Types
 
         /// <summary>Combines the provided seed state with the Left value of this instance, asynchronously.</summary>
         /// <typeparam name="TState">The type of the seed value.</typeparam>
-        /// <param name="state">The seed value to be combined with the Left value of this instance.</param>
+        /// <param name="state">The seed value to combine with the Left value of this instance.</param>
         /// <param name="left">
         /// A function to invoke asynchronously with the seed value and the Left value of this instance
         /// as the arguments if this instance is in the Left state.
@@ -1196,7 +1201,7 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TState, TLeft, Task<TState>> left)
         {
             if (state == null) { throw new ArgumentNullException(nameof(state)); }
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             var result = IsLeft
@@ -1225,7 +1230,7 @@ namespace Tiger.Types
         public async Task<TState> FoldAsync<TState>([NotNull, InstantHandle] Func<TState, TRight, Task<TState>> right)
             where TState : struct
         {
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             return IsRight
@@ -1235,7 +1240,7 @@ namespace Tiger.Types
 
         /// <summary>Combines the provided seed state with the Right value of this instance, asynchronously.</summary>
         /// <typeparam name="TState">The type of the seed value.</typeparam>
-        /// <param name="state">The seed value to be combined with the Right value of this instance.</param>
+        /// <param name="state">The seed value to combine with the Right value of this instance.</param>
         /// <param name="right">
         /// A function to invoke asynchronously with the seed value and the Right value of this instance
         /// as the arguments if this instance is in the Right state.
@@ -1253,7 +1258,7 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TState, TRight, Task<TState>> right)
         {
             if (state == null) { throw new ArgumentNullException(nameof(state)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
             if (State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             var result = IsRight
@@ -1277,7 +1282,7 @@ namespace Tiger.Types
         [MustUseReturnValue]
         public Either<TLeft, TRight> Tap([NotNull, InstantHandle] Action<TLeft> left)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
 
             if (IsLeft)
             {
@@ -1297,7 +1302,7 @@ namespace Tiger.Types
         [NotNull, MustUseReturnValue]
         public async Task<Either<TLeft, TRight>> TapAsync([NotNull, InstantHandle] Func<TLeft, Task> left)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
 
             if (IsLeft)
             {
@@ -1317,7 +1322,7 @@ namespace Tiger.Types
         [MustUseReturnValue]
         public Either<TLeft, TRight> Tap([NotNull, InstantHandle] Action<TRight> right)
         {
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
 
             if (IsRight)
             {
@@ -1337,7 +1342,7 @@ namespace Tiger.Types
         [MustUseReturnValue]
         public async Task<Either<TLeft, TRight>> TapAsync([NotNull, InstantHandle] Func<TRight, Task> right)
         {
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
 
             if (IsRight)
             {
@@ -1361,8 +1366,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Action<TLeft> left,
             [NotNull, InstantHandle] Action<TRight> right)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
 
             if (IsLeft)
             {
@@ -1392,8 +1397,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TLeft, Task> left,
             [NotNull, InstantHandle] Action<TRight> right)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
 
             if (IsLeft)
             {
@@ -1424,8 +1429,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Action<TLeft> left,
             [NotNull, InstantHandle] Func<TRight, Task> right)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
 
             if (IsLeft)
             {
@@ -1456,8 +1461,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TLeft, Task> left,
             [NotNull, InstantHandle] Func<TRight, Task> right)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
 
             if (IsLeft)
             {
@@ -1484,7 +1489,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         public Unit Let([NotNull, InstantHandle] Action<TLeft> left)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
 
             if (IsLeft)
             {
@@ -1500,7 +1505,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         public Unit Let([NotNull, InstantHandle] Action<TRight> right)
         {
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
 
             if (IsRight)
             {
@@ -1515,14 +1520,16 @@ namespace Tiger.Types
         /// <returns>The task object representing the asynchronous operation.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         [NotNull]
-        public async Task LetAsync([NotNull, InstantHandle] Func<TLeft, Task> left)
+        public async Task<Unit> LetAsync([NotNull, InstantHandle] Func<TLeft, Task> left)
         {
-            if (left == null) { throw new ArgumentNullException(nameof(left)); }
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
 
             if (IsLeft)
             {
                 await left(_leftValue).ConfigureAwait(false);
             }
+
+            return Unit.Value;
         }
 
         /// <summary>Performs an action on the Right value of this instance.</summary>
@@ -1530,14 +1537,16 @@ namespace Tiger.Types
         /// <returns>The task object representing the asynchronous operation.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         [NotNull]
-        public async Task LetAsync([NotNull, InstantHandle] Func<TRight, Task> right)
+        public async Task<Unit> LetAsync([NotNull, InstantHandle] Func<TRight, Task> right)
         {
-            if (right == null) { throw new ArgumentNullException(nameof(right)); }
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
 
             if (IsRight)
             {
                 await right(_rightValue).ConfigureAwait(false);
             }
+
+            return Unit.Value;
         }
 
         #endregion
@@ -1573,7 +1582,7 @@ namespace Tiger.Types
         [Pure]
         public Either<TLeft, TRight> Recover([NotNull, InstantHandle] Func<TRight> recoverer)
         {
-            if (recoverer == null) { throw new ArgumentNullException(nameof(recoverer)); }
+            if (recoverer is null) { throw new ArgumentNullException(nameof(recoverer)); }
 
             if (IsRight) { return this; }
 
@@ -1593,7 +1602,7 @@ namespace Tiger.Types
         [Pure, NotNull]
         public async Task<Either<TLeft, TRight>> RecoverAsync([NotNull, InstantHandle] Func<Task<TRight>> recoverer)
         {
-            if (recoverer == null) { throw new ArgumentNullException(nameof(recoverer)); }
+            if (recoverer is null) { throw new ArgumentNullException(nameof(recoverer)); }
 
             if (IsRight) { return this; }
 
@@ -1677,7 +1686,7 @@ namespace Tiger.Types
         [NotNull, Pure]
         public TRight GetValueOrDefault([NotNull, InstantHandle] Func<TRight> other)
         {
-            if (other == null) { throw new ArgumentNullException(nameof(other)); }
+            if (other is null) { throw new ArgumentNullException(nameof(other)); }
 
             var result = IsRight
                 ? _rightValue
@@ -1699,7 +1708,7 @@ namespace Tiger.Types
         [NotNull, ItemNotNull, Pure]
         public async Task<TRight> GetValueOrDefaultAsync([NotNull, InstantHandle] Func<Task<TRight>> other)
         {
-            if (other == null) { throw new ArgumentNullException(nameof(other)); }
+            if (other is null) { throw new ArgumentNullException(nameof(other)); }
 
             var result = IsRight
                 ? _rightValue
@@ -1769,7 +1778,7 @@ namespace Tiger.Types
         /// otherwise <see langword="false"/>.
         /// </returns>
         [Pure]
-        internal bool EqualsCore(Either<TLeft, TRight> other)
+        internal bool EqualsCore(in Either<TLeft, TRight> other)
         { // note(cosborn) Eh, this gets gnarly using other implementations.
             if (State == Bottom && other.State == Bottom)
             {
@@ -1804,10 +1813,8 @@ namespace Tiger.Types
         {
             readonly Either<TLeft, TRight> _value;
 
-            /// <summary>
-            /// Initializes a new instance of the <see cref="DebuggerTypeProxy"/> class.
-            /// </summary>
-            /// <param name="value">The either value to be proxied.</param>
+            /// <summary>Initializes a new instance of the <see cref="DebuggerTypeProxy"/> class.</summary>
+            /// <param name="value">The either value to proxy.</param>
             public DebuggerTypeProxy(in Either<TLeft, TRight> value)
             {
                 _value = value;

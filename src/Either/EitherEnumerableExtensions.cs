@@ -44,7 +44,7 @@ namespace Tiger.Types
         public static IEnumerable<TRight> CatRight<TLeft, TRight>(
             [NotNull] this IEnumerable<Either<TLeft, TRight>> eitherEnumerableValue)
         {
-            if (eitherEnumerableValue == null) { throw new ArgumentNullException(nameof(eitherEnumerableValue)); }
+            if (eitherEnumerableValue is null) { throw new ArgumentNullException(nameof(eitherEnumerableValue)); }
 
             return eitherEnumerableValue.Where(ev => ev.IsRight).Select(ev => ev.Value);
         }
@@ -62,7 +62,7 @@ namespace Tiger.Types
         public static IEnumerable<TLeft> CatLeft<TLeft, TRight>(
             [NotNull] this IEnumerable<Either<TLeft, TRight>> eitherEnumerableValue)
         {
-            if (eitherEnumerableValue == null) { throw new ArgumentNullException(nameof(eitherEnumerableValue)); }
+            if (eitherEnumerableValue is null) { throw new ArgumentNullException(nameof(eitherEnumerableValue)); }
 
             return eitherEnumerableValue.Where(ev => ev.IsLeft).Select(ev => (TLeft)ev);
         }
@@ -79,7 +79,7 @@ namespace Tiger.Types
         public static (ImmutableArray<TLeft> lefts, ImmutableArray<TRight> rights) Partition<TLeft, TRight>(
             [NotNull] this IReadOnlyCollection<Either<TLeft, TRight>> eitherEnumerableValue)
         {
-            if (eitherEnumerableValue == null) { throw new ArgumentNullException(nameof(eitherEnumerableValue)); }
+            if (eitherEnumerableValue is null) { throw new ArgumentNullException(nameof(eitherEnumerableValue)); }
 
             return eitherEnumerableValue.Fold(
                 (lefts: ImmutableArray<TLeft>.Empty, rights: ImmutableArray<TRight>.Empty),

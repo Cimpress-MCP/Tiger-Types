@@ -36,7 +36,7 @@ namespace Tiger.Types
         /// The Some type of the Result type of <paramref name="optionTaskValue"/>.
         /// </typeparam>
         /// <typeparam name="TOut">The type to which to transform.</typeparam>
-        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to be matched.</param>
+        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to match.</param>
         /// <param name="none">A value to return in the None case.</param>
         /// <param name="some">
         /// A transformation from <typeparamref name="TIn"/> to <typeparamref name="TOut"/>
@@ -55,9 +55,9 @@ namespace Tiger.Types
             [NotNull, InstantHandle] TOut none,
             [NotNull, InstantHandle] Func<TIn, TOut> some)
         {
-            if (optionTaskValue == null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
+            if (optionTaskValue is null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
             if (none == null) { throw new ArgumentNullException(nameof(none)); }
-            if (some == null) { throw new ArgumentNullException(nameof(some)); }
+            if (some is null) { throw new ArgumentNullException(nameof(some)); }
 
             return optionTaskValue.Map(v => v.Match(none: none, some: some));
         }
@@ -68,7 +68,7 @@ namespace Tiger.Types
         /// </summary>
         /// <typeparam name="TIn">The Some type of the Result type of <paramref name="optionTaskValue"/>.</typeparam>
         /// <typeparam name="TOut">The type to which to transform.</typeparam>
-        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to be matched.</param>
+        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to match.</param>
         /// <param name="none">A value to return in the None case.</param>
         /// <param name="some">
         /// An asynchronous transformation from <typeparamref name="TIn"/> to
@@ -87,9 +87,9 @@ namespace Tiger.Types
             [NotNull, InstantHandle] TOut none,
             [NotNull, InstantHandle] Func<TIn, Task<TOut>> some)
         {
-            if (optionTaskValue == null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
+            if (optionTaskValue is null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
             if (none == null) { throw new ArgumentNullException(nameof(none)); }
-            if (some == null) { throw new ArgumentNullException(nameof(some)); }
+            if (some is null) { throw new ArgumentNullException(nameof(some)); }
 
             return optionTaskValue.Bind(v => v.MatchAsync(none: none, some: some));
         }
@@ -102,7 +102,7 @@ namespace Tiger.Types
         /// The Some type of the Result type of <paramref name="optionTaskValue"/>.
         /// </typeparam>
         /// <typeparam name="TOut">The type to which to transform.</typeparam>
-        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to be matched.</param>
+        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to match.</param>
         /// <param name="none">
         /// A transformation from nothing to <typeparamref name="TOut"/>
         /// to perform in the None case.
@@ -124,9 +124,9 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TOut> none,
             [NotNull, InstantHandle] Func<TIn, TOut> some)
         {
-            if (optionTaskValue == null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
-            if (none == null) { throw new ArgumentNullException(nameof(none)); }
-            if (some == null) { throw new ArgumentNullException(nameof(some)); }
+            if (optionTaskValue is null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
+            if (none is null) { throw new ArgumentNullException(nameof(none)); }
+            if (some is null) { throw new ArgumentNullException(nameof(some)); }
 
             return optionTaskValue.Map(v => v.Match(none: none, some: some));
         }
@@ -137,7 +137,7 @@ namespace Tiger.Types
         /// </summary>
         /// <typeparam name="TIn">The Some type of the Result type of <paramref name="optionTaskValue"/>.</typeparam>
         /// <typeparam name="TOut">The type to which to transform.</typeparam>
-        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to be matched.</param>
+        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to match.</param>
         /// <param name="none">
         /// A transformation from nothing to <typeparamref name="TOut"/> to perform
         /// in the None case.
@@ -159,9 +159,9 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TOut> none,
             [NotNull, InstantHandle] Func<TIn, Task<TOut>> some)
         {
-            if (optionTaskValue == null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
-            if (none == null) { throw new ArgumentNullException(nameof(none)); }
-            if (some == null) { throw new ArgumentNullException(nameof(some)); }
+            if (optionTaskValue is null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
+            if (none is null) { throw new ArgumentNullException(nameof(none)); }
+            if (some is null) { throw new ArgumentNullException(nameof(some)); }
 
             return optionTaskValue.Bind(v => v.MatchAsync(none: none, some: some));
         }
@@ -174,7 +174,7 @@ namespace Tiger.Types
         /// The Some type of the Result type of <paramref name="optionTaskValue"/>.
         /// </typeparam>
         /// <typeparam name="TOut">The type to which to transform.</typeparam>
-        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to be matched.</param>
+        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to match.</param>
         /// <param name="none">
         /// An asynchronous transformation from nothing to <typeparamref name="TOut"/>
         /// to perform in the None case.
@@ -196,9 +196,9 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<Task<TOut>> none,
             [NotNull, InstantHandle] Func<TIn, TOut> some)
         {
-            if (optionTaskValue == null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
-            if (none == null) { throw new ArgumentNullException(nameof(none)); }
-            if (some == null) { throw new ArgumentNullException(nameof(some)); }
+            if (optionTaskValue is null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
+            if (none is null) { throw new ArgumentNullException(nameof(none)); }
+            if (some is null) { throw new ArgumentNullException(nameof(some)); }
 
             return optionTaskValue.Bind(v => v.MatchAsync(none: none, some: some));
         }
@@ -211,7 +211,7 @@ namespace Tiger.Types
         /// The Some type of the Result type of <paramref name="optionTaskValue"/>.
         /// </typeparam>
         /// <typeparam name="TOut">The type to which to transform.</typeparam>
-        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to be matched.</param>
+        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to match.</param>
         /// <param name="none">
         /// An asynchronous transformation from nothing to <typeparamref name="TOut"/>
         /// to perform in the None case.
@@ -233,9 +233,9 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<Task<TOut>> none,
             [NotNull, InstantHandle] Func<TIn, Task<TOut>> some)
         {
-            if (optionTaskValue == null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
-            if (none == null) { throw new ArgumentNullException(nameof(none)); }
-            if (some == null) { throw new ArgumentNullException(nameof(some)); }
+            if (optionTaskValue is null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
+            if (none is null) { throw new ArgumentNullException(nameof(none)); }
+            if (some is null) { throw new ArgumentNullException(nameof(some)); }
 
             return optionTaskValue.Bind(v => v.MatchAsync(none: none, some: some));
         }
@@ -249,7 +249,7 @@ namespace Tiger.Types
         /// </summary>
         /// <typeparam name="TIn">The Some type of the Result type of <paramref name="optionTaskValue"/>.</typeparam>
         /// <typeparam name="TOut">The return type of <paramref name="some"/>.</typeparam>
-        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to be mapped.</param>
+        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to map.</param>
         /// <param name="some">
         /// A transformation from <typeparamref name="TIn"/> to <typeparamref name="TOut"/>.
         /// </param>
@@ -264,8 +264,8 @@ namespace Tiger.Types
             [NotNull] this Task<Option<TIn>> optionTaskValue,
             [NotNull, InstantHandle] Func<TIn, TOut> some)
         {
-            if (optionTaskValue == null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
-            if (some == null) { throw new ArgumentNullException(nameof(some)); }
+            if (optionTaskValue is null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
+            if (some is null) { throw new ArgumentNullException(nameof(some)); }
 
             return optionTaskValue.Map(ov => ov.Map(some));
         }
@@ -275,7 +275,7 @@ namespace Tiger.Types
         /// </summary>
         /// <typeparam name="TIn">The Some type of the Result type of <paramref name="optionTaskValue"/>.</typeparam>
         /// <typeparam name="TOut">The Result type of the return type of <paramref name="some"/>.</typeparam>
-        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to be mapped.</param>
+        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to map.</param>
         /// <param name="some">
         /// An asynchronous transformation from <typeparamref name="TIn"/> to <typeparamref name="TOut"/>.
         /// </param>
@@ -290,8 +290,8 @@ namespace Tiger.Types
             [NotNull] this Task<Option<TIn>> optionTaskValue,
             [NotNull, InstantHandle] Func<TIn, Task<TOut>> some)
         {
-            if (optionTaskValue == null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
-            if (some == null) { throw new ArgumentNullException(nameof(some)); }
+            if (optionTaskValue is null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
+            if (some is null) { throw new ArgumentNullException(nameof(some)); }
 
             return optionTaskValue.Bind(ov => ov.MapAsync(some));
         }
@@ -305,7 +305,7 @@ namespace Tiger.Types
         /// </summary>
         /// <typeparam name="TIn">The Some type of the Result type of <paramref name="optionTaskValue"/>.</typeparam>
         /// <typeparam name="TOut">The Some type of the return type of <paramref name="some"/>.</typeparam>
-        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to be bound.</param>
+        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to bind.</param>
         /// <param name="some">
         /// A transformation from <typeparamref name="TIn"/> to <see cref="Option{TSome}"/>.
         /// </param>
@@ -320,8 +320,8 @@ namespace Tiger.Types
             [NotNull] this Task<Option<TIn>> optionTaskValue,
             [NotNull, InstantHandle] Func<TIn, Option<TOut>> some)
         {
-            if (optionTaskValue == null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
-            if (some == null) { throw new ArgumentNullException(nameof(some)); }
+            if (optionTaskValue is null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
+            if (some is null) { throw new ArgumentNullException(nameof(some)); }
 
             return optionTaskValue.Map(ov => ov.Bind(some));
         }
@@ -331,7 +331,7 @@ namespace Tiger.Types
         /// </summary>
         /// <typeparam name="TIn">The Some type of the Result type of <paramref name="optionTaskValue"/>.</typeparam>
         /// <typeparam name="TOut">The Some type of the Result type of the return type of <paramref name="some"/>.</typeparam>
-        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to be bound.</param>
+        /// <param name="optionTaskValue">The <see cref="Task{TResult}"/> to bind.</param>
         /// <param name="some">
         /// An asynchronous transformation from <typeparamref name="TIn"/> to <see cref="Option{TSome}"/>.
         /// </param>
@@ -346,8 +346,8 @@ namespace Tiger.Types
             [NotNull] this Task<Option<TIn>> optionTaskValue,
             [NotNull, InstantHandle] Func<TIn, Task<Option<TOut>>> some)
         {
-            if (optionTaskValue == null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
-            if (some == null) { throw new ArgumentNullException(nameof(some)); }
+            if (optionTaskValue is null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
+            if (some is null) { throw new ArgumentNullException(nameof(some)); }
 
             return optionTaskValue.Bind(ov => ov.BindAsync(some));
         }
@@ -372,8 +372,8 @@ namespace Tiger.Types
             [NotNull] this Task<Option<T>> optionTaskValue,
             [NotNull, InstantHandle] Action<T> tapper)
         {
-            if (optionTaskValue == null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
-            if (tapper == null) { throw new ArgumentNullException(nameof(tapper)); }
+            if (optionTaskValue is null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
+            if (tapper is null) { throw new ArgumentNullException(nameof(tapper)); }
 
             return optionTaskValue.Map(ov => ov.Tap(tapper));
         }
@@ -396,8 +396,8 @@ namespace Tiger.Types
             [NotNull] this Task<Option<T>> optionTaskValue,
             [NotNull, InstantHandle] Func<T, Task> tapper)
         {
-            if (optionTaskValue == null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
-            if (tapper == null) { throw new ArgumentNullException(nameof(tapper)); }
+            if (optionTaskValue is null) { throw new ArgumentNullException(nameof(optionTaskValue)); }
+            if (tapper is null) { throw new ArgumentNullException(nameof(tapper)); }
 
             return optionTaskValue.Bind(ov => ov.TapAsync(tapper));
         }

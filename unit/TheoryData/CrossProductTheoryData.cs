@@ -25,8 +25,8 @@ namespace Tiger.Types.UnitTest
             [NotNull] IReadOnlyCollection<T1> collection1,
             [NotNull] IReadOnlyCollection<T2> collection2)
         {
-            if (collection1 == null) { throw new ArgumentNullException(nameof(collection1)); }
-            if (collection2 == null) { throw new ArgumentNullException(nameof(collection2)); }
+            if (collection1 is null) { throw new ArgumentNullException(nameof(collection1)); }
+            if (collection2 is null) { throw new ArgumentNullException(nameof(collection2)); }
 
             foreach (var item1 in collection1)
             {

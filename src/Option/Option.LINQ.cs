@@ -55,7 +55,7 @@ namespace Tiger.Types
             in this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, bool> predicate)
         {
-            if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
+            if (predicate is null) { throw new ArgumentNullException(nameof(predicate)); }
 
             return source.Filter(predicate).IsSome;
         }
@@ -79,7 +79,7 @@ namespace Tiger.Types
             in this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, bool> predicate)
         {
-            if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
+            if (predicate is null) { throw new ArgumentNullException(nameof(predicate)); }
 
             return source.IsNone || source.Filter(predicate).IsSome;
         }
@@ -177,7 +177,7 @@ namespace Tiger.Types
             in this Option<TSource> source,
             [NotNull, InstantHandle] Action<TSource> onNext)
         {
-            if (onNext == null) { throw new ArgumentNullException(nameof(onNext)); }
+            if (onNext is null) { throw new ArgumentNullException(nameof(onNext)); }
 
             return source.Tap(onNext);
         }
@@ -193,7 +193,7 @@ namespace Tiger.Types
             in this Option<TSource> source,
             [NotNull, InstantHandle] Action<TSource> onNext)
         {
-            if (onNext == null) { throw new ArgumentNullException(nameof(onNext)); }
+            if (onNext is null) { throw new ArgumentNullException(nameof(onNext)); }
 
             return source.Let(onNext);
         }
@@ -212,7 +212,7 @@ namespace Tiger.Types
             in this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, bool> predicate)
         {
-            if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
+            if (predicate is null) { throw new ArgumentNullException(nameof(predicate)); }
 
             return source.Filter(predicate);
         }
@@ -232,7 +232,7 @@ namespace Tiger.Types
             in this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, TResult> selector)
         {
-            if (selector == null) { throw new ArgumentNullException(nameof(selector)); }
+            if (selector is null) { throw new ArgumentNullException(nameof(selector)); }
 
             return source.Map(selector);
         }
@@ -257,7 +257,7 @@ namespace Tiger.Types
             in this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, Option<TResult>> selector)
         {
-            if (selector == null) { throw new ArgumentNullException(nameof(selector)); }
+            if (selector is null) { throw new ArgumentNullException(nameof(selector)); }
 
             return source.Bind(selector);
         }
@@ -294,8 +294,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TSource, Option<TOption>> optionalSelector,
             [NotNull, InstantHandle] Func<TSource, TOption, TResult> resultSelector)
         {
-            if (optionalSelector == null) { throw new ArgumentNullException(nameof(optionalSelector)); }
-            if (resultSelector == null) { throw new ArgumentNullException(nameof(resultSelector)); }
+            if (optionalSelector is null) { throw new ArgumentNullException(nameof(optionalSelector)); }
+            if (resultSelector is null) { throw new ArgumentNullException(nameof(resultSelector)); }
 
             return source.Bind(sv => source.Bind(optionalSelector).Map(cv => resultSelector(sv, cv)));
         }
@@ -304,7 +304,7 @@ namespace Tiger.Types
         /// <typeparam name="TSource">The Some type of <paramref name="source"/>.</typeparam>
         /// <typeparam name="TAccumulate">The type of the accumulator value.</typeparam>
         /// <param name="source">An <see cref="Option{TSome}"/> to aggregate over.</param>
-        /// <param name="func">An accumulator function to be invoked on the Some value.</param>
+        /// <param name="func">An accumulator function to invoke on the Some value.</param>
         /// <returns>The final accumulator value.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
         [Pure, EditorBrowsable(Never)]
@@ -313,7 +313,7 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TAccumulate, TSource, TAccumulate> func)
             where TAccumulate : struct
         {
-            if (func == null) { throw new ArgumentNullException(nameof(func)); }
+            if (func is null) { throw new ArgumentNullException(nameof(func)); }
 
             return source.Fold(default, func);
         }
@@ -326,7 +326,7 @@ namespace Tiger.Types
         /// <typeparam name="TAccumulate">The type of the accumulator value.</typeparam>
         /// <param name="source">An <see cref="Option{TSome}"/> to aggregate over.</param>
         /// <param name="seed">The initial accumulator value.</param>
-        /// <param name="func">An accumulator function to be invoked on the Some value.</param>
+        /// <param name="func">An accumulator function to invoke on the Some value.</param>
         /// <returns>The final accumulator value.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="seed"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
@@ -337,7 +337,7 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TAccumulate, TSource, TAccumulate> func)
         {
             if (seed == null) { throw new ArgumentNullException(nameof(seed)); }
-            if (func == null) { throw new ArgumentNullException(nameof(func)); }
+            if (func is null) { throw new ArgumentNullException(nameof(func)); }
 
             return source.Fold(seed, func);
         }
@@ -352,7 +352,7 @@ namespace Tiger.Types
         /// <typeparam name="TResult">The type of the resulting value.</typeparam>
         /// <param name="source">An <see cref="Option{TSome}"/> to aggregate over.</param>
         /// <param name="seed">The initial accumulator value.</param>
-        /// <param name="func">An accumulator value to be invoked on the Some value.</param>
+        /// <param name="func">An accumulator value to invoke on the Some value.</param>
         /// <param name="resultSelector">
         /// A function to transform the final accumulator value into the result value.
         /// </param>
@@ -368,8 +368,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TAccumulate, TResult> resultSelector)
         {
             if (seed == null) { throw new ArgumentNullException(nameof(seed)); }
-            if (func == null) { throw new ArgumentNullException(nameof(func)); }
-            if (resultSelector == null) { throw new ArgumentNullException(nameof(resultSelector)); }
+            if (func is null) { throw new ArgumentNullException(nameof(func)); }
+            if (resultSelector is null) { throw new ArgumentNullException(nameof(resultSelector)); }
 
             var result = source.Fold(seed, func).Pipe(resultSelector);
             Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute

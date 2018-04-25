@@ -65,7 +65,7 @@ namespace Tiger.Types
             in this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Func<TRightSource, bool> predicate)
         {
-            if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
+            if (predicate is null) { throw new ArgumentNullException(nameof(predicate)); }
             if (source.State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             return source.IsRight && predicate(source.Value);
@@ -92,7 +92,7 @@ namespace Tiger.Types
             in this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Func<TRightSource, bool> predicate)
         {
-            if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
+            if (predicate is null) { throw new ArgumentNullException(nameof(predicate)); }
             if (source.State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             return source.IsLeft || source.IsRight && predicate(source.Value);
@@ -207,7 +207,7 @@ namespace Tiger.Types
             in this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Action<TRightSource> onNext)
         {
-            if (onNext == null) { throw new ArgumentNullException(nameof(onNext)); }
+            if (onNext is null) { throw new ArgumentNullException(nameof(onNext)); }
 
             return source.Tap(right: onNext);
         }
@@ -224,7 +224,7 @@ namespace Tiger.Types
             in this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Action<TRightSource> onNext)
         {
-            if (onNext == null) { throw new ArgumentNullException(nameof(onNext)); }
+            if (onNext is null) { throw new ArgumentNullException(nameof(onNext)); }
 
             return source.Let(onNext);
         }
@@ -246,7 +246,7 @@ namespace Tiger.Types
             in this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Func<TRightSource, TResult> selector)
         {
-            if (selector == null) { throw new ArgumentNullException(nameof(selector)); }
+            if (selector is null) { throw new ArgumentNullException(nameof(selector)); }
             if (source.State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             return source.Map(selector);
@@ -274,7 +274,7 @@ namespace Tiger.Types
             in this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Func<TRightSource, Either<TLeftSource, TResult>> selector)
         {
-            if (selector == null) { throw new ArgumentNullException(nameof(selector)); }
+            if (selector is null) { throw new ArgumentNullException(nameof(selector)); }
             if (source.State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             return source.Bind(selector);
@@ -314,8 +314,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TRightSource, Either<TLeftSource, TEither>> eitherSelector,
             [NotNull, InstantHandle] Func<TRightSource, TEither, TResult> resultSelector)
         {
-            if (eitherSelector == null) { throw new ArgumentNullException(nameof(eitherSelector)); }
-            if (resultSelector == null) { throw new ArgumentNullException(nameof(resultSelector)); }
+            if (eitherSelector is null) { throw new ArgumentNullException(nameof(eitherSelector)); }
+            if (resultSelector is null) { throw new ArgumentNullException(nameof(resultSelector)); }
             if (source.State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             return source.Bind(sv => source.Bind(eitherSelector).Map(cv => resultSelector(sv, cv)));
@@ -327,7 +327,7 @@ namespace Tiger.Types
         /// <typeparam name="TAccumulate">The type of the accumulator value.</typeparam>
         /// <param name="source">An <see cref="Either{TLeft,TRight}"/> to aggregate over.</param>
         /// <param name="seed">The initial accumulator value.</param>
-        /// <param name="func">An accumulator function to be invoked on the Right value.</param>
+        /// <param name="func">An accumulator function to invoke on the Right value.</param>
         /// <returns>The final accumulator value.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="seed"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
@@ -339,7 +339,7 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TAccumulate, TRightSource, TAccumulate> func)
         {
             if (seed == null) { throw new ArgumentNullException(nameof(seed)); }
-            if (func == null) { throw new ArgumentNullException(nameof(func)); }
+            if (func is null) { throw new ArgumentNullException(nameof(func)); }
             if (source.State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             return source.Fold(seed, func);
@@ -356,7 +356,7 @@ namespace Tiger.Types
         /// <typeparam name="TResult">The type of the resulting value.</typeparam>
         /// <param name="source">An <see cref="Either{TLeft,TRight}"/> to aggregate over.</param>
         /// <param name="seed">The initial accumulator value.</param>
-        /// <param name="func">An accumulator function to be invoked on the Right value.</param>
+        /// <param name="func">An accumulator function to invoke on the Right value.</param>
         /// <param name="resultSelector">
         /// A function to transform the final accumulator value into the result value.
         /// </param>
@@ -374,8 +374,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TAccumulate, TResult> resultSelector)
         {
             if (seed == null) { throw new ArgumentNullException(nameof(seed)); }
-            if (func == null) { throw new ArgumentNullException(nameof(func)); }
-            if (resultSelector == null) { throw new ArgumentNullException(nameof(resultSelector)); }
+            if (func is null) { throw new ArgumentNullException(nameof(func)); }
+            if (resultSelector is null) { throw new ArgumentNullException(nameof(resultSelector)); }
             if (source.State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             var result = source.Fold(seed, func).Pipe(resultSelector);
