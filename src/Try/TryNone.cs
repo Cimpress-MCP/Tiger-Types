@@ -1,4 +1,4 @@
-// <copyright file="OptionNone.cs" company="Cimpress, Inc.">
+﻿// <copyright file="TryNone.cs" company="Cimpress, Inc.">
 //   Copyright 2017 Cimpress, Inc.
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,28 +27,28 @@ namespace Tiger.Types
     [EditorBrowsable(Never)]
     [StructLayout(Auto)]
     [SuppressMessage("Microsoft:Guidelines", "CA1066", Justification = "Type system isn't rich enough to prove this.")]
-    public readonly struct OptionNone
+    public readonly struct TryNone
     {
         #region Operators
 
-        /// <summary>Compare two instances of <see cref="OptionNone"/> for equality.</summary>
-        /// <param name="left">The left instance of <see cref="OptionNone"/>.</param>
-        /// <param name="right">The right instance of <see cref="OptionNone"/>.</param>
+        /// <summary>Compare two instances of <see cref="TryNone"/> for equality.</summary>
+        /// <param name="left">The left instance of <see cref="TryNone"/>.</param>
+        /// <param name="right">The right instance of <see cref="TryNone"/>.</param>
         /// <returns>
-        /// <see langword="true"/> if the two instances are equal;
-        /// otherwise, <see langword="false"/>.
+        /// <see langword="true"/> if the two instances are equal,
+        /// otherwise <see langword="false"/>.
         /// </returns>
         [SuppressMessage("Roslynator", "RCS1163", Justification = "All instances are equal.")]
-        public static bool operator ==(OptionNone left, OptionNone right) => true;
+        public static bool operator ==(TryNone left, TryNone right) => true;
 
-        /// <summary>Compare two instances of <see cref="OptionNone"/> for inequality.</summary>
-        /// <param name="left">The left instance of <see cref="OptionNone"/>.</param>
-        /// <param name="right">The right instance of <see cref="OptionNone"/>.</param>
+        /// <summary>Compare two instances of <see cref="TryNone"/> for inequality.</summary>
+        /// <param name="left">The left instance of <see cref="TryNone"/>.</param>
+        /// <param name="right">The right instance of <see cref="TryNone"/>.</param>
         /// <returns>
-        /// <see langword="true"/> if the two instances are unequal;
-        /// otherwise, <see langword="false"/>.
+        /// <see langword="true"/> if the two instances are unequal,
+        /// otherwise <see langword="false"/>.
         /// </returns>
-        public static bool operator !=(OptionNone left, OptionNone right) => !(left == right);
+        public static bool operator !=(TryNone left, TryNone right) => !(left == right);
 
         #endregion
 
@@ -62,7 +62,7 @@ namespace Tiger.Types
 
         /// <inheritdoc/>
         [Pure]
-        public override bool Equals(object obj) => obj is OptionNone;
+        public override bool Equals(object obj) => obj is TryNone;
 
         /// <inheritdoc/>
         [Pure]

@@ -28,12 +28,12 @@ namespace Tiger.Types
     /// <summary>LINQ support.</summary>
     public static partial class Either
     {
-        /// <summary>Determines whether the either value contains a right value.</summary>
+        /// <summary>Determines whether the either value contains a Right value.</summary>
         /// <typeparam name="TLeftSource">The Left type of <paramref name="source"/>.</typeparam>
         /// <typeparam name="TRightSource">The Right type of <paramref name="source"/>.</typeparam>
         /// <param name="source">The <see cref="Either{TLeft,TRight}"/> to check for a Right state.</param>
         /// <returns>
-        /// <see langword="true"/> if the either value contains a right value;
+        /// <see langword="true"/> if the either value contains a Right value;
         /// otherwise <see langword="false"/>.
         /// </returns>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
@@ -46,7 +46,7 @@ namespace Tiger.Types
         }
 
         /// <summary>
-        /// Determines whether an either value contains a right value that satisfies a condition.
+        /// Determines whether an either value contains a Right value that satisfies a condition.
         /// </summary>
         /// <typeparam name="TLeftSource">The Left type of <paramref name="source"/>.</typeparam>
         /// <typeparam name="TRightSource">The Right type of <paramref name="source"/>.</typeparam>
@@ -72,7 +72,7 @@ namespace Tiger.Types
         }
 
         /// <summary>
-        /// Determines whether an either value contains a right value that satisfies a condition.
+        /// Determines whether an either value contains a Right value that satisfies a condition.
         /// </summary>
         /// <typeparam name="TLeftSource">The Left type of <paramref name="source"/>.</typeparam>
         /// <typeparam name="TRightSource">The Right type of <paramref name="source"/>.</typeparam>
@@ -82,7 +82,7 @@ namespace Tiger.Types
         /// <param name="predicate">A function to test the Right value for a condition.</param>
         /// <returns>
         /// <see langword="true"/> if the Right value of the source either value passes the test
-        /// in the specified predicate, or if the source either is in the Left state;
+        /// in the specified predicate or if the source either is in the Left state;
         /// otherwise, <see langword="false"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is <see langword="null"/>.</exception>
@@ -95,11 +95,11 @@ namespace Tiger.Types
             if (predicate is null) { throw new ArgumentNullException(nameof(predicate)); }
             if (source.State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return source.IsLeft || source.IsRight && predicate(source.Value);
+            return !source.IsRight || source.IsRight && predicate(source.Value);
         }
 
         /// <summary>
-        /// Determines whether an either value contains a specified right value
+        /// Determines whether an either value contains a specified Right value
         /// by using the default equality comparer.
         /// </summary>
         /// <typeparam name="TLeftSource">The Left type of <paramref name="source"/>.</typeparam>
@@ -124,8 +124,8 @@ namespace Tiger.Types
         }
 
         /// <summary>
-        /// Determines whether an either value contains a specified right value
-        /// by using a specified <see cref="IEqualityComparer{T}"/>.
+        /// Determines whether an either value contains a specified Right value
+        /// by using the provided <see cref="IEqualityComparer{T}"/>.
         /// </summary>
         /// <typeparam name="TLeftSource">The Left type of <paramref name="source"/>.</typeparam>
         /// <typeparam name="TRightSource">The Right type of <paramref name="source"/>.</typeparam>
@@ -302,7 +302,7 @@ namespace Tiger.Types
         /// <returns>
         /// An <see cref="Either{TLeft,TRight}"/> whose Right value is the result of invoking
         /// the right-to-either transform function <paramref name="eitherSelector"/> on the Right value
-        /// of <paramref name="source"/> and then mapping that Right value and their corresponding
+        /// of <paramref name="source"/> and then mapping that Right value and its corresponding
         /// either value to a result either value.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherSelector"/> is <see langword="null"/>.</exception>
@@ -365,7 +365,6 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="resultSelector"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [Pure, NotNull, EditorBrowsable(Never)]
         public static TResult Aggregate<TLeftSource, TRightSource, TAccumulate, TResult>(
             in this Either<TLeftSource, TRightSource> source,

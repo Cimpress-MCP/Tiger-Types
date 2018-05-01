@@ -26,7 +26,7 @@ using static Tiger.Types.EitherState;
 
 namespace Tiger.Types
 {
-    /// <summary>A partially-applied <see cref="Either{TLeft,TRight}"/> in the Left state.</summary>
+    /// <summary>A partially applied <see cref="Either{TLeft,TRight}"/> in the Left state.</summary>
     /// <typeparam name="TLeft">The applied Left type.</typeparam>
     [EditorBrowsable(Never)]
     [StructLayout(Auto)]
@@ -34,24 +34,25 @@ namespace Tiger.Types
     public readonly struct EitherLeft<TLeft>
     {
         /// <summary>Initializes a new instance of the <see cref="EitherLeft{TLeft}"/> struct.</summary>
-        /// <param name="value">The value to wrap.</param>
-        [SuppressMessage("Style", "IDE0016:Use 'throw' expression", Justification = "Analyzer bug.")]
-        internal EitherLeft([NotNull] TLeft value)
+        /// <param name="leftValue">The value to wrap.</param>
+        internal EitherLeft([NotNull] TLeft leftValue)
         {
-            if (value == null) { throw new ArgumentNullException(nameof(value)); }
+            if (leftValue == null) { throw new ArgumentNullException(nameof(leftValue)); }
 
-            Value = value;
+            Value = leftValue;
         }
 
         /// <summary>Gets the internal value of this instance.</summary>
         internal TLeft Value { get; }
 
+        #region Operators
+
         /// <summary>Compare two instances of <see cref="EitherLeft{TLeft}"/> for equality.</summary>
         /// <param name="left">The left instance of <see cref="EitherLeft{TLeft}"/>.</param>
         /// <param name="right">The right instance of <see cref="EitherLeft{TLeft}"/>.</param>
         /// <returns>
-        /// <see langword="true"/> if the two instances are equal,
-        /// otherwise <see langword="false"/>.
+        /// <see langword="true"/> if the two instances are equal;
+        /// otherwise, <see langword="false"/>.
         /// </returns>
         public static bool operator ==(EitherLeft<TLeft> left, EitherLeft<TLeft> right) => left.EqualsCore(right);
 
@@ -59,10 +60,16 @@ namespace Tiger.Types
         /// <param name="left">The left instance of <see cref="EitherLeft{TLeft}"/>.</param>
         /// <param name="right">The right instance of <see cref="EitherLeft{TLeft}"/>.</param>
         /// <returns>
-        /// <see langword="true"/> if the two instances are unequal,
-        /// otherwise <see langword="false"/>.
+        /// <see langword="true"/> if the two instances are unequal;
+        /// otherwise, <see langword="false"/>.
         /// </returns>
         public static bool operator !=(EitherLeft<TLeft> left, EitherLeft<TLeft> right) => !(left == right);
+
+        #endregion
+
+        #region Overrides
+
+        #region object
 
         /// <inheritdoc/>
         [NotNull, Pure]
@@ -87,5 +94,9 @@ namespace Tiger.Types
             State = Left,
             Value
         };
+
+        #endregion
+
+        #endregion
     }
 }

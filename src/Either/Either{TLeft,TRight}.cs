@@ -54,7 +54,6 @@ namespace Tiger.Types
         /// </summary>
         /// <param name="leftValue">The value to use as the Left value.</param>
         /// <exception cref="ArgumentNullException"><paramref name="leftValue"/> is <see langword="null"/>.</exception>
-        [SuppressMessage("Style", "IDE0016:Use 'throw' expression", Justification = "Analyzer bug.")]
         internal Either([NotNull] TLeft leftValue)
             : this()
         {
@@ -69,7 +68,6 @@ namespace Tiger.Types
         /// </summary>
         /// <param name="rightValue">The value to use as the Right value.</param>
         /// <exception cref="ArgumentNullException"><paramref name="rightValue"/> is <see langword="null"/>.</exception>
-        [SuppressMessage("Style", "IDE0016:Use 'throw' expression", Justification = "Analyzer bug.")]
         internal Either([NotNull] TRight rightValue)
             : this()
         {

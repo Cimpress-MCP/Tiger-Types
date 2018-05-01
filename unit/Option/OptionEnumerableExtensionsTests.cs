@@ -4,13 +4,13 @@ using Xunit;
 
 namespace Tiger.Types.UnitTest
 {
-    /// <summary>Tests related to <see cref="OptionEnumerableExtensions"/>.</summary>
+    /// <summary>Tests related to <see cref="OptionCollectionExtensions"/>.</summary>
     public static class OptionEnumerableExtensionsTests
     {
         [Fact(DisplayName = "A null collection of options throws.")]
         public static void Cat_Null_Throws()
         {
-            var actual = Record.Exception(() => OptionEnumerableExtensions.Cat<int>(null));
+            var actual = Record.Exception(() => OptionCollectionExtensions.Cat<int>(null));
 
             Assert.NotNull(actual);
         }

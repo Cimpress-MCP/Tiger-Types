@@ -81,7 +81,7 @@ namespace Tiger.Types
         {
             if (predicate is null) { throw new ArgumentNullException(nameof(predicate)); }
 
-            return source.IsNone || source.Filter(predicate).IsSome;
+            return !source.IsSome || source.Filter(predicate).IsSome;
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace Tiger.Types
 
         /// <summary>
         /// Determines whether an optional value contains a specified value
-        /// by using a specified <see cref="IEqualityComparer{T}"/>.
+        /// by using the provided <see cref="IEqualityComparer{T}"/>.
         /// </summary>
         /// <typeparam name="TSource">The Some type of <paramref name="source"/>.</typeparam>
         /// <param name="source">An optional value in which to locate a value.</param>
@@ -283,7 +283,7 @@ namespace Tiger.Types
         /// <returns>
         /// An <see cref="Option{TSome}"/> whose Some value is the result of invoking the some-to-optional
         /// transform function <paramref name="optionalSelector"/> on the Some value of
-        /// <paramref name="source"/> and then mapping that Some value and their corresponding optional
+        /// <paramref name="source"/> and then mapping that Some value and its corresponding optional
         /// value to a result optional value.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="optionalSelector"/> is <see langword="null"/>.</exception>

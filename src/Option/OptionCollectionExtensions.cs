@@ -1,4 +1,4 @@
-// <copyright file="OptionEnumerableExtensions.cs" company="Cimpress, Inc.">
+// <copyright file="OptionCollectionExtensions.cs" company="Cimpress, Inc.">
 //   Copyright 2017 Cimpress, Inc.
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,11 +23,12 @@ using JetBrains.Annotations;
 namespace Tiger.Types
 {
     /// <summary>
-    /// Extensions to the functionality of <see cref="IEnumerable{T}"/>, specialized for <see cref="Option{TSome}"/>.
+    /// Extensions to the functionality of collections,
+    /// specialized for <see cref="Option{TSome}"/>.
     /// </summary>
     [PublicAPI]
     [DebuggerStepThrough]
-    public static class OptionEnumerableExtensions
+    public static class OptionCollectionExtensions
     {
         /// <summary>Maps a collection of optional values to their Some values.</summary>
         /// <typeparam name="TSome">The Some type of the element type of <paramref name="optionEnumerableValue"/>.</typeparam>

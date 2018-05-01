@@ -26,7 +26,7 @@ using static Tiger.Types.EitherState;
 
 namespace Tiger.Types
 {
-    /// <summary>A partially-applied <see cref="Either{TLeft,TRight}"/> in the Right state.</summary>
+    /// <summary>A partially applied <see cref="Either{TLeft,TRight}"/> in the Right state.</summary>
     /// <typeparam name="TRight">The applied Right type.</typeparam>
     [EditorBrowsable(Never)]
     [StructLayout(Auto)]
@@ -35,7 +35,6 @@ namespace Tiger.Types
     {
         /// <summary>Initializes a new instance of the <see cref="EitherRight{TRight}"/> struct.</summary>
         /// <param name="value">The value to wrap.</param>
-        [SuppressMessage("Style", "IDE0016:Use 'throw' expression", Justification = "Analyzer bug.")]
         internal EitherRight([NotNull] TRight value)
         {
             if (value == null) { throw new ArgumentNullException(nameof(value)); }

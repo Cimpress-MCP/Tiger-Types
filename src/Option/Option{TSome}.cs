@@ -108,7 +108,7 @@ namespace Tiger.Types
         public static explicit operator TSome(Option<TSome> optionValue) => optionValue.Value;
 
         /// <summary>
-        /// Implicitly converts a <see cref="OptionNone"/> to an
+        /// Implicitly converts an <see cref="OptionNone"/> to an
         /// <see cref="Option{TSome}"/> in the None state.
         /// </summary>
         /// <param name="none">The default value of <see cref="OptionNone"/>.</param>

@@ -41,7 +41,7 @@ namespace Tiger.Types
         /// A transformation from <typeparamref name="TIn"/> to <typeparamref name="TOut"/>.
         /// </param>
         /// <returns>
-        /// An <see cref="IEnumerable{T}"/>, with the transformation applied to each member.
+        /// An <see cref="IEnumerable{T}"/> with the transformation applied to each member.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="enumerableTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="mapper"/> is <see langword="null"/>.</exception>
@@ -66,7 +66,7 @@ namespace Tiger.Types
         /// A transformation from <typeparamref name="TIn"/> to <typeparamref name="TOut"/>.
         /// </param>
         /// <returns>
-        /// An <see cref="IEnumerable{T}"/>, with the transformation applied to each member.
+        /// An <see cref="IEnumerable{T}"/> with the transformation applied to each member.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="enumerableTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="mapper"/> is <see langword="null"/>.</exception>

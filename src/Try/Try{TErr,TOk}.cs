@@ -101,24 +101,22 @@ namespace Tiger.Types
         /// <exception cref="InvalidOperationException">This instance is in an invalid state.</exception>
         [NotNull]
         [SuppressMessage("Microsoft:Guidelines", "CA2225", Justification = "Type parameters play poorly with this analysis.")]
-        public static explicit operator TErr(Try<TErr, TOk> tryValue)
-        {
-            if (!tryValue.IsErr) { throw new InvalidOperationException(TryIsNotErr); }
-
-            return (TErr)tryValue._value.Value;
-        }
+        public static explicit operator TErr(Try<TErr, TOk> tryValue) => (TErr)tryValue._value.Value;
 
         /// <summary>Unwraps the Ok value of <paramref name="tryValue"/>.</summary>
         /// <param name="tryValue">The value to unwrap.</param>
         /// <exception cref="InvalidOperationException">This instance is in an invalid state.</exception>
         [NotNull]
         [SuppressMessage("Microsoft:Guidelines", "CA2225", Justification = "Type parameters play poorly with this analysis.")]
-        public static explicit operator TOk(Try<TErr, TOk> tryValue)
-        {
-            if (!tryValue.IsOk) { throw new InvalidOperationException(TryIsNotOk); }
+        public static explicit operator TOk(Try<TErr, TOk> tryValue) => tryValue.Value;
 
-            return tryValue.Value;
-        }
+        /// <summary>
+        /// Implicitly converts a <see cref="TryNone"/> to a
+        /// <see cref="Try{TErr, TOk}"/> in the None state.
+        /// </summary>
+        /// <param name="none">The default value of <see cref="TryNone"/>.</param>
+        [SuppressMessage("Roslynator", "RCS1163", Justification = "Used only for the type inference.")]
+        public static implicit operator Try<TErr, TOk>(TryNone none) => None;
 
         /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
         /// <param name="left">An object to compare with <paramref name="right"/>.</param>
@@ -1337,6 +1335,92 @@ namespace Tiger.Types
             if (ok is null) { throw new ArgumentNullException(nameof(ok)); }
 
             return MapAsync(err: err, ok: ok).Map(ttv => ttv.Collapse(none: Try<TOutErr, TOutOk>.None));
+        }
+
+        #endregion
+
+        #region Filter
+
+        /// <summary>Filters the Err value of this instance based on a provided condition.</summary>
+        /// <param name="err">
+        /// A function to invoke with the Err value of this instance
+        /// as the argument if this instance is in the Err state.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Try{TErr, TOk}"/> in the Err state if this instance is in the Err state
+        /// ans the result of invoking <paramref name="err"/> over the Err value of this instance
+        /// is <see langword="true"/>; otherwise, a <see cref="Try{TErr, TOk}"/> in the None state.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="err"/> is <see langword="null"/>.</exception>
+        [Pure]
+        public Try<TErr, TOk> Filter([NotNull, InstantHandle] Func<TErr, bool> err)
+        {
+            if (err is null) { throw new ArgumentNullException(nameof(err)); }
+
+            return new Try<TErr, TOk>(_value.Filter(ev => ev.IsLeft && err((TErr)ev)));
+        }
+
+        /// <summary>
+        /// Filters the Err value of this instance based on a provided condition, asynchronously.
+        /// </summary>
+        /// <param name="err">
+        /// An asynchronous function to invoke with the Err value of this instance
+        /// as the argument if this instance is in the Err state.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Try{TErr, TOk}"/> in the Err state if this instance is in the Err state
+        /// ans the result of invoking <paramref name="err"/> over the Err value of this instance
+        /// is <see langword="true"/>; otherwise, a <see cref="Try{TErr, TOk}"/> in the None state.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="err"/> is <see langword="null"/>.</exception>
+        [NotNull, Pure]
+        public Task<Try<TErr, TOk>> FilterAsync([NotNull, InstantHandle] Func<TErr, Task<bool>> err)
+        {
+            if (err is null) { throw new ArgumentNullException(nameof(err)); }
+
+            return _value.FilterAsync(async ev => ev.IsLeft && await err((TErr)ev).ConfigureAwait(false))
+                .Map(oev => new Try<TErr, TOk>(oev));
+        }
+
+        /// <summary>Filters the Ok value of this instance based on a provided condition.</summary>
+        /// <param name="ok">
+        /// A function to invoke with the Ok value of this instance
+        /// as the argument if this instance is in the Ok state.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Try{TErr, TOk}"/> in the Ok state if this instance is in the Err state
+        /// ans the result of invoking <paramref name="ok"/> over the Err value of this instance
+        /// is <see langword="true"/>; otherwise, a <see cref="Try{TErr, TOk}"/> in the None state.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="ok"/> is <see langword="null"/>.</exception>
+        [Pure]
+        public Try<TErr, TOk> Filter([NotNull, InstantHandle] Func<TOk, bool> ok)
+        {
+            if (ok is null) { throw new ArgumentNullException(nameof(ok)); }
+
+            return new Try<TErr, TOk>(_value.Filter(ev => ev.IsRight && ok(ev.Value)));
+        }
+
+        /// <summary>
+        /// Filters the Ok value of this instance based on a provided condition, asynchronously.
+        /// </summary>
+        /// <param name="ok">
+        /// An asynchronous function to invoke with the Ok value of this instance
+        /// as the argument if this instance is in the Ok state.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Try{TErr, TOk}"/> in the Ok state if this instance is in the Ok state
+        /// ans the result of invoking <paramref name="ok"/> over the Err value of this instance
+        /// is <see langword="true"/>; otherwise, a <see cref="Try{TErr, TOk}"/> in the None state.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="ok"/> is <see langword="null"/>.</exception>
+        [NotNull, Pure]
+        public Task<Try<TErr, TOk>> FilterAsync([NotNull, InstantHandle] Func<TOk, Task<bool>> ok)
+        {
+            if (ok is null) { throw new ArgumentNullException(nameof(ok)); }
+
+            return _value.FilterAsync(async ev => ev.IsLeft && await ok(ev.Value).ConfigureAwait(false))
+                .Map(oev => new Try<TErr, TOk>(oev));
         }
 
         #endregion

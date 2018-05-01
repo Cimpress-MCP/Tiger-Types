@@ -23,8 +23,14 @@ namespace Tiger.Types
 {
     /// <summary>Explicitly creates instances of <see cref="Try{TErr, TOk}"/>.</summary>
     [PublicAPI]
-    public static class Try
+    public static partial class Try
     {
+        /// <summary>
+        /// A value that can be converted to a <see cref="Try{TErr, TOk}"/>
+        /// of any Err and Ok type.
+        /// </summary>
+        public static readonly TryNone None;
+
         /// <summary>Creates a <see cref="Try{TErr, TOk}"/> from the provided value.</summary>
         /// <typeparam name="TErr">The Err type of the <see cref="Try{TErr, TOk}"/> to create.</typeparam>
         /// <typeparam name="TOk">The Ok type of the <see cref="Try{TErr, TOk}"/> to create.</typeparam>
@@ -185,7 +191,7 @@ namespace Tiger.Types
                 ok: Try<TErr, TOk>.From);
 
         /// <summary>
-        /// Collapses a <see cref="Try"/> whose Err and Ok types match
+        /// Collapses a <see cref="Try{TErr, TOk}"/> whose Err and Ok types match
         /// into a value, based in its state.
         /// </summary>
         /// <typeparam name="TSame">The Err and Ok type of <paramref name="tryValue"/>.</typeparam>

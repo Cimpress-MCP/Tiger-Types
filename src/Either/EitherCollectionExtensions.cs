@@ -1,4 +1,4 @@
-// <copyright file="EitherEnumerableExtensions.cs" company="Cimpress, Inc.">
+﻿// <copyright file="EitherCollectionExtensions.cs" company="Cimpress, Inc.">
 //   Copyright 2017 Cimpress, Inc.
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,12 +24,12 @@ using JetBrains.Annotations;
 namespace Tiger.Types
 {
     /// <summary>
-    /// Extensions to the functionality of <see cref="IEnumerable{T}"/>,
+    /// Extensions to the functionality of collections,
     /// specialized for <see cref="Either{TLeft,TRight}"/>.
     /// </summary>
     [PublicAPI]
     [DebuggerStepThrough]
-    public static class EitherEnumerableExtensions
+    public static class EitherCollectionExtensions
     {
         /// <summary>Maps a collection of either values to their Right values.</summary>
         /// <typeparam name="TLeft">The Left type of the element type of <paramref name="eitherEnumerableValue"/>.</typeparam>
@@ -68,20 +68,20 @@ namespace Tiger.Types
         }
 
         /// <summary>Partitions a collection of either values into two collections.</summary>
-        /// <typeparam name="TLeft">The Left type of the element type of <paramref name="eitherEnumerableValue"/>.</typeparam>
-        /// <typeparam name="TRight">The Right type of the element type of <paramref name="eitherEnumerableValue"/>.</typeparam>
-        /// <param name="eitherEnumerableValue">A collection of either values.</param>
+        /// <typeparam name="TLeft">The Left type of the element type of <paramref name="eitherCollectionValue"/>.</typeparam>
+        /// <typeparam name="TRight">The Right type of the element type of <paramref name="eitherCollectionValue"/>.</typeparam>
+        /// <param name="eitherCollectionValue">A collection of either values.</param>
         /// <returns>
-        /// A tuple whose first component is the Left values of the elements of <paramref name="eitherEnumerableValue"/>
-        /// and whose second component is the Right values of the elements of <paramref name="eitherEnumerableValue"/>.
+        /// A tuple whose first component is the Left values of the elements of <paramref name="eitherCollectionValue"/>
+        /// and whose second component is the Right values of the elements of <paramref name="eitherCollectionValue"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="eitherEnumerableValue"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="eitherCollectionValue"/> is <see langword="null"/>.</exception>
         public static (ImmutableArray<TLeft> lefts, ImmutableArray<TRight> rights) Partition<TLeft, TRight>(
-            [NotNull] this IReadOnlyCollection<Either<TLeft, TRight>> eitherEnumerableValue)
+            [NotNull] this IReadOnlyCollection<Either<TLeft, TRight>> eitherCollectionValue)
         {
-            if (eitherEnumerableValue is null) { throw new ArgumentNullException(nameof(eitherEnumerableValue)); }
+            if (eitherCollectionValue is null) { throw new ArgumentNullException(nameof(eitherCollectionValue)); }
 
-            return eitherEnumerableValue.Fold(
+            return eitherCollectionValue.Fold(
                 (lefts: ImmutableArray<TLeft>.Empty, rights: ImmutableArray<TRight>.Empty),
                 (acc, curr) => curr.Match(
                     left: l => (acc.lefts.Add(l), acc.rights),

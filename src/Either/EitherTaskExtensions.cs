@@ -174,7 +174,7 @@ namespace Tiger.Types
         /// A transformation from <typeparamref name="TIn"/> to <typeparamref name="TOut"/>.
         /// </param>
         /// <returns>
-        /// An <see cref="Either{TLeft,TRight}"/>, with the transformation applied if the result of
+        /// An <see cref="Either{TLeft,TRight}"/> with the transformation applied if the result of
         /// <paramref name="eitherTaskValue"/> was in the Right state.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
@@ -202,7 +202,7 @@ namespace Tiger.Types
         /// An asynchronous transformation from <typeparamref name="TIn"/> to <typeparamref name="TOut"/>.
         /// </param>
         /// <returns>
-        /// An <see cref="Either{TLeft,TRight}"/>, with the transformation applied if the result of
+        /// An <see cref="Either{TLeft,TRight}"/> with the transformation applied if the result of
         /// <paramref name="eitherTaskValue"/> was in the Right state.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
@@ -229,7 +229,7 @@ namespace Tiger.Types
         /// <param name="left">
         /// A transformation from <typeparamref name="TIn"/> to <typeparamref name="TOut"/>.</param>
         /// <returns>
-        /// An <see cref="Either{TLeft,TRight}"/>, with the transformation applied if the result of
+        /// An <see cref="Either{TLeft,TRight}"/> with the transformation applied if the result of
         /// <paramref name="eitherTaskValue"/> was in the Left state.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
@@ -257,7 +257,7 @@ namespace Tiger.Types
         /// An asynchronous transformation from <typeparamref name="TIn"/> to <typeparamref name="TOut"/>.
         /// </param>
         /// <returns>
-        /// An <see cref="Either{TLeft,TRight}"/>, with the transformation applied if the result of
+        /// An <see cref="Either{TLeft,TRight}"/> with the transformation applied if the result of
         /// <paramref name="eitherTaskValue"/> was in the Right state, asynchronously.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
@@ -289,7 +289,7 @@ namespace Tiger.Types
         /// A transformation from <typeparamref name="TIn"/> to <see cref="Either{TLeft,TRight}"/>.
         /// </param>
         /// <returns>
-        /// An <see cref="Either{TLeft,TRight}"/>, with the transformation applied if the result of
+        /// An <see cref="Either{TLeft,TRight}"/> with the transformation applied if the result of
         /// <paramref name="eitherTaskValue"/> was in the Right state.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
@@ -317,7 +317,7 @@ namespace Tiger.Types
         /// An asynchronous transformation from <typeparamref name="TIn"/> to <see cref="Either{TLeft,TRight}"/>.
         /// </param>
         /// <returns>
-        /// An <see cref="Either{TLeft,TRight}"/>, with the transformation applied if the result of
+        /// An <see cref="Either{TLeft,TRight}"/> with the transformation applied if the result of
         /// <paramref name="eitherTaskValue"/> was in the Right state, asynchronously.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
@@ -345,7 +345,7 @@ namespace Tiger.Types
         /// A transformation from <typeparamref name="TIn"/> to <see cref="Either{TLeft,TRight}"/>.
         /// </param>
         /// <returns>
-        /// An <see cref="Either{TLeft,TRight}"/>, with the transformation applied if the result of
+        /// An <see cref="Either{TLeft,TRight}"/> with the transformation applied if the result of
         /// <paramref name="eitherTaskValue"/> was in the Right state.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
@@ -371,7 +371,7 @@ namespace Tiger.Types
         /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to bind.</param>
         /// <param name="left">An asynchronous transformation from <typeparamref name="TIn"/> to <see cref="Either{TLeft,TRight}"/>.</param>
         /// <returns>
-        /// An <see cref="Either{TLeft,TRight}"/>, with the transformation applied if the result of
+        /// An <see cref="Either{TLeft,TRight}"/> with the transformation applied if the result of
         /// <paramref name="eitherTaskValue"/> was in the Right state, asynchronously.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
@@ -393,14 +393,14 @@ namespace Tiger.Types
         #region TapT
 
         /// <summary>
-        /// Performs an action on the Left value of this instance,
-        /// if present, and returns this instance.
+        /// Performs an action on the Left value of <paramref name="eitherTaskValue"/>,
+        /// if present, and returns <paramref name="eitherTaskValue"/>.
         /// </summary>
         /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
         /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
         /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
-        /// <param name="left">An action to perform on the Left value of the Result value of this instance.</param>
-        /// <returns>A task which, when resolved, produces <paramref name="eitherTaskValue"/>.</returns>
+        /// <param name="left">An action to perform on the Left value of the Result value of <paramref name="eitherTaskValue"/>.</param>
+        /// <returns>The original value of <paramref name="eitherTaskValue"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         [NotNull, MustUseReturnValue]
@@ -415,14 +415,16 @@ namespace Tiger.Types
         }
 
         /// <summary>
-        /// Performs an action on the Left value of this instance,
-        /// if present, and returns this instance, asynchronously.
+        /// Performs an action on the Left value of <paramref name="eitherTaskValue"/>,
+        /// if present, and returns <paramref name="eitherTaskValue"/>, asynchronously.
         /// </summary>
         /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
         /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
         /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
-        /// <param name="left">An action to perform on the Left value of the Result value of this instance, asynchronously.</param>
-        /// <returns>A task which, when resolved, produces <paramref name="eitherTaskValue"/>.</returns>
+        /// <param name="left">
+        /// An action to perform on the Left value of the Result value of <paramref name="eitherTaskValue"/>, asynchronously.
+        /// </param>
+        /// <returns>The original value of <paramref name="eitherTaskValue"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         [NotNull, MustUseReturnValue]
@@ -437,14 +439,14 @@ namespace Tiger.Types
         }
 
         /// <summary>
-        /// Performs an action on the Right value of this instance,
-        /// if present, and returns this instance.
+        /// Performs an action on the Right value of <paramref name="eitherTaskValue"/>,
+        /// if present, and returns <paramref name="eitherTaskValue"/>.
         /// </summary>
         /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
         /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
         /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
-        /// <param name="right">An action to perform on the Right value of the Result value of this instance.</param>
-        /// <returns>A task which, when resolved, produces <paramref name="eitherTaskValue"/>.</returns>
+        /// <param name="right">An action to perform on the Right value of the Result value of <paramref name="eitherTaskValue"/>.</param>
+        /// <returns>The original value of <paramref name="eitherTaskValue"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         [NotNull, MustUseReturnValue]
@@ -459,14 +461,16 @@ namespace Tiger.Types
         }
 
         /// <summary>
-        /// Performs an action on the Right value of this instance,
-        /// if present, and returns this instance, asynchronously.
+        /// Performs an action on the Right value of <paramref name="eitherTaskValue"/>,
+        /// if present, and returns <paramref name="eitherTaskValue"/>, asynchronously.
         /// </summary>
         /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
         /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
         /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
-        /// <param name="right">An action to perform on the Right value of the Result value of this instance, asynchronously.</param>
-        /// <returns>A task which, when resolved, produces <paramref name="eitherTaskValue"/>.</returns>
+        /// <param name="right">
+        /// An action to perform on the Right value of the Result value of <paramref name="eitherTaskValue"/>, asynchronously.
+        /// </param>
+        /// <returns>The original value of <paramref name="eitherTaskValue"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         [NotNull, MustUseReturnValue]
@@ -482,14 +486,14 @@ namespace Tiger.Types
 
         /// <summary>
         /// Performs an action on the Left or Right value of the Result value
-        /// of this instance, whichever is present, and returns this instance.
+        /// of <paramref name="eitherTaskValue"/>, whichever is present, and returns <paramref name="eitherTaskValue"/>.
         /// </summary>
         /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
         /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
         /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
-        /// <param name="left">An action to perform on the Left value of the Result value of this instance.</param>
-        /// <param name="right">An action to perform on the Right value of the Result value of this instance.</param>
-        /// <returns>A task which, when resolved, produces <paramref name="eitherTaskValue"/>.</returns>
+        /// <param name="left">An action to perform on the Left value of the Result value of <paramref name="eitherTaskValue"/>.</param>
+        /// <param name="right">An action to perform on the Right value of the Result value of <paramref name="eitherTaskValue"/>.</param>
+        /// <returns>The original value of <paramref name="eitherTaskValue"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
@@ -508,14 +512,14 @@ namespace Tiger.Types
 
         /// <summary>
         /// Performs an action on the Left or Right value of the Result value
-        /// of this instance, whichever is present, and returns this instance, asynchronously.
+        /// of <paramref name="eitherTaskValue"/>, whichever is present, and returns <paramref name="eitherTaskValue"/>, asynchronously.
         /// </summary>
         /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
         /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
         /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
-        /// <param name="left">An action to perform on the Left value of the Result value of this instance, asynchronously.</param>
-        /// <param name="right">An action to perform on the Right value of the Result value of this instance.</param>
-        /// <returns>A task which, when resolved, produces <paramref name="eitherTaskValue"/>.</returns>
+        /// <param name="left">An action to perform on the Left value of the Result value of <paramref name="eitherTaskValue"/>, asynchronously.</param>
+        /// <param name="right">An action to perform on the Right value of the Result value of <paramref name="eitherTaskValue"/>.</param>
+        /// <returns>The original value of <paramref name="eitherTaskValue"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
@@ -534,14 +538,14 @@ namespace Tiger.Types
 
         /// <summary>
         /// Performs an action on the Left or Right value of the Result value
-        /// of this instance, whichever is present, and returns this instance, asynchronously.
+        /// of <paramref name="eitherTaskValue"/>, whichever is present, and returns <paramref name="eitherTaskValue"/>, asynchronously.
         /// </summary>
         /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
         /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
         /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
-        /// <param name="left">An action to perform on the Left value of the Result value of this instance.</param>
-        /// <param name="right">An action to perform on the Right value of the Result value of this instance, asynchronously.</param>
-        /// <returns>A task which, when resolved, produces <paramref name="eitherTaskValue"/>.</returns>
+        /// <param name="left">An action to perform on the Left value of the Result value of <paramref name="eitherTaskValue"/>.</param>
+        /// <param name="right">An action to perform on the Right value of the Result value of <paramref name="eitherTaskValue"/>, asynchronously.</param>
+        /// <returns>The original value of <paramref name="eitherTaskValue"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
@@ -560,14 +564,14 @@ namespace Tiger.Types
 
         /// <summary>
         /// Performs an action on the Left or Right value of the Result value
-        /// of this instance, whichever is present, and returns this instance, asynchronously.
+        /// of <paramref name="eitherTaskValue"/>, whichever is present, and returns <paramref name="eitherTaskValue"/>, asynchronously.
         /// </summary>
         /// <typeparam name="TLeft">The Left type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
         /// <typeparam name="TRight">The Right type of the Result type of <paramref name="eitherTaskValue"/>.</typeparam>
         /// <param name="eitherTaskValue">The <see cref="Task{TResult}"/> to tap.</param>
-        /// <param name="left">An action to perform on the Left value of the Result value of this instance, asynchronously.</param>
-        /// <param name="right">An action to perform on the Right value of the Result value of this instance, asynchronously.</param>
-        /// <returns>A task which, when resolved, produces <paramref name="eitherTaskValue"/>.</returns>
+        /// <param name="left">An action to perform on the Left value of the Result value of <paramref name="eitherTaskValue"/>, asynchronously.</param>
+        /// <param name="right">An action to perform on the Right value of the Result value of <paramref name="eitherTaskValue"/>, asynchronously.</param>
+        /// <returns>The original value of <paramref name="eitherTaskValue"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherTaskValue"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
