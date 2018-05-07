@@ -67,7 +67,7 @@ namespace Tiger.Types.UnitTest.Utility
         [SuppressMessage("Microsoft:Guidelines", "CA2225", Justification = "Type parameters play poorly with this analysis.")]
         public static implicit operator (T left, T right) (UnequalNonNullPair<T> pair) => pair._pair;
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         [SuppressMessage("ReSharper", "ImpureMethodCallOnReadonlyValueField", Justification = "Lies???")]
         public bool Equals(UnequalNonNullPair<T> other) => _pair.Equals(other._pair);
 

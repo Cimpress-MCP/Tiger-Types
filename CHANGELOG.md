@@ -1,3 +1,15 @@
+### What's new in 5.0.0 (Released ????-??-??)
+
+* The library has been refactored completely, consuming much of the functionality of the deprecated Tiger.ErrorTypes.
+* See [the wiki][] for migration details.
+* The library now supports multiple target frameworks.
+* Relevant types have been marked as `readonly`, increasing performance in some scenarios.
+  * Accordingly, many methods have been annotated with `in`.
+* The `Error` type has been promoted from Tiger.ErrorTypes
+* The `Try<TErr, TOk>` type has arrived, providiong the functionality of an optional either.
+
+[the wiki]: https://github.com/Cimpress-MCP/Tiger-Types/wiki/Migration-to-5.0
+
 ### What's new in 4.0.0 (Released 2017-04-10)
 
 * Types that obey the monad laws have grown a `Join` method.
@@ -47,12 +59,14 @@
 * A greater number of methods have been marked as pure.
 * Equality comparisons have been made simpler.
 * The `Some` static method has been removed from `Option`, as its usage was identical to `From`, and saved no cycles.
-* Arguments to `Map` or `Bind` that could lead to a violation of laws now throw uncatchable exceptions. Circumstances under which these exceptions occur are to be considered "[boneheaded](https://blogs.msdn.microsoft.com/ericlippert/2008/09/10/vexing-exceptions/)", and represent a bug in the calling code.
+* Arguments to `Map` or `Bind` that could lead to a violation of laws now throw uncatchable exceptions. Circumstances under which these exceptions occur are to be considered "[boneheaded][]", and represent a bug in the calling code.
 * The `null`-safety of some methods has been adjusted to match reality.
 * A greater number of `Either` methods will panic upon being passed an `Either` in the Bottom state.
 * The performance of a number of methods has been slightly improved by reducing indirect method calls.
 * `Option` and `Either` may now be converted from the one to the other, and from the other to the one.
 * `Option` method parameter names have been adjusted to be parallel with those of other Tiger Types.
+
+[boneheaded]: https://blogs.msdn.microsoft.com/ericlippert/2008/09/10/vexing-exceptions/
 
 ### What's new in 1.1.0 (Released 2016-07-12)
 

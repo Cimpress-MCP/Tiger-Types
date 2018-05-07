@@ -18,9 +18,14 @@
     <PackageId>Tiger.Types</PackageId>
     <PackageTags>option;maybe;either;union;task;functional</PackageTags>
     <PackageReleaseNotes><![CDATA[⁃ The library has been refactored completely, consuming much of the functionality of the deprecated Tiger.ErrorTypes.
-⁃ See the wiki for migration details.]]></PackageReleaseNotes>
+⁃ See the wiki for migration details: https://github.com/Cimpress-MCP/Tiger-Types/wiki/Migration-to-5.0
+⁃ The library now supports multiple target frameworks.
+⁃ Relevant types have been marked as `readonly`, increasing performance in some scenarios.
+  ⁃ Accordingly, many methods have been annotated with `in`.
+⁃ The `Error` type has been promoted from Tiger.ErrorTypes
+⁃ The `Try<TErr, TOk>` type has arrived, providiong the functionality of an optional either.]]></PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/Cimpress-MCP</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/Cimpress-MCP/Tiger-Types/develop/tiger_logo.png</PackageIconUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/Cimpress-MCP/Tiger-Types/master/tiger_logo.png</PackageIconUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Cimpress-MCP/Tiger-Types.git</RepositoryUrl>
   </PropertyGroup>
