@@ -14,13 +14,13 @@
 //   limitations under the License.
 // </copyright>
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 using static System.ComponentModel.EditorBrowsableState;
+using static System.Diagnostics.Contracts.Contract;
 using static System.Runtime.InteropServices.LayoutKind;
 
 namespace Tiger.Types
@@ -36,7 +36,7 @@ namespace Tiger.Types
         /// <param name="errValue">The value to wrap.</param>
         internal TryErr([NotNull] TErr errValue)
         {
-            if (errValue == null) { throw new ArgumentNullException(nameof(errValue)); }
+            Assume(errValue != null, "Attempted to initialize TryErr with null value.");
 
             Value = errValue;
         }

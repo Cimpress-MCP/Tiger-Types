@@ -14,13 +14,13 @@
 //   limitations under the License.
 // </copyright>
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 using static System.ComponentModel.EditorBrowsableState;
+using static System.Diagnostics.Contracts.Contract;
 using static System.Runtime.InteropServices.LayoutKind;
 
 namespace Tiger.Types
@@ -36,7 +36,7 @@ namespace Tiger.Types
         /// <param name="okValue">The value to wrap.</param>
         internal TryOk([NotNull] TOk okValue)
         {
-            if (okValue == null) { throw new ArgumentNullException(nameof(okValue)); }
+            Assume(okValue != null, "Attempted to initialize TryOk with null value.");
 
             Value = okValue;
         }
@@ -90,7 +90,7 @@ namespace Tiger.Types
         [NotNull, Pure, UsedImplicitly]
         object ToDump() => new
         {
-            State = "Err",
+            State = "Ok",
             Value
         };
 

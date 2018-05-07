@@ -33,7 +33,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => new Error(null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: message", ane.Message, Ordinal);
+            Assert.Contains("message", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "An error constructed with only a message has no context.")]
@@ -51,7 +51,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => new Error(null, new {}));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: message", ane.Message, Ordinal);
+            Assert.Contains("message", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "An error constructed with no context has no context.")]
@@ -82,7 +82,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => new Error(null, ImmutableDictionary<string, object>.Empty));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: message", ane.Message, Ordinal);
+            Assert.Contains("message", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "An error constructed with no context has no context.")]
@@ -116,7 +116,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => new Error(null, ImmutableDictionary<string, string>.Empty));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: message", ane.Message, Ordinal);
+            Assert.Contains("message", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "An error constructed with no context has no context.")]

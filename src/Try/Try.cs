@@ -31,55 +31,91 @@ namespace Tiger.Types
         /// </summary>
         public static readonly TryNone None;
 
-        /// <summary>Creates a <see cref="Try{TErr, TOk}"/> from the provided value.</summary>
-        /// <typeparam name="TErr">The Err type of the <see cref="Try{TErr, TOk}"/> to create.</typeparam>
-        /// <typeparam name="TOk">The Ok type of the <see cref="Try{TErr, TOk}"/> to create.</typeparam>
-        /// <param name="value">The value from which to create the <see cref="Try{TErr, TOk}"/>.</param>
+        /// <summary>
+        /// Creates a value that can be converted to a <see cref="Try{TErr, TOk}"/>
+        /// of any Ok type.
+        /// </summary>
+        /// <typeparam name="TErr">The Err type of the value to create.</typeparam>
+        /// <param name="err">The value to wrap.</param>
         /// <returns>
-        /// A <see cref="Try{TErr, TOk}"/> in the None state if <paramref name="value"/> is <see langword="null"/>;
-        /// otherwise, a <see cref="Try{TErr, TOk}"/> in the Ok state whose Ok value is the value of <paramref name="value"/>.
+        /// A value that can be convered to a <see cref="Try{TErr, TOk}"/>
+        /// of any Ok type.
         /// </returns>
-        public static Try<TErr, TOk> From<TErr, TOk>([CanBeNull] TOk value) => value == null
-            ? Try<TErr, TOk>.None
-            : Try<TErr, TOk>.From(value);
+        /// <exception cref="ArgumentNullException"><paramref name="err"/> is <see langword="null"/>.</exception>
+        public static TryErr<TErr> Err<TErr>([NotNull] TErr err)
+        {
+            if (err == null) { throw new ArgumentNullException(nameof(err)); }
+
+            return new TryErr<TErr>(err);
+        }
+
+        /// <summary>
+        /// Creates a value that can be converted to a <see cref="Try{TErr, TOk}"/>
+        /// of any Err type.
+        /// </summary>
+        /// <typeparam name="TOk">The Ok type of the value to create.</typeparam>
+        /// <param name="ok">The value to wrap.</param>
+        /// <returns>
+        /// A value that can be convered to a <see cref="Try{TErr, TOk}"/>
+        /// of any Err type.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="ok"/> is <see langword="null"/>.</exception>
+        public static TryOk<TOk> Ok<TOk>([NotNull] TOk ok)
+        {
+            if (ok == null) { throw new ArgumentNullException(nameof(ok)); }
+
+            return new TryOk<TOk>(ok);
+        }
 
         /// <summary>Creates a <see cref="Try{TErr, TOk}"/> from the provided value.</summary>
         /// <typeparam name="TErr">The Err type of the <see cref="Try{TErr, TOk}"/> to create.</typeparam>
         /// <typeparam name="TOk">The Ok type of the <see cref="Try{TErr, TOk}"/> to create.</typeparam>
-        /// <param name="value">The value from which to create the <see cref="Try{TErr, TOk}"/>.</param>
+        /// <param name="ok">The value from which to create the <see cref="Try{TErr, TOk}"/>.</param>
         /// <returns>
-        /// A <see cref="Try{TErr, TOk}"/> in the None state if <paramref name="value"/> is <see langword="null"/>;
-        /// otherwise, a <see cref="Try{TErr, TOk}"/> in the Err state whose Err value is the value of <paramref name="value"/>.
+        /// A <see cref="Try{TErr, TOk}"/> in the None state if <paramref name="ok"/> is <see langword="null"/>;
+        /// otherwise, a <see cref="Try{TErr, TOk}"/> in the Ok state whose Ok value is the value of <paramref name="ok"/>.
         /// </returns>
-        public static Try<TErr, TOk> From<TErr, TOk>([CanBeNull] TErr value) => value == null
+        public static Try<TErr, TOk> From<TErr, TOk>([CanBeNull] TOk ok) => ok == null
             ? Try<TErr, TOk>.None
-            : Try<TErr, TOk>.From(value);
+            : Try<TErr, TOk>.From(ok);
 
         /// <summary>Creates a <see cref="Try{TErr, TOk}"/> from the provided value.</summary>
         /// <typeparam name="TErr">The Err type of the <see cref="Try{TErr, TOk}"/> to create.</typeparam>
         /// <typeparam name="TOk">The Ok type of the <see cref="Try{TErr, TOk}"/> to create.</typeparam>
-        /// <param name="value">The value from which to create the <see cref="Try{TErr, TOk}"/>.</param>
+        /// <param name="err">The value from which to create the <see cref="Try{TErr, TOk}"/>.</param>
         /// <returns>
-        /// A <see cref="Try{TErr, TOk}"/> in the None state is <paramref name="value"/> is <see langword="null"/>;
-        /// otherwise, a <see cref="Try{TErr, TOk}"/> in the Ok state whose Ok value is the value of <paramref name="value"/>.
+        /// A <see cref="Try{TErr, TOk}"/> in the None state if <paramref name="err"/> is <see langword="null"/>;
+        /// otherwise, a <see cref="Try{TErr, TOk}"/> in the Err state whose Err value is the value of <paramref name="err"/>.
         /// </returns>
-        public static Try<TErr, TOk> From<TErr, TOk>([CanBeNull] TOk? value)
-            where TOk : struct => value == null
+        public static Try<TErr, TOk> From<TErr, TOk>([CanBeNull] TErr err) => err == null
             ? Try<TErr, TOk>.None
-            : Try<TErr, TOk>.From(value.Value);
+            : Try<TErr, TOk>.From(err);
 
         /// <summary>Creates a <see cref="Try{TErr, TOk}"/> from the provided value.</summary>
         /// <typeparam name="TErr">The Err type of the <see cref="Try{TErr, TOk}"/> to create.</typeparam>
         /// <typeparam name="TOk">The Ok type of the <see cref="Try{TErr, TOk}"/> to create.</typeparam>
-        /// <param name="value">The value from which to create the <see cref="Try{TErr, TOk}"/>.</param>
+        /// <param name="ok">The value from which to create the <see cref="Try{TErr, TOk}"/>.</param>
         /// <returns>
-        /// A <see cref="Try{TErr, TOk}"/> in the None state if <paramref name="value"/> is <see langword="null"/>;
-        /// otherwise, a <see cref="Try{TErr, TOk}"/> in the Err state whose Err value is the value of <paramref name="value"/>.
+        /// A <see cref="Try{TErr, TOk}"/> in the None state is <paramref name="ok"/> is <see langword="null"/>;
+        /// otherwise, a <see cref="Try{TErr, TOk}"/> in the Ok state whose Ok value is the value of <paramref name="ok"/>.
         /// </returns>
-        public static Try<TErr, TOk> From<TErr, TOk>([CanBeNull] TErr? value)
-            where TErr : struct => value == null
+        public static Try<TErr, TOk> From<TErr, TOk>([CanBeNull] TOk? ok)
+            where TOk : struct => ok == null
             ? Try<TErr, TOk>.None
-            : Try<TErr, TOk>.From(value.Value);
+            : Try<TErr, TOk>.From(ok.Value);
+
+        /// <summary>Creates a <see cref="Try{TErr, TOk}"/> from the provided value.</summary>
+        /// <typeparam name="TErr">The Err type of the <see cref="Try{TErr, TOk}"/> to create.</typeparam>
+        /// <typeparam name="TOk">The Ok type of the <see cref="Try{TErr, TOk}"/> to create.</typeparam>
+        /// <param name="err">The value from which to create the <see cref="Try{TErr, TOk}"/>.</param>
+        /// <returns>
+        /// A <see cref="Try{TErr, TOk}"/> in the None state if <paramref name="err"/> is <see langword="null"/>;
+        /// otherwise, a <see cref="Try{TErr, TOk}"/> in the Err state whose Err value is the value of <paramref name="err"/>.
+        /// </returns>
+        public static Try<TErr, TOk> From<TErr, TOk>([CanBeNull] TErr? err)
+            where TErr : struct => err == null
+            ? Try<TErr, TOk>.None
+            : Try<TErr, TOk>.From(err.Value);
 
         #region Extensions
 
@@ -102,24 +138,24 @@ namespace Tiger.Types
         /// <typeparam name="TErr">The Err type of <paramref name="tryValue"/>.</typeparam>
         /// <typeparam name="TOk">The Ok type of <paramref name="tryValue"/>.</typeparam>
         /// <param name="tryValue">The value to convert.</param>
-        /// <param name="fallback">A function producing the value to use as fallback.</param>
+        /// <param name="right">A value to use as fallback.</param>
         /// <returns>
         /// An <see cref="Either{TLeft, TRight}"/> in the Left state if <paramref name="tryValue"/>
         /// is in the Err state,
         /// an <see cref="Either{TLeft, TRight}"/> in the Right state whose Right value
         /// is the Ok value of <paramref name="tryValue"/> if <paramref name="tryValue"/> is in the Ok state,
         /// or an <see cref="Either{TLeft, TRight}"/> in the Right state whose Right value
-        /// is the result of invoking <paramref name="fallback"/> if <paramref name="tryValue"/> is in the None state.
+        /// is <paramref name="right"/> if <paramref name="tryValue"/> is in the None state.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="fallback"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         public static Either<TErr, TOk> ToEither<TErr, TOk>(
             in this Try<TErr, TOk> tryValue,
-            [NotNull, InstantHandle] Func<TOk> fallback)
+            [NotNull, InstantHandle] TOk right)
         {
-            if (fallback is null) { throw new ArgumentNullException(nameof(fallback)); }
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
 
             return tryValue.Match(
-                none: () => fallback(),
+                none: new Either<TErr, TOk>(right),
                 err: e => new Either<TErr, TOk>(e),
                 ok: v => new Either<TErr, TOk>(v));
         }
@@ -128,24 +164,76 @@ namespace Tiger.Types
         /// <typeparam name="TErr">The Err type of <paramref name="tryValue"/>.</typeparam>
         /// <typeparam name="TOk">The Ok type of <paramref name="tryValue"/>.</typeparam>
         /// <param name="tryValue">The value to convert.</param>
-        /// <param name="fallback">A function producing the value to use as fallback.</param>
+        /// <param name="right">A function producing the value to use as fallback.</param>
+        /// <returns>
+        /// An <see cref="Either{TLeft, TRight}"/> in the Left state if <paramref name="tryValue"/>
+        /// is in the Err state,
+        /// an <see cref="Either{TLeft, TRight}"/> in the Right state whose Right value
+        /// is the Ok value of <paramref name="tryValue"/> if <paramref name="tryValue"/> is in the Ok state,
+        /// or an <see cref="Either{TLeft, TRight}"/> in the Right state whose Right value
+        /// is the result of invoking <paramref name="right"/> if <paramref name="tryValue"/> is in the None state.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
+        public static Either<TErr, TOk> ToEither<TErr, TOk>(
+            in this Try<TErr, TOk> tryValue,
+            [NotNull, InstantHandle] Func<TOk> right)
+        {
+            if (right is null) { throw new ArgumentNullException(nameof(right)); }
+
+            return tryValue.Match(
+                none: () => right(),
+                err: e => new Either<TErr, TOk>(e),
+                ok: v => new Either<TErr, TOk>(v));
+        }
+
+        /// <summary>Converts a <see cref="Try{TErr, TOk}"/> into an <see cref="Either{TLeft, TRight}"/>.</summary>
+        /// <typeparam name="TErr">The Err type of <paramref name="tryValue"/>.</typeparam>
+        /// <typeparam name="TOk">The Ok type of <paramref name="tryValue"/>.</typeparam>
+        /// <param name="tryValue">The value to convert.</param>
+        /// <param name="left">A value to use as fallback.</param>
         /// <returns>
         /// An <see cref="Either{TLeft, TRight}"/> in the Left state if <paramref name="tryValue"/>
         /// is in the Err state,
         /// an <see cref="Either{TLeft, TRight}"/> in the Right state whose Right value
         /// is the Ok value of <paramref name="tryValue"/> if <paramref name="tryValue"/> is in the Ok state,
         /// or an <see cref="Either{TLeft, TRight}"/> in the Left state whose Left value
-        /// is the result of invoking <paramref name="fallback"/> if <paramref name="tryValue"/> is in the None state.
+        /// is <paramref name="left"/> if <paramref name="tryValue"/> is in the None state.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="fallback"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         public static Either<TErr, TOk> ToEither<TErr, TOk>(
             in this Try<TErr, TOk> tryValue,
-            [NotNull, InstantHandle] Func<TErr> fallback)
+            [NotNull, InstantHandle] TErr left)
         {
-            if (fallback is null) { throw new ArgumentNullException(nameof(fallback)); }
+            if (left == null) { throw new ArgumentNullException(nameof(left)); }
 
             return tryValue.Match(
-                none: () => fallback(),
+                none: new Either<TErr, TOk>(left),
+                err: e => new Either<TErr, TOk>(e),
+                ok: v => new Either<TErr, TOk>(v));
+        }
+
+        /// <summary>Converts a <see cref="Try{TErr, TOk}"/> into an <see cref="Either{TLeft, TRight}"/>.</summary>
+        /// <typeparam name="TErr">The Err type of <paramref name="tryValue"/>.</typeparam>
+        /// <typeparam name="TOk">The Ok type of <paramref name="tryValue"/>.</typeparam>
+        /// <param name="tryValue">The value to convert.</param>
+        /// <param name="left">A function producing the value to use as fallback.</param>
+        /// <returns>
+        /// An <see cref="Either{TLeft, TRight}"/> in the Left state if <paramref name="tryValue"/>
+        /// is in the Err state,
+        /// an <see cref="Either{TLeft, TRight}"/> in the Right state whose Right value
+        /// is the Ok value of <paramref name="tryValue"/> if <paramref name="tryValue"/> is in the Ok state,
+        /// or an <see cref="Either{TLeft, TRight}"/> in the Left state whose Left value
+        /// is the result of invoking <paramref name="left"/> if <paramref name="tryValue"/> is in the None state.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
+        public static Either<TErr, TOk> ToEither<TErr, TOk>(
+            in this Try<TErr, TOk> tryValue,
+            [NotNull, InstantHandle] Func<TErr> left)
+        {
+            if (left is null) { throw new ArgumentNullException(nameof(left)); }
+
+            return tryValue.Match(
+                none: () => left(),
                 err: e => new Either<TErr, TOk>(e),
                 ok: v => new Either<TErr, TOk>(v));
         }
@@ -204,13 +292,47 @@ namespace Tiger.Types
         /// or the Ok value of <paramref name="tryValue"/>
         /// if <paramref name="tryValue"/> is in the Ok state.
         /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
         [NotNull, EditorBrowsable(Never)]
         public static TSame Collapse<TSame>(
             in this Try<TSame, TSame> tryValue,
-            [NotNull] TSame none) => tryValue.Match(
+            [NotNull] TSame none)
+        {
+            if (none == null) { throw new ArgumentNullException(nameof(none)); }
+
+            return tryValue.Match(
                 none: none,
                 err: ev => ev,
                 ok: ov => ov);
+        }
+
+        /// <summary>
+        /// Collapses a <see cref="Try{TErr, TOk}"/> whose Err and Ok types match
+        /// into a value, based in its state.
+        /// </summary>
+        /// <typeparam name="TSame">The Err and Ok type of <paramref name="tryValue"/>.</typeparam>
+        /// <param name="tryValue">The value to collapse.</param>
+        /// <param name="none">The value to return if <paramref name="tryValue"/> is in the None state.</param>
+        /// <returns>
+        /// <paramref name="none"/> if <paramref name="tryValue"/> is in the None state,
+        /// the Err value of <paramref name="tryValue"/>
+        /// if <paramref name="tryValue"/> is in the Err state,
+        /// or the Ok value of <paramref name="tryValue"/>
+        /// if <paramref name="tryValue"/> is in the Ok state.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="none"/> is <see langword="null"/>.</exception>
+        [NotNull, EditorBrowsable(Never)]
+        public static TSame Collapse<TSame>(
+            in this Try<TSame, TSame> tryValue,
+            [NotNull, InstantHandle] Func<TSame> none)
+        {
+            if (none is null) { throw new ArgumentNullException(nameof(none)); }
+
+            return tryValue.Match(
+                none: none,
+                err: ev => ev,
+                ok: ov => ov);
+        }
 
         /// <summary>
         /// Asserts that the provided try value is in the Ok state,

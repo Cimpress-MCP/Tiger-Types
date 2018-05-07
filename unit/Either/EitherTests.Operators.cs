@@ -14,8 +14,8 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Two Eithers of same type, in different state, with different value are not equal.")]
         public static void OperatorEquals_SameType_DifferentState_DifferentValue(Guid leftValue, Version rightValue)
         {
-            var left = Either.Left<Guid, Version>(leftValue);
-            var right = Either.Right<Guid, Version>(rightValue);
+            var left = Either.From<Guid, Version>(leftValue);
+            var right = Either.From<Guid, Version>(rightValue);
 
             Assert.False(left == right);
             Assert.False(right == left);
@@ -26,8 +26,8 @@ namespace Tiger.Types.UnitTest
             Guid leftValue,
             Guid rightValue)
         {
-            var left = Either.Left<Guid, Version>(leftValue);
-            var right = Either.Left<Guid, Version>(rightValue);
+            var left = Either.From<Guid, Version>(leftValue);
+            var right = Either.From<Guid, Version>(rightValue);
 
             Assert.False(left == right);
             Assert.False(right == left);
@@ -36,8 +36,8 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Two Eithers of same type, in same state, with same value are equal.")]
         public static void OperatorEquals_SameType_SameState_SameValue(Guid value)
         {
-            var left = Either.Left<Guid, Version>(value);
-            var right = Either.Left<Guid, Version>(value);
+            var left = Either.From<Guid, Version>(value);
+            var right = Either.From<Guid, Version>(value);
 
             Assert.True(left == right);
             Assert.True(right == left);
@@ -56,8 +56,8 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Two Eithers of same type, in different state, with different value are not equal.")]
         public static void OperatorNotEquals_SameType_DifferentState_DifferentValue(Guid leftValue, Version rightValue)
         {
-            var left = Either.Left<Guid, Version>(leftValue);
-            var right = Either.Right<Guid, Version>(rightValue);
+            var left = Either.From<Guid, Version>(leftValue);
+            var right = Either.From<Guid, Version>(rightValue);
 
             Assert.True(left != right);
             Assert.True(right != left);
@@ -66,8 +66,8 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Two Eithers of same type, in same state, with different value are not equal.")]
         public static void OperatorNotEquals_SameType_SameState_DifferentValue(UnequalPair<Guid> values)
         {
-            var left = Either.Left<Guid, Version>(values.Left);
-            var right = Either.Left<Guid, Version>(values.Right);
+            var left = Either.From<Guid, Version>(values.Left);
+            var right = Either.From<Guid, Version>(values.Right);
 
             Assert.True(left != right);
             Assert.True(right != left);
@@ -76,8 +76,8 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Two Eithers of same type, in same state, with same value are equal.")]
         public static void OperatorNotEquals_SameType_SameState_SameValue(Guid value)
         {
-            var left = Either.Left<Guid, Version>(value);
-            var right = Either.Left<Guid, Version>(value);
+            var left = Either.From<Guid, Version>(value);
+            var right = Either.From<Guid, Version>(value);
 
             Assert.False(left != right);
             Assert.False(right != left);
@@ -143,10 +143,32 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(left.Get, innerValue);
         }
 
+        [Property(DisplayName = "A value of the Left type converts to a Left Either.")]
+        public static void Named_Left_IsLeft(NonEmptyString left)
+        {
+            var actual = Either<string, int>.ToEither(left.Get);
+
+            Assert.True(actual.IsLeft);
+            Assert.False(actual.IsRight);
+            var innerValue = (string)actual;
+            Assert.Equal(left.Get, innerValue);
+        }
+
         [Property(DisplayName = "A value of the Right type converts to a Right Either.")]
         public static void Right_IsRight(int right)
         {
             Either<string, int> actual = right;
+
+            Assert.False(actual.IsLeft);
+            Assert.True(actual.IsRight);
+            var innerValue = (int)actual;
+            Assert.Equal(right, innerValue);
+        }
+
+        [Property(DisplayName = "A value of the Right type converts to a Right Either.")]
+        public static void Named_Right_IsRight(int right)
+        {
+            var actual = Either<string, int>.ToEither(right);
 
             Assert.False(actual.IsLeft);
             Assert.True(actual.IsRight);
@@ -166,7 +188,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Unwrapping a Left Either throws.")]
         public static void Cast_Left_Throws(NonEmptyString left)
         {
-            var actual = Record.Exception(() => (int)Either.Left<string, int>(left.Get));
+            var actual = Record.Exception(() => (int)Either.From<string, int>(left.Get));
 
             var ex = Assert.IsType<InvalidOperationException>(actual);
             Assert.Contains(EitherIsNotRight, ex.Message, Ordinal);
@@ -174,10 +196,10 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Unwrapping a Left Either returns the Left value.")]
         public static void Cast_Left(NonEmptyString left) =>
-            Assert.Equal(left.Get, (string)Either.Left<string, int>(left.Get));
+            Assert.Equal(left.Get, (string)Either.From<string, int>(left.Get));
 
         [Property(DisplayName = "Unwrapping a Right Either returns its Right value.")]
-        public static void Cast_Right(int right) => Assert.Equal(right, (int)Either.Right<string, int>(right));
+        public static void Cast_Right(int right) => Assert.Equal(right, (int)Either.From<string, int>(right));
 
         [Fact(DisplayName = "Unwrapping a Bottom Either throws.")]
         public static void Cast_Bottom_Throws()

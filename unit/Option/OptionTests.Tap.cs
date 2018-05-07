@@ -14,10 +14,10 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Tapping an option with a null action throws.")]
         public static void FuncTap_OneWayNone_Null_Throws(Option<string> option)
         {
-            var actual = Record.Exception(() => option.Tap(none: (Action)null));
+            var actual = Record.Exception(() => option.Tap(none: null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+            Assert.Contains("none", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Tapping a None Option over a func returns a None Option and performs an action.")]
@@ -45,10 +45,10 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Tapping an option with a null action throws.")]
         public static void FuncTap_OneWaySome_Null_Throws(Option<string> option)
         {
-            var actual = Record.Exception(() => option.Tap(some: (Action<string>)null));
+            var actual = Record.Exception(() => option.Tap(some: null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Tapping a None Option over a func returns a None Option and performs no action.")]
@@ -79,7 +79,7 @@ namespace Tiger.Types.UnitTest
             var actual = await Record.ExceptionAsync(() => option.TapAsync(none: null)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+            Assert.Contains("none", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Tapping a None Option over a task returns a None Option and performs an action.")]
@@ -110,7 +110,7 @@ namespace Tiger.Types.UnitTest
             var actual = await Record.ExceptionAsync(() => option.TapAsync(some: null)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Tapping a None Option over a task returns a None Option and performs no action.")]
@@ -139,11 +139,11 @@ namespace Tiger.Types.UnitTest
         public static void FuncFuncTap_TwoWay_NoneNull_Throws(Option<string> option)
         {
             var actual = Record.Exception(() => option.Tap(
-                none: (Action)null,
+                none: null,
                 some: _ => { }));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+            Assert.Contains("none", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Tapping an option with a null Some Action throws.")]
@@ -151,10 +151,10 @@ namespace Tiger.Types.UnitTest
         {
             var actual = Record.Exception(() => option.Tap(
                 none: () => { },
-                some: (Action<string>)null));
+                some: null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Tapping a None Option over a func and a func returns a None Option and performs " +
@@ -193,7 +193,7 @@ namespace Tiger.Types.UnitTest
                 some: _ => { })).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+            Assert.Contains("none", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Tapping an option with a null Some task throws.")]
@@ -204,7 +204,7 @@ namespace Tiger.Types.UnitTest
                 some: (Action<string>)null)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Tapping a None Option over a task and a func returns a None Option and performs " +
@@ -243,7 +243,7 @@ namespace Tiger.Types.UnitTest
                 some: _ => CompletedTask)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+            Assert.Contains("none", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Tapping an option with a null Some task throws.")]
@@ -254,7 +254,7 @@ namespace Tiger.Types.UnitTest
                 some: null)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Tapping a None Option over a func and a task returns a None Option and performs " +
@@ -293,7 +293,7 @@ namespace Tiger.Types.UnitTest
                 some: _ => CompletedTask)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+            Assert.Contains("none", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Tapping an option with a null Some task throws.")]
@@ -304,7 +304,7 @@ namespace Tiger.Types.UnitTest
                 some: null)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Tapping a None Option over a task and a task returns a None Option and performs " +

@@ -21,12 +21,27 @@ namespace Tiger.Types.UnitTest.Utility
             .ToArbitrary();
 
         /// <summary>Generates an arbitrary instance of <see cref="Option{TSome}"/>.</summary>
-        /// <typeparam name="T">The type of value to generate.</typeparam>
+        /// <typeparam name="TSome">The type of value to generate.</typeparam>
         /// <returns>An arbitrary value.</returns>
-        public static Arbitrary<Option<T>> OptionValue<T>() => Arb.From(
+        public static Arbitrary<Option<TSome>> OptionValue<TSome>() => Arb.From(
             Gen.Frequency(
-                Tuple.Create(24, Arb.Generate<T>().Where(t => t != null).Select(Option.From)),
-                Tuple.Create(1, Gen.Constant(Option<T>.None))));
+                Tuple.Create(24, Arb.Generate<TSome>().Where(t => t != null).Select(Option.From)),
+                Tuple.Create(1, Gen.Constant(Option<TSome>.None))));
+
+        public static Arbitrary<Either<TLeft, TRight>> EitherValue<TLeft, TRight>() => Arb.From(
+            Gen.Frequency(
+                Tuple.Create(50, Arb.Generate<TLeft>().Where(t => t != null).Select(Either<TLeft, TRight>.From)),
+                Tuple.Create(50, Arb.Generate<TRight>().Where(t => t != null).Select(Either<TLeft, TRight>.From))));
+
+        /// <summary>Generates an arbitrary instance of <see cref="Try{TErr, TOk}"/>.</summary>
+        /// <typeparam name="TErr">The Err type of the value to generate.</typeparam>
+        /// <typeparam name="TOk">The Ok type of the value to generate.</typeparam>
+        /// <returns>An arbitrary value.</returns>
+        public static Arbitrary<Try<TErr, TOk>> TryValue<TErr, TOk>() => Arb.From(
+            Gen.Frequency(
+                Tuple.Create(49, Arb.Generate<TErr>().Where(t => t != null).Select(Try<TErr, TOk>.From)),
+                Tuple.Create(49, Arb.Generate<TOk>().Where(t => t != null).Select(Try<TErr, TOk>.From)),
+                Tuple.Create(2, Gen.Constant(Try<TErr, TOk>.None))));
 
         /// <summary>Generates an arbitrary instance of <see cref="UnequalNonNullPair{T}"/>.</summary>
         /// <typeparam name="T">The type of value to generate.</typeparam>

@@ -14,7 +14,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => option.Replace((string)null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: replacement", ane.Message, Ordinal);
+            Assert.Contains("replacement", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Replacing a None Option returns a None Option.")]

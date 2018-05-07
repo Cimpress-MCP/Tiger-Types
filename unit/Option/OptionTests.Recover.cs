@@ -17,7 +17,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option<string>.None.Recover(recoverer: (string)null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: recoverer", ane.Message, Ordinal);
+            Assert.Contains("recoverer", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Recovering a None Option returns the recovery value.")]
@@ -36,7 +36,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option.From(some.Get).Recover(recoverer: (string)null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: recoverer", ane.Message, Ordinal);
+            Assert.Contains("recoverer", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Recovering a Some Option returns the original value.")]
@@ -55,7 +55,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option<string>.None.Recover(recoverer: (Func<string>)null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: recoverer", ane.Message, Ordinal);
+            Assert.Contains("recoverer", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Recovering a None Option returns the recovery value.")]
@@ -74,7 +74,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option.From(some.Get).Recover(recoverer: (Func<string>)null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: recoverer", ane.Message, Ordinal);
+            Assert.Contains("recoverer", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Recovering a Some Option returns the original value.")]
@@ -91,11 +91,11 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskRecover_None_Null_Throws()
         {
             var actual = await Record.ExceptionAsync(() => Option<string>.None
-                .RecoverAsync(recoverer: (Func<Task<string>>)null))
+                .RecoverAsync(recoverer: null))
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: recoverer", ane.Message, Ordinal);
+            Assert.Contains("recoverer", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Recovering a None Option returns the recovery value.")]
@@ -114,11 +114,11 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskRecover_Some_Null_Throws(NonEmptyString some)
         {
             var actual = await Record.ExceptionAsync(() => Option.From(some.Get)
-                .RecoverAsync(recoverer: (Func<Task<string>>)null))
+                .RecoverAsync(recoverer: null))
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: recoverer", ane.Message, Ordinal);
+            Assert.Contains("recoverer", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Recovering a Some Option returns the original value.")]

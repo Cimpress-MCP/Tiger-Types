@@ -90,6 +90,16 @@ namespace Tiger.Types.UnitTest
             Assert.Contains("enumerableTaskValue", ane.Message, Ordinal);
         }
 
+        [Property(DisplayName = "Folding over null with folder func throws.")]
+        public static async Task FoldTImplicitFunc_NullValue_Throws(Func<int, int, int> folder)
+        {
+            var actual = await Record.ExceptionAsync(
+                () => CollectionTaskExtensions.FoldT(null, folder)).ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("enumerableTaskValue", ane.Message, Ordinal);
+        }
+
         [Property(DisplayName = "Folding with a null state throws.")]
         public static async Task FoldTFunc_NullState_Throws(
             List<string> collection,
@@ -106,7 +116,18 @@ namespace Tiger.Types.UnitTest
         public static async Task FoldTFunc_NullFolder_Throws(List<string> collection, NonEmptyString state)
         {
             var actual = await Record.ExceptionAsync(
-                () => Task.FromResult<IReadOnlyCollection<string>>(collection).FoldT(state.Get, (Func<string, string, string>)null))
+                () => Task.FromResult<IReadOnlyCollection<string>>(collection).FoldT(state.Get, null))
+                .ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("folder", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Folding with a null folder func throws.")]
+        public static async Task FoldTImplicitFunc_NullFolder_Throws(List<string> collection)
+        {
+            var actual = await Record.ExceptionAsync(
+                () => Task.FromResult<IReadOnlyCollection<string>>(collection).FoldT<string, int>(null))
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
@@ -121,12 +142,26 @@ namespace Tiger.Types.UnitTest
         {
             string Folder(string acc, string curr) => string.Concat(acc, curr);
 
-            var expected = collection.Fold(state.Get, (acc, curr) => Folder(acc, curr));
+            var expected = collection.Fold(state.Get, Folder);
             var actual = await Task.FromResult<IReadOnlyCollection<string>>(collection)
-                .FoldT(state.Get, (acc, curr) => Folder(acc, curr))
+                .FoldT(state.Get, Folder)
                 .ConfigureAwait(false);
 
             Assert.Equal(expected, actual, StringComparer.Ordinal);
+        }
+
+        [Property(DisplayName = "Folding over a collection in a task with a func is the same as " +
+                                "folding over the collection not wrapped in a task.")]
+        public static async Task FoldTImplicitFunc_Folds(List<int> collection)
+        {
+            int Folder(int acc, int curr) => acc + curr;
+
+            var expected = collection.Fold<int, int>(Folder);
+            var actual = await Task.FromResult<IReadOnlyCollection<int>>(collection)
+                .FoldT<int, int>(Folder)
+                .ConfigureAwait(false);
+
+            Assert.Equal(expected, actual);
         }
 
         [Property(DisplayName = "Folding over null with folder task throws.")]
@@ -134,6 +169,16 @@ namespace Tiger.Types.UnitTest
         {
             var actual = await Record.ExceptionAsync(
                 () => CollectionTaskExtensions.FoldTAsync(null, state, folder)).ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("enumerableTaskValue", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Folding over null with folder task throws.")]
+        public static async Task FoldTImplicitTask_NullValue_Throws(Func<int, int, Task<int>> folder)
+        {
+            var actual = await Record.ExceptionAsync(
+                () => CollectionTaskExtensions.FoldTAsync(null, folder)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
             Assert.Contains("enumerableTaskValue", ane.Message, Ordinal);
@@ -156,7 +201,19 @@ namespace Tiger.Types.UnitTest
         {
             var actual = await Record.ExceptionAsync(
                 () => Task.FromResult<IReadOnlyCollection<string>>(collection)
-                    .FoldTAsync(state.Get, (Func<string, string, Task<string>>)null))
+                    .FoldTAsync(state.Get, null))
+                .ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("folder", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Folding with a null folder task throws.")]
+        public static async Task FoldTImplicitTask_NullFolder_Throws(List<string> collection)
+        {
+            var actual = await Record.ExceptionAsync(
+                () => Task.FromResult<IReadOnlyCollection<string>>(collection)
+                    .FoldTAsync((Func<int, string, Task<int>>)null))
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
@@ -171,12 +228,26 @@ namespace Tiger.Types.UnitTest
         {
             Task<string> Folder(string acc, string curr) => Task.FromResult(string.Concat(acc, curr));
 
-            var expected = await collection.FoldAsync(state.Get, (acc, curr) => Folder(acc, curr)).ConfigureAwait(false);
+            var expected = await collection.FoldAsync(state.Get, Folder).ConfigureAwait(false);
             var actual = await Task.FromResult<IReadOnlyCollection<string>>(collection)
-                .FoldTAsync(state.Get, (acc, curr) => Folder(acc, curr))
+                .FoldTAsync(state.Get, Folder)
                 .ConfigureAwait(false);
 
             Assert.Equal(expected, actual, StringComparer.Ordinal);
+        }
+
+        [Property(DisplayName = "Folding over a collection in a task with a task is the same as " +
+                                "folding over the collection not wrapped in a task.")]
+        public static async Task FoldTImplicitTask_Folds(List<int> collection)
+        {
+            Task<int> Folder(int acc, int curr) => Task.FromResult(acc + curr);
+
+            var expected = await collection.FoldAsync<int, int>(Folder).ConfigureAwait(false);
+            var actual = await Task.FromResult<IReadOnlyCollection<int>>(collection)
+                .FoldTAsync<int, int>(Folder)
+                .ConfigureAwait(false);
+
+            Assert.Equal(expected, actual);
         }
     }
 }

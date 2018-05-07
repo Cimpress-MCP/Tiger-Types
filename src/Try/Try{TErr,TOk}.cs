@@ -118,6 +118,20 @@ namespace Tiger.Types
         [SuppressMessage("Roslynator", "RCS1163", Justification = "Used only for the type inference.")]
         public static implicit operator Try<TErr, TOk>(TryNone none) => None;
 
+        /// <summary>
+        /// Implicitly converts a <see cref="TryErr{TErr}"/> to a
+        /// <see cref="Try{TErr, TOk}"/> in the Err state.
+        /// </summary>
+        /// <param name="err">The partially applied try value.</param>
+        public static implicit operator Try<TErr, TOk>(TryErr<TErr> err) => From(err.Value);
+
+        /// <summary>
+        /// Implicitly converts a <see cref="TryOk{TOk}"/> to a
+        /// <see cref="Try{TErr, TOk}"/> in the Ok state.
+        /// </summary>
+        /// <param name="ok">The partially applied try value.</param>
+        public static implicit operator Try<TErr, TOk>(TryOk<TOk> ok) => From(ok.Value);
+
         /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
         /// <param name="left">An object to compare with <paramref name="right"/>.</param>
         /// <param name="right">An object to compare with <paramref name="left"/>.</param>
@@ -162,27 +176,27 @@ namespace Tiger.Types
         /// Creates a <see cref="Try{TErr, TOk}"/> in the Err or None state
         /// from the provided value.
         /// </summary>
-        /// <param name="value">The value to wrap.</param>
+        /// <param name="err">The value to wrap.</param>
         /// <returns>
         /// A <see cref="Try{TErr, TOk}"/> in the None state if
-        /// <paramref name="value"/> is <see langword="null"/>;
+        /// <paramref name="err"/> is <see langword="null"/>;
         /// otherwise, a <see cref="Try{TErr, TOk}"/> in the Err state.
         /// </returns>
-        public static Try<TErr, TOk> From([CanBeNull] TErr value) =>
-            new Try<TErr, TOk>(Option.From(value).Map(Either.Left<TErr, TOk>));
+        public static Try<TErr, TOk> From([CanBeNull] TErr err) =>
+            new Try<TErr, TOk>(Option.From(err).Map(Either.From<TErr, TOk>));
 
         /// <summary>
         /// Creates a <see cref="Try{TErr, TOk}"/> in the Ok or None state
         /// from the provided value.
         /// </summary>
-        /// <param name="value">The value to wrap.</param>
+        /// <param name="ok">The value to wrap.</param>
         /// <returns>
         /// A <see cref="Try{TErr, TOk}"/> in the None state if
-        /// <paramref name="value"/> is <see langword="null"/>;
+        /// <paramref name="ok"/> is <see langword="null"/>;
         /// otherwise, a <see cref="Try{TErr, TOk}"/> in the Ok state.
         /// </returns>
-        public static Try<TErr, TOk> From([CanBeNull] TOk value) =>
-            new Try<TErr, TOk>(Option.From(value).Map(Either.Right<TErr, TOk>));
+        public static Try<TErr, TOk> From([CanBeNull] TOk ok) =>
+            new Try<TErr, TOk>(Option.From(ok).Map(Either.From<TErr, TOk>));
 
         #region Match
 
@@ -2250,7 +2264,13 @@ namespace Tiger.Types
         /// if <typeparamref name="TOk"/> satisfies <see langword="class"/>.</para>
         /// </remarks>
         [CanBeNull, Pure]
-        public TOk GetValueOrDefault() => _value.Map(ev => ev.GetValueOrDefault()).GetValueOrDefault();
+        public TOk GetValueOrDefault()
+        {
+            if (_value.IsNone) { return default; }
+            if (_value.Value.IsLeft) { return default; }
+
+            return Value;
+        }
 
         /// <summary>
         /// Unwraps this instance with an alternative value

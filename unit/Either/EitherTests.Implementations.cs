@@ -11,7 +11,7 @@ namespace Tiger.Types.UnitTest
         public static void GetEnumerator_Left(Guid left, Version before)
         {
             var actual = before;
-            foreach (var v in Either.Left<Guid, Version>(left))
+            foreach (var v in Either.From<Guid, Version>(left))
             {
                 actual = v;
             }
@@ -23,7 +23,7 @@ namespace Tiger.Types.UnitTest
         public static void GetEnumerator_Right(Version right, Version before)
         {
             var actual = before;
-            foreach (var v in Either.Right<Guid, Version>(right))
+            foreach (var v in Either.From<Guid, Version>(right))
             {
                 actual = v;
             }

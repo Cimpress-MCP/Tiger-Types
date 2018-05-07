@@ -17,7 +17,7 @@
     <AssemblyName>Tiger.Types</AssemblyName>
     <PackageId>Tiger.Types</PackageId>
     <PackageTags>option;maybe;either;union;task;functional</PackageTags>
-    <PackageReleaseNotes><![CDATA[⁃ The library has been refactored commpletely, consuming much of the functionality of the deprecated Tiger.ErrorTypes.
+    <PackageReleaseNotes><![CDATA[⁃ The library has been refactored completely, consuming much of the functionality of the deprecated Tiger.ErrorTypes.
 ⁃ See the wiki for migration details.]]></PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/Cimpress-MCP</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/Cimpress-MCP/Tiger-Types/develop/tiger_logo.png</PackageIconUrl>
@@ -32,7 +32,6 @@
   
   <ItemGroup>
     <AdditionalFiles Include="../stylecop.json" />
-    <None Remove="Tiger.Types.csproj.DotSettings" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">

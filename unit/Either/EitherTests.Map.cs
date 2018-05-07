@@ -13,7 +13,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Left-Mapping a Left Either over a func returns a Left Either.")]
         public static void FuncMapLeft_Left(NonEmptyString left, Guid sentinel)
         {
-            var actual = Either.Left<string, int>(left.Get).Map(left: _ => sentinel);
+            var actual = Either.From<string, int>(left.Get).Map(left: _ => sentinel);
 
             Assert.True(actual.IsLeft);
             var innerValue = (Guid)actual;
@@ -23,7 +23,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Left-Mapping a Right Either over a func returns a Right Either.")]
         public static void FuncMapLeft_Right(int right, Guid sentinel)
         {
-            var actual = Either.Right<string, int>(right).Map(left: _ => sentinel);
+            var actual = Either.From<string, int>(right).Map(left: _ => sentinel);
 
             Assert.True(actual.IsRight);
             var innerValue = (int)actual;
@@ -33,7 +33,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Left-Mapping a Left Either over a task returns a Left Either.")]
         public static async Task TaskMapLeft_Left(NonEmptyString left, Guid sentinel)
         {
-            var actual = await Either.Left<string, int>(left.Get)
+            var actual = await Either.From<string, int>(left.Get)
                 .MapAsync(left: _ => FromResult(sentinel))
                 .ConfigureAwait(false);
 
@@ -45,7 +45,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Left-Mapping a Right Either over a task returns a Right Either.")]
         public static async Task TaskMapLeft_Right(int right, Guid sentinel)
         {
-            var actual = await Either.Right<string, int>(right)
+            var actual = await Either.From<string, int>(right)
                 .MapAsync(left: _ => FromResult(sentinel))
                 .ConfigureAwait(false);
 
@@ -57,7 +57,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Right-Mapping a Left Either over a func returns a Left Either.")]
         public static void FuncMapRight_Left(NonEmptyString left, Guid sentinel)
         {
-            var actual = Either.Left<string, int>(left.Get)
+            var actual = Either.From<string, int>(left.Get)
                 .Map(right: _ => sentinel);
 
             Assert.True(actual.IsLeft);
@@ -68,7 +68,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Right-Mapping a Right Either over a func returns a Right Either.")]
         public static void FuncMapRight_Right(int right, Guid sentinel)
         {
-            var actual = Either.Right<string, int>(right)
+            var actual = Either.From<string, int>(right)
                 .Map(right: _ => sentinel);
 
             Assert.True(actual.IsRight);
@@ -79,7 +79,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Right-Mapping a Left Either over a task returns a Left Either.")]
         public static async Task TaskMapRight_Left(NonEmptyString left, Guid sentinel)
         {
-            var actual = await Either.Left<string, int>(left.Get)
+            var actual = await Either.From<string, int>(left.Get)
                 .MapAsync(right: _ => FromResult(sentinel))
                 .ConfigureAwait(false);
 
@@ -91,7 +91,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Right-Mapping a Right Either over a task returns a Right Either.")]
         public static async Task TaskMapRight_Right(int right, Guid sentinel)
         {
-            var actual = await Either.Right<string, int>(right)
+            var actual = await Either.From<string, int>(right)
                 .MapAsync(right: _ => FromResult(sentinel))
                 .ConfigureAwait(false);
 
@@ -103,7 +103,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Mapping a Left Either over a func returns a Left Either.")]
         public static void FuncFuncMap_Left(NonEmptyString left, Guid leftSentinel, Version rightSentinel)
         {
-            var actual = Either.Left<string, int>(left.Get).Map(
+            var actual = Either.From<string, int>(left.Get).Map(
                 left: _ => leftSentinel,
                 right: _ => rightSentinel);
 
@@ -115,7 +115,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Mapping a Right Either over a func returns a Right Either.")]
         public static void FuncFuncMap_Right(int right, Guid leftSentinel, Version rightSentinel)
         {
-            var actual = Either.Right<string, int>(right).Map(
+            var actual = Either.From<string, int>(right).Map(
                 left: _ => leftSentinel,
                 right: _ => rightSentinel);
 
@@ -127,7 +127,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Mapping a Left Either over a func returns a Left Either.")]
         public static async Task FuncTaskMap_Left(NonEmptyString left, Guid leftSentinel, Version rightSentinel)
         {
-            var actual = await Either.Left<string, int>(left.Get).MapAsync(
+            var actual = await Either.From<string, int>(left.Get).MapAsync(
                 left: _ => FromResult(leftSentinel),
                 right: _ => rightSentinel)
                 .ConfigureAwait(false);
@@ -140,7 +140,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Mapping a Right Either over a task returns a Right Either.")]
         public static async Task FuncTaskMap_Right(int right, Guid leftSentinel, Version rightSentinel)
         {
-            var actual = await Either.Right<string, int>(right).MapAsync(
+            var actual = await Either.From<string, int>(right).MapAsync(
                 left: _ => FromResult(leftSentinel),
                 right: _ => rightSentinel)
                 .ConfigureAwait(false);
@@ -153,7 +153,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Mapping a Left Either over a task returns a Left Either.")]
         public static async Task TaskFuncMap_Left(NonEmptyString left, Guid leftSentinel, Version rightSentinel)
         {
-            var actual = await Either.Left<string, int>(left.Get).MapAsync(
+            var actual = await Either.From<string, int>(left.Get).MapAsync(
                 left: _ => leftSentinel,
                 right: _ => FromResult(rightSentinel))
                 .ConfigureAwait(false);
@@ -166,7 +166,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Mapping a Right Either over a func returns a Right Either.")]
         public static async Task TaskFuncMap_Right(int right, Guid leftSentinel, Version rightSentinel)
         {
-            var actual = await Either.Right<string, int>(right).MapAsync(
+            var actual = await Either.From<string, int>(right).MapAsync(
                 left: _ => leftSentinel,
                 right: _ => FromResult(rightSentinel))
                 .ConfigureAwait(false);
@@ -179,7 +179,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Mapping a Left Either over a task returns a Left Either.")]
         public static async Task TaskTaskMap_Left(NonEmptyString left, Guid leftSentinel, Version rightSentinel)
         {
-            var actual = await Either.Left<string, int>(left.Get).MapAsync(
+            var actual = await Either.From<string, int>(left.Get).MapAsync(
                 left: _ => FromResult(leftSentinel),
                 right: _ => FromResult(rightSentinel))
                 .ConfigureAwait(false);
@@ -192,7 +192,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Mapping a Right Either over a task returns a Right Either.")]
         public static async Task TaskTaskMap_Right(int right, Guid leftSentinel, Version rightSentinel)
         {
-            var actual = await Either.Right<string, int>(right).MapAsync(
+            var actual = await Either.From<string, int>(right).MapAsync(
                 left: _ => FromResult(leftSentinel),
                 right: _ => FromResult(rightSentinel))
                 .ConfigureAwait(false);

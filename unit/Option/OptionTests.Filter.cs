@@ -13,10 +13,10 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Filtering an option over a null func throws.")]
         public static void FuncFilter_Null_Throws(Option<int> option)
         {
-            var actual = Record.Exception(() => option.Filter((Func<int, bool>)null));
+            var actual = Record.Exception(() => option.Filter(null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: predicate", ane.Message, Ordinal);
+            Assert.Contains("predicate", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Filtering a None Option produces a None Option.")]
@@ -48,11 +48,11 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Filtering an option over a null task throws.")]
         public static async Task TaskFilter_Null_Throws(Option<int> option)
         {
-            var actual = await Record.ExceptionAsync(() => option.FilterAsync((Func<int, Task<bool>>)null))
+            var actual = await Record.ExceptionAsync(() => option.FilterAsync(null))
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: predicate", ane.Message, Ordinal);
+            Assert.Contains("predicate", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Filtering a None Option produces a None Option.")]

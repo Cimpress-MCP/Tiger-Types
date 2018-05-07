@@ -16,7 +16,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => new OptionTypeConverter(type: null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: type", ane.Message, Ordinal);
+            Assert.Contains("type", ane.Message, Ordinal);
         }
 
         [Theory(DisplayName = "An option type converter throws when provided an invalid type.")]

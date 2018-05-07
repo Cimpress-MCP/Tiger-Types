@@ -17,16 +17,16 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => option.Fold(null, folder));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: state", ane.Message, Ordinal);
+            Assert.Contains("state", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Folding over an option with a null seed throws.")]
         public static void FuncFold_NullFolder_Throws(Option<int> option, NonEmptyString state)
         {
-            var actual = Record.Exception(() => option.Fold(state.Get, (Func<string, int, string>)null));
+            var actual = Record.Exception(() => option.Fold(state.Get, null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: folder", ane.Message, Ordinal);
+            Assert.Contains("folder", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Folding over a None Option returns the seed value.")]
@@ -42,17 +42,17 @@ namespace Tiger.Types.UnitTest
             var actual = await Record.ExceptionAsync(() => option.FoldAsync(null, folder)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: state", ane.Message, Ordinal);
+            Assert.Contains("state", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Folding over an option with a null seed throws.")]
         public static async Task TaskFold_NullFolder_Throws(Option<int> option, NonEmptyString state)
         {
-            var actual = await Record.ExceptionAsync(() => option.FoldAsync(state.Get, (Func<string, int, Task<string>>)null))
+            var actual = await Record.ExceptionAsync(() => option.FoldAsync(state.Get, null))
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: folder", ane.Message, Ordinal);
+            Assert.Contains("folder", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Folding over a None Option returns the seed value.")]

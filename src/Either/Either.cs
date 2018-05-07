@@ -43,7 +43,7 @@ namespace Tiger.Types
         /// <returns>An <see cref="Either{TLeft,TRight}"/> in the Left state.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         [Pure]
-        public static Either<TLeft, TRight> Left<TLeft, TRight>([NotNull] TLeft left)
+        public static Either<TLeft, TRight> From<TLeft, TRight>([NotNull] TLeft left)
         {
             if (left == null) { throw new ArgumentNullException(nameof(left)); }
 
@@ -84,7 +84,7 @@ namespace Tiger.Types
         /// <returns>An <see cref="Either{TLeft,TRight}"/> in the Right state.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         [Pure]
-        public static Either<TLeft, TRight> Right<TLeft, TRight>([NotNull] TRight right)
+        public static Either<TLeft, TRight> From<TLeft, TRight>([NotNull] TRight right)
         {
             if (right == null) { throw new ArgumentNullException(nameof(right)); }
 
@@ -285,8 +285,8 @@ namespace Tiger.Types
             if (splitter is null) { throw new ArgumentNullException(nameof(splitter)); }
 
             return splitter(value)
-                ? Right<TValue, TValue>(right: value)
-                : Left<TValue, TValue>(left: value);
+                ? From<TValue, TValue>(right: value)
+                : From<TValue, TValue>(left: value);
         }
 
         /// <summary>
@@ -313,8 +313,8 @@ namespace Tiger.Types
             if (splitter is null) { throw new ArgumentNullException(nameof(splitter)); }
 
             return await splitter(value).ConfigureAwait(false)
-                ? Right<TValue, TValue>(right: value)
-                : Left<TValue, TValue>(left: value);
+                ? From<TValue, TValue>(right: value)
+                : From<TValue, TValue>(left: value);
         }
 
         /// <summary>

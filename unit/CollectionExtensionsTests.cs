@@ -21,7 +21,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => ((IEnumerable<int>)null).FirstOrNone());
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: source", ane.Message, Ordinal);
+            Assert.Contains("source", ane.Message, Ordinal);
         }
 
         [Fact(DisplayName = "Optionally getting the first element of an empty collection returns a None Option.")]
@@ -58,7 +58,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => CollectionExtensions.FirstOrNone(null, predicate));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: source", ane.Message, Ordinal);
+            Assert.Contains("source", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Optionally getting the first element of a collection with a null predicate throws.")]
@@ -67,7 +67,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => source.Get.FirstOrNone(null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: predicate", ane.Message, Ordinal);
+            Assert.Contains("predicate", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Optionally getting the first element of an empty collection with any filter " +
@@ -89,6 +89,15 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(values.Get[0], innerValue);
         }
 
+        [Property(DisplayName = "Optionally getting the first element of a populated collection " +
+                                "failing the filter for all members returns a None Option.")]
+        public static void FirstOrNonePredicate_False_Populated_Some(NonEmptyArray<int> values)
+        {
+            var actual = values.Get.FirstOrNone(_ => false);
+
+            Assert.True(actual.IsNone);
+        }
+
         [Property(DisplayName = "Optionally getting the first element of a populated collection returns a Some Option.")]
         public static void FirstOrNonePredicate_PopulatedEnumerable_Some(int value, PositiveInt count)
         {
@@ -99,13 +108,112 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(value, innerValue);
         }
 
+        [Property(DisplayName = "Folding over null with folder func throws.")]
+        public static void Fold_NullValue_Throws(int state, Func<int, int, int> folder)
+        {
+            var actual = Record.Exception(() => CollectionExtensions.Fold(null, state, folder));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("collection", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Folding over null with folder func throws.")]
+        public static void FoldImplicit_NullValue_Throws(Func<int, int, int> folder)
+        {
+            var actual = Record.Exception(() => CollectionExtensions.Fold(null, folder));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("collection", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Folding with a null state throws.")]
+        public static void Fold_NullState_Throws(
+            List<string> collection,
+            Func<string, string, string> folder)
+        {
+            var actual = Record.Exception(() => collection.Fold(null, folder));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("state", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Folding with a null folder func throws.")]
+        public static void Fold_NullFolder_Throws(List<string> collection, NonEmptyString state)
+        {
+            var actual = Record.Exception(() => collection.Fold(state.Get, null));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("folder", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Folding with a null folder func throws.")]
+        public static void FoldImplicit_NullFolder_Throws(List<string> collection)
+        {
+            var actual = Record.Exception(() => collection.Fold<string, int>(null));
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("folder", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Folding over null with folder task throws.")]
+        public static async Task FoldAsync_NullValue_Throws(int state, Func<int, int, Task<int>> folder)
+        {
+            var actual = await Record.ExceptionAsync(() => CollectionExtensions.FoldAsync(null, state, folder))
+                .ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("collection", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Folding over null with folder task throws.")]
+        public static async Task FoldAsyncImplicit_NullValue_Throws(Func<int, int, Task<int>> folder)
+        {
+            var actual = await Record.ExceptionAsync(() => CollectionExtensions.FoldAsync(null, folder))
+                .ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("collection", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Folding with a null state throws.")]
+        public static async Task FoldAsync_NullState_Throws(
+            List<string> collection,
+            Func<string, string, Task<string>> folder)
+        {
+            var actual = await Record.ExceptionAsync(() => collection.FoldAsync(null, folder))
+                .ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("state", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Folding with a null folder func throws.")]
+        public static async Task FoldAsync_NullFolder_Throws(List<string> collection, NonEmptyString state)
+        {
+            var actual = await Record.ExceptionAsync(() => collection.FoldAsync(state.Get, null))
+                .ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("folder", ane.Message, Ordinal);
+        }
+
+        [Property(DisplayName = "Folding with a null folder func throws.")]
+        public static async Task FoldAsyncImplicit_NullFolder_Throws(List<string> collection)
+        {
+            var actual = await Record.ExceptionAsync(() => collection.FoldAsync<string, int>(null))
+                .ConfigureAwait(false);
+
+            var ane = Assert.IsType<ArgumentNullException>(actual);
+            Assert.Contains("folder", ane.Message, Ordinal);
+        }
+
         [Property(DisplayName = "Mapping over null with a func mapper throws.")]
         public static void MapFunc_NullValue_Throws(Func<int, string> mapper)
         {
             var actual = Record.Exception(() => CollectionExtensions.Map(null, mapper));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: enumerableValue", ane.Message, Ordinal);
+            Assert.Contains("enumerableValue", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Mapping with a null func mapper throws.")]
@@ -114,7 +222,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => collection.Item.Map((Func<int, string>)null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: mapper", ane.Message, Ordinal);
+            Assert.Contains("mapper", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Mapping over a collection is the same as Select.")]
@@ -133,7 +241,7 @@ namespace Tiger.Types.UnitTest
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: enumerableValue", ane.Message, Ordinal);
+            Assert.Contains("enumerableValue", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Mapping with a null task mapper throws.")]
@@ -143,7 +251,7 @@ namespace Tiger.Types.UnitTest
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: mapper", ane.Message, Ordinal);
+            Assert.Contains("mapper", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Mapping over a collection is the same as Select.")]
@@ -161,7 +269,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => CollectionExtensions.MapCat(null, mapper));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: enumerableValue", ane.Message, Ordinal);
+            Assert.Contains("enumerableValue", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "MapCatting with a null mapper.")]
@@ -170,7 +278,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => collection.MapCat<int, string>(null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: mapper", ane.Message, Ordinal);
+            Assert.Contains("mapper", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "MapCatting, uh... MapCats successfully?")]

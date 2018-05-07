@@ -5,15 +5,11 @@ using Xunit;
 namespace Tiger.Types.UnitTest
 {
     /// <summary>Tests related to <see cref="OptionCollectionExtensions"/>.</summary>
-    public static class OptionEnumerableExtensionsTests
+    public static class OptionCollectionExtensionsTests
     {
         [Fact(DisplayName = "A null collection of options throws.")]
-        public static void Cat_Null_Throws()
-        {
-            var actual = Record.Exception(() => OptionCollectionExtensions.Cat<int>(null));
-
-            Assert.NotNull(actual);
-        }
+        public static void Cat_Null_Throws() =>
+            Assert.NotNull(Record.Exception(() => OptionCollectionExtensions.Cat<int>(null)));
 
         [Property(DisplayName = "A collection of None Options cats to an empty collection.")]
         public static void Cat_AllNone(byte count)
@@ -45,7 +41,6 @@ namespace Tiger.Types.UnitTest
 
             var actual = mixed.Cat().ToList();
 
-            //assert
             Assert.NotNull(actual);
             Assert.NotEmpty(actual);
             Assert.Equal(mixed.Count(o => o.IsSome), actual.Count);

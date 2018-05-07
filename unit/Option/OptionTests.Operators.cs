@@ -261,7 +261,7 @@ namespace Tiger.Types.UnitTest
                 return Option<string>.None;
             }
 
-            var dummy = Option.From(some.Get) || Right();
+            var _ = Option.From(some.Get) || Right();
 
             Assert.Equal(before.Get, actual);
         }
@@ -279,7 +279,7 @@ namespace Tiger.Types.UnitTest
                 return Option.From(some.Get);
             }
 
-            var dummy = Option.From(some.Get) || Right();
+            var _ = Option.From(some.Get) || Right();
 
             Assert.Equal(before.Get, actual);
         }
@@ -393,7 +393,7 @@ namespace Tiger.Types.UnitTest
                 return Option<string>.None;
             }
 
-            var dummy = Option<string>.None && Right();
+            var _ = Option<string>.None && Right();
 
             Assert.Equal(before.Get, actual);
         }
@@ -408,7 +408,7 @@ namespace Tiger.Types.UnitTest
                 return Option.From(sentinel.Get);
             }
 
-            var dummy = Option<string>.None && Right();
+            var _ = Option<string>.None && Right();
 
             Assert.Equal(before.Get, actual);
         }

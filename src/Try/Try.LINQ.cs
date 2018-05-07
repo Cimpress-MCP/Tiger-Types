@@ -211,6 +211,26 @@ namespace Tiger.Types
             return source.Let(onNext);
         }
 
+        /// <summary>Filters the Ok value of a try value based on a predicate.</summary>
+        /// <typeparam name="TErrSource">The Err type of <paramref name="source"/>.</typeparam>
+        /// <typeparam name="TOkSource">The Ok type of <paramref name="source"/>.</typeparam>
+        /// <param name="source">An <see cref="Option{TSome}"/> to filter.</param>
+        /// <param name="predicate">A function to test the Ok value for a condition.</param>
+        /// <returns>
+        /// An <see cref="Try{TErr, TOk}"/> that contains the value from the input
+        /// option value that satifies the condition.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is <see langword="null"/>.</exception>
+        [Pure, LinqTunnel, EditorBrowsable(Never)]
+        public static Try<TErrSource, TOkSource> Where<TErrSource, TOkSource>(
+            in this Try<TErrSource, TOkSource> source,
+            [NotNull, InstantHandle] Func<TOkSource, bool> predicate)
+        {
+            if (predicate is null) { throw new ArgumentNullException(nameof(predicate)); }
+
+            return source.Filter(predicate);
+        }
+
         /// <summary>Projects the Ok value of a try value into a new form.</summary>
         /// <typeparam name="TErrSource">The Err type of <paramref name="source"/>.</typeparam>
         /// <typeparam name="TOkSource">The Ok type of <paramref name="source"/>.</typeparam>
@@ -295,6 +315,25 @@ namespace Tiger.Types
             if (resultSelector is null) { throw new ArgumentNullException(nameof(resultSelector)); }
 
             return source.Bind(sv => source.Bind(trySelector).Map(cv => resultSelector(sv, cv)));
+        }
+
+        /// <summary>Applies an accumulator function over a try value.</summary>
+        /// <typeparam name="TErrSource">The Err type of <paramref name="source"/>.</typeparam>
+        /// <typeparam name="TOkSource">The Ok type of <paramref name="source"/>.</typeparam>
+        /// <typeparam name="TAccumulate">The type of the accumulator value.</typeparam>
+        /// <param name="source">A <see cref="Try{TErr, TOk}"/> to aggregate over.</param>
+        /// <param name="func">An accumulator function to invoke on the Ok value.</param>
+        /// <returns>The final accumulator value.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
+        [Pure, EditorBrowsable(Never)]
+        public static TAccumulate Aggregate<TErrSource, TOkSource, TAccumulate>(
+            in this Try<TErrSource, TOkSource> source,
+            [NotNull, InstantHandle] Func<TAccumulate, TOkSource, TAccumulate> func)
+            where TAccumulate : struct
+        {
+            if (func is null) { throw new ArgumentNullException(nameof(func)); }
+
+            return source.Fold(default, func);
         }
 
         /// <summary>Applies an accumulator function over a try value.</summary>

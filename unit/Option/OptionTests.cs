@@ -61,8 +61,8 @@ namespace Tiger.Types.UnitTest
         {
             var actual = Record.Exception(() => Option<string>.None.Value);
 
-            var ex = Assert.IsType<InvalidOperationException>(actual);
-            Assert.Contains(OptionIsNone, ex.Message, Ordinal);
+            var ioe = Assert.IsType<InvalidOperationException>(actual);
+            Assert.Contains(OptionIsNone, ioe.Message, Ordinal);
         }
 
         [Property(DisplayName = "Forcibly unwrapping a Some Option returns the Some value.")]
@@ -81,7 +81,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => option.GetValueOrDefault((string)null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: other", ane.Message, Ordinal);
+            Assert.Contains("other", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Coalescing a None Option with an alternative value returns the alternative value.")]
@@ -98,7 +98,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => option.GetValueOrDefault((Func<string>)null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: other", ane.Message, Ordinal);
+            Assert.Contains("other", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Coalescing a None Option with a func producing an alternative value returns the alternative value.")]
@@ -112,10 +112,10 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Coalescing an Option with a null task throws.")]
         public static async Task TaskGetOrDefault_Null_Throws(Option<string> option)
         {
-            var actual = await Record.ExceptionAsync(() => option.GetValueOrDefaultAsync((Func<Task<string>>)null)).ConfigureAwait(false);
+            var actual = await Record.ExceptionAsync(() => option.GetValueOrDefaultAsync(null)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: other", ane.Message, Ordinal);
+            Assert.Contains("other", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Coalescing a None Option with a task producing an alternative value returns the alternative value.")]
@@ -189,7 +189,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option.GetUnderlyingType(null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: optionalType", ane.Message, Ordinal);
+            Assert.Contains("optionalType", ane.Message, Ordinal);
         }
 
         [Theory(DisplayName = "The underlying type of an Option is accessible.")]

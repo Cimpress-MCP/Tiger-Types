@@ -14,10 +14,10 @@ namespace Tiger.Types.UnitTest
         [Fact(DisplayName = "Conditionally executing an action based on a None Option with a null action throws.")]
         public static void ActionLet_None_Null_Throws()
         {
-            var actual = Record.Exception(() => Option<string>.None.Let((Action<string>)null));
+            var actual = Record.Exception(() => Option<string>.None.Let(null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Conditionally executing an action based on a None Option does not execute.")]
@@ -32,10 +32,10 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Conditionally executing an action based on a Some Option with a null action throws.")]
         public static void ActionLet_Some_Null_Throws(NonEmptyString some)
         {
-            var actual = Record.Exception(() => Option.From(some.Get).Let((Action<string>)null));
+            var actual = Record.Exception(() => Option.From(some.Get).Let(null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Conditionally executing an action based on a Some Option executes.")]
@@ -53,7 +53,7 @@ namespace Tiger.Types.UnitTest
             var actual = await Record.ExceptionAsync(() => Option<string>.None.LetAsync(null)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Conditionally executing a task based on a None Option does not execute.")]
@@ -73,7 +73,7 @@ namespace Tiger.Types.UnitTest
             var actual = await Record.ExceptionAsync(() => Option.From(some.Get).LetAsync(null)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Conditionally executing a task based on a Some Option executes.")]

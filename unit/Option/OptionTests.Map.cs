@@ -17,7 +17,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option<string>.None.Map((Func<string, int>)null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Fact(DisplayName = "Mapping a None Option over a func returns a None Option.")]
@@ -34,7 +34,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option.From(some.Get).Map((Func<string, int>)null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Mapping a Some Option over a func returns a Some Option.")]
@@ -55,7 +55,7 @@ namespace Tiger.Types.UnitTest
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Fact(DisplayName = "Mapping a None Option over a task returns a None Option.")]
@@ -76,7 +76,7 @@ namespace Tiger.Types.UnitTest
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Mapping a Some Option over a task returns a Some Option.")]

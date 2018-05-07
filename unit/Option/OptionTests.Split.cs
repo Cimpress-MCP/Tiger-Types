@@ -14,10 +14,10 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Splitting a value over a null func throws.")]
         public static void FuncSplit_NullSplitter_Throws(string from)
         {
-            var actual = Record.Exception(() => Option.Split(from, splitter: (Func<string, bool>)null));
+            var actual = Record.Exception(() => Option.Split(from, splitter: null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: splitter", ane.Message, Ordinal);
+            Assert.Contains("splitter", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Splitting a null value over a func returns a None Option.")]
@@ -29,7 +29,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option.Split(some, splitter: (Func<int, bool>)null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: splitter", ane.Message, Ordinal);
+            Assert.Contains("splitter", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Splitting a null nullable value over a func returns a None Option.")]
@@ -68,11 +68,11 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskSplit_NullSplitter_Throws(string from)
         {
             var actual = await Record.ExceptionAsync(() => Option
-                .SplitAsync(from, splitter: (Func<string, Task<bool>>)null))
+                .SplitAsync(from, splitter: null))
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: splitter", ane.Message, Ordinal);
+            Assert.Contains("splitter", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Splitting a null value over a task returns a None Option.")]
@@ -91,7 +91,7 @@ namespace Tiger.Types.UnitTest
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: splitter", ane.Message, Ordinal);
+            Assert.Contains("splitter", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Splitting a nullable null value over a task returns a None Option.")]

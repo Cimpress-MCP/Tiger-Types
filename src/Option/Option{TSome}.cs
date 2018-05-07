@@ -54,7 +54,7 @@ namespace Tiger.Types
         /// <param name="value">The value to wrap.</param>
         internal Option([NotNull] TSome value)
         {
-            Assume(value != null, "Attempted to initialize Option with null value.");
+            Assume(value != null, OptionConstructNull);
 
             _value = value;
             IsSome = true;

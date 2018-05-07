@@ -26,7 +26,7 @@ namespace Tiger.Types.UnitTest
             Option.None
         };
 
-        [Theory(DisplayName = "All units are equal."), MemberData(nameof(ReflexiveEqualityData))]
+        [Theory(DisplayName = "All OptionNones are equal."), MemberData(nameof(ReflexiveEqualityData))]
         public static void Equality_Reflexive(OptionNone left, OptionNone right)
         {
             Assert.Equal(left, right);
@@ -44,22 +44,22 @@ namespace Tiger.Types.UnitTest
 
         [Theory(DisplayName = "An OptionNone is not equal to null."), MemberData(nameof(OptionNoneData))]
         [SuppressMessage("xUnit", "xUnit2002", Justification = "That's the test.")]
-        public static void Equality_Null(OptionNone optionNone) => Assert.NotNull(optionNone);
+        public static void Equality_Null(OptionNone none) => Assert.NotNull(none);
 
         [Theory(DisplayName = "An OptionNone has a hashcode of 0."), MemberData(nameof(OptionNoneData))]
-        public static void GetHashCode_Zero(OptionNone optionNone) =>
+        public static void GetHashCode_Zero(OptionNone none) =>
             // note(cosborn) Any value is fine, as long as they're equal. One might be better than zero.
-            Assert.Equal(0, optionNone.GetHashCode());
+            Assert.Equal(0, none.GetHashCode());
 
         [Theory(DisplayName = "An OptionNone stringfies to None."), MemberData(nameof(OptionNoneData))]
-        public static void ToString_Parens(OptionNone optionNone) => Assert.Equal("None", optionNone.ToString(), Ordinal);
+        public static void ToString_None(OptionNone none) => Assert.Equal("None", none.ToString(), Ordinal);
 
         [Theory(DisplayName = "An OptionNone dumps to a None Option."), MemberData(nameof(OptionNoneData))]
-        public static void Dump_Empty(OptionNone optionNone)
+        public static void Dump_Empty(OptionNone none)
         {
             var actual = typeof(OptionNone)
                 .GetMethod("ToDump", Instance | NonPublic)
-                .Invoke(optionNone, Array.Empty<object>());
+                .Invoke(none, Array.Empty<object>());
             var properties = actual
                 .GetType()
                 .GetProperties();

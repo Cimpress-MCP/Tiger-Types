@@ -17,7 +17,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => option.Bind((Func<string, Option<int>>)null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Binding a None Option over a func returns a None Option.")]
@@ -45,7 +45,7 @@ namespace Tiger.Types.UnitTest
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Binding a None Option over a task returns a None Option.")]

@@ -57,7 +57,7 @@ namespace Tiger.Types
         internal Either([NotNull] TLeft leftValue)
             : this()
         {
-            if (leftValue == null) { throw new ArgumentNullException(nameof(leftValue)); }
+            Assume(leftValue != null, EitherConstructNull);
 
             _leftValue = leftValue;
             State = Left;
@@ -71,7 +71,7 @@ namespace Tiger.Types
         internal Either([NotNull] TRight rightValue)
             : this()
         {
-            if (rightValue == null) { throw new ArgumentNullException(nameof(rightValue)); }
+            Assume(rightValue != null, EitherConstructNull);
 
             _rightValue = rightValue;
             State = Right;
@@ -195,29 +195,29 @@ namespace Tiger.Types
         /// <summary>
         /// Creates an <see cref="Either{TLeft,TRight}"/> in the Left state from the provided value.
         /// </summary>
-        /// <param name="value">The value to wrap.</param>
+        /// <param name="left">The value to wrap.</param>
         /// <returns>An <see cref="Either{TLeft,TRight}"/> in the Left state.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> is <see langword="null"/>.</exception>
         [Pure]
-        public static Either<TLeft, TRight> From([NotNull] TLeft value)
+        public static Either<TLeft, TRight> From([NotNull] TLeft left)
         {
-            if (value == null) { throw new ArgumentNullException(nameof(value)); }
+            if (left == null) { throw new ArgumentNullException(nameof(left)); }
 
-            return new Either<TLeft, TRight>(value);
+            return new Either<TLeft, TRight>(left);
         }
 
         /// <summary>
         /// Creates an <see cref="Either{TLeft,TRight}"/> in the Right state from the provided value.
         /// </summary>
-        /// <param name="value">The value to wrap.</param>
+        /// <param name="right">The value to wrap.</param>
         /// <returns>An <see cref="Either{TLeft,TRight}"/> in the Right state.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="right"/> is <see langword="null"/>.</exception>
         [Pure]
-        public static Either<TLeft, TRight> From([NotNull] TRight value)
+        public static Either<TLeft, TRight> From([NotNull] TRight right)
         {
-            if (value == null) { throw new ArgumentNullException(nameof(value)); }
+            if (right == null) { throw new ArgumentNullException(nameof(right)); }
 
-            return new Either<TLeft, TRight>(value);
+            return new Either<TLeft, TRight>(right);
         }
 
         #region Match

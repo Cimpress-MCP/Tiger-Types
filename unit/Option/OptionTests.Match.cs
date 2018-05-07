@@ -19,7 +19,7 @@ namespace Tiger.Types.UnitTest
                 some: some));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+            Assert.Contains("none", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching an Option with a null some func throws.")]
@@ -27,10 +27,10 @@ namespace Tiger.Types.UnitTest
         {
             var actual = Record.Exception(() => option.Match(
                 none: none.Get,
-                some: (Func<int, string>)null));
+                some: null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching a None Option returns the None value branch, " +
@@ -63,7 +63,7 @@ namespace Tiger.Types.UnitTest
                 some: some)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+            Assert.Contains("none", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching an Option with a null Some task throws.")]
@@ -71,10 +71,10 @@ namespace Tiger.Types.UnitTest
         {
             var actual = await Record.ExceptionAsync(() => option.MatchAsync(
                 none: none.Get,
-                some: (Func<int, Task<string>>)null)).ConfigureAwait(false);
+                some: null)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching a None Option returns the None value branch, " +
@@ -109,7 +109,7 @@ namespace Tiger.Types.UnitTest
                 some: some));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+            Assert.Contains("none", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching an Option with a null Some func throws.")]
@@ -120,7 +120,7 @@ namespace Tiger.Types.UnitTest
                 some: (Func<int, string>)null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching a None Option returns the None func branch, " +
@@ -153,7 +153,7 @@ namespace Tiger.Types.UnitTest
                 some: some)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+            Assert.Contains("none", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching an Option with a null Some task throws.")]
@@ -164,7 +164,7 @@ namespace Tiger.Types.UnitTest
                 some: (Func<int, Task<string>>)null)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching a None Option returns the None func branch, " +
@@ -195,11 +195,11 @@ namespace Tiger.Types.UnitTest
         public static async Task TaskFuncMatchReturn_NullNone_Throw(Option<int> option, Func<int, string> some)
         {
             var actual = await Record.ExceptionAsync(() => option.MatchAsync(
-                none: (Func<Task<string>>)null,
+                none: null,
                 some: some)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+            Assert.Contains("none", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching an Option with a null Some func throws.")]
@@ -210,7 +210,7 @@ namespace Tiger.Types.UnitTest
                 some: (Func<int, string>)null)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching a None Option returns the None task branch, " +
@@ -245,7 +245,7 @@ namespace Tiger.Types.UnitTest
                 some: some)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+            Assert.Contains("none", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching an Option with a null Some task throws.")]
@@ -256,7 +256,7 @@ namespace Tiger.Types.UnitTest
                 some: (Func<int, Task<string>>)null)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching a None Option returns the None task branch, " +
@@ -287,11 +287,11 @@ namespace Tiger.Types.UnitTest
         public static void ActionActionMatchVoid_NullNone_Throw(Option<int> option, Action<int> some)
         {
             var actual = Record.Exception(() => option.Match(
-                none: (Action)null,
+                none: null,
                 some: some));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+            Assert.Contains("none", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching an Option with a null Some func throws.")]
@@ -299,10 +299,10 @@ namespace Tiger.Types.UnitTest
         {
             var actual = Record.Exception(() => option.Match(
                 none: () => { },
-                some: (Action<int>)null));
+                some: null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching a None Option executes the None action branch, " +
@@ -338,7 +338,7 @@ namespace Tiger.Types.UnitTest
                 some: some)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+            Assert.Contains("none", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching an Option with a null Some task throws.")]
@@ -346,10 +346,10 @@ namespace Tiger.Types.UnitTest
         {
             var actual = await Record.ExceptionAsync(() => option.MatchAsync(
                 none: () => { },
-                some: (Func<int, Task>)null)).ConfigureAwait(false);
+                some: null)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching a None Option executes the None action branch, " +
@@ -386,7 +386,7 @@ namespace Tiger.Types.UnitTest
                 some: some)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+            Assert.Contains("none", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching an Option with a null Some action throws.")]
@@ -397,7 +397,7 @@ namespace Tiger.Types.UnitTest
                 some: (Action<int>)null)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching a None Option executes the None task branch, " +
@@ -434,7 +434,7 @@ namespace Tiger.Types.UnitTest
                 some: some)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: none", ane.Message, Ordinal);
+            Assert.Contains("none", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching an Option with a null Some task throws.")]
@@ -445,7 +445,7 @@ namespace Tiger.Types.UnitTest
                 some: (Func<int, Task>)null)).ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: some", ane.Message, Ordinal);
+            Assert.Contains("some", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Matching a None Option executes the None task branch, " +

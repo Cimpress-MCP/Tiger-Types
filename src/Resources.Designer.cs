@@ -62,6 +62,15 @@ namespace Tiger.Types {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Attempted to initialize Tiger.Types.Either`2[TLeft,TRight] with null value..
+        /// </summary>
+        public static string EitherConstructNull {
+            get {
+                return ResourceManager.GetString("EitherConstructNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This instance has not been initialized..
         /// </summary>
         public static string EitherIsBottom {
@@ -94,6 +103,15 @@ namespace Tiger.Types {
         public static string IncompatibleType {
             get {
                 return ResourceManager.GetString("IncompatibleType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Attempted to initialize Tiger.Types.Option`1[TSome] with null value..
+        /// </summary>
+        public static string OptionConstructNull {
+            get {
+                return ResourceManager.GetString("OptionConstructNull", resourceCulture);
             }
         }
         

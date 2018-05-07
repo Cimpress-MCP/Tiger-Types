@@ -48,7 +48,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option.From(from).Any(predicate: null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: predicate", ane.Message, Ordinal);
+            Assert.Contains("predicate", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Asking a None Option for any returns false.")]
@@ -64,7 +64,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option.From(from).All(predicate: null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: predicate", ane.Message, Ordinal);
+            Assert.Contains("predicate", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Asking a None Option for all returns true.")]
@@ -72,7 +72,7 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Asking a Some Option for all returns the result of the predicate.")]
         public static void All_Some(NonEmptyString some, bool result) =>
-            Assert.Equal(Option.From(some.Get).All(_ => result), result);
+            Assert.Equal(result, Option.From(some.Get).All(_ => result));
 
         [Property(DisplayName = "Asking an option whether it contains null throws.")]
         public static void Contains_Null_Throws(string from)
@@ -80,7 +80,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option.From(from).Contains(value: null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: value", ane.Message, Ordinal);
+            Assert.Contains("value", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Asking a None Option whether it contains a value returns false.")]
@@ -100,7 +100,7 @@ namespace Tiger.Types.UnitTest
                 .Contains(value: null, equalityComparer: StringComparer.Ordinal));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: value", ane.Message, Ordinal);
+            Assert.Contains("value", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Asking a None Option whether it contains a value returns false.")]
@@ -135,22 +135,13 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(some, innerValue);
         }
 
-        [Fact(DisplayName = "Recovering a None Option with null throws.")]
-        public static void ValueDefaultIfEmpty_None_Null_Throws()
+        [Property(DisplayName = "Recovering an Option with null throws.")]
+        public static void ValueDefaultIfEmpty_None_Null_Throws(Option<string> option)
         {
-            var actual = Record.Exception(() => Option<string>.None.DefaultIfEmpty(null));
+            var actual = Record.Exception(() => option.DefaultIfEmpty(defaultValue: null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: defaultValue", ane.Message, Ordinal);
-        }
-
-        [Property(DisplayName = "Recovering a Some Option with null throws.")]
-        public static void ValueDefaultIfEmpty_Some_Null_Throws(NonEmptyString some)
-        {
-            var actual = Record.Exception(() => Option.From(some.Get).DefaultIfEmpty(null));
-
-            var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: defaultValue", ane.Message, Ordinal);
+            Assert.Contains("defaultValue", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Recovering a None Option returns the recovery value.")]
@@ -174,12 +165,12 @@ namespace Tiger.Types.UnitTest
         }
 
         [Property(DisplayName = "Tapping an Option over a null func throws.")]
-        public static void Do_Some_Null_Throws(string from)
+        public static void Do_Some_Null_Throws(Option<string> option)
         {
-            var actual = Record.Exception(() => Option.From(from).Do(null));
+            var actual = Record.Exception(() => option.Do(onNext: null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: onNext", ane.Message, Ordinal);
+            Assert.Contains("onNext", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Tapping a None Option over a func returns a None Option and performs no action.")]
@@ -195,12 +186,10 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Tapping a Some Option over a func returns a Some Option and performs an action.")]
         public static void Do_Some(NonEmptyString some, NonEmptyString before, NonEmptyString sentinel)
         {
-            var value = Option.From(some.Get);
-
             var output = before.Get;
-            var actual = value.Do(_ => output = sentinel.Get);
+            var actual = Option.From(some.Get).Do(_ => output = sentinel.Get);
 
-            Assert.Equal(value, actual);
+            Assert.True(actual.IsSome);
             Assert.Equal(sentinel.Get, output);
         }
 
@@ -210,7 +199,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option.From(from).ForEach(null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: onNext", ane.Message, Ordinal);
+            Assert.Contains("onNext", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Conditionally executing an action based on a None Option does not execute.")]
@@ -237,7 +226,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option.From(from).Select<string, string>(selector: null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: selector", ane.Message, Ordinal);
+            Assert.Contains("selector", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Selecting a None Option produces a None Option.")]
@@ -262,7 +251,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option.From(from).Where(predicate: null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: predicate", ane.Message, Ordinal);
+            Assert.Contains("predicate", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Filtering a None Option produces a None Option.")]
@@ -296,7 +285,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option.From(from).SelectMany<string, Option<string>>(selector: null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: selector", ane.Message, Ordinal);
+            Assert.Contains("selector", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Selecting from an Option with a null optional selector throws.")]
@@ -308,7 +297,7 @@ namespace Tiger.Types.UnitTest
                 .SelectMany(optionalSelector: null, resultSelector: resultSelector));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: optionalSelector", ane.Message, Ordinal);
+            Assert.Contains("optionalSelector", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Selecting from an Option with a null result selector throws.")]
@@ -318,7 +307,7 @@ namespace Tiger.Types.UnitTest
                 .SelectMany<string, string, string>(optionalSelector: Option.From, resultSelector: null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: resultSelector", ane.Message, Ordinal);
+            Assert.Contains("resultSelector", ane.Message, Ordinal);
         }
 
         [Fact(DisplayName = "Selecting from two None Options produces a None Option.")]
@@ -388,7 +377,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option.From(from).Aggregate<string, int>(func: null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: func", ane.Message, Ordinal);
+            Assert.Contains("func", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Folding over a None Option returns the default.")]
@@ -405,7 +394,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option.From(from).Aggregate(seed: null, func: func));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: seed", ane.Message, Ordinal);
+            Assert.Contains("seed", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Folding over an option with a null aggregator throws.")]
@@ -414,7 +403,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option.From(from).Aggregate(seed, func: null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: func", ane.Message, Ordinal);
+            Assert.Contains("func", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Folding over a None Option returns the seed value.")]
@@ -435,7 +424,7 @@ namespace Tiger.Types.UnitTest
                 .Aggregate(seed: null, func: func, resultSelector: resultSelector));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: seed", ane.Message, Ordinal);
+            Assert.Contains("seed", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Folding over an option with a null aggregator throws.")]
@@ -445,7 +434,7 @@ namespace Tiger.Types.UnitTest
                 .Aggregate(seed, func: null, resultSelector: resultSelector));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: func", ane.Message, Ordinal);
+            Assert.Contains("func", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Folding over an option with a null result selector throws.")]
@@ -455,7 +444,7 @@ namespace Tiger.Types.UnitTest
                 .Aggregate<string, int, int>(seed, func: func, resultSelector: null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: resultSelector", ane.Message, Ordinal);
+            Assert.Contains("resultSelector", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Folding over a None Option returns the transformed seed value.")]

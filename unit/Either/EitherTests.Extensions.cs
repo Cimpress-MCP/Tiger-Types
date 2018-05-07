@@ -26,64 +26,64 @@ namespace Tiger.Types.UnitTest
             Assert.Equal(right, Either<string, int>.From(right).Assert(left));
 
         [Property(DisplayName = "Asking a Left Either for any returns false.")]
-        public static void Any_Left(Guid left) => Assert.False(Either.Left<Guid, Version>(left).Any());
+        public static void Any_Left(Guid left) => Assert.False(Either.From<Guid, Version>(left).Any());
 
         [Property(DisplayName = "Asking a Right Either for any returns true.")]
-        public static void Any_Right(Version right) => Assert.True(Either.Right<Guid, Version>(right).Any());
+        public static void Any_Right(Version right) => Assert.True(Either.From<Guid, Version>(right).Any());
 
         [Property(DisplayName = "Asking a Left Either for any returns false.")]
         public static void PredicateAny_LeftFalse(Guid left, bool predicate) =>
-            Assert.False(Either.Left<Guid, Version>(left).Any(_ => predicate));
+            Assert.False(Either.From<Guid, Version>(left).Any(_ => predicate));
 
         [Property(DisplayName = "Asking a Right Either for any with a false predicate returns false.")]
         public static void PredicateAny_RightFalse(Version right) =>
-            Assert.False(Either.Right<Guid, Version>(right).Any(_ => false));
+            Assert.False(Either.From<Guid, Version>(right).Any(_ => false));
 
         [Property(DisplayName = "Asking a Right Either for any with a true predicate returns true.")]
-        public static void PredicateAny_RightTrue(Version right) => Assert.True(Either.Right<Guid, Version>(right).Any(_ => true));
+        public static void PredicateAny_RightTrue(Version right) => Assert.True(Either.From<Guid, Version>(right).Any(_ => true));
 
         [Property(DisplayName = "Asking a Left Either for all returns true.")]
-        public static void PredicateAll_LeftFalse(Guid left, bool predicate) =>
-            Assert.True(Either.Left<Guid, Version>(left).All(_ => predicate));
+        public static void PredicateAll_LeftFalse(Guid left, Func<Version, bool> predicate) =>
+            Assert.True(Either.From<Guid, Version>(left).All(predicate));
 
         [Property(DisplayName = "Asking a Left Either for all with a true predicate returns true.")]
-        public static void PredicateAll_LeftTrue(Guid left) => Assert.True(Either.Left<Guid, Version>(left).All(_ => true));
+        public static void PredicateAll_LeftTrue(Guid left) => Assert.True(Either.From<Guid, Version>(left).All(_ => true));
 
         [Property(DisplayName = "Asking a Right Either for all with a false predicate returns false.")]
         public static void PredicateAll_RightFalse(Version right) =>
-            Assert.False(Either.Right<Guid, Version>(right).All(_ => false));
+            Assert.False(Either.From<Guid, Version>(right).All(_ => false));
 
         [Property(DisplayName = "Asking a Right Either for all with a true predicate returns true.")]
-        public static void PredicateAll_RightTrue(Version right) => Assert.True(Either.Right<Guid, Version>(right).All(_ => true));
+        public static void PredicateAll_RightTrue(Version right) => Assert.True(Either.From<Guid, Version>(right).All(_ => true));
 
         [Property(DisplayName = "Asking a Left Either whether it contains a value returns false.")]
         public static void Contains_Left(Guid left, Version contains) =>
-            Assert.False(Either.Left<Guid, Version>(left).Contains(contains));
+            Assert.False(Either.From<Guid, Version>(left).Contains(contains));
 
         [Property(DisplayName = "Asking a Right Either whether it contains a value that it doesn't returns false.")]
         public static void Contains_Right_False(UnequalPair<Version> values) =>
-            Assert.False(Either.Right<Guid, Version>(values.Right).Contains(values.Left));
+            Assert.False(Either.From<Guid, Version>(values.Right).Contains(values.Left));
 
         [Property(DisplayName = "Asking a Right Either whether it contains a value that it does returns true.")]
         public static void Contains_Right_True(Version right) =>
-            Assert.True(Either.Right<Guid, Version>(right).Contains(right));
+            Assert.True(Either.From<Guid, Version>(right).Contains(right));
 
         [Property(DisplayName = "Asking a Left Either whether it contains a value returns false.")]
         public static void ComparerContains_Left(Guid left, NonEmptyString contains) =>
-            Assert.False(Either.Left<Guid, string>(left).Contains(contains.Get, StringComparer.Ordinal));
+            Assert.False(Either.From<Guid, string>(left).Contains(contains.Get, StringComparer.Ordinal));
 
         [Property(DisplayName = "Asking a Right Either whether it contains a value that it doesn't returns false.")]
         public static void ComparerContains_Right_False(UnequalNonNullPair<string> values) =>
-            Assert.False(Either.Right<Guid, string>(values.Right).Contains(values.Left, StringComparer.Ordinal));
+            Assert.False(Either.From<Guid, string>(values.Right).Contains(values.Left, StringComparer.Ordinal));
 
         [Property(DisplayName = "Asking a Right Either whether it contains a value that it does returns true.")]
         public static void ComparerContains_Right_True(NonEmptyString right) =>
-            Assert.True(Either.Right<Guid, string>(right.Get).Contains(right.Get, StringComparer.Ordinal));
+            Assert.True(Either.From<Guid, string>(right.Get).Contains(right.Get, StringComparer.Ordinal));
 
         [Property(DisplayName = "Recovering a Left Either returns the recovery value.")]
         public static void DefaultIfEmpty_Left(NonEmptyString left)
         {
-            var actual = Either.Left<string, int>(left.Get).DefaultIfEmpty();
+            var actual = Either.From<string, int>(left.Get).DefaultIfEmpty();
 
             Assert.True(actual.IsRight);
             var innerValue = (int)actual;
@@ -93,7 +93,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Recovering a Right Either returns the Right value.")]
         public static void DefaultIfEmpty_Right(UnequalPair<int> values)
         {
-            var actual = Either.Right<string, int>(values.Right).Recover(values.Left);
+            var actual = Either.From<string, int>(values.Right).Recover(values.Left);
 
             Assert.True(actual.IsRight);
             var innerValue = (int)actual;
@@ -114,7 +114,7 @@ namespace Tiger.Types.UnitTest
         public static void Do_Left(NonEmptyString left, Guid before, Guid sentinel)
         {
             var output = before;
-            var actual = Either.Left<string, int>(left.Get).Do(_ => output = sentinel);
+            var actual = Either.From<string, int>(left.Get).Do(_ => output = sentinel);
 
             Assert.True(actual.IsLeft);
             var innerValue = (string)actual;
@@ -126,7 +126,7 @@ namespace Tiger.Types.UnitTest
         public static void Do_Right(int right, Guid before, Guid sentinel)
         {
             var output = before;
-            var actual = Either.Right<string, int>(right).Do(_ => output = sentinel);
+            var actual = Either.From<string, int>(right).Do(_ => output = sentinel);
 
             Assert.True(actual.IsRight);
             var innerValue = (int)actual;
@@ -138,7 +138,7 @@ namespace Tiger.Types.UnitTest
         public static void ForEach_Left(Guid left, Version before)
         {
             var actual = before;
-            Either.Left<Guid, Version>(left).ForEach(v => actual = v);
+            Either.From<Guid, Version>(left).ForEach(v => actual = v);
 
             Assert.Equal(before, actual);
         }
@@ -147,7 +147,7 @@ namespace Tiger.Types.UnitTest
         public static void ForEach_Right(Version right, Version before)
         {
             var actual = before;
-            Either.Right<Guid, Version>(right).ForEach(v => actual = v);
+            Either.From<Guid, Version>(right).ForEach(v => actual = v);
 
             Assert.Equal(right, actual);
         }
@@ -155,7 +155,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Selecting a Left Either produces a Left Either.")]
         public static void Select_Left(NonEmptyString left)
         {
-            var actual = Either.Left<string, int>(left.Get).Select(v => v + 1);
+            var actual = Either.From<string, int>(left.Get).Select(v => v + 1);
 
             Assert.True(actual.IsLeft);
             var innerValue = (string)actual;
@@ -165,7 +165,7 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Selecting a Right Either produces a Right Either.")]
         public static void Select_Right(int right)
         {
-            var actual = Either.Right<string, int>(right).Select(v => v + 1);
+            var actual = Either.From<string, int>(right).Select(v => v + 1);
 
             Assert.True(actual.IsRight);
             Assert.Equal(right + 1, actual.Value);
@@ -183,8 +183,8 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Selecting from two Left eithers produces a Left either.")]
         public static void SelectManyResult_LeftLeft(NonEmptyString leftValue, NonEmptyString rightValue)
         {
-            var actual = from l in Either.Left<string, int>(leftValue.Get)
-                         from r in Either.Left<string, int>(rightValue.Get)
+            var actual = from l in Either.From<string, int>(leftValue.Get)
+                         from r in Either.From<string, int>(rightValue.Get)
                          select l + r;
 
             Assert.True(actual.IsLeft);
@@ -195,8 +195,8 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Selecting from a Left Either and a Right Either produces a Left Either.")]
         public static void SelectManyResult_LeftRight(NonEmptyString leftValue, int rightValue)
         {
-            var actual = from l in Either.Left<string, int>(leftValue.Get)
-                         from r in Either.Right<string, int>(rightValue)
+            var actual = from l in Either.From<string, int>(leftValue.Get)
+                         from r in Either.From<string, int>(rightValue)
                          select l + r;
 
             Assert.True(actual.IsLeft);
@@ -207,8 +207,8 @@ namespace Tiger.Types.UnitTest
         [Property(DisplayName = "Selecting from two Right eithers produces a Right either.")]
         public static void SelectManyResult_RightRight(int leftValue, int rightValue)
         {
-            var actual = from l in Either.Right<string, int>(leftValue)
-                         from r in Either.Right<string, int>(rightValue)
+            var actual = from l in Either.From<string, int>(leftValue)
+                         from r in Either.From<string, int>(rightValue)
                          select l + r;
 
             Assert.False(actual.IsLeft);
@@ -219,20 +219,20 @@ namespace Tiger.Types.UnitTest
 
         [Property(DisplayName = "Folding over a Left Either returns the seed value.")]
         public static void Aggregate_Left(NonEmptyString left, int seed) =>
-            Assert.Equal(seed, Either.Left<string, int>(left.Get).Aggregate(seed, (s, v) => s + v));
+            Assert.Equal(seed, Either.From<string, int>(left.Get).Aggregate(seed, (s, v) => s + v));
 
         [Property(DisplayName = "Folding over a Right Either returns the result of invoking the accumulator over the seed value and the Right value.")]
         public static void Aggregate_Right(int right, int seed) =>
-            Assert.Equal(seed + right, Either.Right<string, int>(right).Aggregate(seed, (s, v) => s + v));
+            Assert.Equal(seed + right, Either.From<string, int>(right).Aggregate(seed, (s, v) => s + v));
 
         [Property(DisplayName = "Folding over a Left Either returns the seed value.")]
         public static void ResultAggregate_Left(NonEmptyString left, int seed) =>
-            Assert.Equal(seed * 2, Either.Left<string, int>(left.Get).Aggregate(seed, (s, v) => s + v, v => v * 2));
+            Assert.Equal(seed * 2, Either.From<string, int>(left.Get).Aggregate(seed, (s, v) => s + v, v => v * 2));
 
         [Property(DisplayName = "Folding over a Right Either returns the result of invoking the accumulator over the seed value and the Right value.")]
         public static void ResultAggregate_Right(int right, int seed)
         {
-            var actual = Either.Right<string, int>(right).Aggregate(seed, (s, v) => s + v, v => v * 2);
+            var actual = Either.From<string, int>(right).Aggregate(seed, (s, v) => s + v, v => v * 2);
 
             var expected = (seed + right) * 2;
             Assert.Equal(expected, actual);

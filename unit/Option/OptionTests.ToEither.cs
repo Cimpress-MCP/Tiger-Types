@@ -17,7 +17,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option.From(from).ToEither(fallback: (Version)null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: fallback", ane.Message, Ordinal);
+            Assert.Contains("fallback", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Converting a None Option to an Either results in a Left Either.")]
@@ -46,7 +46,7 @@ namespace Tiger.Types.UnitTest
             var actual = Record.Exception(() => Option.From(from).ToEither(fallback: (Func<Version>)null));
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: fallback", ane.Message, Ordinal);
+            Assert.Contains("fallback", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Converting a None Option to an Either results in a Left Either.")]
@@ -77,7 +77,7 @@ namespace Tiger.Types.UnitTest
                 .ConfigureAwait(false);
 
             var ane = Assert.IsType<ArgumentNullException>(actual);
-            Assert.Contains("Parameter name: fallback", ane.Message, Ordinal);
+            Assert.Contains("fallback", ane.Message, Ordinal);
         }
 
         [Property(DisplayName = "Converting a None Option to an Either results in a Left Either.")]

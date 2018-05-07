@@ -15,10 +15,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Test.csproj.DotSettings" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\src\Tiger.Types.csproj" />
   </ItemGroup>
 
