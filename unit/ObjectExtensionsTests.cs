@@ -1,29 +1,20 @@
-﻿// ReSharper disable All
-
-using System;
+﻿using FsCheck.Xunit;
 using Xunit;
 
 namespace Tiger.Types.UnitTest
 {
     /// <summary>Tests related to <see cref="ObjectExtensions"/>.</summary>
-    public sealed class ObjectExtensionsTests
+    public static class ObjectExtensionsTests
     {
         #region Pipe
 
-        [Fact(DisplayName= "Piping a value through a function is identical to invoking the " +
-                           "function with that value directly.")]
-        public void Pipe()
+        [Property(DisplayName = "Piping a value through a function is identical to invoking the " +
+            "function with that value directly.")]
+        public static void Pipe(int value)
         {
-            // arrange
-            var value = 0;
-            Func<int, int> piper = v => v + 1;
+            int Piper(int v) => v + 1;
 
-            // act
-            var expected = piper(value);
-            var actual = value.Pipe(piper);
-
-            // assert
-            Assert.Equal(expected, actual);
+            Assert.Equal(Piper(value), value.Pipe(Piper));
         }
 
         #endregion

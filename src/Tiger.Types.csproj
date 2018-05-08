@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <Description>A collection of useful types and operations on types.</Description>
-    <Copyright>©Cimpress 2016–2017</Copyright>
+    <Copyright>©Cimpress 2016–2018</Copyright>
     <AssemblyTitle>Tiger Types</AssemblyTitle>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <VersionPrefix>4.0.0</VersionPrefix>
+    <VersionPrefix>5.0.0</VersionPrefix>
     <Authors>cosborn@cimpress.com</Authors>
-    <TargetFramework>netstandard1.0</TargetFramework>
+    <TargetFrameworks>netstandard1.0;netstandard2.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);CODE_ANALYSIS;CONTRACTS_FULL</DefineConstants>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugType>portable</DebugType>
@@ -16,44 +16,59 @@
     <CodeAnalysisRuleSet>../Tiger.ruleset</CodeAnalysisRuleSet>
     <AssemblyName>Tiger.Types</AssemblyName>
     <PackageId>Tiger.Types</PackageId>
-    <PackageTags>option;maybe;either;union;task;functional</PackageTags>
-    <PackageReleaseNotes>⁃ Types that obey the monad laws have grown a `Join` method.
-⁃ The `Bind` operation on many types has been made more efficient.
-⁃ Asynchronous operations have been made significantly more efficient.
-⁃ Collections have learned some new tricks, such as folding asynchronously.
-⁃ Equlity operations have been made slightly more efficient.
-⁃ Many extension methods have been moved into a more easily imported namespace.
-</PackageReleaseNotes>
+    <PackageTags>option;maybe;either;try;task;functional</PackageTags>
+    <PackageReleaseNotes><![CDATA[➟ Release 5.0.0
+⁃ The library has been refactored completely, consuming much of the functionality of the deprecated Tiger.ErrorTypes.
+⁃ See the wiki for migration details: https://github.com/Cimpress-MCP/Tiger-Types/wiki/Migration-to-5.0
+⁃ The library now supports multiple target frameworks.
+⁃ Relevant types have been marked as `readonly`, increasing performance in some scenarios.
+  ⁃ Accordingly, many methods have been annotated with `in`.
+⁃ The `Error` type has been promoted from Tiger.ErrorTypes.
+⁃ The `Try<TErr, TOk>` type has arrived, providing the functionality of an optional either.]]></PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/Cimpress-MCP</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/Cimpress-MCP/Tiger-Types/develop/tiger_logo.png</PackageIconUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/Cimpress-MCP/Tiger-Types/master/tiger_logo.png</PackageIconUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Cimpress-MCP/Tiger-Types.git</RepositoryUrl>
   </PropertyGroup>
 
   <PropertyGroup>
     <Features>IOperation</Features>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   
   <ItemGroup>
     <AdditionalFiles Include="../stylecop.json" />
-    <None Remove="Tiger.Types.csproj.DotSettings" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
+    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.Contracts" Version="4.3.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
+    
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.0" PrivateAssets="All" /> 
+    <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="2.6.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.NetCore.Analyzers" Version="2.6.0" PrivateAssets="All" /> 
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta006" PrivateAssets="All" /> 
+    <PackageReference Include="Text.Analyzers" Version="2.6.0" PrivateAssets="All" /> 
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Collections.Immutable" Version="1.3.1" />
-    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.Contracts" Version="4.3.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.3.1" />
+    <Compile Update="Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
 
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta004">
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Runtime.Analyzers" Version="1.2.0-beta2">
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Collections.Immutable.Analyzers" Version="1.2.0-beta2">
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
+  <ItemGroup>
+    <EmbeddedResource Update="Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

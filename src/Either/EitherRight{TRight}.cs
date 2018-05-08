@@ -15,24 +15,26 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 using static System.ComponentModel.EditorBrowsableState;
 using static System.Runtime.InteropServices.LayoutKind;
+using static Tiger.Types.EitherState;
 
 namespace Tiger.Types
 {
-    /// <summary>A partially-applied <see cref="Either{TLeft,TRight}"/> in the Right state.</summary>
+    /// <summary>A partially applied <see cref="Either{TLeft,TRight}"/> in the Right state.</summary>
     /// <typeparam name="TRight">The applied Right type.</typeparam>
     [EditorBrowsable(Never)]
     [StructLayout(Auto)]
-    public partial struct EitherRight<TRight>
+    [SuppressMessage("Microsoft:Guidelines", "CA1066", Justification = "Type system isn't rich enough to prove this.")]
+    public readonly struct EitherRight<TRight>
     {
         /// <summary>Initializes a new instance of the <see cref="EitherRight{TRight}"/> struct.</summary>
-        /// <param name="value">The value to be wrapped.</param>
-        [SuppressMessage("Style", "IDE0016:Use 'throw' expression", Justification = "Analyzer bug.")]
+        /// <param name="value">The value to wrap.</param>
         internal EitherRight([NotNull] TRight value)
         {
             if (value == null) { throw new ArgumentNullException(nameof(value)); }
@@ -42,5 +44,45 @@ namespace Tiger.Types
 
         /// <summary>Gets the internal value of this instance.</summary>
         internal TRight Value { get; }
+
+        /// <summary>Compare two instances of <see cref="EitherRight{TRight}"/> for equality.</summary>
+        /// <param name="left">The left instance of <see cref="EitherRight{TRight}"/>.</param>
+        /// <param name="right">The right instance of <see cref="EitherRight{TRight}"/>.</param>
+        /// <returns>
+        /// <see langword="true"/> if the two instances are equal,
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        public static bool operator ==(EitherRight<TRight> left, EitherRight<TRight> right) => left.EqualsCore(right);
+
+        /// <summary>Compare two instances of <see cref="EitherRight{TRight}"/> for inequality.</summary>
+        /// <param name="left">The left instance of <see cref="EitherRight{TRight}"/>.</param>
+        /// <param name="right">The right instance of <see cref="EitherRight{TRight}"/>.</param>
+        /// <returns>
+        /// <see langword="true"/> if the two instances are unequal,
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        public static bool operator !=(EitherRight<TRight> left, EitherRight<TRight> right) => !(left == right);
+
+        /// <inheritdoc/>
+        [NotNull, Pure]
+        public override string ToString() => $"Right({Value})";
+
+        /// <inheritdoc/>
+        [Pure]
+        public override bool Equals(object obj) => obj is EitherRight<TRight> eitherRight && EqualsCore(eitherRight);
+
+        /// <inheritdoc/>
+        [Pure]
+        public override int GetHashCode() => Value.GetHashCode();
+
+        [Pure]
+        bool EqualsCore(in EitherRight<TRight> other) => EqualityComparer<TRight>.Default.Equals(Value, other.Value);
+
+        [NotNull, Pure, UsedImplicitly]
+        object ToDump() => new
+        {
+            State = Right,
+            Value
+        };
     }
 }

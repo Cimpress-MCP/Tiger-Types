@@ -15,7 +15,9 @@
 // </copyright>
 
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using JetBrains.Annotations;
 using static System.ComponentModel.EditorBrowsableState;
 using static System.Runtime.InteropServices.LayoutKind;
 
@@ -24,7 +26,53 @@ namespace Tiger.Types
     /// <summary>A None state that can be cast to an <see cref="Option{TSome}"/> of any type.</summary>
     [EditorBrowsable(Never)]
     [StructLayout(Auto)]
-    public partial struct OptionNone
+    [SuppressMessage("Microsoft:Guidelines", "CA1066", Justification = "Type system isn't rich enough to prove this.")]
+    public readonly struct OptionNone
     {
+        #region Operators
+
+        /// <summary>Compare two instances of <see cref="OptionNone"/> for equality.</summary>
+        /// <param name="left">The left instance of <see cref="OptionNone"/>.</param>
+        /// <param name="right">The right instance of <see cref="OptionNone"/>.</param>
+        /// <returns>
+        /// <see langword="true"/> if the two instances are equal;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        [SuppressMessage("Roslynator", "RCS1163", Justification = "All instances are equal.")]
+        public static bool operator ==(OptionNone left, OptionNone right) => true;
+
+        /// <summary>Compare two instances of <see cref="OptionNone"/> for inequality.</summary>
+        /// <param name="left">The left instance of <see cref="OptionNone"/>.</param>
+        /// <param name="right">The right instance of <see cref="OptionNone"/>.</param>
+        /// <returns>
+        /// <see langword="true"/> if the two instances are unequal;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public static bool operator !=(OptionNone left, OptionNone right) => !(left == right);
+
+        #endregion
+
+        #region Overrides
+
+        #region object
+
+        /// <inheritdoc/>
+        [NotNull, Pure]
+        public override string ToString() => "None";
+
+        /// <inheritdoc/>
+        [Pure]
+        public override bool Equals(object obj) => obj is OptionNone;
+
+        /// <inheritdoc/>
+        [Pure]
+        public override int GetHashCode() => 0;
+
+        [NotNull, Pure, UsedImplicitly]
+        object ToDump() => new { State = "None" };
+
+        #endregion
+
+        #endregion
     }
 }

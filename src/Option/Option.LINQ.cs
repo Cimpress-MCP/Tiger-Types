@@ -24,7 +24,7 @@ using static Tiger.Types.Resources;
 
 namespace Tiger.Types
 {
-    /// <content>LINQ support.</content>
+    /// <summary>LINQ support.</summary>
     public static partial class Option
     {
         /// <summary>Determines whether an optional value contains a value.</summary>
@@ -35,7 +35,7 @@ namespace Tiger.Types
         /// otherwise, <see langword="false"/>.
         /// </returns>
         [Pure]
-        public static bool Any<TSource>(this Option<TSource> source) => source.IsSome;
+        public static bool Any<TSource>(in this Option<TSource> source) => source.IsSome;
 
         /// <summary>
         /// Determines whether an optional value contains a value that satisfies a condition.
@@ -52,10 +52,10 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is <see langword="null"/>.</exception>
         [Pure]
         public static bool Any<TSource>(
-            this Option<TSource> source,
+            in this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, bool> predicate)
         {
-            if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
+            if (predicate is null) { throw new ArgumentNullException(nameof(predicate)); }
 
             return source.Filter(predicate).IsSome;
         }
@@ -76,12 +76,12 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is <see langword="null" />.</exception>
         [Pure]
         public static bool All<TSource>(
-            this Option<TSource> source,
+            in this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, bool> predicate)
         {
-            if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
+            if (predicate is null) { throw new ArgumentNullException(nameof(predicate)); }
 
-            return source.IsNone || source.Filter(predicate).IsSome;
+            return !source.IsSome || source.Filter(predicate).IsSome;
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Tiger.Types
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         [Pure]
-        public static bool Contains<TSource>(this Option<TSource> source, [NotNull] TSource value)
+        public static bool Contains<TSource>(in this Option<TSource> source, [NotNull] TSource value)
         {
             if (value == null) { throw new ArgumentNullException(nameof(value)); }
 
@@ -106,7 +106,7 @@ namespace Tiger.Types
 
         /// <summary>
         /// Determines whether an optional value contains a specified value
-        /// by using a specified <see cref="IEqualityComparer{T}"/>.
+        /// by using the provided <see cref="IEqualityComparer{T}"/>.
         /// </summary>
         /// <typeparam name="TSource">The Some type of <paramref name="source"/>.</typeparam>
         /// <param name="source">An optional value in which to locate a value.</param>
@@ -119,7 +119,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
         [Pure]
         public static bool Contains<TSource>(
-            this Option<TSource> source,
+            in this Option<TSource> source,
             [NotNull] TSource value,
             [CanBeNull] IEqualityComparer<TSource> equalityComparer)
         {
@@ -139,8 +139,8 @@ namespace Tiger.Types
         /// the <typeparamref name="TSource"/> type as the Some value
         /// if <paramref name="source"/> is in the None state; otherwise; <paramref name="source"/>.
         /// </returns>
-        [EditorBrowsable(Never)]
-        public static Option<TSource> DefaultIfEmpty<TSource>(this Option<TSource> source)
+        [Pure, EditorBrowsable(Never)]
+        public static Option<TSource> DefaultIfEmpty<TSource>(in this Option<TSource> source)
             where TSource : struct => source.Recover(default(TSource));
 
         /// <summary>
@@ -156,9 +156,9 @@ namespace Tiger.Types
         /// otherwise, <paramref name="source"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="defaultValue"/> is <see langword="null"/>.</exception>
-        [EditorBrowsable(Never)]
+        [Pure, EditorBrowsable(Never)]
         public static Option<TSource> DefaultIfEmpty<TSource>(
-            this Option<TSource> source,
+            in this Option<TSource> source,
             [NotNull] TSource defaultValue)
         {
             if (defaultValue == null) { throw new ArgumentNullException(nameof(defaultValue)); }
@@ -174,10 +174,10 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="onNext"/> is <see langword="null"/>.</exception>
         [LinqTunnel, EditorBrowsable(Never)]
         public static Option<TSource> Do<TSource>(
-            this Option<TSource> source,
+            in this Option<TSource> source,
             [NotNull, InstantHandle] Action<TSource> onNext)
         {
-            if (onNext == null) { throw new ArgumentNullException(nameof(onNext)); }
+            if (onNext is null) { throw new ArgumentNullException(nameof(onNext)); }
 
             return source.Tap(onNext);
         }
@@ -190,10 +190,10 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="onNext"/> is <see langword="null"/>.</exception>
         [EditorBrowsable(Never)]
         public static Unit ForEach<TSource>(
-            this Option<TSource> source,
+            in this Option<TSource> source,
             [NotNull, InstantHandle] Action<TSource> onNext)
         {
-            if (onNext == null) { throw new ArgumentNullException(nameof(onNext)); }
+            if (onNext is null) { throw new ArgumentNullException(nameof(onNext)); }
 
             return source.Let(onNext);
         }
@@ -209,10 +209,10 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is <see langword="null"/>.</exception>
         [Pure, LinqTunnel, EditorBrowsable(Never)]
         public static Option<TSource> Where<TSource>(
-            this Option<TSource> source,
+            in this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, bool> predicate)
         {
-            if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
+            if (predicate is null) { throw new ArgumentNullException(nameof(predicate)); }
 
             return source.Filter(predicate);
         }
@@ -229,10 +229,10 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="selector"/> is <see langword="null"/>.</exception>
         [Pure, LinqTunnel, EditorBrowsable(Never)]
         public static Option<TResult> Select<TSource, TResult>(
-            this Option<TSource> source,
+            in this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, TResult> selector)
         {
-            if (selector == null) { throw new ArgumentNullException(nameof(selector)); }
+            if (selector is null) { throw new ArgumentNullException(nameof(selector)); }
 
             return source.Map(selector);
         }
@@ -254,10 +254,10 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="selector"/> is <see langword="null"/>.</exception>
         [Pure, LinqTunnel, EditorBrowsable(Never)]
         public static Option<TResult> SelectMany<TSource, TResult>(
-            this Option<TSource> source,
+            in this Option<TSource> source,
             [NotNull, InstantHandle] Func<TSource, Option<TResult>> selector)
         {
-            if (selector == null) { throw new ArgumentNullException(nameof(selector)); }
+            if (selector is null) { throw new ArgumentNullException(nameof(selector)); }
 
             return source.Bind(selector);
         }
@@ -283,7 +283,7 @@ namespace Tiger.Types
         /// <returns>
         /// An <see cref="Option{TSome}"/> whose Some value is the result of invoking the some-to-optional
         /// transform function <paramref name="optionalSelector"/> on the Some value of
-        /// <paramref name="source"/> and then mapping that Some value and their corresponding optional
+        /// <paramref name="source"/> and then mapping that Some value and its corresponding optional
         /// value to a result optional value.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="optionalSelector"/> is <see langword="null"/>.</exception>
@@ -294,10 +294,28 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TSource, Option<TOption>> optionalSelector,
             [NotNull, InstantHandle] Func<TSource, TOption, TResult> resultSelector)
         {
-            if (optionalSelector == null) { throw new ArgumentNullException(nameof(optionalSelector)); }
-            if (resultSelector == null) { throw new ArgumentNullException(nameof(resultSelector)); }
+            if (optionalSelector is null) { throw new ArgumentNullException(nameof(optionalSelector)); }
+            if (resultSelector is null) { throw new ArgumentNullException(nameof(resultSelector)); }
 
             return source.Bind(sv => source.Bind(optionalSelector).Map(cv => resultSelector(sv, cv)));
+        }
+
+        /// <summary>Applies an accumulator function over an optional value.</summary>
+        /// <typeparam name="TSource">The Some type of <paramref name="source"/>.</typeparam>
+        /// <typeparam name="TAccumulate">The type of the accumulator value.</typeparam>
+        /// <param name="source">An <see cref="Option{TSome}"/> to aggregate over.</param>
+        /// <param name="func">An accumulator function to invoke on the Some value.</param>
+        /// <returns>The final accumulator value.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
+        [Pure, EditorBrowsable(Never)]
+        public static TAccumulate Aggregate<TSource, TAccumulate>(
+            in this Option<TSource> source,
+            [NotNull, InstantHandle] Func<TAccumulate, TSource, TAccumulate> func)
+            where TAccumulate : struct
+        {
+            if (func is null) { throw new ArgumentNullException(nameof(func)); }
+
+            return source.Fold(default, func);
         }
 
         /// <summary>
@@ -308,18 +326,18 @@ namespace Tiger.Types
         /// <typeparam name="TAccumulate">The type of the accumulator value.</typeparam>
         /// <param name="source">An <see cref="Option{TSome}"/> to aggregate over.</param>
         /// <param name="seed">The initial accumulator value.</param>
-        /// <param name="func">An accumulator function to be invoked on the Some value.</param>
+        /// <param name="func">An accumulator function to invoke on the Some value.</param>
         /// <returns>The final accumulator value.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="seed"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
         [Pure, NotNull, EditorBrowsable(Never)]
         public static TAccumulate Aggregate<TSource, TAccumulate>(
-            this Option<TSource> source,
+            in this Option<TSource> source,
             [NotNull] TAccumulate seed,
             [NotNull, InstantHandle] Func<TAccumulate, TSource, TAccumulate> func)
         {
             if (seed == null) { throw new ArgumentNullException(nameof(seed)); }
-            if (func == null) { throw new ArgumentNullException(nameof(func)); }
+            if (func is null) { throw new ArgumentNullException(nameof(func)); }
 
             return source.Fold(seed, func);
         }
@@ -334,7 +352,7 @@ namespace Tiger.Types
         /// <typeparam name="TResult">The type of the resulting value.</typeparam>
         /// <param name="source">An <see cref="Option{TSome}"/> to aggregate over.</param>
         /// <param name="seed">The initial accumulator value.</param>
-        /// <param name="func">An accumulator value to be invoked on the Some value.</param>
+        /// <param name="func">An accumulator value to invoke on the Some value.</param>
         /// <param name="resultSelector">
         /// A function to transform the final accumulator value into the result value.
         /// </param>
@@ -344,14 +362,14 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="resultSelector"/> is <see langword="null"/>.</exception>
         [Pure, NotNull, EditorBrowsable(Never)]
         public static TResult Aggregate<TSource, TAccumulate, TResult>(
-            this Option<TSource> source,
+            in this Option<TSource> source,
             [NotNull] TAccumulate seed,
             [NotNull, InstantHandle] Func<TAccumulate, TSource, TAccumulate> func,
             [NotNull, InstantHandle] Func<TAccumulate, TResult> resultSelector)
         {
             if (seed == null) { throw new ArgumentNullException(nameof(seed)); }
-            if (func == null) { throw new ArgumentNullException(nameof(func)); }
-            if (resultSelector == null) { throw new ArgumentNullException(nameof(resultSelector)); }
+            if (func is null) { throw new ArgumentNullException(nameof(func)); }
+            if (resultSelector is null) { throw new ArgumentNullException(nameof(resultSelector)); }
 
             var result = source.Fold(seed, func).Pipe(resultSelector);
             Assume(result != null, ResultIsNull); // ReSharper disable once AssignNullToNotNullAttribute

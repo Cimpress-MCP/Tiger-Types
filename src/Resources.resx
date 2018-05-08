@@ -117,6 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="EitherConstructNull" xml:space="preserve">
+    <value>Attempted to initialize Tiger.Types.Either`2[TLeft,TRight] with null value.</value>
+    <comment>Explains initializing either with null.</comment>
+  </data>
   <data name="EitherIsBottom" xml:space="preserve">
     <value>This instance has not been initialized.</value>
     <comment>Explains use of a Bottom Either.</comment>
@@ -133,9 +137,9 @@
     <value>The provided type is not compatible with Tiger.Types.Option`1[TSome].</value>
     <comment>Explains that a provided type was not correct.</comment>
   </data>
-  <data name="IncompatibleValue" xml:space="preserve">
-    <value>The provided value is not compatible with Tiger.Types.Option`1[TSome].</value>
-    <comment>Explains that a provided value was not of the correct type.</comment>
+  <data name="OptionConstructNull" xml:space="preserve">
+    <value>Attempted to initialize Tiger.Types.Option`1[TSome] with null value.</value>
+    <comment>Explains initializing option with null.</comment>
   </data>
   <data name="OptionIsNone" xml:space="preserve">
     <value>This instance is in an invalid state.</value>
@@ -145,8 +149,12 @@
     <value>This result evaluated to null.</value>
     <comment>Explains evaluating an lambda and getting null.</comment>
   </data>
-  <data name="UnionDoesNotMatch" xml:space="preserve">
-    <value>This instance is not in the specified state.</value>
-    <comment>Explains forcibly unwrapping a Union incorrectly.</comment>
+  <data name="TryIsNotErr" xml:space="preserve">
+    <value>This instance is in an invalid state.</value>
+    <comment>Explains unwrapping of a Try in a state that is not Err.</comment>
+  </data>
+  <data name="TryIsNotOk" xml:space="preserve">
+    <value>This instance is in an invalid state.</value>
+    <comment>Explains unwrapping of a Try in a state that is not Ok.</comment>
   </data>
 </root>
