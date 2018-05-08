@@ -1,12 +1,12 @@
-### What's new in 5.0.0 (Released ????-??-??)
+### What's new in 5.0.0 (Released 2018-05-08)
 
 * The library has been refactored completely, consuming much of the functionality of the deprecated Tiger.ErrorTypes.
 * See [the wiki][] for migration details.
 * The library now supports multiple target frameworks.
 * Relevant types have been marked as `readonly`, increasing performance in some scenarios.
   * Accordingly, many methods have been annotated with `in`.
-* The `Error` type has been promoted from Tiger.ErrorTypes
-* The `Try<TErr, TOk>` type has arrived, providiong the functionality of an optional either.
+* The `Error` type has been promoted from Tiger.ErrorTypes.
+* The `Try<TErr, TOk>` type has arrived, providing the functionality of an optional either.
 
 [the wiki]: https://github.com/Cimpress-MCP/Tiger-Types/wiki/Migration-to-5.0
 
