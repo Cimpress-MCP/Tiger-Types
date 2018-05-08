@@ -1,3 +1,19 @@
+// <copyright file="Either.LINQ.cs" company="Cimpress, Inc.">
+//   Copyright 2017 Cimpress, Inc.
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+// </copyright>
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,20 +25,20 @@ using static Tiger.Types.Resources;
 
 namespace Tiger.Types
 {
-    /// <content>LINQ support.</content>
+    /// <summary>LINQ support.</summary>
     public static partial class Either
     {
-        /// <summary>Determines whether the either value contains a right value.</summary>
+        /// <summary>Determines whether the either value contains a Right value.</summary>
         /// <typeparam name="TLeftSource">The Left type of <paramref name="source"/>.</typeparam>
         /// <typeparam name="TRightSource">The Right type of <paramref name="source"/>.</typeparam>
         /// <param name="source">The <see cref="Either{TLeft,TRight}"/> to check for a Right state.</param>
         /// <returns>
-        /// <see langword="true"/> if the either value contains a right value;
+        /// <see langword="true"/> if the either value contains a Right value;
         /// otherwise <see langword="false"/>.
         /// </returns>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure]
-        public static bool Any<TLeftSource, TRightSource>(this Either<TLeftSource, TRightSource> source)
+        public static bool Any<TLeftSource, TRightSource>(in this Either<TLeftSource, TRightSource> source)
         {
             if (source.State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
@@ -30,7 +46,7 @@ namespace Tiger.Types
         }
 
         /// <summary>
-        /// Determines whether an either value contains a right value that satisfies a condition.
+        /// Determines whether an either value contains a Right value that satisfies a condition.
         /// </summary>
         /// <typeparam name="TLeftSource">The Left type of <paramref name="source"/>.</typeparam>
         /// <typeparam name="TRightSource">The Right type of <paramref name="source"/>.</typeparam>
@@ -46,17 +62,17 @@ namespace Tiger.Types
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure]
         public static bool Any<TLeftSource, TRightSource>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Func<TRightSource, bool> predicate)
         {
-            if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
+            if (predicate is null) { throw new ArgumentNullException(nameof(predicate)); }
             if (source.State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             return source.IsRight && predicate(source.Value);
         }
 
         /// <summary>
-        /// Determines whether an either value contains a right value that satisfies a condition.
+        /// Determines whether an either value contains a Right value that satisfies a condition.
         /// </summary>
         /// <typeparam name="TLeftSource">The Left type of <paramref name="source"/>.</typeparam>
         /// <typeparam name="TRightSource">The Right type of <paramref name="source"/>.</typeparam>
@@ -66,24 +82,24 @@ namespace Tiger.Types
         /// <param name="predicate">A function to test the Right value for a condition.</param>
         /// <returns>
         /// <see langword="true"/> if the Right value of the source either value passes the test
-        /// in the specified predicate, or if the source either is in the Left state;
+        /// in the specified predicate or if the source either is in the Left state;
         /// otherwise, <see langword="false"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure]
         public static bool All<TLeftSource, TRightSource>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Func<TRightSource, bool> predicate)
         {
-            if (predicate == null) { throw new ArgumentNullException(nameof(predicate)); }
+            if (predicate is null) { throw new ArgumentNullException(nameof(predicate)); }
             if (source.State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
-            return source.IsLeft || source.IsRight && predicate(source.Value);
+            return !source.IsRight || source.IsRight && predicate(source.Value);
         }
 
         /// <summary>
-        /// Determines whether an either value contains a specified right value
+        /// Determines whether an either value contains a specified Right value
         /// by using the default equality comparer.
         /// </summary>
         /// <typeparam name="TLeftSource">The Left type of <paramref name="source"/>.</typeparam>
@@ -98,7 +114,7 @@ namespace Tiger.Types
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure]
         public static bool Contains<TLeftSource, TRightSource>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull] TRightSource value)
         {
             if (value == null) { throw new ArgumentNullException(nameof(value)); }
@@ -108,8 +124,8 @@ namespace Tiger.Types
         }
 
         /// <summary>
-        /// Determines whether an either value contains a specified right value
-        /// by using a specified <see cref="IEqualityComparer{T}"/>.
+        /// Determines whether an either value contains a specified Right value
+        /// by using the provided <see cref="IEqualityComparer{T}"/>.
         /// </summary>
         /// <typeparam name="TLeftSource">The Left type of <paramref name="source"/>.</typeparam>
         /// <typeparam name="TRightSource">The Right type of <paramref name="source"/>.</typeparam>
@@ -124,7 +140,7 @@ namespace Tiger.Types
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure]
         public static bool Contains<TLeftSource, TRightSource>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull] TRightSource value,
             [CanBeNull] IEqualityComparer<TRightSource> equalityComparer)
         {
@@ -150,7 +166,7 @@ namespace Tiger.Types
         /// </returns>
         [Pure, EditorBrowsable(Never)]
         public static Either<TLeftSource, TRightSource> DefaultIfEmpty<TLeftSource, TRightSource>(
-            this Either<TLeftSource, TRightSource> source)
+            in this Either<TLeftSource, TRightSource> source)
             where TRightSource : struct => source.Recover(default(TRightSource));
 
         /// <summary>
@@ -171,7 +187,7 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="defaultValue"/> is <see langword="null"/>.</exception>
         [Pure, EditorBrowsable(Never)]
         public static Either<TLeftSource, TRightSource> DefaultIfEmpty<TLeftSource, TRightSource>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull] TRightSource defaultValue)
         {
             if (defaultValue == null) { throw new ArgumentNullException(nameof(defaultValue)); }
@@ -188,12 +204,12 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="onNext"/> is <see langword="null"/>.</exception>
         [LinqTunnel, EditorBrowsable(Never)]
         public static Either<TLeftSource, TRightSource> Do<TLeftSource, TRightSource>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Action<TRightSource> onNext)
         {
-            if (onNext == null) { throw new ArgumentNullException(nameof(onNext)); }
+            if (onNext is null) { throw new ArgumentNullException(nameof(onNext)); }
 
-            return source.Tap(onNext);
+            return source.Tap(right: onNext);
         }
 
         /// <summary>Invokes an action on the Right value of an either value.</summary>
@@ -205,10 +221,10 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="onNext"/> is <see langword="null"/>.</exception>
         [EditorBrowsable(Never)]
         public static Unit ForEach<TLeftSource, TRightSource>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Action<TRightSource> onNext)
         {
-            if (onNext == null) { throw new ArgumentNullException(nameof(onNext)); }
+            if (onNext is null) { throw new ArgumentNullException(nameof(onNext)); }
 
             return source.Let(onNext);
         }
@@ -227,10 +243,10 @@ namespace Tiger.Types
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure, LinqTunnel, EditorBrowsable(Never)]
         public static Either<TLeftSource, TResult> Select<TLeftSource, TRightSource, TResult>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Func<TRightSource, TResult> selector)
         {
-            if (selector == null) { throw new ArgumentNullException(nameof(selector)); }
+            if (selector is null) { throw new ArgumentNullException(nameof(selector)); }
             if (source.State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             return source.Map(selector);
@@ -255,10 +271,10 @@ namespace Tiger.Types
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure, LinqTunnel, EditorBrowsable(Never)]
         public static Either<TLeftSource, TResult> SelectMany<TLeftSource, TRightSource, TResult>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull, InstantHandle] Func<TRightSource, Either<TLeftSource, TResult>> selector)
         {
-            if (selector == null) { throw new ArgumentNullException(nameof(selector)); }
+            if (selector is null) { throw new ArgumentNullException(nameof(selector)); }
             if (source.State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             return source.Bind(selector);
@@ -286,7 +302,7 @@ namespace Tiger.Types
         /// <returns>
         /// An <see cref="Either{TLeft,TRight}"/> whose Right value is the result of invoking
         /// the right-to-either transform function <paramref name="eitherSelector"/> on the Right value
-        /// of <paramref name="source"/> and then mapping that Right value and their corresponding
+        /// of <paramref name="source"/> and then mapping that Right value and its corresponding
         /// either value to a result either value.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="eitherSelector"/> is <see langword="null"/>.</exception>
@@ -298,8 +314,8 @@ namespace Tiger.Types
             [NotNull, InstantHandle] Func<TRightSource, Either<TLeftSource, TEither>> eitherSelector,
             [NotNull, InstantHandle] Func<TRightSource, TEither, TResult> resultSelector)
         {
-            if (eitherSelector == null) { throw new ArgumentNullException(nameof(eitherSelector)); }
-            if (resultSelector == null) { throw new ArgumentNullException(nameof(resultSelector)); }
+            if (eitherSelector is null) { throw new ArgumentNullException(nameof(eitherSelector)); }
+            if (resultSelector is null) { throw new ArgumentNullException(nameof(resultSelector)); }
             if (source.State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             return source.Bind(sv => source.Bind(eitherSelector).Map(cv => resultSelector(sv, cv)));
@@ -311,19 +327,19 @@ namespace Tiger.Types
         /// <typeparam name="TAccumulate">The type of the accumulator value.</typeparam>
         /// <param name="source">An <see cref="Either{TLeft,TRight}"/> to aggregate over.</param>
         /// <param name="seed">The initial accumulator value.</param>
-        /// <param name="func">An accumulator function to be invoked on the Right value.</param>
+        /// <param name="func">An accumulator function to invoke on the Right value.</param>
         /// <returns>The final accumulator value.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="seed"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
         [Pure, NotNull, EditorBrowsable(Never)]
         public static TAccumulate Aggregate<TLeftSource, TRightSource, TAccumulate>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull] TAccumulate seed,
             [NotNull, InstantHandle] Func<TAccumulate, TRightSource, TAccumulate> func)
         {
             if (seed == null) { throw new ArgumentNullException(nameof(seed)); }
-            if (func == null) { throw new ArgumentNullException(nameof(func)); }
+            if (func is null) { throw new ArgumentNullException(nameof(func)); }
             if (source.State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             return source.Fold(seed, func);
@@ -340,7 +356,7 @@ namespace Tiger.Types
         /// <typeparam name="TResult">The type of the resulting value.</typeparam>
         /// <param name="source">An <see cref="Either{TLeft,TRight}"/> to aggregate over.</param>
         /// <param name="seed">The initial accumulator value.</param>
-        /// <param name="func">An accumulator function to be invoked on the Right value.</param>
+        /// <param name="func">An accumulator function to invoke on the Right value.</param>
         /// <param name="resultSelector">
         /// A function to transform the final accumulator value into the result value.
         /// </param>
@@ -349,17 +365,16 @@ namespace Tiger.Types
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="resultSelector"/> is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">This instance has not been initialized.</exception>
-        /// <exception cref="InvalidOperationException">This result evaluated to <see langword="null"/>.</exception>
         [Pure, NotNull, EditorBrowsable(Never)]
         public static TResult Aggregate<TLeftSource, TRightSource, TAccumulate, TResult>(
-            this Either<TLeftSource, TRightSource> source,
+            in this Either<TLeftSource, TRightSource> source,
             [NotNull] TAccumulate seed,
             [NotNull, InstantHandle] Func<TAccumulate, TRightSource, TAccumulate> func,
             [NotNull, InstantHandle] Func<TAccumulate, TResult> resultSelector)
         {
             if (seed == null) { throw new ArgumentNullException(nameof(seed)); }
-            if (func == null) { throw new ArgumentNullException(nameof(func)); }
-            if (resultSelector == null) { throw new ArgumentNullException(nameof(resultSelector)); }
+            if (func is null) { throw new ArgumentNullException(nameof(func)); }
+            if (resultSelector is null) { throw new ArgumentNullException(nameof(resultSelector)); }
             if (source.State == Bottom) { throw new InvalidOperationException(EitherIsBottom); }
 
             var result = source.Fold(seed, func).Pipe(resultSelector);

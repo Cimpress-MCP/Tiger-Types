@@ -1,4 +1,20 @@
-﻿using System;
+﻿// <copyright file="OptionTypeConverter.cs" company="Cimpress, Inc.">
+//   Copyright 2017 Cimpress, Inc.
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+// </copyright>
+
+using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -22,15 +38,15 @@ namespace Tiger.Types
         /// <summary>Initializes a new instance of the <see cref="OptionTypeConverter"/> class.</summary>
         /// <param name="type">The type from which to convert.</param>
         /// <exception cref="ArgumentNullException"><paramref name="type"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="type"/> is not compatible.</exception>
+        /// <exception cref="ArgumentException"><paramref name="type"/> is not compatible.</exception>
         public OptionTypeConverter([NotNull] Type type)
         {
-            if (type == null) { throw new ArgumentNullException(nameof(type)); }
+            if (type is null) { throw new ArgumentNullException(nameof(type)); }
 
-            if (!type.IsConstructedGenericType ||
-                type.GetGenericTypeDefinition() != typeof(Option<>))
+            if (!type.IsConstructedGenericType
+                || type.GetGenericTypeDefinition() != typeof(Option<>))
             {
-                throw new ArgumentOutOfRangeException(nameof(type), IncompatibleType);
+                throw new ArgumentException(IncompatibleType, nameof(type));
             }
 
             _conversionType = type; // note(cosborn) This is Option<TSome>.
@@ -49,9 +65,9 @@ namespace Tiger.Types
         public override object ConvertFrom(
             ITypeDescriptorContext context,
             CultureInfo culture,
-            [CanBeNull] object value)
+            object value)
         {
-            if (value == null) { return Activator.CreateInstance(_conversionType); }
+            if (value is null) { return Activator.CreateInstance(_conversionType); }
 
             if (Option.From(value as string).Any(s => s.Length == 0))
             { // note(cosborn) For TypeConverter purposes, an empty string is "no value."
@@ -59,10 +75,15 @@ namespace Tiger.Types
             }
 
             var typeInfo = _conversionType.GetTypeInfo();
-            var ctor = typeInfo.DeclaredConstructors.Single(c => c.GetParameters().Length == 1);
+            var ctor = typeInfo.DeclaredConstructors.Single(c =>
+            {
+                var parameters = c.GetParameters();
+                return parameters.Length == 1
+                    && parameters[0].ParameterType == _underlyingType;
+            });
 
             if (value.GetType() == _underlyingType)
-            { // note(cosborn) Since there's no other conversion to be done, wrap it up!
+            { // note(cosborn) Since there's no other conversion to do, wrap it up!
                 return ctor.Invoke(new[] { value });
             }
 
@@ -91,7 +112,7 @@ namespace Tiger.Types
             [CanBeNull] object value,
             Type destinationType)
         { // todo(cosborn) There is a strong possibility that this can be more efficient.
-            if (value == null)
+            if (value is null)
             {
                 return ConvertToNull(context, culture, destinationType);
             }
@@ -142,10 +163,8 @@ namespace Tiger.Types
         object ConvertToNull(
             [CanBeNull] ITypeDescriptorContext context,
             [CanBeNull] CultureInfo culture,
-            [NotNull] Type destinationType)
+            Type destinationType)
         {
-            if (destinationType == null) { throw new ArgumentNullException(nameof(destinationType)); }
-
             return Nullable.GetUnderlyingType(destinationType) == _underlyingType
                 ? null
                 : base.ConvertTo(context, culture, null, destinationType);

@@ -10,7 +10,10 @@ Tiger.Types is a library of useful types for C#, ones that are sometimes include
 
 ## Why You Want It
 
-These types and operations allow you to treat more operations in your .NET application as [monads](https://en.wikipedia.org/wiki/Monad_\(functional_programming\)#Motivating_examples), which frequently represent operations in more type-safe ways than .NET conventions.
+These types and operations allow you to treat more operations in your .NET application as [functors] or [monads], which frequently represent operations in more type-safe ways than .NET conventions.
+
+[functors]: https://en.wikipedia.org/wiki/Map_\(higher-order_function\)#Generalization
+[monads]: https://en.wikipedia.org/wiki/Monad_\(functional_programming\)#Motivating_examples
 
 Let’s use `Option<TSome>` for an example. In the following code, we’ll write a short method that converts a string to all upper-case.
 
@@ -108,7 +111,9 @@ Most of this library is allergic to `null`. It advertises where `null` is allowe
 
 ## How You Develop It
 
-This project is using the standard [`dotnet`](https://dot.net) build tool. A brief primer:
+This project is using the standard [`dotnet`] build tool. A brief primer:
+
+[`dotnet`]: https://dot.net
 
 - Restore NuGet dependencies: `dotnet restore`
 - Build the entire solution: `dotnet build`
@@ -120,7 +125,9 @@ The parameter `--configuration` (shortname `-c`) can be supplied to the `build`,
 - “Debug” (the default)
 - “Release”
 
-This repository is attempting to use the [GitFlow](http://jeffkreeftmeijer.com/2010/why-arent-you-using-git-flow/) branching methodology. Results may be mixed, please be aware.
+This repository is attempting to use the [GitFlow] branching methodology. Results may be mixed, please be aware.
+
+[GitFlow]: http://jeffkreeftmeijer.com/2010/why-arent-you-using-git-flow/
 
 ## Thank You
 
